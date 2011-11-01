@@ -55,10 +55,11 @@ SPELL_NETHER_PORTAL     = 66264,
 SPELL_LEGION_FLAME_0    = 66199,
 SPELL_LEGION_FLAME_1    = 66197,
 SPELL_SHIVAN_SLASH      = 67098,
-SPELL_SPINNING_STRIKE   = 66316,
+SPELL_SPINNING_STRIKE   = 66283,
 SPELL_FEL_INFERNO       = 67047,
 SPELL_FEL_STREAK        = 66494,
 SPELL_BERSERK           = 26662,
+SPELL_WILFRED_PORTAL        = 68424,
 };
 
 /*######
@@ -92,7 +93,6 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
             m_portalsCount = 1;
             m_volcanoCount = 4;
         }
-        DoScriptText(-1713517,m_creature);
         m_creature->SetRespawnDelay(DAY);
     }
 
@@ -106,11 +106,18 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
     void JustDied(Unit* pKiller)
     {
         if (!m_pInstance) return;
-            DoScriptText(-1713525,m_creature);
             m_pInstance->SetData(TYPE_JARAXXUS, DONE);
             m_pInstance->SetData(TYPE_EVENT,2000);
             m_pInstance->SetData(TYPE_STAGE,0);
     }
+
+    /*void JustSummoned(Creature *pSummoned)
+    {
+        if (pSummoned->GetEntry() == NPC_FEL_INFERNAL)
+        {
+            pSummoned->ForcedDespawn(20);
+        }
+    }*/
 
     void Aggro(Unit* pWho)
     {
@@ -119,6 +126,20 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
         m_pInstance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
         DoScriptText(-1713514,m_creature);
         doCast(SPELL_NETHER_POWER);
+    }
+
+    void KilledUnit(Unit* pVictim)
+    {
+        if (pVictim->GetTypeId() == TYPEID_PLAYER)
+        switch (urand(0,1))
+        {
+            case 0:
+                DoScriptText(-1713567,m_creature,pVictim);
+                break;
+            case 1:
+                DoScriptText(-1713568,m_creature,pVictim);
+                break;
+        };
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -134,6 +155,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
                     if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,1))
                            {
                            DoScriptText(-1713522,m_creature,pTarget);
+                           DoScriptText(-1713523,m_creature);
                            doCast(SPELL_INCINERATE_FLESH,pTarget);
                            }
                     }
@@ -155,6 +177,11 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
                              {
                 DoScriptText(-1713519,m_creature);
                 if (doCast(NPC_NETHER_PORTAL) == CAST_OK) --m_portalsCount;
+                 if (Creature* pMistress = m_pInstance->GetSingleCreatureFromStorage(NPC_NETHER_PORTAL)) 
+                 {
+                        pMistress->SetDisplayId(17612);
+                        pMistress->CastSpell(pMistress, SPELL_WILFRED_PORTAL, false);
+                 }
                 };
 
         DoMeleeAttackIfReady();
@@ -252,12 +279,12 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public BSWScriptedAI
     void Reset()
     {
         m_Timer = 15000;
-        m_creature->SetRespawnDelay(DAY);
         if (currentDifficulty != RAID_DIFFICULTY_10MAN_HEROIC && currentDifficulty != RAID_DIFFICULTY_25MAN_HEROIC) 
         {
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             m_Count = 3;
-        } else
+        } 
+        else
         {
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -277,6 +304,8 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public BSWScriptedAI
 
     void JustDied(Unit* Killer)
     {
+        m_creature->SetRespawnDelay(60);
+        m_creature->ForcedDespawn();
     }
 
     void Aggro(Unit *who)
@@ -329,6 +358,7 @@ struct MANGOS_DLL_DECL mob_fel_infernalAI : public BSWScriptedAI
 
     void JustDied(Unit* Killer)
     {
+        m_creature->ForcedDespawn(5000);
     }
 
     void Aggro(Unit *who)
@@ -412,6 +442,7 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public BSWScriptedAI
         if (m_Timer < diff && m_Count > 0) {
             DoCast(m_creature,SPELL_NETHER_PORTAL,false);
             DoScriptText(-1713521,m_creature);
+            m_creature->ForcedDespawn(6000);
             --m_Count;
             m_Timer = 60000;
             } else m_Timer -= diff;
@@ -455,8 +486,8 @@ struct MANGOS_DLL_DECL mob_mistress_of_painAI : public BSWScriptedAI
     void Aggro(Unit *who)
     {
         if (!m_pInstance) return;
-        DoScriptText(-1713523,m_creature, who);
     }
+
 
     void UpdateAI(const uint32 uiDiff)
     {

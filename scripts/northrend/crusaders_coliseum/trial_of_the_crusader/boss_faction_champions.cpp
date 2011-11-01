@@ -231,6 +231,24 @@ struct MANGOS_DLL_DECL mob_toc_druidAI : public boss_faction_championsAI
         SetEquipmentSlots(false, 51799, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
    }
 
+   /*void JustDied(Player *pPlayer, Unit *pKiller)
+   {
+        if (pPlayer->GetTeam() == ALLIANCE) 
+        {
+            if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_RINN)) 
+            {
+                DoScriptText(-1713567,pTemp);
+            }
+        }
+        else
+        {
+            if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_GARROSH)) 
+            {
+                DoScriptText(-1713588,pTemp);
+            }
+        };
+   }*/
+
     void UpdateAI(const uint32 diff)
     {
         if(!m_creature->SelectHostileTarget() || !m_creature->getVictim()) return;

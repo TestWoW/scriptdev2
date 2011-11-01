@@ -120,10 +120,12 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
         Reset();
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        m_bIsAlliance = true;
     }
 
     ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
+    bool m_bIsAlliance;
 
     uint32 Plague_Strike_Timer;
     uint32 Icy_Touch_Timer;
@@ -165,6 +167,14 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
             return;
         if (m_pInstance->GetData(TYPE_BLACK_KNIGHT) != DONE)
             m_pInstance->SetData(TYPE_BLACK_KNIGHT, IN_PROGRESS);
+
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster())
+        {
+            if (((Player*)pWho)->GetTeam() == ALLIANCE)
+                m_bIsAlliance = true;
+            else
+                m_bIsAlliance = false;
+        }
     }
 
     void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
@@ -188,6 +198,14 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
         {
             m_pInstance->SetData(TYPE_BLACK_KNIGHT, DONE);
         }
+
+        if (m_bIsAlliance)
+            m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 4296 : 4298);
+        else
+            m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 3778 : 4297);
+
+
+
 /*        if (phase2 && !phase1 && !phase3)
             if (!m_creature->isAlive())
             {

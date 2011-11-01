@@ -141,6 +141,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
                                if (GameObject* pChest = GetSingleGameObjectFromStorage(uiCacheEntry)) 
                                    if (!pChest->isSpawned()) 
                                        pChest->SetRespawnTime(7*DAY);
+                                       //pChest->ForcedDespawn(10000);
                             };
                             break;
         case TYPE_CRUSADERS_COUNT:  if (uiData == 0) --m_auiCrusadersCount;
@@ -252,6 +253,9 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
             case TYPE_EVENT_NPC: switch (m_auiEncounter[8]) 
                                  {
                                  case 110:
+                                 case 111:
+                                 case 115:
+                                 case 116:
                                  case 140:
                                  case 150:
                                  case 200:
@@ -300,6 +304,11 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
 
                                  case 130:
                                  case 132:
+                                 case 133:
+                                 case 134:
+                                 case 135:
+                                 case 136:
+                                 case 137:
                                  case 2020:
                                  case 3080:
                                  case 3051:
@@ -309,7 +318,20 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
                                  break;
 
                                  case 120:
+                                 case 121:
                                  case 122:
+                                 case 123:
+                                 case 124:
+                                 case 125:
+                                 case 126:
+                                 case 127:
+                                 case 128:
+                                 case 129:
+                                 case 1333:
+                                 case 1334:
+                                 case 1335:
+                                 case 1336:
+                                 case 1337:
                                  case 2010:
                                  case 3050:
                                  case 3070:

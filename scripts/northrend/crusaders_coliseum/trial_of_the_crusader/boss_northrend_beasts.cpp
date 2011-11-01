@@ -591,7 +591,13 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public BSWScriptedAI
                                     MovementStarted = true;
                                     m_creature->GetMotionMaster()->MovePoint(1, fPosX, fPosY, fPosZ);
                                     DoScriptText(-1713508,m_creature);
-                                    doCast(SPELL_ADRENALINE);
+            if (pTarget && pTarget->isAlive() && pTarget->IsWithinDistInMap(m_creature, 50.0f))
+            {
+               doCast(SPELL_ADRENALINE, pTarget);
+              // doRemove(SPELL_GASEOUS_BLOAT, pTarget);
+              // expunded = true;
+            };
+                                   // m_creature->CastSpell(m_creature->getVictim, SPELL_ADRENALINE, true);
                                     stage = 4;
                                     }
                         else        {

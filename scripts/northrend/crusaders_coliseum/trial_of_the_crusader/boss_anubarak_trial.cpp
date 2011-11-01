@@ -111,6 +111,14 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
         if (!m_pInstance) return;
             DoScriptText(-1713564,m_creature);
             m_pInstance->SetData(TYPE_ANUBARAK, DONE);
+        if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_10MAN_NORMAL) 
+            m_pInstance->DoCompleteAchievement(3917);
+        if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_25MAN_NORMAL) 
+            m_pInstance->DoCompleteAchievement(3916);
+        if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_10MAN_HEROIC) 
+            m_pInstance->DoCompleteAchievement(3918);
+        if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_25MAN_HEROIC) 
+            m_pInstance->DoCompleteAchievement(3812);
     }
 
     void Aggro(Unit* pWho)

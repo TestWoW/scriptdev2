@@ -175,6 +175,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
                       {
                             m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_LIGHT_VORTEX);
                             DoScriptText(-1713538,m_creature);
+                            DoScriptText(-1713542,m_creature);
                             stage = 1;
                             break;
                       };
@@ -332,6 +333,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
                       {
                             m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_DARK_VORTEX);
                             DoScriptText(-1713540,m_creature);
+                            DoScriptText(-1713546,m_creature);
                             stage = 1;
                             break;
                       };
