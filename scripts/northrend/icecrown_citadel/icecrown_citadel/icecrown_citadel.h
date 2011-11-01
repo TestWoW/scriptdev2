@@ -9,202 +9,180 @@
 
 enum
 {
-
-    TYPE_TELEPORT               = 0,
-    TYPE_MARROWGAR              = 1,
-    TYPE_DEATHWHISPER           = 2,
-    TYPE_FLIGHT_WAR             = 3,
-    TYPE_SAURFANG               = 4,
-    TYPE_FESTERGUT              = 5,
-    TYPE_ROTFACE                = 6,
-    TYPE_PUTRICIDE              = 7,
-    TYPE_BLOOD_COUNCIL          = 8,
-    TYPE_LANATHEL               = 9,
-    TYPE_VALITHRIA              = 10,
-    TYPE_SINDRAGOSA             = 11,
-    TYPE_KINGS_OF_ICC           = 12,
-    TYPE_LICH_KING              = 13,
-    TYPE_ICECROWN_QUESTS        = 14,
-    TYPE_COUNT                  = 15,
+    TYPE_TELEPORT                       = 0,
+    TYPE_MARROWGAR                      = 1,
+    TYPE_DEATHWHISPER                   = 2,
+    TYPE_FLIGHT_WAR                     = 3,
+    TYPE_SAURFANG                       = 4,
+    TYPE_FESTERGUT                      = 5,
+    TYPE_ROTFACE                        = 6,
+    TYPE_PUTRICIDE                      = 7,
+    TYPE_BLOOD_COUNCIL                  = 8,
+    TYPE_LANATHEL                       = 9,
+    TYPE_VALITHRIA                      = 10,
+    TYPE_SINDRAGOSA                     = 11,
+    TYPE_KINGS_OF_ICC                   = 12,
+    TYPE_LICH_KING                      = 13,
+    TYPE_ICECROWN_QUESTS                = 14,
+    TYPE_COUNT                          = 15,
     MAX_ENCOUNTERS,
 
     TYPE_STINKY,
     TYPE_PRECIOUS,
 
-    NPC_LORD_MARROWGAR          = 36612,
-    NPC_LADY_DEATHWHISPER       = 36855,
-    NPC_DEATHBRINGER_SAURFANG   = 37813,
-    NPC_FESTERGUT               = 36626,
-    NPC_ROTFACE                 = 36627,
-    NPC_PROFESSOR_PUTRICIDE     = 36678,
-    NPC_TALDARAM                = 37973,
-    NPC_VALANAR                 = 37970,
-    NPC_KELESETH                = 37972,
-    NPC_LANATHEL                = 37955,
-    NPC_VALITHRIA               = 36789,
-    NPC_VALITHRIA_QUEST         = 38589,
-    NPC_SINDRAGOSA              = 36853,
-    NPC_LICH_KING               = 36597,
+    NPC_LORD_MARROWGAR                  = 36612,
+    NPC_LADY_DEATHWHISPER               = 36855,
+    NPC_DEATHBRINGER_SAURFANG           = 37813,
+    NPC_FESTERGUT                       = 36626,
+    NPC_ROTFACE                         = 36627,
+    NPC_PROFESSOR_PUTRICIDE             = 36678,
+    NPC_TALDARAM                        = 37973,
+    NPC_VALANAR                         = 37970,
+    NPC_KELESETH                        = 37972,
+    NPC_LANATHEL                        = 37955,
 
-    NPC_LANATHEL_INTRO          = 38004,
-    NPC_BLOOD_ORB_CONTROL       = 38008,
+    NPC_CROK                            = 37129,
+    NPC_ARNATH                          = 37122,
+    NPC_BRANDON                         = 37123,
+    NPC_GRONDEL                         = 37124,
+    NPC_RUPERT                          = 37125,
+    NPC_SVALNA                          = 37126,
 
-    NPC_MURADIN                 = 36948,
+    NPC_VALITHRIA                       = 36789,
+    NPC_VALITHRIA_QUEST                 = 38589,
+    NPC_SINDRAGOSA                      = 36853,
+    NPC_LICH_KING                       = 36597,
 
-    NPC_TIRION                  = 38995,
-    NPC_MENETHIL                = 38579,
-    NPC_SPIRIT_WARDEN           = 38579,
+    NPC_LANATHEL_INTRO                  = 38004,
+    NPC_BLOOD_ORB_CONTROL               = 38008,
 
-    NPC_FROSTMOURNE_TRIGGER     = 38584,
-    NPC_FROSTMOURNE_HOLDER      = 27880,
+    NPC_MURADIN                         = 36948,
 
-    NPC_STINKY                  = 37025,
-    NPC_PRECIOUS                = 37217,
+    NPC_TIRION                          = 38995,
+    NPC_MENETHIL                        = 38579,
+    NPC_SPIRIT_WARDEN                   = 36824,
+    NPC_TERENAS_FROSTMOURNE             = 36823,
 
-    NPC_RIMEFANG                = 37533,
-    NPC_SPINESTALKER            = 37534,
+    NPC_FROSTMOURNE_TRIGGER             = 38584,
+    NPC_FROSTMOURNE_HOLDER              = 27880,
 
-    NPC_COMBAT_TRIGGER          = 38752,
+    NPC_STINKY                          = 37025,
+    NPC_PRECIOUS                        = 37217,
 
-    GO_TELEPORT_GOSSIP_MESSAGE  = 99323,
-    TELEPORT_GOSSIP_MESSAGE     = 99322,
+    NPC_RIMEFANG                        = 37533,
+    NPC_SPINESTALKER                    = 37534,
 
-    GO_ICEWALL_1                = 201911,
-    GO_ICEWALL_2                = 201910,
+    NPC_COMBAT_TRIGGER                  = 38752,
 
-    GO_MARROWGAR_DOOR           = 201857,
+    GO_TELEPORT_GOSSIP_MESSAGE          = 99323,
+    TELEPORT_GOSSIP_MESSAGE             = 99322,
 
-    GO_ORATORY_DOOR             = 201563,
-    GO_DEATHWHISPER_ELEVATOR    = 202220, //5653
+    GO_ICEWALL_1                        = 201911,
+    GO_ICEWALL_2                        = 201910,
 
-    GO_SAURFANG_DOOR            = 201825,
+    GO_MARROWGAR_DOOR                   = 201857,
 
-    GO_GAS_RELEASE_VALVE        = 201616, //72479
+    GO_ORATORY_DOOR                     = 201563,
+    GO_DEATHWHISPER_ELEVATOR            = 202220, //5653
 
-    GO_ORANGE_PLAGUE            = 201371, //72536
-    GO_GREEN_PLAGUE             = 201370, //72537
+    GO_SAURFANG_DOOR                    = 201825,
 
-    GO_SCIENTIST_DOOR_GREEN     = 201614, //72530
-    GO_SCIENTIST_DOOR_ORANGE    = 201613, //72531
-    GO_SCIENTIST_DOOR_COLLISION = 201612,
-    GO_SCIENTIST_DOOR           = 201372, //72541
+    GO_GAS_RELEASE_VALVE                = 201616, //72479
 
-    GO_BLOODWING_DOOR           = 201920, //72532
-    GO_CRIMSON_HALL_DOOR        = 201376, //72532
-    GO_COUNCIL_DOOR_1           = 201377, //72533
-    GO_COUNCIL_DOOR_2           = 201378, //72534
+    GO_ORANGE_PLAGUE                    = 201371, //72536
+    GO_GREEN_PLAGUE                     = 201370, //72537
 
-    GO_BLOODPRINCE_DOOR         = 201746,
-    GO_ICECROWN_GRATE           = 201755,
+    GO_SCIENTIST_DOOR_GREEN             = 201614, //72530
+    GO_SCIENTIST_DOOR_ORANGE            = 201613, //72531
+    GO_SCIENTIST_DOOR_COLLISION         = 201612,
+    GO_SCIENTIST_DOOR                   = 201372, //72541
 
-    GO_FROSTWING_DOOR           = 201919,
-    GO_GREEN_DRAGON_DOOR_1      = 201375, //1202
-    GO_GREEN_DRAGON_DOOR_2      = 201374, //1200
-    GO_VALITHRIA_DOOR_1         = 201380, //1618
-    GO_VALITHRIA_DOOR_2         = 201382, //1482
-    GO_VALITHRIA_DOOR_3         = 201383, //1335
-    GO_VALITHRIA_DOOR_4         = 201381, //1558
+    GO_BLOODWING_DOOR                   = 201920, //72532
+    GO_CRIMSON_HALL_DOOR                = 201376, //72532
+    GO_COUNCIL_DOOR_1                   = 201377, //72533
+    GO_COUNCIL_DOOR_2                   = 201378, //72534
 
-    GO_SINDRAGOSA_DOOR_1        = 201369, //1619
-    GO_SINDRAGOSA_DOOR_2        = 201379,
+    GO_BLOODPRINCE_DOOR                 = 201746,
+    GO_ICECROWN_GRATE                   = 201755,
 
-    GO_SINDRAGOSA_ENTRANCE      = 201373,
+    GO_FROSTWING_DOOR                   = 201919,
+    GO_GREEN_DRAGON_DOOR_1              = 201375, //1202
+    GO_GREEN_DRAGON_DOOR_2              = 201374, //1200
+    GO_VALITHRIA_DOOR_1                 = 201381, //1618
+    GO_VALITHRIA_DOOR_2                 = 201382, //1482
+    GO_VALITHRIA_DOOR_3                 = 201383, //1335
+    GO_VALITHRIA_DOOR_4                 = 201380, //1558
 
-    GO_FROZENTRONE_TR           = 202223, //72061
+    GO_SINDRAGOSA_DOOR_1                = 201369, //1619
+    GO_SINDRAGOSA_DOOR_2                = 201379,
 
-    GO_SAURFANG_CACHE_10        = 202239,
-    GO_SAURFANG_CACHE_25        = 202240,
-    GO_SAURFANG_CACHE_10_H      = 202238,
-    GO_SAURFANG_CACHE_25_H      = 202241,
+    GO_SINDRAGOSA_ENTRANCE              = 201373,
 
-    GO_GUNSHIP_ARMORY_A_10      = 201872, //
-    GO_GUNSHIP_ARMORY_A_25      = 201873, //
-    GO_GUNSHIP_ARMORY_A_10H     = 201874, //
-    GO_GUNSHIP_ARMORY_A_25H     = 201875, //
+    GO_SINDRAGOSA_ICEWALL               = 201385,
 
-    GO_GUNSHIP_ARMORY_H_10      = 202177, //
-    GO_GUNSHIP_ARMORY_H_25      = 202178, //
-    GO_GUNSHIP_ARMORY_H_10H     = 202179, //
-    GO_GUNSHIP_ARMORY_H_25H     = 202180, //
+    GO_FROZENTRONE_TR                   = 202223, //72061
 
-    GO_DREAMWALKER_CACHE_10      = 201959, //
-    GO_DREAMWALKER_CACHE_25      = 202339, //
-    GO_DREAMWALKER_CACHE_10_H    = 202338, //
-    GO_DREAMWALKER_CACHE_25_H    = 202340, //
+    GO_SAURFANG_CACHE_10                = 202239,
+    GO_SAURFANG_CACHE_25                = 202240,
+    GO_SAURFANG_CACHE_10_H              = 202238,
+    GO_SAURFANG_CACHE_25_H              = 202241,
 
-    GO_PLAGUE_SIGIL             = 202182,
-    GO_FROSTWING_SIGIL          = 202181,
-    GO_BLOODWING_SIGIL          = 202183,
+    GO_GUNSHIP_ARMORY_A_10              = 201872, //
+    GO_GUNSHIP_ARMORY_A_25              = 201873, //
+    GO_GUNSHIP_ARMORY_A_10H             = 201874, //
+    GO_GUNSHIP_ARMORY_A_25H             = 201875, //
 
-    GO_ICESHARD_1               = 202142, //8304
-    GO_ICESHARD_2               = 202141, //8364
-    GO_ICESHARD_3               = 202143, //8310
-    GO_ICESHARD_4               = 202144, //9007
+    GO_GUNSHIP_ARMORY_H_10              = 202177, //
+    GO_GUNSHIP_ARMORY_H_25              = 202178, //
+    GO_GUNSHIP_ARMORY_H_10H             = 202179, //
+    GO_GUNSHIP_ARMORY_H_25H             = 202180, //
 
-    GO_FROSTY_WIND              = 202188, //
-    GO_FROSTY_EDGE              = 202189, //
-    GO_SNOW_EDGE                = 202190, //
-    GO_ARTHAS_PLATFORM          = 202161, //
-    GO_ARTHAS_PRECIPICE         = 202078, //
+    GO_DREAMWALKER_CACHE_10             = 201959, //
+    GO_DREAMWALKER_CACHE_25             = 202339, //
+    GO_DREAMWALKER_CACHE_10_H           = 202338, //
+    GO_DREAMWALKER_CACHE_25_H           = 202340, //
 
-    TYPE_EVENT_TIMER            = 99,
-    TYPE_EVENT                  = 100,
-    TYPE_EVENT_NPC              = 101,
-    MAP_NUM                     = 631,
-    DATA_DIRECTION              = 1001,
-    DATA_BLOOD_INVOCATION       = 1002,
-    DESPAWN_TIME                = 300000,
-    SPELL_SHADOWS_EDGE          = 71168,
+    GO_PLAGUE_SIGIL                     = 202182,
+    GO_FROSTWING_SIGIL                  = 202181,
+    GO_BLOODWING_SIGIL                  = 202183,
 
-};
+    GO_ICESHARD_1                       = 202142, //8304
+    GO_ICESHARD_2                       = 202141, //8364
+    GO_ICESHARD_3                       = 202143, //8310
+    GO_ICESHARD_4                       = 202144, //9007
 
-class MANGOS_DLL_DECL instance_icecrown_spire : public BSWScriptedInstance
-{
-public:
-    instance_icecrown_spire(Map* pMap);
-    ~instance_icecrown_spire() {}
+    GO_FROSTY_WIND                      = 202188, //
+    GO_FROSTY_EDGE                      = 202189, //
+    GO_SNOW_EDGE                        = 202190, //
+    GO_ARTHAS_PLATFORM                  = 202161, //
+    GO_ARTHAS_PRECIPICE                 = 202078, //
 
-    void Initialize();
+    TYPE_EVENT_TIMER                    = 99,
+    TYPE_EVENT                          = 100,
+    TYPE_EVENT_NPC                      = 101,
+    MAP_NUM                             = 631,
+    DATA_DIRECTION                      = 1001,
+    DATA_BLOOD_INVOCATION               = 1002,
+    DESPAWN_TIME                        = 300000,
+    SPELL_SHADOWS_EDGE                  = 71168,
 
-    void OnObjectCreate(GameObject* pGo);
-    void OnCreatureCreate(Creature* pCreature);
+    MAX_SPECIAL_ACHIEV_CRITS            = 14,
 
-    void OpenAllDoors();
-    void OnPlayerEnter(Player* pPlayer);
-    bool IsEncounterInProgress();
+    TYPE_BONED                          = 0,
+    TYPE_FULL_HOUSE                     = 1,
+    TYPE_ON_THE_BOAT                    = 2,
+    TYPE_IVE_MADE_AND_MESS              = 3,
+    TYPE_DANCES_WITH_OOZES              = 4,
+    TYPE_FLU_SHORT_SHORTAGE             = 5,
+    TYPE_NAUSEA_HEATBURN_INDIGESTION    = 6,
+    TYPE_ORB_WHISPERER                  = 7,
+    TYPE_ONCE_BITTEN_TWICE_SHY_N        = 8,
+    TYPE_ONCE_BITTEN_TWICE_SHY_V        = 9,
+    TYPE_PORTAL_JOCKEY                  = 10,
+    TYPE_ALL_YOU_CAN_EAT                = 11,
+    TYPE_BEEN_WATING_A_LONG_TIME        = 12,
+    TYPE_NECK_DEEP_IN_VILE              = 13,
 
-    void SetData(uint32 uiType, uint32 uiData);
-    uint32 GetData(uint32 uiType);
-
-    const char* Save() { return strSaveData.c_str(); }
-    void Load(const char* chrIn);
-    bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/);
-
-private:
-
-    uint8 Difficulty;
-    bool needSave;
-    std::string strSaveData;
-
-    //Creatures GUID
-    uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
-
-    uint32 m_uiCouncilInvocation;
-
-    uint32 m_auiEvent;
-    uint32 m_auiEventTimer;
-    uint32 m_uiDirection;
-
-    uint32 m_uiStinkystate;
-    uint32 m_uiPreciousstate;
-    uint32 m_uiGunshipArmoryA_ID;
-    uint32 m_uiGunshipArmoryH_ID;
-    uint32 m_uiValithriaCache;
-    uint32 m_uiSaurfangCache;
-};
-
-enum AchievementCriteriaIds
-{
     // Lord Marrowgar
     CRITERIA_BONED_10N                  = 12775,
     CRITERIA_BONED_25N                  = 12962,
@@ -238,4 +216,72 @@ enum AchievementCriteriaIds
     CRITERIA_ONCE_BITTEN_TWICE_SHY_25V  = 13013,
 };
 
+class MANGOS_DLL_DECL instance_icecrown_spire : public BSWScriptedInstance
+{
+public:
+    instance_icecrown_spire(Map* pMap);
+    ~instance_icecrown_spire() {}
+
+    void Initialize();
+
+    void OnObjectCreate(GameObject* pGo);
+    void OnCreatureCreate(Creature* pCreature);
+
+    void OpenAllDoors();
+    void OnPlayerEnter(Player* pPlayer);
+    bool IsEncounterInProgress();
+
+    void SetData(uint32 uiType, uint32 uiData);
+    uint32 GetData(uint32 uiType);
+
+    const char* Save() { return strSaveData.c_str(); }
+    void Load(const char* chrIn);
+    void SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet);
+    bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/);
+
+private:
+
+    uint8 Difficulty;
+    bool needSave;
+    std::string strSaveData;
+    bool m_abAchievCriteria[MAX_SPECIAL_ACHIEV_CRITS];
+
+    //Creatures GUID
+    uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
+
+    uint32 m_uiCouncilInvocation;
+
+    uint32 m_auiEvent;
+    uint32 m_auiEventTimer;
+    uint32 m_uiDirection;
+
+    uint32 m_uiStinkystate;
+    uint32 m_uiPreciousstate;
+    uint32 m_uiGunshipArmoryA_ID;
+    uint32 m_uiGunshipArmoryH_ID;
+    uint32 m_uiValithriaCache;
+    uint32 m_uiSaurfangCache;
+};
+
+struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
+{
+    base_icc_bossAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
+        Reset();
+    }
+
+    ScriptedInstance* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
+
+    void Reset(){}
+    void UpdateAI(const uint32 uiDiff){}
+};
+
 #endif
+

@@ -85,6 +85,9 @@ static Locations SpawnLoc[]=
         for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
             m_auiEncounter[i] = NOT_STARTED;
 
+        for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS; ++i)
+            m_abAchievCriteria[i] = false;
+
         m_auiEncounter[0] = 0;
 
         m_auiEvent = 0;
@@ -179,6 +182,8 @@ static Locations SpawnLoc[]=
             case NPC_KELESETH:
             case NPC_LANATHEL:
             case NPC_LANATHEL_INTRO:
+            case NPC_SVALNA:
+            case NPC_CROK:
             case NPC_VALITHRIA:
             case NPC_VALITHRIA_QUEST:
             case NPC_SINDRAGOSA:
@@ -254,6 +259,7 @@ static Locations SpawnLoc[]=
             case GO_BLOODPRINCE_DOOR:
             case GO_ICECROWN_GRATE:
             case GO_SINDRAGOSA_ENTRANCE:
+            case GO_SINDRAGOSA_ICEWALL:
                 m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
                 break;
             }
@@ -268,7 +274,10 @@ static Locations SpawnLoc[]=
             case TYPE_MARROWGAR:
                 m_auiEncounter[TYPE_MARROWGAR] = uiData;
                 if (uiData == IN_PROGRESS)
+                {
                     DoCloseDoor(GO_MARROWGAR_DOOR);
+                    SetSpecialAchievementCriteria(TYPE_BONED, true);
+                }
                 else DoOpenDoor(GO_MARROWGAR_DOOR);
 
                 if (uiData == DONE)
@@ -297,17 +306,20 @@ static Locations SpawnLoc[]=
              case TYPE_FLIGHT_WAR:
                 if (uiData == DONE && m_auiEncounter[TYPE_FLIGHT_WAR] != DONE  )
                 {
-                                if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiGunshipArmoryA_ID))
-                                    if (pChest && !pChest->isSpawned())
-                                    {
-                                        pChest->SetRespawnTime(7*DAY);
-                                    };
-
-                                if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiGunshipArmoryH_ID))
-                                    if (pChest && !pChest->isSpawned())
-                                    {
-                                        pChest->SetRespawnTime(7*DAY);
-                                    };
+                    if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiGunshipArmoryA_ID))
+                    {
+                        if (pChest && !pChest->isSpawned()) 
+                        {
+                            pChest->SetRespawnTime(7*DAY);
+                        }
+                    }
+                    if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiGunshipArmoryH_ID))
+                    {
+                        if (pChest && !pChest->isSpawned()) 
+                        {
+                            pChest->SetRespawnTime(7*DAY);
+                        }
+                    }
                 };
                 m_auiEncounter[3] = uiData;
                 break;
@@ -407,30 +419,63 @@ static Locations SpawnLoc[]=
                 m_auiEncounter[TYPE_VALITHRIA] = uiData;
 
                 if (uiData == IN_PROGRESS)
-                    DoCloseDoor(GO_GREEN_DRAGON_DOOR_1);
-                else
-                    DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
-
-                if (uiData == DONE)
                 {
+                    DoCloseDoor(GO_GREEN_DRAGON_DOOR_1);
+                    DoOpenDoor(GO_VALITHRIA_DOOR_1);
+                    DoOpenDoor(GO_VALITHRIA_DOOR_2);
+                    if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
+                        instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                    {
+                        DoOpenDoor(GO_VALITHRIA_DOOR_3);
+                        DoOpenDoor(GO_VALITHRIA_DOOR_4);
+                    }
+                }
+                else if (uiData == DONE)
+                {
+                    DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
                     DoOpenDoor(GO_GREEN_DRAGON_DOOR_2);
                     DoOpenDoor(GO_SINDRAGOSA_DOOR_1);
                     DoOpenDoor(GO_SINDRAGOSA_DOOR_2);
+                    DoCloseDoor(GO_VALITHRIA_DOOR_1);
+                    DoCloseDoor(GO_VALITHRIA_DOOR_2);
+                    if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
+                        instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                    {
+                        DoCloseDoor(GO_VALITHRIA_DOOR_3);
+                        DoCloseDoor(GO_VALITHRIA_DOOR_4);
+                    }
                     if (GameObject* pChest = GetSingleGameObjectFromStorage( m_uiValithriaCache))
+                    {
                         if (pChest && !pChest->isSpawned())
-                        {
                             pChest->SetRespawnTime(7*DAY);
-                        };
-                };
+                    }
+                }
+                else
+                {
+                    DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
+                    DoCloseDoor(GO_VALITHRIA_DOOR_1);
+                    DoCloseDoor(GO_VALITHRIA_DOOR_2);
+                    if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
+                        instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                    {
+                        DoCloseDoor(GO_VALITHRIA_DOOR_3);
+                        DoCloseDoor(GO_VALITHRIA_DOOR_4);
+                    }
+                }
                 break;
              case TYPE_SINDRAGOSA:
                 m_auiEncounter[TYPE_SINDRAGOSA] = uiData;
 
                 if (uiData == IN_PROGRESS)
-                    DoCloseDoor(GO_SINDRAGOSA_ENTRANCE);
+                //{
+                    DoCloseDoor(GO_SINDRAGOSA_ICEWALL);
+                    //DoCloseDoor(GO_SINDRAGOSA_ENTRANCE);
+                //}
                 else
-                    DoOpenDoor(GO_SINDRAGOSA_ENTRANCE);
-
+                //{
+                    DoOpenDoor(GO_SINDRAGOSA_ICEWALL);
+                    //DoOpenDoor(GO_SINDRAGOSA_ENTRANCE);
+                //}
                 if (uiData == DONE)
                 {
                     if (m_auiEncounter[TYPE_PUTRICIDE] == DONE
@@ -506,96 +551,108 @@ static Locations SpawnLoc[]=
              case TYPE_EVENT_TIMER:   return m_auiEventTimer;
              case TYPE_EVENT_NPC:     switch (m_auiEvent)
                                          {
-                                          case 12030:
-                                          case 12050:
-                                          case 12051:
-                                          case 12052:
-                                          case 12053:
-                                          case 12070:
-                                          case 12090:
-                                          case 12110:
-                                          case 12130:
-                                          case 12150:
-                                          case 12170:
-                                          case 13110:
-                                          case 13130:
-                                          case 13131:
-                                          case 13132:
-                                          case 13150:
-                                          case 13170:
-                                          case 13190:
-                                          case 13210:
-                                          case 13230:
-                                          case 13250:
-                                          case 13270:
-                                          case 13290:
-                                          case 13310:
-                                          case 13330:
-                                          case 13350:
-                                          case 13370:
-                                          case 14010:
-                                          case 14030:
-                                          case 14050:
-                                          case 14070:
-                                                 return NPC_TIRION;
-                                                 break;
+                                         case 12030:
+                                         case 12050:
+                                         case 12051:
+                                         case 12052:
+                                         case 12053:
+                                         case 12070:
+                                         case 12090:
+                                         case 12110:
+                                         case 12130:
+                                         case 12150:
+                                         case 12170:
+                                         case 13110:
+                                         case 13111:
+                                         case 13130:
+                                         case 13131:
+                                         case 13132:
+                                         case 13133:
+                                         case 13134:
+                                         case 13135:
+                                         case 13139:
+                                         case 13150:
+                                         case 13170:
+                                         case 13190:
+                                         case 13210:
+                                         case 13230:
+                                         case 13250:
+                                         case 13270:
+                                         case 13290:
+                                         case 13310:
+                                         case 13330:
+                                         case 13350:
+                                         case 13370:
+                                         case 14009:
+                                         case 14010:
+                                         case 14030:
+                                         case 14050:
+                                         case 14070:
+                                                return NPC_TIRION;
+                                                break;
 
-                                          case 12000:
-                                          case 12020:
-                                          case 12040:
-                                          case 12041:
-                                          case 12042:
-                                          case 12043:
-                                          case 12060:
-                                          case 12080:
-                                          case 12100:
-                                          case 12120:
-                                          case 12200:
-                                          case 13000:
-                                          case 13020:
-                                          case 13040:
-                                          case 13060:
-                                          case 13080:
-                                          case 13100:
-                                          case 13120:
-                                          case 13140:
-                                          case 13160:
-                                          case 13180:
-                                          case 13200:
-                                          case 13220:
-                                          case 13240:
-                                          case 13260:
-                                          case 13280:
-                                          case 13300:
-                                          case 14000:
-                                                 return NPC_LICH_KING;
-                                                 break;
-                                          case 500:
-                                          case 510:
-                                          case 550:
-                                          case 560:
-                                          case 570:
-                                          case 580:
-                                          case 590:
-                                          case 600:
-                                          case 610:
-                                          case 620:
-                                          case 630:
-                                          case 640:
-                                          case 650:
-                                          case 660:
-                                                 return NPC_PROFESSOR_PUTRICIDE;
-                                                 break;
+                                         case 12000:
+                                         case 12020:
+                                         case 12040:
+                                         case 12041:
+                                         case 12042:
+                                         case 12043:
+                                         case 12060:
+                                         case 12080:
+                                         case 12100:
+                                         case 12120:
+                                         case 12200:
+                                         case 12995:
+                                         case 12996:
+                                         case 12997:
+                                         case 12998:
+                                         case 12999:
+                                         case 13000:
+                                         case 13005:
+                                         case 13020:
+                                         case 13040:
+                                         case 13060:
+                                         case 13080:
+                                         case 13100:
+                                         case 13120:
+                                         case 13140:
+                                         case 13160:
+                                         case 13180:
+                                         case 13200:
+                                         case 13220:
+                                         case 13240:
+                                         case 13260:
+                                         case 13280:
+                                         case 13300:
+                                         case 14000:
+                                                return NPC_LICH_KING;
+                                                break;
+                                         case 500:
+                                         case 510:
+                                         case 550:
+                                         case 560:
+                                         case 570:
+                                         case 580:
+                                         case 590:
+                                         case 600:
+                                         case 610:
+                                         case 620:
+                                         case 630:
+                                         case 640:
+                                         case 650:
+                                         case 660:
+                                                return NPC_PROFESSOR_PUTRICIDE;
+                                                break;
 
-                                          case 800:
-                                          case 810:
-                                          case 820:
-                                                 return NPC_LANATHEL_INTRO;
-                                                 break;
+                                         case 800:
+                                         case 810:
+                                         case 820:
+                                                return NPC_LANATHEL_INTRO;
+                                                break;
 
-                                          default:
-                                                 break;
-                                          };
+                                         default:
+                                                break;
+                                         };
 
         }
         return 0;
@@ -625,9 +682,24 @@ static Locations SpawnLoc[]=
         OpenAllDoors();
     }
 
-    bool instance_icecrown_spire::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* player, Unit const* /*target*/, uint32 /*miscvalue1*/)
+    bool instance_icecrown_spire::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
     {
-        return GetCriteriaState(criteria_id, player);
+        switch (uiCriteriaId)
+        {
+        case CRITERIA_BONED_10N:
+        case CRITERIA_BONED_25N:
+        case CRITERIA_BONED_10H:
+        case CRITERIA_BONED_25H:
+            return m_abAchievCriteria[TYPE_BONED];
+        default:
+             return false;
+        }
+    }
+
+    void instance_icecrown_spire::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
+    {
+        if (uiType < MAX_SPECIAL_ACHIEV_CRITS)
+            m_abAchievCriteria[uiType] = bIsMet;
     }
 
 InstanceData* GetInstanceData_instance_icecrown_spire(Map* pMap)
@@ -644,3 +716,4 @@ void AddSC_instance_icecrown_spire()
     pNewScript->GetInstanceData = &GetInstanceData_instance_icecrown_spire;
     pNewScript->RegisterSelf();
 }
+

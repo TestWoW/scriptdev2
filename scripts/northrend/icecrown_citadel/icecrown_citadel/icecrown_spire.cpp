@@ -25,7 +25,6 @@ EndScriptData */
 #include "icecrown_citadel.h"
 enum
 {
-        SPELL_BERSERK                           = 47008,
         SPELL_FROST_BREATH                      = 70116,
         SPELL_BLIZZARD                          = 70362,
         SPELL_CLEAVE                            = 70361,
@@ -41,6 +40,7 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public BSWScriptedAI
     mob_spire_frostwyrmAI(Creature* pCreature) : BSWScriptedAI(pCreature)
     {
         pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         Reset();
     }
 
@@ -49,7 +49,9 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public BSWScriptedAI
 
     void Reset()
     {
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         m_creature->SetRespawnDelay(DAY);
+
         stage = 0;
         resetTimers();
     }
@@ -59,26 +61,9 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public BSWScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        switch(stage)
-        {
-            case 0:
-                    break;
-            case 1:
-                    doCast(SPELL_BERSERK);
-                    stage = 2;
-                    break;
-            case 2:
-            default:
-                    break;
-        }
-
         timedCast(SPELL_CLEAVE, diff);
         timedCast(SPELL_BLIZZARD, diff);
         timedCast(SPELL_FROST_BREATH, diff);
-
-        if (m_creature->GetHealthPercent() < 10.0f && stage == 0) stage = 1;
-
-        timedCast(SPELL_BERSERK, diff);
 
         DoMeleeAttackIfReady();
 
@@ -108,14 +93,16 @@ struct MANGOS_DLL_DECL mob_frost_giantAI : public BSWScriptedAI
 
     void JustDied(Unit *killer)
     {
-        if(!pInstance) return;
+        if(!pInstance)
+            return;
         if (killer->GetTypeId() == TYPEID_PLAYER || killer->GetCharmerOrOwnerOrSelf()->GetTypeId() == TYPEID_PLAYER )
               pInstance->SetData(TYPE_FLIGHT_WAR, DONE);
     }
 
     void JustReachedHome()
     {
-        if (pInstance) pInstance->SetData(TYPE_FLIGHT_WAR, FAIL);
+        if (pInstance)
+            pInstance->SetData(TYPE_FLIGHT_WAR, FAIL);
     }
 
     void Reset()
@@ -130,24 +117,8 @@ struct MANGOS_DLL_DECL mob_frost_giantAI : public BSWScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        switch(stage)
-        {
-            case 0:
-                    break;
-            case 1:
-                    doCast(SPELL_BERSERK);
-                    stage = 2;
-                    break;
-            case 2:
-            default:
-                    break;
-        }
         timedCast(SPELL_STOMP, diff);
         timedCast(SPELL_DEATH_PLAGUE, diff);
-
-        if (m_creature->GetHealthPercent() < 2.0f && stage == 0) stage = 1;
-
-        timedCast(SPELL_BERSERK, diff);
 
         DoMeleeAttackIfReady();
 
@@ -173,3 +144,4 @@ void AddSC_icecrown_spire()
     newscript->GetAI = &GetAI_mob_frost_giant;
     newscript->RegisterSelf();
 }
+
