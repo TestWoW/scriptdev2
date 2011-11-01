@@ -16,22 +16,13 @@
 
 /* ScriptData
 SDName: boss_ragefire
-SD%Complete: 90%
-SDComment: by notagain && /dev/rsa
-SDCategory: Ruby Sanctum
+SD%Complete: 99%
+SDComment: by notagain && /dev/rsa && carlos93
+SDCategory: ruby_sanctum
 EndScriptData */
 
 #include "precompiled.h"
 #include "ruby_sanctum.h"
-
-enum
-{
-    SAY_AGGRO                   = -1666400,
-    SAY_SLAY_1                  = -1666401,
-    SAY_SLAY_2                  = -1666402,
-    SAY_SPECIAL                 = -1666404,
-    SOUND_DEATH                 = -1666403,                 // On death it has only a screaming sound
-};
 
 enum BossSpells
 {
@@ -43,6 +34,16 @@ enum BossSpells
     SPELL_CONFLAGATION_2             = 74456, // Aura
 
     MAX_BEACON_TARGETS               = 5,
+};
+
+enum Yells
+{
+    SAY_AGGRO                        = -1666400,
+    SAY_SLAY_1                       = -1666401,
+    SAY_SLAY_2                       = -1666402,
+    SAY_DEATH                        = -1666403,
+    SAY_SPECIAL                      = -1666404,
+    SAY_ENRAGE                       = -1666405
 };
 
 static Locations SpawnLoc[]=
@@ -62,8 +63,12 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
     ScriptedInstance *pInstance;
     uint8 nextPoint;
     Unit* marked[MAX_BEACON_TARGETS];
+    uint32 m_uiFlyTimer;
+    uint32 m_uiWaitTimer;
+    uint32 m_uiEnrageTimer;
     bool MovementStarted;
     bool conflagated;
+    bool goLand;
 
     void Reset()
     {
@@ -74,7 +79,13 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
         resetTimers();
         setStage(0);
         nextPoint = 0;
+        m_creature->SetSpeedRate(MOVE_WALK, 3);
+        m_creature->SetSpeedRate(MOVE_RUN, 3);
+        m_uiFlyTimer = 50000;
+        m_uiEnrageTimer = urand(20000,30000);
+        m_uiWaitTimer = 5000;
         conflagated = false;
+        goLand = false;
         for (uint8 i = 0; i < MAX_BEACON_TARGETS; ++i)
             marked[i] = NULL;
     }
@@ -85,10 +96,11 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
 
         if (type != POINT_MOTION_TYPE || !MovementStarted) return;
 
-        if (id == nextPoint) {
-                m_creature->GetMotionMaster()->MovementExpired();
-                MovementStarted = false;
-                }
+        if (id == nextPoint)
+        {
+            m_creature->GetMotionMaster()->MovementExpired();
+            MovementStarted = false;
+        }
     }
 
     void SetFly(bool command = false)
@@ -120,10 +132,10 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
     {
     switch (urand(0,1)) {
         case 0:
-               DoScriptText(SAY_SLAY_1,m_creature,pVictim);
+               DoScriptText(SAY_SLAY_1, m_creature, pVictim);
                break;
         case 1:
-               DoScriptText(SAY_SLAY_2,m_creature,pVictim);
+               DoScriptText(SAY_SLAY_2, m_creature, pVictim);
                break;
         };
     }
@@ -132,15 +144,20 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
     {
         if (pInstance)
             pInstance->SetData(TYPE_RAGEFIRE, FAIL);
+        resetTimers();
+        m_uiFlyTimer = 50000;
+        m_uiEnrageTimer = urand(20000,30000);
+        m_uiWaitTimer = 5000;
+        conflagated = false;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) 
     {
         if(!pInstance) return;
 
         pInstance->SetData(TYPE_RAGEFIRE, IN_PROGRESS);
         m_creature->SetInCombatWithZone();
-        DoScriptText(SAY_AGGRO,m_creature);
+        DoScriptText(SAY_AGGRO, m_creature, who);
     }
 
     void JustDied(Unit *killer)
@@ -148,7 +165,7 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
         if(!pInstance) return;
 
         pInstance->SetData(TYPE_RAGEFIRE, DONE);
-        DoScriptText(SOUND_DEATH,m_creature);
+        DoScriptText(SAY_DEATH, m_creature, killer);
     }
 
     void doBeacon(bool command = false)
@@ -189,46 +206,60 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
         {
             case 0: //GROUND
                  timedCast(SPELL_FLAME_BREATH, diff);
-                 timedCast(SPELL_ENRAGE, diff);
-                 if ( m_creature->GetHealthPercent() <= 80.0f) setStage(1);
+
+                 if (m_uiEnrageTimer < diff)
+                 {
+                     if(DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
+                     {
+                         m_uiEnrageTimer = urand(20000,30000);
+                         DoScriptText(SAY_ENRAGE, m_creature);
+                     }
+                 }
+                 else m_uiEnrageTimer -= diff;
+
+                 if (m_uiFlyTimer < diff)
+                 {
+                     setStage(1);
+                     m_uiFlyTimer = 50000;
+                 }
+                 else m_uiFlyTimer -= diff;
+                 DoMeleeAttackIfReady();
                  break;
 
             case 1: //Air phase start
                  SetCombatMovement(false);
                  m_creature->InterruptNonMeleeSpells(true);
                  SetFly(true);
-                 doBeacon(true);
                  StartMovement(1);
                  setStage(2);
                  break;
 
             case 2: // Wait for movement
                  if (MovementStarted) return;
-                 doCast(SPELL_CONFLAGATION);
-                 DoScriptText(SAY_SPECIAL,m_creature);
                  setStage(3);
                  break;
 
-            case 3: // Wait for cast finish
-                 if (!m_creature->IsNonMeleeSpellCasted(false))
+            case 3: // Beacons
+                 doBeacon(true);
+                 if (m_uiWaitTimer < diff)
                  {
-                     doBeacon(false);
                      setStage(4);
-                 };
+                     m_uiWaitTimer = 5000;
+                 }
+                 else m_uiWaitTimer -= diff;
                  break;
 
-            case 4: // Air phase
+            case 4: // Conflagate
                  timedCast(SPELL_FLAME_BREATH, diff);
-                 if (timedQuery(SPELL_BEACON, diff))
-                     {
-                         doBeacon(true);
-                         doCast(SPELL_CONFLAGATION);
-                     };
-                 if (conflagated && timedQuery(SPELL_CONFLAGATION_1, diff))
+                 if (conflagated)
                      {
                          doBeacon(false);
+                         doCast(SPELL_CONFLAGATION);
+                         DoScriptText(SAY_SPECIAL, m_creature);
+                         goLand = true;
                      };
-                 if ( m_creature->GetHealthPercent() <= 60.0f) setStage(5);
+                 if (goLand)
+                     setStage(5);
                  break;
 
             case 5: //Air phase end
@@ -242,77 +273,12 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public BSWScriptedAI
                  SetCombatMovement(true);
                  m_creature->GetMotionMaster()->Clear();
                  m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                 setStage(7);
-                 break;
-
-            case 7: //GROUND
-                 timedCast(SPELL_FLAME_BREATH, diff);
-                 timedCast(SPELL_ENRAGE, diff);
-                 if ( m_creature->GetHealthPercent() <= 40.0f) setStage(8);
-                 break;
-
-            case 8: //Air phase start
-                 SetCombatMovement(false);
-                 m_creature->InterruptNonMeleeSpells(true);
-                 SetFly(true);
-                 doBeacon(true);
-                 StartMovement(1);
-                 setStage(9);
-                 break;
-
-            case 9: // Wait for movement
-                 if (MovementStarted) return;
-                 doCast(SPELL_CONFLAGATION);
-                 DoScriptText(SAY_SPECIAL,m_creature);
-                 setStage(10);
-                 break;
-
-            case 10: // Wait for cast finish
-                 if (!m_creature->IsNonMeleeSpellCasted(false))
-                 {
-                     doBeacon(false);
-                     setStage(11);
-                 };
-                 break;
-
-            case 11: // Air phase
-                 timedCast(SPELL_FLAME_BREATH, diff);
-                 if (timedQuery(SPELL_BEACON, diff))
-                     {
-                         doBeacon(true);
-                         doCast(SPELL_CONFLAGATION);
-                     };
-                 if (conflagated && timedQuery(SPELL_CONFLAGATION_1, diff))
-                     {
-                         doBeacon(false);
-                     };
-                 if ( m_creature->GetHealthPercent() <= 20.0f) setStage(12);
-                 break;
-
-            case 12: //Air phase end
-                 StartMovement(0);
-                 setStage(13);
-                 break;
-
-            case 13: // Wait for movement
-                 if (MovementStarted) return;
-                 SetFly(false);
-                 SetCombatMovement(true);
-                 m_creature->GetMotionMaster()->Clear();
-                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                 setStage(14);
-                 break;
-
-            case 14: //GROUND
-                 timedCast(SPELL_FLAME_BREATH, diff);
-                 timedCast(SPELL_ENRAGE, diff*2);
+                 setStage(0);
                  break;
 
             default:
                 break;
         }
-
-        DoMeleeAttackIfReady();
     }
 };
 

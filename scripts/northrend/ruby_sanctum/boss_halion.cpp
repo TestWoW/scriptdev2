@@ -41,7 +41,7 @@ enum
     //NEED SCRIPT
     SPELL_TAIL_LASH                             = 74531, // A sweeping tail strike hits all enemies behind the caster, inflicting 3063 to 3937 damage and stunning them for 2 sec.
     SPELL_TWILIGHT_DIVISION                     = 75063, // Phases the caster, allowing him to exist and act simultaneously in both the material and Twilight realms.
-    SPELL_TWILIGHT_CUTTER                       = 77844, // Inflicts 13,875 to 16,125 Shadow damage every second to players touched by the shadow beam
+    SPELL_TWILIGHT_CUTTER                       = 74768, // Inflicts 13,875 to 16,125 Shadow damage every second to players touched by the shadow beam
     //CORPOREALITY
     SPELL_CORPOREALITY_EVEN                     = 74826, // Deals & receives normal damage
     SPELL_CORPOREALITY_20I                      = 74827, // Damage dealt increased by 10% & Damage taken increased by 15%
@@ -373,6 +373,20 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public BSWScriptedAI
                 break;
 
             case 8: //PHASE 3 BOTH REALMS
+                if (!m_creature->getVictim())
+                {
+                    if (Creature* pClone = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_HALION_TWILIGHT)))
+                    {
+                        pClone->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                }
+                else if (m_creature->getVictim())
+                {
+                    if (Creature* pClone = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_HALION_REAL)))
+                    {
+                        pClone->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                }
                 timedCast(SPELL_FLAME_BREATH, uiDiff);
                 timedCast(SPELL_FIERY_COMBUSTION, uiDiff);
                 timedCast(SPELL_METEOR, uiDiff);
@@ -553,6 +567,20 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public BSWScriptedAI
                 break;
 
             case 3: //PHASE 3 BOTH REALMS
+                if (!m_creature->getVictim())
+                {
+                    if (Creature* pReal = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_HALION_REAL)))
+                    {
+                        pReal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                }
+                else if (m_creature->getVictim())
+                {
+                    if (Creature* pReal = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_HALION_REAL)))
+                    {
+                        pReal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                }
                 timedCast(SPELL_DUSK_SHROUD, uiDiff);
                 timedCast(SPELL_DARK_BREATH, uiDiff);
                 timedCast(SPELL_SOUL_CONSUMPTION, uiDiff);
