@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: boss_sindragosa
-SD%Complete: 80%
-SDComment: by /dev/rsa
+SD%Complete: 85%
+SDComment: by /dev/rsa & improved by walkum - TODO: Sindragosa down to the floor. Frost Tombs. Phase two.
 SDCategory: Icecrown Citadel
 EndScriptData */
 // Need correct timers and models
@@ -63,13 +63,32 @@ enum BossSpells
     SPELL_BELLOWING_ROAR     = 36922,
     SPELL_CLEAVE             = 40505,
     SPELL_TAIL_SWEEP         = 71369,
+
+    MAX_BEACON_TARGETS       = 5,
+};
+
+// talks
+enum
+{
+    SAY_AGGRO                   = -1631148,
+    SAY_UNCHAINED_MAGIC         = -1631149,
+    SAY_BLISTERING_COLD         = -1631150,
+    SAY_RESPIRE                 = -1631151,
+    SAY_TAKEOFF                 = -1631152,
+    SAY_PHASE_3                 = -1631153,
+    SAY_SLAY_1                  = -1631154,
+    SAY_SLAY_2                  = -1631155,
+    SAY_BERSERK                 = -1631156,
+    SAY_DEATH                   = -1631157,
 };
 
 static Locations SpawnLoc[]=
 {
-    {4408.052734f, 2484.825439f, 203.374207f},  // 0 Sindragosa spawn
+    {4408.052734f, 2484.825439f, 227},  // 0 Sindragosa spawn
     {4474.239746f, 2484.243896f, 231.0f},       // 1 Sindragosa fly o=3.11
     {4474.239746f, 2484.243896f, 203.380402f},  // 2 Sindragosa fly - ground point o=3.11
+    {4558, 2483, 227}, // 3 Sindragosa entrance
+    {4408.052734f, 2484.825439f, 204}
 };
 
 struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
@@ -81,20 +100,27 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
     }
 
     ScriptedInstance *pInstance;
+    uint32 UpdateTimer;
     bool MovementStarted;
     bool gripped;
     Unit* marked[5];
     uint8 bombs;
+    uint32 m_uiTailTimer;
 
     void Reset()
     {
         if(!pInstance)
             return;
 
+        for (uint8 i = 0; i < MAX_BEACON_TARGETS; ++i)
+            marked[i] = NULL;
+
         resetTimers();
         setStage(0);
         bombs = 0;
         gripped = false;
+        m_uiTailTimer = urand(15000,20000);
+        m_creature->GetMotionMaster()->MovePoint(1, SpawnLoc[4].x, SpawnLoc[4].y, SpawnLoc[4].z);
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetSpeedRate(MOVE_RUN, 1.0f);
         m_creature->SetSpeedRate(MOVE_WALK, 1.0f);
@@ -112,15 +138,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        switch (urand(0,1))
-        {
-            case 0:
-                DoScriptText(-1631421,m_creature,pVictim);
-                break;
-            case 1:
-                DoScriptText(-1631422,m_creature,pVictim);
-                break;
-        }
+        DoScriptText(SAY_SLAY_1 - urand(0, 1),m_creature,pVictim);
     }
 
     void JustReachedHome()
@@ -130,7 +148,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
 
         pInstance->SetData(TYPE_SINDRAGOSA, FAIL);
         doRemoveFromAll(SPELL_ICY_TOMB);
-        DoScriptText(-1631422,m_creature);
 
         if (Creature* pTemp = pInstance->GetSingleCreatureFromStorage(NPC_RIMEFANG))
            if (!pTemp->isAlive())
@@ -161,8 +178,13 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
         if(!pInstance)
             return;
 
-        DoScriptText(-1631420,m_creature,pWho);
-        doCast(SPELL_FROST_AURA_1);
+        pInstance->SetData(TYPE_SINDRAGOSA, IN_PROGRESS);
+
+        UpdateTimer = 4000;
+        DoScriptText(SAY_AGGRO,m_creature,pWho);
+
+        if(DoCastSpellIfCan(m_creature, SPELL_FROST_AURA_1))
+           m_creature->RemoveAurasDueToSpell(70084);
 
         if (Unit* pTarget = doSelectRandomPlayer(SPELL_SHADOWS_EDGE, true, 100.0f))
             doAura(FROST_IMBUED_BLADE_AURA,pTarget);
@@ -174,7 +196,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
             return;
         doRemoveFromAll(SPELL_ICY_TOMB);
         pInstance->SetData(TYPE_SINDRAGOSA, DONE);
-        DoScriptText(-1631423,m_creature,killer);
+        DoScriptText(SAY_DEATH,m_creature,killer);
 
         if (Creature* pTemp = pInstance->GetSingleCreatureFromStorage(NPC_RIMEFANG))
             pTemp->SetRespawnDelay(7*DAY);
@@ -227,11 +249,21 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+        {
+            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, 0);
+        }
+
         switch(getStage())
         {
             case 0:
                     timedCast(SPELL_CLEAVE_1, diff);
-                    timedCast(SPELL_TAIL_SMASH, diff);
+                    if (m_uiTailTimer < diff)
+                    {
+                        if(DoCastSpellIfCan(m_creature, SPELL_TAIL_SMASH))
+                            m_uiTailTimer = urand(15000,20000);
+                    }
+                    else m_uiTailTimer -= diff;
                     timedCast(SPELL_FROST_BREATH_1, diff);
                     timedCast(SPELL_PERMEATING_CHILL, diff);
 
@@ -245,7 +277,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
 
                     if (gripped && !m_creature->IsNonMeleeSpellCasted(true,false,false))
                     {
-                        DoScriptText(-1631426,m_creature);
+                        DoScriptText(SAY_BLISTERING_COLD,m_creature);
                         doCast(SPELL_BLISTERING_COLD);
                         gripped = false;
                     }
@@ -255,13 +287,14 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
 
                     if (m_creature->GetHealthPercent() < 35.0f)
                     {
-                        doCast(SPELL_MYSTIC_BUFFET);
+                    if(DoCastSpellIfCan(m_creature, SPELL_MYSTIC_BUFFET))
+                        m_creature->RemoveAurasDueToSpell(SPELL_MYSTIC_BUFFET);
                         setStage(9);
-                        DoScriptText(-1631429,m_creature);
+                        DoScriptText(SAY_PHASE_3,m_creature);
                     }
                 break;
             case 1:
-                    DoScriptText(-1631425,m_creature);
+                    DoScriptText(SAY_TAKEOFF,m_creature);
                     IceMark();
                     setStage(2);
                     MovementStarted = true;
@@ -325,7 +358,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
 
             case 9:
                     timedCast(SPELL_CLEAVE_1, diff);
-                    timedCast(SPELL_TAIL_SMASH, diff);
+                    if (m_uiTailTimer < diff)
+                    {
+                        if(DoCastSpellIfCan(m_creature, SPELL_TAIL_SMASH))
+                            m_uiTailTimer = urand(15000,20000);
+                    }
                     timedCast(SPELL_FROST_BREATH_1, diff);
                     timedCast(SPELL_PERMEATING_CHILL, diff);
                     timedCast(SPELL_UNCHAINED_MAGIC, diff);
@@ -338,7 +375,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
 
                     if (gripped && !m_creature->IsNonMeleeSpellCasted(true,false,false))
                     {
-                        DoScriptText(-1631426,m_creature);
+                        DoScriptText(SAY_BLISTERING_COLD,m_creature);
                         doCast(SPELL_BLISTERING_COLD);
                         gripped = false;
                     }
@@ -351,7 +388,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public BSWScriptedAI
         if (timedQuery(SPELL_BERSERK, diff))
         {
             doCast(SPELL_BERSERK);
-            DoScriptText(-1631424,m_creature);
+            DoScriptText(SAY_BERSERK,m_creature);
         };
 
         DoMeleeAttackIfReady();
@@ -426,7 +463,7 @@ struct MANGOS_DLL_DECL mob_ice_tombAI : public BSWScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         if ((m_pInstance && m_pInstance->GetData(TYPE_SINDRAGOSA) != IN_PROGRESS)
-            || (victimGUID && 
+            || (victimGUID &&
             (!m_creature->GetMap()->GetPlayer(victimGUID) || !m_creature->GetMap()->GetPlayer(victimGUID)->HasAura(SPELL_ICY_TOMB))))
         {
             if (Player* pVictim = m_creature->GetMap()->GetPlayer(victimGUID))
@@ -564,7 +601,18 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public BSWScriptedAI
         if (pBrother && !pBrother->isAlive())
         if (pBrother && !pBrother->isAlive())
         {
-            Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true);
+            Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SpawnLoc[3].x, SpawnLoc[3].y, SpawnLoc[3].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true);
+
+            pSindr->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+            pSindr->SetLevitate(true);
+
+            pSindr->SetSpeedRate(MOVE_WALK, 3.0f);
+            pSindr->SetSpeedRate(MOVE_RUN, 3.0f);
+    
+            pSindr->GetMotionMaster()->MovePoint(1, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z);
+            //pSindr->GetMotionMaster()->MovePoint(1, SpawnLoc[4].x, SpawnLoc[4].y, SpawnLoc[4].z);
+            //pSindr->SetByteValue(UNIT_FIELD_BYTES_1, 3, 0); 
+
             if (pSindr)
                 pSindr->SetCreatorGuid(ObjectGuid());
         }
@@ -580,6 +628,12 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public BSWScriptedAI
             m_creature->SetRespawnDelay(DAY);
             m_creature->ForcedDespawn();
             return;
+        }
+
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+        {
+            m_creature->HandleEmote(EMOTE_ONESHOT_FLY_SIT_GROUND_DOWN);
+            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, 0);
         }
 
         doCastAll(diff);
@@ -655,7 +709,18 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public BSWScriptedAI
             return;
         if (pBrother && !pBrother->isAlive())
         {
-            Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true);
+            Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SpawnLoc[3].x, SpawnLoc[3].y, SpawnLoc[3].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true);
+
+            pSindr->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+            pSindr->SetLevitate(true);
+
+            pSindr->SetSpeedRate(MOVE_WALK, 3.0f);
+            pSindr->SetSpeedRate(MOVE_RUN, 3.0f);
+     
+            pSindr->GetMotionMaster()->MovePoint(1, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z);
+            //pSindr->GetMotionMaster()->MovePoint(1, SpawnLoc[4].x, SpawnLoc[4].y, SpawnLoc[4].z);
+            //pSindr->SetByteValue(UNIT_FIELD_BYTES_1, 3, 0); 
+
             if (pSindr)
                 pSindr->SetCreatorGuid(ObjectGuid());
         }
@@ -672,6 +737,12 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public BSWScriptedAI
             m_creature->SetRespawnDelay(DAY);
             m_creature->ForcedDespawn();
             return;
+        }
+
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+        {
+            m_creature->HandleEmote(EMOTE_ONESHOT_FLY_SIT_GROUND_DOWN);
+            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, 0);
         }
 
         doCastAll(diff);
