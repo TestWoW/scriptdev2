@@ -50,6 +50,7 @@ enum BossSpells
     SPELL_DISENGAGE                     = 61508,
     SPELL_FURY_OF_FROSTMOURNE           = 70063,
     SPELL_REVIVE_VISUAL                 = 37755, //Override?
+    SPELL_REVIVE                        = 51918,
     SPELL_BERSERK                       = 47008,
 
     //Transition phase
@@ -828,7 +829,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public BSWScriptedAI
                             DoScriptText(SAY_HARVEST_SOUL,m_creature);
                        }
 
-                    /*if (m_uiVileSpiritsTimer <= diff){
+                    if (m_uiVileSpiritsTimer <= diff){
                         m_creature->CastSpell(m_creature->getVictim(), SPELL_VILE_SPIRITS, true);
                         m_creature->CastSpell(m_creature->getVictim(), SPELL_VILE_SPIRITS, true);
                         m_creature->CastSpell(m_creature->getVictim(), SPELL_VILE_SPIRITS, true);
@@ -841,7 +842,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public BSWScriptedAI
                         m_creature->CastSpell(m_creature->getVictim(), SPELL_VILE_SPIRITS, true);
                         m_uiVileSpiritsTimer = 45000; }
                     else
-                        m_uiVileSpiritsTimer -= diff;*/   // NEED REVISION
+                        m_uiVileSpiritsTimer -= diff; 
 
                     timedCast(SPELL_SOUL_REAPER, diff);
                     timedCast(SPELL_INFEST, diff);
@@ -942,7 +943,7 @@ struct MANGOS_DLL_DECL boss_tirion_iccAI : public BSWScriptedAI
                      pPlayer->SendMovieStart(FINAL_ARTHAS_MOVIE);
     }
 
-    /*void doRevivePlayers()
+    void doRevivePlayers()
     {
         Creature* pMenethil = m_creature->GetMap()->GetCreature(MenethilGUID);
         Map::PlayerList const &pList = pMenethil->GetMap()->GetPlayers();
@@ -958,7 +959,7 @@ struct MANGOS_DLL_DECL boss_tirion_iccAI : public BSWScriptedAI
                    }
                 }
              };
-    }*/
+    }
 
     void UpdateAI(const uint32 diff)
     {
@@ -1100,11 +1101,12 @@ struct MANGOS_DLL_DECL boss_tirion_iccAI : public BSWScriptedAI
                 case 13250:
                           UpdateTimer = 6000;
                           pInstance->SetData(TYPE_EVENT,13270);
-                            if (Creature* pMenethil = m_creature->GetMap()->GetCreature(MenethilGUID))
-                            {
+                          {	  	
+                              Creature* pMenethil = m_creature->GetMap()->GetCreature(MenethilGUID);
                               DoScriptText(SAY_OUTRO_10, pMenethil);
-                              pMenethil->CastSpell(pMenethil, SPELL_MASS_RESURRECT, false);
-                            }
+                              //pMenethil->CastSpell(pMenethil, SPELL_MASS_RESURRECT, false);
+                              doRevivePlayers();
+                          }
                           break;
                 case 13270:
                           UpdateTimer = 6000;
