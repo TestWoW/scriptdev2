@@ -23,3 +23,23 @@ INSERT IGNORE INTO `script_texts` (`entry`,`content_default`,`content_loc6`,`con
 (-1576020,'Dragonqueen... Life-Binder... preserve... me.','¡Reina de los dragones...! ¡Vinculadora de vida...! Consérvame.','¡Reina de los dragones...! ¡Vinculadora de vida...! Consérvame.',13454,1,0,'keristrasza SAY_DEATH'),
 (-1576021,'%s opens a Chaotic Rift!','¡%s abre una Falla caótica!','¡%s abre una Falla caótica!',0,3,0,'EMOTE_GUARDIAN_PORTAL'),
 (-1576022,'%s shields himself and divert his power to the rifts!','¡%s se protege y desvía su poder a las fallas!','¡%s se protege y desvía su poder a las fallas!',0,3,0,'EMOTE_DRAGONFLIGHT_PORTAL');
+
+DELETE FROM `script_texts` WHERE entry BETWEEN -1601041 AND -1601025;
+INSERT IGNORE INTO `script_texts` (`entry`,`content_default`,`content_loc6`,`content_loc7`,`sound`,`type`,`language`,`comment`) VALUES
+(-1601025,'May the Light give me strength to provide a worthy challenge.','Que la luz me de fuerzas para ser un reto digno.','Que la luz me de fuerzas para ser un reto digno.',16246,1,0,'palestress SAY_AGGRO'),
+(-1601026,'Take this time to consider your past deeds.','Aprovecha este tiempo para pensar en tus hazañas.','Aprovecha este tiempo para pensar en tus hazañas.',16248,1,0,'palestress SAY_SUMMON'),
+(-1601027,'Even the darkest memory fades when confronted!','Incluso el recuerdo más oscuro se desvanece al afrontarlo.','Incluso el recuerdo más oscuro se desvanece al afrontarlo.',16249,1,0,'palestress SAY_SUMMON_DEFEAT'),
+(-1601028,'Take your rest.','Descansa.','Descansa.',16250,1,0,'palestress SAY_SLAY1'),
+(-1601029,'Be at ease.','Ve en paz.','Ve en paz.',16251,1,0,'palestress SAY_SLAY2'),
+(-1601030,'Excellent work!','¡Un trabajo... excelente!','¡Un trabajo... excelente!',16252,1,0,'palestress SAY_DEATH'),
+(-1601031,'Prepare yourselves!','¡¡PREPARAOS!!','¡¡PREPARAOS!!',16135,1,0,'eadric SAY_AGGRO'),
+(-1601032,'Hammer of the Righteous!','¡Martillo del honrado!','¡Martillo del honrado!',16136,1,0,'eadric SAY_HAMMER'),
+(-1601033,'You! You need more practice.','¡Oh! ¡Tú, tienes que practicar más!','¡Oh! ¡Tú, tienes que practicar más!',16137,1,0,'eadric SAY_SLAY1'),
+(-1601034,'Nay, nay, and I say yet again nay! Not good enough.','¡No, no, y otra vez NO! ¡No, es, SUFICIENTE!','¡No, no, y otra vez NO! ¡No, es, SUFICIENTE!',16138,1,0,'eadric SAY_SLAY2'),
+(-1601035,'I yield! I submit. Excellent work. May I run away now?','¡Me rindo! ¡Lo admito! ¡Un trabajo excelente! Mmm... ¿puedo escaparme ya?','¡Me rindo! ¡Lo admito! ¡Un trabajo excelente! Mmm... ¿puedo escaparme ya?',16139,1,0,'eadric SAY_DEATH'),
+(-1601036,'This farce ends here!','¡Esta farsa acaba aquí!','¡Esta farsa acaba aquí!',16259,1,0,'blacknight SAY_AGGRO'),
+(-1601037,'My rotting flesh was just getting in the way!','¡Me estorbaba esa carne putrefacta!','¡Me estorbaba esa carne putrefacta!',16262,1,0,'blacknight SAY_SKELETON'),
+(-1601038,'I have no need for bones to best you!','¡No necesito huesos para vencerte!','¡No necesito huesos para vencerte!',16263,1,0,'blacknight SAY_GHOST'),
+(-1601039,'Pathetic.','¡Patético!','¡Patético!',16260,1,0,'blacknight SAY_SLAY1'),
+(-1601040,'A waste of flesh.','¡Otro desperdicio!','¡Otro desperdicio!',16261,1,0,'blacknight SAY_SLAY2'),
+(-1601041,'No! I must not fail... again...','¡No! No debo fallar... otra vez...','¡No! No debo fallar... otra vez...',16264,1,0,'blacknight SAY_DEATH');

@@ -113,6 +113,8 @@ enum
 
     SPELL_ACHIEVEMENT_CHECK            = 59046,             // Doesn't exist in client dbc
 
+    BRANN_ACHIEVEMENT                  = 2154,
+
     NPC_DARK_RUNE_PROTECTOR            = 27983,
     NPC_DARK_RUNE_STORMCALLER          = 27984,
     NPC_IRON_GOLEM_CUSTODIAN           = 27985,
@@ -227,7 +229,7 @@ struct MANGOS_DLL_DECL mob_tribuna_controllerAI : public ScriptedAI
                         for(GUIDList::iterator itr = m_lKaddrakGUIDList.begin(); itr != m_lKaddrakGUIDList.end(); ++itr)
                             if (Creature* pCreature = m_creature->GetMap()->GetCreature(*itr))
                                 if (pCreature->isAlive())
-                                    pCreature->CastSpell(pTarget, m_bIsRegularMode ? SPELL_GLARE_OF_THE_TRIBUNAL_H : SPELL_GLARE_OF_THE_TRIBUNAL, true);
+                                    pCreature->CastSpell(pTarget, SPELL_GLARE_OF_THE_TRIBUNAL, true);
 
                 m_uiKaddrak_Encounter_timer = 1500;
             }
@@ -243,7 +245,7 @@ struct MANGOS_DLL_DECL mob_tribuna_controllerAI : public ScriptedAI
                     {
                         pTemp->SetDisplayId(11686);
                         pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        pTemp->CastSpell(pTarget, m_bIsRegularMode ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
+                        pTemp->CastSpell(pTarget, SPELL_DARK_MATTER, true);
                     }
 
                 m_uiMarnak_Encounter_timer = 30000 + rand()%1000;
@@ -260,7 +262,7 @@ struct MANGOS_DLL_DECL mob_tribuna_controllerAI : public ScriptedAI
                     {
                         pTemp->SetDisplayId(11686);
                         pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        pTemp->CastSpell(pTemp, m_bIsRegularMode ? SPELL_SEARING_GAZE_H : SPELL_SEARING_GAZE, true);
+                        pTemp->CastSpell(pTemp, SPELL_SEARING_GAZE, true);
                     }
 
                 m_uiAbedneum_Encounter_timer = 30000 + rand()%1000;
@@ -703,7 +705,11 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
 
                     //if (Player* pPlayer = GetPlayerForEscort())
                         //pPlayer->GroupEventHappens(QUEST_HALLS_OF_STONE, m_creature);
-                    DoCastSpellIfCan(m_creature, SPELL_ACHIEVEMENT_CHECK, CAST_TRIGGERED);
+                    //DoCastSpellIfCan(m_creature, SPELL_ACHIEVEMENT_CHECK, CAST_TRIGGERED);
+
+                    if (!m_bIsRegularMode)
+                    if (m_creature->GetHealthPercent() < 100.0f)
+                        m_pInstance->DoCompleteAchievement(BRANN_ACHIEVEMENT);
 
                     m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                     m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);

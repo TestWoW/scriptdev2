@@ -142,6 +142,9 @@ enum
   SPELL_ESCAPED_FROM_ARTHAS          = 72830,
 
   FACTION                            = 2076,
+
+  ACHIEV_COMPLETE_NORMAL             = 4518,
+  ACHIEV_COMPLETE_HEROIC             = 4521,
 };
 
 struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
@@ -528,6 +531,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
    npc_jaina_and_sylvana_HRextroAI(Creature *pCreature) : npc_escortAI(pCreature)
    {
         m_pInstance = (BSWScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
    }
 
@@ -536,6 +540,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
     uint32 CastTimer;
     uint32 HoldTimer;
     uint8 m_wallNum;
+    bool m_bIsRegularMode;
     bool Fight;
     ObjectGuid wallTarget;
     uint32    m_chestID;
@@ -861,6 +866,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
             case 611:
               if (GameObject* pCave = m_pInstance->GetSingleGameObjectFromStorage(GO_CAVE))
                   pCave->SetGoState(GO_STATE_READY);
+              m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_COMPLETE_NORMAL : ACHIEV_COMPLETE_HEROIC);
               m_creature->RemoveAurasDueToSpell(SPELL_SILENCE);
               m_creature->SetLevitate(false);
               m_creature->CastSpell(m_creature, SPELL_SHIELD_DISRUPTION,false);
