@@ -48,6 +48,9 @@ enum
     SPELL_DETERMINED_GORE_H = 59444,
     SPELL_QUAKE             = 55101,
     SPELL_NUMBING_ROAR      = 55100,
+
+    // Achievement
+    ACHIEV                  = 2040,
 };
 
 /*######
@@ -79,7 +82,7 @@ struct MANGOS_DLL_DECL boss_moorabiAI : public ScriptedAI
         m_bMammothPhase = false;
 
         m_uiStabTimer           = 8000;
-        m_uiQuakeTimer          = 1000;
+        m_uiQuakeTimer          = 6000;
         m_uiRoarTimer           = 7000;
         m_uiTransformationTimer = 10000;
         m_uiPreviousTimer       = 10000;
@@ -108,6 +111,12 @@ struct MANGOS_DLL_DECL boss_moorabiAI : public ScriptedAI
     {
         DoScriptText(SAY_DEATH, m_creature);
 
+        if (!m_bIsRegularMode)
+        if (m_bMammothPhase)
+           return;
+        else
+            m_pInstance->DoCompleteAchievement(ACHIEV);
+
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MOORABI, DONE);
     }
@@ -134,7 +143,7 @@ struct MANGOS_DLL_DECL boss_moorabiAI : public ScriptedAI
         if (m_uiQuakeTimer < uiDiff)
         {
             DoScriptText(SAY_QUAKE, m_creature);
-            DoCastSpellIfCan(m_creature->getVictim(), m_bMammothPhase ? SPELL_QUAKE : SPELL_GROUND_TREMOR);
+            m_creature->CastSpell(m_creature->getVictim(), m_bMammothPhase ? SPELL_QUAKE : SPELL_GROUND_TREMOR, false);
             m_uiQuakeTimer = m_bMammothPhase ? 13000 : 18000;
         }
         else

@@ -131,6 +131,8 @@ struct MANGOS_DLL_DECL boss_tharonjaAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         DoCastSpellIfCan(pKiller, SPELL_ACHIEV_CHECK, CAST_TRIGGERED);
 
+        m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 482 : 493);
+
         if (m_pInstance)
             m_pInstance->SetData(TYPE_THARONJA, DONE);
     }
