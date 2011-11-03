@@ -114,6 +114,7 @@ struct MANGOS_DLL_DECL boss_gormokAI : public BSWScriptedAI
     {
         if (!m_pInstance) return;
             m_pInstance->SetData(TYPE_NORTHREND_BEASTS, FAIL);
+            m_pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
             m_creature->ForcedDespawn();
     }
 
@@ -248,6 +249,7 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public BSWScriptedAI
         if (m_pInstance->GetData(TYPE_BEASTS) == IN_PROGRESS
             && m_pInstance->GetData(TYPE_NORTHREND_BEASTS) != FAIL)
                         m_pInstance->SetData(TYPE_NORTHREND_BEASTS, FAIL);
+            m_pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
             m_creature->ForcedDespawn();
     }
 
@@ -535,6 +537,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public BSWScriptedAI
     {
         if (!m_pInstance) return;
             m_pInstance->SetData(TYPE_NORTHREND_BEASTS, FAIL);
+            m_pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
             m_creature->ForcedDespawn();
     }
 

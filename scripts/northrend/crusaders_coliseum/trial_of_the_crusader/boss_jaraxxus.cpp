@@ -99,6 +99,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
     void JustReachedHome()
     {
         if (!m_pInstance) return;
+            m_pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
             m_pInstance->SetData(TYPE_JARAXXUS, FAIL);
             m_creature->ForcedDespawn();
     }
@@ -109,6 +110,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
             m_pInstance->SetData(TYPE_JARAXXUS, DONE);
             m_pInstance->SetData(TYPE_EVENT,2000);
             m_pInstance->SetData(TYPE_STAGE,0);
+            m_pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
     }
 
     /*void JustSummoned(Creature *pSummoned)
@@ -160,10 +162,10 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
                            }
                     }
 
-        if (timedQuery(SPELL_LEGION_FLAME_1, uiDiff)) {
+        /*if (timedQuery(SPELL_LEGION_FLAME_1, uiDiff)) {
                     DoScriptText(-1713518,m_creature);
                     doCast(SPELL_LEGION_FLAME_1);
-                    };
+                    };*/
 
         if (timedQuery(SPELL_INFERNAL_ERUPTION, uiDiff)
                              && m_volcanoCount > 0) {

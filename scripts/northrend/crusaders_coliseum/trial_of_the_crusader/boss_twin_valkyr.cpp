@@ -257,6 +257,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
             m_pInstance->SetData(TYPE_VALKIRIES, FAIL);
             m_pInstance->SetData(DATA_HEALTH_EYDIS, m_creature->GetMaxHealth());
             m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_NONE);
+            m_pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
             m_creature->ForcedDespawn();
     }
 
