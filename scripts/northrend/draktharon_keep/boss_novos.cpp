@@ -116,7 +116,6 @@ struct MANGOS_DLL_DECL boss_novosAI : public Scripted_NoMovementAI
         m_uiWrathTimer = urand(12000, 15000);
 
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE);
 
         m_uiSummonedHandlers = 0;
         m_uiLostCrystals = 0;
@@ -162,7 +161,6 @@ struct MANGOS_DLL_DECL boss_novosAI : public Scripted_NoMovementAI
         DoCastSpellIfCan(m_creature, SPELL_IMMUNITY, CAST_TRIGGERED);
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_NOVOS, IN_PROGRESS);
@@ -278,7 +276,6 @@ struct MANGOS_DLL_DECL boss_novosAI : public Scripted_NoMovementAI
 
             case PHASE_NORMAL:                              // Normal Phase, attack enemies
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE);
 
                 if (m_uiArcaneBlastTimer < uiDiff)
                 {
