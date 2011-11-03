@@ -27,11 +27,11 @@ EndScriptData */
 enum
 {
     SAY_AGGRO               = -1576000,
-    SAY_SPLIT_1             = -1576001,
-    SAY_SPLIT_2             = -1576002,
+    SAY_KILL                = -1576001,
+    SAY_DEATH               = -1576002,
     SAY_MERGE               = -1576003,
-    SAY_KILL                = -1576004,
-    SAY_DEATH               = -1576005,
+    SAY_SPLIT_1             = -1576004,
+    SAY_SPLIT_2             = -1576005,
 
     SPELL_FIREBOMB          = 47773,
     SPELL_FIREBOMB_H        = 56934,
