@@ -59,7 +59,7 @@ enum
   SAY_UTHER_H_09                     = -1668457,
   SAY_JAINA_10                       = -1668458,
   SAY_UTHER_A_11                     = -1668459,
-  SAY_UTHER_H_11                     = -1668660,
+  SAY_UTHER_H_11                     = -1668460,
   SAY_JAINA_12                       = -1668461,
   SAY_SYLVANA_12                     = -1668462,
   SAY_UTHER_A_13                     = -1668463,
@@ -142,6 +142,9 @@ enum
   SPELL_ESCAPED_FROM_ARTHAS          = 72830,
 
   FACTION                            = 2076,
+
+  ACHIEV_COMPLETE_NORMAL             = 4518,
+  ACHIEV_COMPLETE_HEROIC             = 4521,
 };
 
 struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
@@ -219,7 +222,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
                 if (m_creature->GetEntry() == NPC_SYLVANA)
                 {
                     DoScriptText(SAY_SYLVANA_INTRO_03, m_creature);
-                    m_pInstance->SetNextEvent(7,m_creature->GetEntry(),5000);
+                    m_pInstance->SetNextEvent(7,m_creature->GetEntry(),6000);
                 }
                 break;
             case 7:
@@ -328,7 +331,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
                 else if (m_creature->GetEntry() == NPC_SYLVANA && pUther)
                 {
                     DoScriptText(SAY_UTHER_H_07, pUther);
-                    m_pInstance->SetNextEvent(16,m_creature->GetEntry(),6000);
+                    m_pInstance->SetNextEvent(16,m_creature->GetEntry(),19500);
                 }
                 break;
             case 16:
@@ -528,6 +531,8 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
    npc_jaina_and_sylvana_HRextroAI(Creature *pCreature) : npc_escortAI(pCreature)
    {
         m_pInstance = (BSWScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        oldflag = 0;
         Reset();
    }
 
@@ -536,6 +541,8 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
     uint32 CastTimer;
     uint32 HoldTimer;
     uint8 m_wallNum;
+    uint32 oldflag;
+    bool m_bIsRegularMode;
     bool Fight;
     ObjectGuid wallTarget;
     uint32    m_chestID;
@@ -601,6 +608,11 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
                 break;
         }
 
+        m_creature->SummonGameobject(GO_ICE_WALL, WallLoc[wallNum].x,WallLoc[wallNum].y,WallLoc[wallNum].z, WallLoc[wallNum].o, 0);
+
+        if (GameObject* pIceWall = GetClosestGameObjectWithEntry(m_creature, GO_ICE_WALL, 50.0f))
+            pIceWall->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
+
         if (Creature* pWallTarget = m_creature->SummonCreature(NPC_ICE_WALL,WallLoc[wallNum].x,WallLoc[wallNum].y,WallLoc[wallNum].z,WallLoc[wallNum].o,TEMPSUMMON_MANUAL_DESPAWN,0, true))
         {
             pWallTarget->SetPhaseMask(65535, true);
@@ -615,6 +627,12 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
     void DoDestructWall()
     {
         m_pInstance->DoOpenDoor(GO_ICE_WALL);
+
+        if (GameObject* pIceWall = m_pInstance->GetSingleGameObjectFromStorage(GO_ICE_WALL))
+        {
+            pIceWall->Delete();
+        }
+
         if (Creature* pWallTarget = m_creature->GetMap()->GetCreature(wallTarget))
         {
             pWallTarget->ForcedDespawn();
@@ -861,6 +879,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
             case 611:
               if (GameObject* pCave = m_pInstance->GetSingleGameObjectFromStorage(GO_CAVE))
                   pCave->SetGoState(GO_STATE_READY);
+              m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_COMPLETE_NORMAL : ACHIEV_COMPLETE_HEROIC);
               m_creature->RemoveAurasDueToSpell(SPELL_SILENCE);
               m_creature->SetLevitate(false);
               m_creature->CastSpell(m_creature, SPELL_SHIELD_DISRUPTION,false);
@@ -1019,8 +1038,8 @@ CreatureAI* GetAI_npc_jaina_and_sylvana_HRextro(Creature* pCreature)
 
 enum GENERAL_EVENT
 {
-   SAY_AGGRO                    = -1594519,
-   SAY_DEATH                    = -1594520,
+   SAY_AGGRO                    = -1668534,
+   SAY_DEATH                    = -1668535,
 
    SPELL_SHIELD_THROWN          = 69222,
 };
@@ -1109,7 +1128,7 @@ struct MANGOS_DLL_DECL npc_frostworn_generalAI : public ScriptedAI
         if(m_uiShieldTimer < uiDiff)
         {
             if(Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-               DoCast(pTarget,SPELL_SHIELD_THROWN);
+               m_creature->CastSpell(pTarget, SPELL_SHIELD_THROWN, false);
             m_uiShieldTimer = urand(4000, 8000);
         }
         else m_uiShieldTimer -= uiDiff;

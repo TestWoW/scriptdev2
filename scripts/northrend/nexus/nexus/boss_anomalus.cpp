@@ -44,10 +44,14 @@ enum eEnums
     NPC_CHAOTIC_RIFT                    = 26918,
 
     // Texts
-    SAY_AGGRO                           = -1576010,
-    SAY_DEATH                           = -1576011,
-    SAY_RIFT                            = -1576012,
-    SAY_SHIELD                          = -1576013,
+    SAY_AGGRO                           = -1576011,
+    SAY_DEATH                           = -1576012,
+    SAY_RIFT                            = -1576013,
+    SAY_SHIELD                          = -1576014,
+    SAY_KILL                            = -1576015,
+    
+    EMOTE_GUARDIAN_PORTAL               = -1576021,
+    EMOTE_DRAGONFLIGHT_PORTAL           = -1576022,
 
     // Achievements
     ACHIEVEMENT_CHAOS_THEORY            = 2037,
@@ -91,6 +95,11 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
             m_pInstance->SetData(TYPE_ANOMALUS, NOT_STARTED);
     }
 
+    void KilledUnit(Unit* pVictim)
+    {
+        DoScriptText(SAY_KILL, m_creature);
+    }
+
     void EnterCombat(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
@@ -122,6 +131,7 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
     void SummonRifts()
     {
         DoScriptText(SAY_SHIELD, m_creature);
+        DoScriptText(EMOTE_DRAGONFLIGHT_PORTAL, m_creature);
         DoCast(m_creature, SPELL_RIFT_SHIELD);
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -135,7 +145,7 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
                 pRift->AI()->AttackStart(pTarget);
 
             m_ChaoticRiftGuid = pRift->GetObjectGuid();
-            DoScriptText(SAY_RIFT , m_creature);
+            DoScriptText(EMOTE_GUARDIAN_PORTAL, m_creature);
         }
     }
 
@@ -153,6 +163,7 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
                 {
                     m_creature->RemoveAurasDueToSpell(SPELL_RIFT_SHIELD);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    DoScriptText(SAY_RIFT , m_creature);
                     m_ChaoticRiftGuid.Clear();
                 }
                 return;

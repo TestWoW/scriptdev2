@@ -49,6 +49,9 @@ enum
     NPC_FORGED_IRON_TROGG       = 27979,
     NPC_MALFORMED_OOZE          = 27981,
     NPC_FORGED_IRON_DWARF       = 27982,
+
+    ACHIEV_COMPLETE             = 485,
+    ACHIEV_COMPLETE_H           = 496,
 };
 
 struct Locations
@@ -131,6 +134,8 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GRIEF, DONE);
+
+        m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_COMPLETE : ACHIEV_COMPLETE_H);
     }
 
     void DespawnDwarf()

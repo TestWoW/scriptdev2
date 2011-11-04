@@ -703,7 +703,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                DoScriptText(-1713569, m_creature);
                UpdateTimer = 4500;
                pInstance->SetData(TYPE_EVENT,120);
-               pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
+               //pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
                break;
 // Ali
         case 115:
@@ -719,7 +719,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                DoScriptText(-1713582, m_creature);
                UpdateTimer = 7000;
                pInstance->SetData(TYPE_EVENT,130);
-               pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
+               //pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
                break;
 
         case 140:
@@ -819,6 +819,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                DoScriptText(-1713510, m_creature);
                UpdateTimer = 5000;
                m_creature->SummonCreature(NPC_FIZZLEBANG, SpawnLoc[21].x, SpawnLoc[21].y, SpawnLoc[21].z, 2, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME);
+               pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
                pInstance->SetData(TYPE_EVENT,1110);
                break;
         case 1179:
@@ -839,6 +840,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                DoScriptText(-1713526, m_creature);
                UpdateTimer = 15000;
                pInstance->SetData(TYPE_EVENT,2010);
+               pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
                break;
         case 2030:
                DoScriptText(-1713529, m_creature);
@@ -849,6 +851,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                DoScriptText(-1713530, m_creature);
                UpdateTimer = 8000;
                pInstance->SetData(TYPE_EVENT,3050);
+               pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
                break;
         case 3001:
                DoScriptText(-1713530, m_creature);
@@ -1168,12 +1171,14 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                DoScriptText(-1713535, m_creature);
                UpdateTimer = 5000;
                pInstance->SetData(TYPE_EVENT,0);
+               pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
                break;
 
         case 4000:
                DoScriptText(-1713536, m_creature);
                UpdateTimer = 3000;
                pInstance->SetData(TYPE_EVENT,4010);
+               pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
                break;
         case 4010:
                UpdateTimer = 10000;

@@ -60,6 +60,7 @@ struct MANGOS_DLL_DECL boss_faction_championsAI : public BSWScriptedAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CRUSADERS, FAIL);
             m_creature->ForcedDespawn();
+            m_pInstance->DoUseDoorOrButton(GO_WEST_PORTCULLIS);
     }
 
     float CalculateThreat(float distance, float armor, uint32 health)

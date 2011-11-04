@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation; either version 2 of the License, or
@@ -24,7 +24,15 @@ EndScriptData */
 #include "precompiled.h"
 #include "pit_of_saron.h"
 
-instance_pit_of_saron::instance_pit_of_saron(Map* pMap) : ScriptedInstance(pMap)
+instance_pit_of_saron::instance_pit_of_saron(Map* pMap) : ScriptedInstance(pMap),
+    m_uiTyrannusIntroGUID(0),
+    m_uiGarfrostGUID(0),
+    m_uiKrickGUID(0),
+    m_uiIckGUID(0),
+    m_uiTyrannusGUID(0),
+    m_uiRimefangGUID(0),
+    m_uiIcewallGUID(0),
+    m_uiHallsPortGUID(0)
 {
     Initialize();
 }
@@ -38,14 +46,12 @@ void instance_pit_of_saron::OnCreatureCreate(Creature* pCreature)
 {
     switch(pCreature->GetEntry())
     {
-        case NPC_TYRANNUS_INTRO:
-        case NPC_GARFROST:
-        case NPC_KRICK:
-        case NPC_ICK:
-        case NPC_TYRANNUS:
-        case NPC_RIMEFANG:
-            m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
-            break;
+        case NPC_TYRANNUS_INTRO: m_uiTyrannusIntroGUID = pCreature->GetGUID(); break;
+        case NPC_GARFROST:       m_uiGarfrostGUID      = pCreature->GetGUID(); break;
+        case NPC_KRICK:          m_uiKrickGUID         = pCreature->GetGUID(); break;
+        case NPC_ICK:            m_uiIckGUID           = pCreature->GetGUID(); break;
+        case NPC_TYRANNUS:       m_uiTyrannusGUID      = pCreature->GetGUID(); break;
+        case NPC_RIMEFANG:       m_uiRimefangGUID      = pCreature->GetGUID(); break;
     }
 }
 
@@ -54,16 +60,14 @@ void instance_pit_of_saron::OnObjectCreate(GameObject* pGo)
     switch(pGo->GetEntry())
     {
         case GO_ICEWALL:
+            m_uiIcewallGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_GARFROST] == DONE && m_auiEncounter[TYPE_KRICK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_HALLS_OF_REFLECT_PORT:
+            m_uiHallsPortGUID = pGo->GetGUID();
             break;
-
-        default:
-            return;
     }
-    m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
 }
 
 void instance_pit_of_saron::SetData(uint32 uiType, uint32 uiData)
@@ -72,15 +76,21 @@ void instance_pit_of_saron::SetData(uint32 uiType, uint32 uiData)
     {
         case TYPE_GARFROST:
             if (uiData == DONE && m_auiEncounter[TYPE_KRICK] == DONE)
-                DoUseDoorOrButton(GO_ICEWALL);
+                DoUseDoorOrButton(m_uiIcewallGUID);
             m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_KRICK:
             if (uiData == DONE && m_auiEncounter[TYPE_GARFROST] == DONE)
-                DoUseDoorOrButton(GO_ICEWALL);
+                DoUseDoorOrButton(m_uiIcewallGUID);
             m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_TYRANNUS:
+            m_auiEncounter[uiType] = uiData;
+            break;
+        case TYPE_GAUNTLET:
+            m_auiEncounter[uiType] = uiData;
+            break;
+        case TYPE_INTRO:
             m_auiEncounter[uiType] = uiData;
             break;
         default:
@@ -92,9 +102,9 @@ void instance_pit_of_saron::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2];
+        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " " << m_auiEncounter[3] << " " << m_auiEncounter[4];
 
-        m_strInstData = saveStream.str();
+        strInstData = saveStream.str();
 
         SaveToDB();
         OUT_SAVE_INST_DATA_COMPLETE;
@@ -125,21 +135,31 @@ void instance_pit_of_saron::Load(const char* chrIn)
 
 uint32 instance_pit_of_saron::GetData(uint32 uiType)
 {
-    if (uiType < MAX_ENCOUNTER)
-        return m_auiEncounter[uiType];
-
-    return 0;
+    switch(uiType)
+    {
+        case TYPE_GARFROST:  return m_auiEncounter[uiType];
+        case TYPE_KRICK:     return m_auiEncounter[uiType];
+        case TYPE_TYRANNUS:  return m_auiEncounter[uiType];
+        case TYPE_INTRO:                return m_auiEncounter[uiType];
+        case TYPE_GAUNTLET:             return m_auiEncounter[uiType];
+        default:
+            return 0;
+    }
 }
 
-bool AreaTrigger_at_tyrannus(Player* pPlayer, AreaTriggerEntry const* pAt)
+uint64 instance_pit_of_saron::GetData64(uint32 uiData)
 {
-    if (instance_pit_of_saron* pInstance = (instance_pit_of_saron*)pPlayer->GetInstanceData())
+    switch(uiData)
     {
-        if (pInstance->GetData(TYPE_TYRANNUS) == NOT_STARTED)
-            pInstance->SetData(TYPE_TYRANNUS, SPECIAL);
+        case NPC_TYRANNUS_INTRO: return m_uiTyrannusIntroGUID;
+        case NPC_GARFROST:       return m_uiGarfrostGUID;
+        case NPC_KRICK:          return m_uiKrickGUID;
+        case NPC_ICK:            return m_uiIckGUID;
+        case NPC_TYRANNUS:       return m_uiTyrannusGUID;
+        case NPC_RIMEFANG:       return m_uiRimefangGUID;
+        default:
+            return 0;
     }
-
-    return false;
 }
 
 InstanceData* GetInstanceData_instance_pit_of_saron(Map* pMap)
@@ -155,9 +175,4 @@ void AddSC_instance_pit_of_saron()
     pNewScript->Name = "instance_pit_of_saron";
     pNewScript->GetInstanceData = &GetInstanceData_instance_pit_of_saron;
     pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "at_tyrannus";
-    pNewScript->pAreaTrigger = &AreaTrigger_at_tyrannus;
-    pNewScript->RegisterSelf(false);
 }

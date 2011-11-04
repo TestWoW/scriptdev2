@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: boss_argent_challenge
-SD%Complete: 50%
-SDComment: missing yells. radiance is "wrong". modified by /dev/rsa
+SD%Complete: 70%
+SDComment: modified by /dev/rsa
 SDCategory: Trial Of the Champion
 EndScriptData */
 
@@ -26,32 +26,44 @@ EndScriptData */
 
 enum
 {
-        SPELL_BERSERK                           = 47008,
+    SPELL_BERSERK                   = 47008,
     //yells
+    SAY_EADRIC_AGGRO                = -1601031,
+    SAY_EADRIC_HAMMER               = -1601032,
+    SAY_EADRIC_SLAY1                = -1601033,
+    SAY_EADRIC_SLAY2                = -1601034,
+    SAY_EADRIC_DEATH                = -1601035,
+
+    SAY_PALETRESS_AGGRO             = -1601025,
+    SAY_PALETRESS_SUMMON            = -1601026,
+    SAY_PALETRESS_SUMMON_DEFEAT     = -1601027,
+    SAY_PALETRESS_SLAY1             = -1601028,
+    SAY_PALETRESS_SLAY2             = -1601029,
+    SAY_PALETRESS_DEATH             = -1601030,
 
     //eadric
-    SPELL_VENGEANCE                = 66889,
-    SPELL_RADIANCE                = 66862,
-    SPELL_RADIANCE_H            = 67681,
-    SPELL_HAMMER_OF_JUSTICE        = 66940,
-    SPELL_HAMMER                = 67680,
+    SPELL_VENGEANCE                 = 66889,
+    SPELL_RADIANCE                  = 66862,
+    SPELL_RADIANCE_H                = 67681,
+    SPELL_HAMMER_OF_JUSTICE         = 66940,
+    SPELL_HAMMER                    = 67680,
     //paletress
-    SPELL_SMITE                    = 66536,
-    SPELL_SMITE_H                = 67674,
-    SPELL_HOLY_FIRE                = 66538,
-    SPELL_HOLY_FIRE_H            = 67676,
-    SPELL_RENEW                    = 66537,
-    SPELL_RENEW_H                = 67675,
-    SPELL_HOLY_NOVA                = 66546,
-    SPELL_SHIELD                = 66515,
-    SPELL_CONFESS                = 66547,
+    SPELL_SMITE                     = 66536,
+    SPELL_SMITE_H                   = 67674,
+    SPELL_HOLY_FIRE                 = 66538,
+    SPELL_HOLY_FIRE_H               = 67676,
+    SPELL_RENEW                     = 66537,
+    SPELL_RENEW_H                   = 67675,
+    SPELL_HOLY_NOVA                 = 66546,
+    SPELL_SHIELD                    = 66515,
+    SPELL_CONFESS                   = 66547,
     //memory
-    SPELL_FEAR                    = 66552,
-    SPELL_FEAR_H                = 67677,
-    SPELL_SHADOWS                = 66619,
-    SPELL_SHADOWS_H                = 67678,
-    SPELL_OLD_WOUNDS            = 66620,
-    SPELL_OLD_WOUNDS_H            = 67679,
+    SPELL_FEAR                      = 66552,
+    SPELL_FEAR_H                    = 67677,
+    SPELL_SHADOWS                   = 66619,
+    SPELL_SHADOWS_H                 = 67678,
+    SPELL_OLD_WOUNDS                = 66620,
+    SPELL_OLD_WOUNDS_H              = 67679,
 };
 
 // Eadric The Pure
@@ -93,6 +105,13 @@ struct MANGOS_DLL_DECL boss_eadricAI : public ScriptedAI
             return;
         if (m_pInstance->GetData(TYPE_ARGENT_CHALLENGE) != DONE)
             m_pInstance->SetData(TYPE_ARGENT_CHALLENGE, IN_PROGRESS);
+
+        DoScriptText(SAY_EADRIC_AGGRO, m_creature);
+    }
+
+    void KilledUnit(Unit* pVictim)
+    {
+        DoScriptText(urand(SAY_EADRIC_SLAY1, SAY_EADRIC_SLAY2), m_creature);
     }
 
     void JustDied(Unit* pKiller)
@@ -100,6 +119,8 @@ struct MANGOS_DLL_DECL boss_eadricAI : public ScriptedAI
         if (!m_pInstance)
             return;
         m_pInstance->SetData(TYPE_ARGENT_CHALLENGE, DONE);
+
+        DoScriptText(SAY_EADRIC_DEATH, m_creature);
     }
 
     void UpdateAI(const uint32 diff)
@@ -124,6 +145,7 @@ struct MANGOS_DLL_DECL boss_eadricAI : public ScriptedAI
             if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
             {
                 DoCast(target, SPELL_HAMMER_OF_JUSTICE);
+                DoScriptText(SAY_EADRIC_HAMMER, m_creature);
                 HammerTarget = target->GetGUID();
             }
             Hammer_Timer = m_bIsRegularMode ? 40000 : 15000;
@@ -187,6 +209,7 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
         m_uiBerserk_Timer = m_bIsRegularMode ? 300000 : 180000;
         summoned = false;
         shielded = false;
+        m_creature->setFaction(14);
         m_creature->GetMotionMaster()->MovePoint(0, 746, 614, m_creature->GetPositionZ());
                 m_creature->SetWalk(true);
     }
@@ -204,6 +227,13 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
             return;
         if (m_pInstance->GetData(TYPE_ARGENT_CHALLENGE) != DONE)
             m_pInstance->SetData(TYPE_ARGENT_CHALLENGE, IN_PROGRESS);
+
+        DoScriptText(SAY_PALETRESS_AGGRO, m_creature);
+    }
+
+    void KilledUnit(Unit* pVictim)
+    {
+        DoScriptText(urand(SAY_PALETRESS_SLAY1, SAY_PALETRESS_SLAY2), m_creature);
     }
 
     void JustDied(Unit* pKiller)
@@ -211,6 +241,8 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
         if (!m_pInstance)
             return;
         m_pInstance->SetData(TYPE_ARGENT_CHALLENGE, DONE);
+
+        DoScriptText(SAY_PALETRESS_DEATH, m_creature);
     }
 
     void UpdateAI(const uint32 diff)
@@ -258,6 +290,7 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
             m_creature->CastStop(m_bIsRegularMode ? SPELL_SMITE : SPELL_SMITE_H);
             m_creature->CastStop(m_bIsRegularMode ? SPELL_HOLY_FIRE : SPELL_HOLY_FIRE_H);
             DoCast(m_creature, SPELL_HOLY_NOVA);
+            DoScriptText(SAY_PALETRESS_SUMMON, m_creature);
             switch(urand(0, 24))
         {
     case 0: m_creature->SummonCreature(MEMORY_ALGALON, 0.0f, 0.0f, 0.0f, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
@@ -328,6 +361,7 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
         if (Creature* pTemp = (m_creature->GetMap()->GetCreature( m_pInstance->GetData64(DATA_MEMORY))))
                 if (!pTemp->isAlive())
                 {
+                    DoScriptText(SAY_PALETRESS_SUMMON_DEFEAT, m_creature);
                     m_creature->RemoveAurasDueToSpell(SPELL_SHIELD);
                     shielded = false;
                 } else Shield_Check = 1000;
@@ -371,6 +405,12 @@ struct MANGOS_DLL_DECL mob_toc5_memoryAI : public ScriptedAI
         Old_Wounds_Timer = 5000;
         Shadows_Timer = 8000;
         Fear_Timer = 13000;
+    }
+
+    void KilledUnit(Unit* pVictim)
+    {
+        if (Creature* pPaletress = m_pInstance->GetSingleCreatureFromStorage(NPC_PALETRESS))
+            DoScriptText(urand(SAY_PALETRESS_SLAY1, SAY_PALETRESS_SLAY2), pPaletress);
     }
 
     void JustDied(Unit* pKiller)
