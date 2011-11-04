@@ -26,16 +26,15 @@ EndScriptData */
 
 enum saysSD2
 {
-    SAY_AGGRO                           = -1658014,
-    SAY_SLAY_1                          = -1658015,
-    SAY_BOULDER_HIT                     = -1658016,         // TODO How must this be handled?
-    SAY_DEATH                           = -1658017,
-    SAY_FORGE_1                         = -1658018,
-    SAY_FORGE_2                         = -1658019,
-    SAY_TYRANNUS_GARFROST               = -1658020,
-    SAY_GENERAL_GARFROST                = -1658021,
+    SAY_AGGRO                           = -1610051,
+    SAY_SLAY_1                          = -1610052,
+    SAY_BOULDER_HIT                     = -1610054,         // TODO How must this be handled?
+    SAY_DEATH                           = -1610057,
+    SAY_FORGE_1                         = -1610055,
+    SAY_FORGE_2                         = -1610056,
+    SAY_TYRANNUS_GARFROST               = -1610058,
 
-    EMOTE_THROW_SARONITE                = -1658022,
+    EMOTE_THROW_SARONITE                = -1610053,
     EMOTE_DEEP_FREEZE                   = -1658023,
 
     SPELL_PERMAFROST                    = 70326,
@@ -100,12 +99,18 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_GARFROST, IN_PROGRESS);
+
         DoScriptText(SAY_AGGRO, m_creature, pWho);
         DoCastSpellIfCan(m_creature, SPELL_PERMAFROST);
     }
 
     void JustDied(Unit* pKiller)
     {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_GARFROST, DONE);
+
         DoScriptText(SAY_DEATH, m_creature, pKiller);
     }
 
@@ -125,6 +130,7 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
 
         // Cast and say expected spell
         DoCastSpellIfCan(m_creature, uiPointId == PHASE_BLADE_ENCHANTMENT ? SPELL_FORGE_FROZEN_BLADE : SPELL_FORGE_FROSTBORN_MACE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         DoScriptText(uiPointId == PHASE_BLADE_ENCHANTMENT ? SAY_FORGE_1 : SAY_FORGE_2, m_creature);
 
         m_uiThrowSaroniteTimer += 5000;                     // Delay next Saronit
@@ -173,6 +179,7 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
                     SetCombatMovement(false);
 
                     // TODO This should actually be jump movement
+                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_creature->GetMotionMaster()->MovePoint(PHASE_BLADE_ENCHANTMENT, aGarfrostMoveLocs[0][0], aGarfrostMoveLocs[0][1], aGarfrostMoveLocs[0][2]);
                     m_uiPhase = PHASE_MOVEMENT;
 
@@ -189,6 +196,7 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
                     SetCombatMovement(false);
 
                     // TODO This should actually be jump movement
+                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_creature->GetMotionMaster()->MovePoint(PHASE_MACE_ENCHANTMENT, aGarfrostMoveLocs[1][0], aGarfrostMoveLocs[1][1], aGarfrostMoveLocs[1][2]);
                     m_uiPhase = PHASE_MOVEMENT;
 

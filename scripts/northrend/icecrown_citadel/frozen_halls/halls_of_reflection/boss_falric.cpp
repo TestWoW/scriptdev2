@@ -207,8 +207,12 @@ struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
             return;
 
         timedCast(SPELL_QUIVERING_STRIKE, uiDiff);
-        timedCast(SPELL_IMPENDING_DESPAIR, uiDiff);
-        timedCast(SPELL_DEFILING_HORROR, uiDiff);
+
+        if (timedQuery(SPELL_IMPENDING_DESPAIR, uiDiff))
+            DoScriptText(SAY_FALRIC_SP01, m_creature);
+
+        if (timedQuery(SPELL_DEFILING_HORROR, uiDiff))
+            DoScriptText(SAY_FALRIC_SP02, m_creature);
 
         timedCast(SPELL_BERSERK, uiDiff);
 

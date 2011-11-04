@@ -213,8 +213,12 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
 
         timedCast(SPELL_OBLITERATE, uiDiff);
         timedCast(SPELL_WELL_OF_CORRUPTION, uiDiff);
-        timedCast(SPELL_SHARED_SUFFERING, uiDiff);
-        timedCast(SPELL_CORRUPTED_FLESH, uiDiff);
+
+        if (timedQuery(SPELL_SHARED_SUFFERING, uiDiff))
+            DoScriptText(SAY_MARWYN_SP01, m_creature);
+
+        if (timedQuery(SPELL_CORRUPTED_FLESH, uiDiff))
+            DoScriptText(SAY_MARWYN_SP02, m_creature);
 
         timedCast(SPELL_BERSERK, uiDiff);
 

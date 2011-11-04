@@ -678,111 +678,110 @@ UPDATE `script_texts` SET `content_loc7`='¡Ya he perdido demasiado tiempo, mort
 
 -- JAINA PROUDMOORE
 
-UPDATE `script_texts` SET `content_loc7`='El frío de este lugar... ¡Brrrr! Puedo sentir como se congela mi sangre.' WHERE `entry`='-1594433' ;
-UPDATE `script_texts` SET `content_loc7`='¿Qué es eso? ¡Ahí delante! ¿Será...? ¡Héroes, a mí!' WHERE `entry`='-1594435' ;
-UPDATE `script_texts` SET `content_loc7`='La Agonía de Escarcha... la espada que destrozó nuestro reino.' WHERE `entry`='-1594436' ;
-UPDATE `script_texts` SET `content_loc7`='¡Atrás! ¡Si tocáis la espada vuestra alma quedará marcada toda la eternidad! Debo intentar ponerme en contacto con los espíritus atrapados en la Agonía de Escarcha. Haceros a un lado, atrás.' WHERE `entry`='-1594438' ;
-UPDATE `script_texts` SET `content_loc7`='¡Uther! ¡Querido Uther! Lo... lo siento.' WHERE `entry`='-1594442' ;
-UPDATE `script_texts` SET `content_loc7`='¿Arthas está aquí? Tal vez pueda...' WHERE `entry`='-1594446' ;
-UPDATE `script_texts` SET `content_loc7`='Pero Uther, si hay alguna esperanza de llegar a Arthas... debo... debo intentarlo.' WHERE `entry`='-1594450' ;
-UPDATE `script_texts` SET `content_loc7`='Dime cómo, Uther. ¿Cómo acabo con mi príncipe? Mi...' WHERE `entry`='-1594454' ;
-UPDATE `script_texts` SET `content_loc7`='Tienes razón, Uther. Perdóname. No... no sé qué me ha pasado. Daremos esta información al Rey y a los caballeros que se enfrentan a la Plaga en la Ciudadela de Corona de Hielo.' WHERE `entry`='-1594458' ;
-UPDATE `script_texts` SET `content_loc7`='¿Quién afrontaría tal carga?' WHERE `entry`='-1594461' ;
-UPDATE `script_texts` SET `content_loc7`='Entonces, aún hay esperanza...' WHERE `entry`='-1594465' ;
-UPDATE `script_texts` SET `content_loc7`='¡No me privarás de esto, Arthas! ¡Debo saber! ¡Debo averiguar!' WHERE `entry`='-1594471' ;
-UPDATE `script_texts` SET `content_loc7`='Es demasiado poderoso. Debemos abandonar este lugar ahora mismo. Mi magia podrá inmovilizarlo brevemente. ¡Vamos, rápido, héroes!' WHERE `entry`='-1594479' ;
-INSERT INTO `script_texts` (`entry`,`content_default`,`content_loc7`,`content_loc8`,`sound`,`type`,`language`,`emote`,`comment`) VALUES
-(-1594534, '<need translate>', 'Perdonadme, héroes. Debí escuchar a Uther. Tenía... tenía que verlo por mí misma. Poder mirarle a los ojos una última vez. Lo siento...', 'Ну теперь-то точно пора сваливать.', 16648,0,0,0, '67234') ON DUPLICATE KEY UPDATE `content_loc7` = 'Perdonadme, héroes. Debí escuchar a Uther. Tenía... tenía que verlo por mí misma. Poder mirarle a los ojos una última vez. Lo siento...' ;
-UPDATE `script_texts` SET `content_loc7`='Perdonadme, héroes. Debí escuchar a Uther. Tenía... tenía que verlo por mí misma. Poder mirarle a los ojos una última vez. Lo siento...' WHERE `entry`='-1594534' ;
+UPDATE `script_texts` SET `content_loc7`='El frío de este lugar... ¡Brrrr! Puedo sentir como se congela mi sangre.' WHERE `entry`='-1668433' ;
+UPDATE `script_texts` SET `content_loc7`='¿Qué es eso? ¡Ahí delante! ¿Será...? ¡Héroes, a mí!' WHERE `entry`='-1668435' ;
+UPDATE `script_texts` SET `content_loc7`='La Agonía de Escarcha... la espada que destrozó nuestro reino.' WHERE `entry`='-1668436' ;
+UPDATE `script_texts` SET `content_loc7`='¡Atrás! ¡Si tocáis la espada vuestra alma quedará marcada toda la eternidad! Debo intentar ponerme en contacto con los espíritus atrapados en la Agonía de Escarcha. Haceros a un lado, atrás.' WHERE `entry`='-1668438' ;
+UPDATE `script_texts` SET `content_loc7`='¡Uther! ¡Querido Uther! Lo... lo siento.' WHERE `entry`='-1668442' ;
+UPDATE `script_texts` SET `content_loc7`='¿Arthas está aquí? Tal vez pueda...' WHERE `entry`='-1668446' ;
+UPDATE `script_texts` SET `content_loc7`='Pero Uther, si hay alguna esperanza de llegar a Arthas... debo... debo intentarlo.' WHERE `entry`='-1668450' ;
+UPDATE `script_texts` SET `content_loc7`='Dime cómo, Uther. ¿Cómo acabo con mi príncipe? Mi...' WHERE `entry`='-1668454' ;
+UPDATE `script_texts` SET `content_loc7`='Tienes razón, Uther. Perdóname. No... no sé qué me ha pasado. Daremos esta información al Rey y a los caballeros que se enfrentan a la Plaga en la Ciudadela de Corona de Hielo.' WHERE `entry`='-1668458' ;
+UPDATE `script_texts` SET `content_loc7`='¿Quién afrontaría tal carga?' WHERE `entry`='-1668461' ;
+UPDATE `script_texts` SET `content_loc7`='Entonces, aún hay esperanza...' WHERE `entry`='-1668465' ;
+UPDATE `script_texts` SET `content_loc7`='¡No me privarás de esto, Arthas! ¡Debo saber! ¡Debo averiguar!' WHERE `entry`='-1668471' ;
+UPDATE `script_texts` SET `content_loc7`='Es demasiado poderoso. Debemos abandonar este lugar ahora mismo. Mi magia podrá inmovilizarlo brevemente. ¡Vamos, rápido, héroes!' WHERE `entry`='-1668479' ;
+UPDATE `script_texts` SET `content_loc7`='¡Destruiré esta barrera! ¡Debéis mantener atrás a los no-muertos!' WHERE `entry`='-1668487' ;
+UPDATE `script_texts` SET `content_loc7`='¡Otro muro de hielo! Evitad que los no-muertos interrumpan mis conjuros para que pueda derribar este muro' WHERE `entry`='-1668489' ;
+UPDATE `script_texts` SET `content_loc7`='¡Está jugando con nosotros! ¡Le enseñaré lo que pasa al hielo cuando se junta con el fuego!' WHERE `entry`='-1668494' ;
+UPDATE `script_texts` SET `content_loc7`='¡Tus muros no pueden detenernos, monstruo! ¡Los destruiré TODOS!' WHERE `entry`='-1668495' ;
+UPDATE `script_texts` SET `content_loc7`='¡Hay una salida ahí delante! ¡VAMOS!' WHERE `entry`='-1668498' ;
+UPDATE `script_texts` SET `content_loc7`='Casi estamos... ¡no os rindáis!' WHERE `entry`='-1668499' ;
+INSERT INTO `script_texts` (`entry`,`content_default`,`content_loc7`,`content_loc7`,`sound`,`type`,`language`,`emote`,`comment`) VALUES
+(-1668536, '<need translate>', 'Perdonadme, héroes. Debí escuchar a Uther. Tenía... tenía que verlo por mí misma. Poder mirarle a los ojos una última vez. Lo siento...', 'Perdonadme, héroes. Debí escuchar a Uther. Tenía... tenía que verlo por mí misma. Poder mirarle a los ojos una última vez. Lo siento...', 16648,0,0,0, '67234') ON DUPLICATE KEY UPDATE `content_loc7` = 'Perdonadme, héroes. Debí escuchar a Uther. Tenía... tenía que verlo por mí misma. Poder mirarle a los ojos una última vez. Lo siento...', `content_loc7` = 'Perdonadme, héroes. Debí escuchar a Uther. Tenía... tenía que verlo por mí misma. Poder mirarle a los ojos una última vez. Lo siento...' ;
 
 -- UTHER LIGHTBRINGER
 
-UPDATE `script_texts` SET `content_loc7`='¡JAINA! ¿Realmente eres tú?' WHERE `entry`='-1594440' ;
-UPDATE `script_texts` SET `content_loc7`='Jaina, no tenéis mucho tiempo. El Rey Exánime ve lo que ve la espada. Llegará en cualquier momento.' WHERE `entry`='-1594444' ;
-UPDATE `script_texts` SET `content_loc7`='No, niña. Arthas no está aquí. Arthas no es más que una presencia en la mente del Rey Exánime. Una presencia cada vez más débil...' WHERE `entry`='-1594448' ;
-UPDATE `script_texts` SET `content_loc7`='Jaina, escúchame. Debes acabar con el Rey Exánime. No puedes razonar con él. Os matará a ti y a tus aliados y os levantará como poderosos soldados de la Plaga' WHERE `entry`='-1594452' ;
-UPDATE `script_texts` SET `content_loc7`='Despierta, niña. Debes acabar con el Rey Exánime en el lugar dónde se fusionó con Ner\'zhul, en lo alto de la aguja, en el Trono Helado. Es el único modo.' WHERE `entry`='-1594456' ;
-UPDATE `script_texts` SET `content_loc7`='Hay... algo más que deberías saber sobre el Rey Exánime. Nunca se debe perder el control sobre la Plaga. Incluso si vencéis al Rey Exánime, otro deberá ocupar su lugar. Sin el dominio de su maestro, la Plaga acamparía a sus anchas por el mundo, destruyendo todo ser viviente.' WHERE `entry`='-1594459' ;
-UPDATE `script_texts` SET `content_loc7`='Un gran sacrificio para un alma noble...' WHERE `entry`='-1594463' ;
-UPDATE `script_texts` SET `content_loc7`='No lo sé, Jaina. Supongo que la parte de Arthas que vive dentro del Rey Exánime es todo lo que evita que la Plaga aniquile Azeroth.' WHERE `entry`='-1594464' ;
-UPDATE `script_texts` SET `content_loc7`='¡No, Jaina! ARRRRRRGHHHH... Se... acerca. Debes... debes...' WHERE `entry`='-1594466' ;
-UPDATE `script_texts` SET `content_loc7`='¡No puedes derrotar al Rey Exánime! Aquí no. Estarías loca si lo intentases. Matará a los que te siguen y los levantará como poderosos soldados de la Plaga. Pero en tu caso, Sylvanas, la recompensa que tiene para ti seria peor que la última.' WHERE `entry`='-1594449' ;
-UPDATE `script_texts` SET `content_loc7`='No tenéis mucho tiempo. El Rey Exánime ve lo que ve la espada. ¡Llegará en calquier momento!' WHERE `entry`='-1594445' ;
-UPDATE `script_texts` SET `content_loc7`='Tal vez, pero debes saber que siempre debe haber un Rey Exánime. Incluso si derrotas a Arthas otro deberá tomar su lugar. Sin el dominio del Rey Exánime, la Plaga invadirá el mundo como langostas destruyendo todo lo que toque.' WHERE `entry`='-1594453' ;
-UPDATE `script_texts` SET `content_loc7`='No lo sé, Reina alma en pena. Supongo que la parte de Arthas que vive dentro del Rey Exánime es todo lo que evita que la Plaga aniquile Azeroth.' WHERE `entry`='-1594457' ;
-UPDATE `script_texts` SET `content_loc7`='Por tanto, la única forma de derrotar al Rey Exánime es destruirlo en el lugar donde fue creado.' WHERE `entry`='-1594460' ;
-UPDATE `script_texts` SET `content_loc7`='Eso es... ¡Aargh! Se acerca... Tú... tú debes...' WHERE `entry`='-1594467' ;
-UPDATE `script_texts` SET `content_loc7`='¡Cuidado! Ya he oído antes que esa hoja maldita nos salvaría. Mira a tu alrededor y observa lo que ha brotado de la Agonía de Escarcha.' WHERE `entry`='-1594441' ;
+UPDATE `script_texts` SET `content_loc7`='¡JAINA! ¿Realmente eres tú?' WHERE `entry`='-1668440' ;
+UPDATE `script_texts` SET `content_loc7`='Jaina, no tenéis mucho tiempo. El Rey Exánime ve lo que ve la espada. Llegará en cualquier momento.' WHERE `entry`='-1668444' ;
+UPDATE `script_texts` SET `content_loc7`='No, niña. Arthas no está aquí. Arthas no es más que una presencia en la mente del Rey Exánime. Una presencia cada vez más débil...' WHERE `entry`='-1668448' ;
+UPDATE `script_texts` SET `content_loc7`='Jaina, escúchame. Debes acabar con el Rey Exánime. No puedes razonar con él. Os matará a ti y a tus aliados y os levantará como poderosos soldados de la Plaga.' WHERE `entry`='-1668452' ;
+UPDATE `script_texts` SET `content_loc7`='Despierta, niña. Debes acabar con el Rey Exánime en el lugar dónde se fusionó con Ner\'zhul, en lo alto de la aguja, en el Trono Helado. Es el único modo.' WHERE `entry`='-1668456' ;
+UPDATE `script_texts` SET `content_loc7`='Hay... algo más que deberías saber sobre el Rey Exánime. Nunca se debe perder el control sobre la Plaga. Incluso si vencéis al Rey Exánime, otro deberá ocupar su lugar. Sin el dominio de su maestro, la Plaga acamparía a sus anchas por el mundo, destruyendo todo ser viviente.' WHERE `entry`='-1668459' ;
+UPDATE `script_texts` SET `content_loc7`='Un gran sacrificio para un alma noble...' WHERE `entry`='-1668463' ;
+UPDATE `script_texts` SET `content_loc7`='No lo sé, Jaina. Supongo que la parte de Arthas que vive dentro del Rey Exánime es todo lo que evita que la Plaga aniquile Azeroth.' WHERE `entry`='-1668464' ;
+UPDATE `script_texts` SET `content_loc7`='¡No, Jaina! ARRRRRRGHHHH... Se... acerca. Debes... debes...' WHERE `entry`='-1668466' ;
+UPDATE `script_texts` SET `content_loc7`='¡No puedes derrotar al Rey Exánime! Aquí no. Estarías loca si lo intentases. Matará a los que te siguen y los levantará como poderosos soldados de la Plaga. Pero en tu caso, Sylvanas, la recompensa que tiene para ti seria peor que la última.' WHERE `entry`='-1668449' ;
+UPDATE `script_texts` SET `content_loc7`='No tenéis mucho tiempo. El Rey Exánime ve lo que ve la espada. ¡Llegará en calquier momento!' WHERE `entry`='-1668445' ;
+UPDATE `script_texts` SET `content_loc7`='Tal vez, pero debes saber que siempre debe haber un Rey Exánime. Incluso si derrotas a Arthas otro deberá tomar su lugar. Sin el dominio del Rey Exánime, la Plaga invadirá el mundo como langostas destruyendo todo lo que toque.' WHERE `entry`='-1668453' ;
+UPDATE `script_texts` SET `content_loc7`='No lo sé, Reina alma en pena. Supongo que la parte de Arthas que vive dentro del Rey Exánime es todo lo que evita que la Plaga aniquile Azeroth.' WHERE `entry`='-1668457' ;
+UPDATE `script_texts` SET `content_loc7`='Por tanto, la única forma de derrotar al Rey Exánime es destruirlo en el lugar donde fue creado.' WHERE `entry`='-1668460' ;
+UPDATE `script_texts` SET `content_loc7`='Eso es... ¡Aargh! Se acerca... Tú... tú debes...' WHERE `entry`='-1668467' ;
+UPDATE `script_texts` SET `content_loc7`='¡Cuidado! Ya he oído antes que esa hoja maldita nos salvaría. Mira a tu alrededor y observa lo que ha brotado de la Agonía de Escarcha.' WHERE `entry`='-1668441' ;
 
 -- SYLVANAS WINDRUNNER
 
-UPDATE `script_texts` SET `content_loc7`='No... ¡No puede ser! La Agonía de Escarcha está justo ante nosotros, sin vigilancia, tal y como dijo el Gnomo. ¡Venid, héroes!' WHERE `entry`='-1594434' ;
-UPDATE `script_texts` SET `content_loc7`='Al estar tan cerca de la espada que puso fin a mi vida... El dolor... vuelve.' WHERE `entry`='-1594437' ;
-UPDATE `script_texts` SET `content_loc7`='No me atrevo a tocarla. ¡Atrás! ¡Atrás mientras intento comunicarme con la espada! Puede que nuestra salvación se halle dentro.' WHERE `entry`='-1594439' ;
-UPDATE `script_texts` SET `content_loc7`='Uther... Uther el Iluminado. Como...' WHERE `entry`='-1594443' ;
-UPDATE `script_texts` SET `content_loc7`='¿El Rey Exánime está aquí? ¡Entonces hoy cumpliré mi destino!' WHERE `entry`='-1594447' ;
-UPDATE `script_texts` SET `content_loc7`='¡Tiene que haber un modo!' WHERE `entry`='-1594451' ;
-UPDATE `script_texts` SET `content_loc7`='¿Quién afrontaría tal carga?' WHERE `entry`='-1594455' ;
-UPDATE `script_texts` SET `content_loc7`='El Trono Helado...' WHERE `entry`='-1594462' ;
-UPDATE `script_texts` SET `content_loc7`='¡No escaparás de mi tan fácilmente, Arthas! ¡Obtendré mi venganza!' WHERE `entry`='-1594472' ;
-UPDATE `script_texts` SET `content_loc7`='¡Es... demasiado poderoso! ¡Héroes, rápido, venid! ¡Debemos abandonar este lugar ahora mismo! Haré lo que pueda para inmovilizarlo mientras huimos.' WHERE `entry`='-1594480' ;
-UPDATE `script_texts` SET `content_loc7`='¡Ninguna pared detendrá a la Reina alma en pena! ¡Mantened a los no-muertos a raya, héroes! ¡Destruiré la barrera!' WHERE `entry`='-1594488' ;
-UPDATE `script_texts` SET `content_loc7`='¿Otra barrera? ¡Sed fuertes, campeones! ¡Derribaré el muro!' WHERE `entry`='-1594490' ;
-UPDATE `script_texts` SET `content_loc7`='¡Me canso de estos juegos, Arthas! ¡Tus muros no me detendrán!' WHERE `entry`='-1594496' ;
-UPDATE `script_texts` SET `content_loc7`='¡No impedirás que escapemos, demonio! ¡Acabad con los no-muertos mientras derribo esta barrera!' WHERE `entry`='-1594497' ;
-UPDATE `script_texts` SET `content_loc7`='¡Hay una salida ahí delante! ¡VAMOS!' WHERE `entry`='-1594500' ;
-UPDATE `script_texts` SET `content_loc7`='Casi estamos... ¡No os rindáis!' WHERE `entry`='-1594501' ;
-UPDATE `script_texts` SET `content_loc7`='¡Maldición, no hay salida! Así es como acaba... Preparaos, héroes. Hoy tendrá lugar nuestra última batalla.' WHERE `entry`='-1594503' ;
-UPDATE `script_texts` SET `content_loc7`='Estamos a salvo por ahora. Su fuerza se ha multiplicado desde nuestra última batalla. Necesitamos un ejército poderoso para destruir al Rey Exánime, mejor que el que la Horda puede convocar.' WHERE `entry`='-1594531' ;
-UPDATE `script_texts` SET `content_loc7`='Ahí hay un cofre. Deberíais mirar qué hay dentro.' WHERE `entry`='-1594532' ;
-UPDATE `script_texts` SET `content_loc7`='Podéis regresar a Dalaran con este portal que acabo de crear.' WHERE `entry`='-1594533' ;
+UPDATE `script_texts` SET `content_loc7`='No... ¡No puede ser! La Agonía de Escarcha está justo ante nosotros, sin vigilancia, tal y como dijo el Gnomo. ¡Venid, héroes!' WHERE `entry`='-1668434' ;
+UPDATE `script_texts` SET `content_loc7`='Al estar tan cerca de la espada que puso fin a mi vida... El dolor... vuelve.' WHERE `entry`='-1668437' ;
+UPDATE `script_texts` SET `content_loc7`='No me atrevo a tocarla. ¡Atrás! ¡Atrás mientras intento comunicarme con la espada! Puede que nuestra salvación se halle dentro.' WHERE `entry`='-1668439' ;
+UPDATE `script_texts` SET `content_loc7`='Uther... Uther el Iluminado. Como...' WHERE `entry`='-1668443' ;
+UPDATE `script_texts` SET `content_loc7`='¿El Rey Exánime está aquí? ¡Entonces hoy cumpliré mi destino!' WHERE `entry`='-1668447' ;
+UPDATE `script_texts` SET `content_loc7`='¡Tiene que haber un modo!' WHERE `entry`='-1668451' ;
+UPDATE `script_texts` SET `content_loc7`='¿Quién afrontaría tal carga?' WHERE `entry`='-1668455' ;
+UPDATE `script_texts` SET `content_loc7`='El Trono Helado...' WHERE `entry`='-1668462' ;
+UPDATE `script_texts` SET `content_loc7`='¡No escaparás de mi tan fácilmente, Arthas! ¡Obtendré mi venganza!' WHERE `entry`='-1668472' ;
+UPDATE `script_texts` SET `content_loc7`='¡Es... demasiado poderoso! ¡Héroes, rápido, venid! ¡Debemos abandonar este lugar ahora mismo! Haré lo que pueda para inmovilizarlo mientras huimos.' WHERE `entry`='-1668480' ;
+UPDATE `script_texts` SET `content_loc7`='¡Ninguna pared detendrá a la Reina Alma en Pena! ¡Mantened a los no-muertos a raya, héroes! ¡Destruiré la barrera!' WHERE `entry`='-1668488' ;
+UPDATE `script_texts` SET `content_loc7`='¿Otra barrera? ¡Sed fuertes, campeones! ¡Derribaré el muro!' WHERE `entry`='-1668490' ;
+UPDATE `script_texts` SET `content_loc7`='¡Me canso de estos juegos, Arthas! ¡Tus muros no me detendrán!' WHERE `entry`='-1668496' ;
+UPDATE `script_texts` SET `content_loc7`='¡No impedirás que escapemos, demonio! ¡Acabad con los no-muertos mientras derribo esta barrera!' WHERE `entry`='-1668497' ;
+UPDATE `script_texts` SET `content_loc7`='¡Hay una salida ahí delante! ¡VAMOS!' WHERE `entry`='-1668500' ;
+UPDATE `script_texts` SET `content_loc7`='Casi estamos... ¡no os rindáis!' WHERE `entry`='-1668501' ;
+UPDATE `script_texts` SET `content_loc7`='¡Maldición, no hay salida! Así es como acaba... Preparaos, héroes. Hoy tendrá lugar nuestra última batalla.' WHERE `entry`='-1668503' ;
+UPDATE `script_texts` SET `content_loc7`='Estamos a salvo por ahora. Su fuerza se ha multiplicado desde nuestra última batalla. Necesitamos un ejército poderoso para destruir al Rey Exánime, mejor que el que la Horda puede convocar.' WHERE `entry`='-1668531' ;
+UPDATE `script_texts` SET `content_loc7`='Ahí hay un cofre. Deberíais mirar qué hay dentro.' WHERE `entry`='-1668532' ;
+UPDATE `script_texts` SET `content_loc7`='Podéis regresar a Dalaran con este portal que acabo de crear.' WHERE `entry`='-1668533' ;
 
 -- FALRIC
 
-UPDATE `script_texts` SET `content_loc7`='Hombres, mujeres, niños... Nadie se libró de la cólera del maestro. Tu muerte no será distinta.' WHERE `entry`='-1594507' ;
-UPDATE `script_texts` SET `content_loc7`='Marwyn... acaba con ellos...' WHERE `entry`='-1594508' ;
-UPDATE `script_texts` SET `content_loc7`='¡Soldados de Lordaeron, alzaos ante la llamada de vuestro maestro!' WHERE `entry`='-1594505' ;
-UPDATE `script_texts` SET `content_loc7`='Como desees, mi señor.' WHERE `entry`='-1594475' ;
-UPDATE `script_texts` SET `content_loc7`='¡Gusano asqueroso!' WHERE `entry`='-1594509' ;
-UPDATE `script_texts` SET `content_loc7`='¡Los niños de Stratholme lucharon con más saña!' WHERE `entry`='-1594510' ;
-UPDATE `script_texts` SET `content_loc7`='Desesperación... delicioso...' WHERE `entry`='-1594511' ;
-UPDATE `script_texts` SET `content_loc7`='Miedo... tan estimulante...' WHERE `entry`='-1594512' ;
+UPDATE `script_texts` SET `content_loc7`='Hombres, mujeres, niños... Nadie se libró de la cólera del maestro. Tu muerte no será distinta.' WHERE `entry`='-1668507' ;
+UPDATE `script_texts` SET `content_loc7`='Marwyn... acaba con ellos...' WHERE `entry`='-1668508' ;
+UPDATE `script_texts` SET `content_loc7`='¡Soldados de Lordaeron, alzaos ante la llamada de vuestro maestro!' WHERE `entry`='-1668505' ;
+UPDATE `script_texts` SET `content_loc7`='Como desees, mi señor.' WHERE `entry`='-1668475' ;
+UPDATE `script_texts` SET `content_loc7`='¡Gusano asqueroso!' WHERE `entry`='-1668509' ;
+UPDATE `script_texts` SET `content_loc7`='¡Los niños de Stratholme lucharon con más saña!' WHERE `entry`='-1668510' ;
+UPDATE `script_texts` SET `content_loc7`='Desesperación... delicioso...' WHERE `entry`='-1668511' ;
+UPDATE `script_texts` SET `content_loc7`='Miedo... tan estimulante...' WHERE `entry`='-1668512' ;
 
 -- MARWYN
 
-UPDATE `script_texts` SET `content_loc7`='¡Aquí solo encontraréis muerte!' WHERE `entry`='-1594513' ;
-UPDATE `script_texts` SET `content_loc7`='Sí... corre... corre hacia tu destino... Su amargo y frío abrazo te espera.' WHERE `entry`='-1594514' ;
-UPDATE `script_texts` SET `content_loc7`='Como desees, mi señor.' WHERE `entry`='-1594476' ;
-UPDATE `script_texts` SET `content_loc7`='Vi la misma mirada en sus ojos cuando murió. Terenas no se lo podía creer.' WHERE `entry`='-1594515' ;
-UPDATE `script_texts` SET `content_loc7`='¡Atragántate con tu dolor!' WHERE `entry`='-1594516' ;
-UPDATE `script_texts` SET `content_loc7`='¡Tu carne se pudrirá ante tus ojos!' WHERE `entry`='-1594517' ;
-UPDATE `script_texts` SET `content_loc7`='¡Consúmete en la nada!' WHERE `entry`='-1594518' ;
-UPDATE `script_texts` SET `content_loc7`='El maestro servó su reino y lo encontró incompleto. Su juicio fue rápido y despiadado. ¡Muerte a todos!' WHERE `entry`='-1594506' ;
-
--- FROSTWORN GENERAL
-
-UPDATE `script_texts` SET `content_loc7`='¡No sois dignos de enfrentaros al Rey Exánime!' WHERE `entry`='-1594519' ;
-UPDATE `script_texts` SET `content_loc7`='Maestro, he fracasado...' WHERE `entry`='-1594520' ;
-
+UPDATE `script_texts` SET `content_loc7`='¡Aquí solo encontraréis muerte!' WHERE `entry`='-1668513' ;
+UPDATE `script_texts` SET `content_loc7`='Sí... corre... corre hacia tu destino... Su amargo y frío abrazo te espera.' WHERE `entry`='-1668514' ;
+UPDATE `script_texts` SET `content_loc7`='Como desees, mi señor.' WHERE `entry`='-1668476' ;
+UPDATE `script_texts` SET `content_loc7`='Vi la misma mirada en sus ojos cuando murió. Terenas no se lo podía creer.' WHERE `entry`='-1668515' ;
+UPDATE `script_texts` SET `content_loc7`='¡Atragántate con tu dolor!' WHERE `entry`='-1668516' ;
+UPDATE `script_texts` SET `content_loc7`='¡Tu carne se pudrirá ante tus ojos!' WHERE `entry`='-1668517' ;
+UPDATE `script_texts` SET `content_loc7`='¡Consúmete en la nada!' WHERE `entry`='-1668518' ;
+UPDATE `script_texts` SET `content_loc7`='El maestro servó su reino y lo encontró incompleto. Su juicio fue rápido y despiadado. ¡Muerte a todos!' WHERE `entry`='-1668506' ;
 
 -- THE LICH KING
 
-UPDATE `script_texts` SET `content_loc7`='¡SILENCIO, PALADÍN!' WHERE `entry`='-1594468' ;
-UPDATE `script_texts` SET `content_loc7`='¿Así que quieres comunicarte con los muertos? Tendrás lo que deseas.' WHERE `entry`='-1594469' ;
-UPDATE `script_texts` SET `content_loc7`='Falric. Marwyn. Traed sus cuerpos a mi estancia cuando hayáis terminado.' WHERE `entry`='-1594470' ;
-UPDATE `script_texts` SET `content_loc7`='No cometeré el mismo error, Sylvanas. Esta vez no habrá escapatoria. Fallaste al servirme como no-muerta. Ahora lo que te queda es el olvido.' WHERE `entry`='-1594474' ;
-UPDATE `script_texts` SET `content_loc7`='¡No hay escapatoria!' WHERE `entry`='-1594486' ;
-UPDATE `script_texts` SET `content_loc7`='¡Alzaos, esbirros! ¡Que no pasen!' WHERE `entry`='-1594482' ;
-UPDATE `script_texts` SET `content_loc7`='El frío abrazo de la muerte os aguarda.' WHERE `entry`='-1594481' ;
-UPDATE `script_texts` SET `content_loc7`='Sucumbid al frío de la tumba.' WHERE `entry`='-1594491' ;
-UPDATE `script_texts` SET `content_loc7`='¡Todo perdido!' WHERE `entry`='-1594485' ;
-UPDATE `script_texts` SET `content_loc7`='Otro final sin salida.' WHERE `entry`='-1594492' ;
-UPDATE `script_texts` SET `content_loc7`='¡Esbirros, cogedlos! ¡Traedme sus cadáveres!' WHERE `entry`='-1594483' ;
-UPDATE `script_texts` SET `content_loc7`='¿Cuánto vais a aguantar?' WHERE `entry`='-1594493' ;
-UPDATE `script_texts` SET `content_loc7`='¡Jajaja! ¡No corráis! Sois míos...' WHERE `entry`='-1594504' ;
-UPDATE `script_texts` SET `content_loc7`='Insensata. Buscas lo que asesiné tiempo atrás. Ahora, no es más que un fantasma. Un eco lejano en mi mente.' WHERE `entry`='-1594473' ;
-UPDATE `script_texts` SET `content_loc7`='Han llegado tus aliados, Jaina, como prometiste. ¡Jajaja! Todos seréis poderosos agentes de la Plaga.' WHERE `entry`='-1594477' ;
-UPDATE `script_texts` SET `content_loc7`='No cometeré el mismo error, Sylvanas. Esta vez no habrá escapatoria. Me serviréis en la muerte.' WHERE `entry`='-1594478' ;
+UPDATE `script_texts` SET `content_loc7`='¡SILENCIO, PALADÍN!' WHERE `entry`='-1668468' ;
+UPDATE `script_texts` SET `content_loc7`='¿Así que quieres comunicarte con los muertos? Tendrás lo que deseas.' WHERE `entry`='-1668469' ;
+UPDATE `script_texts` SET `content_loc7`='Falric. Marwyn. Traed sus cuerpos a mi estancia cuando hayáis terminado.' WHERE `entry`='-1668470' ;
+UPDATE `script_texts` SET `content_loc7`='No cometeré el mismo error, Sylvanas. Esta vez no habrá escapatoria. Fallaste al servirme como no-muerta. Ahora lo que te queda es el olvido.' WHERE `entry`='-1668474' ;
+UPDATE `script_texts` SET `content_loc7`='¡No hay escapatoria!' WHERE `entry`='-1668486' ;
+UPDATE `script_texts` SET `content_loc7`='¡Alzaos, esbirros! ¡Que no pasen!' WHERE `entry`='-1668482' ;
+UPDATE `script_texts` SET `content_loc7`='El frío abrazo de la muerte os aguarda.' WHERE `entry`='-1668481' ;
+UPDATE `script_texts` SET `content_loc7`='Sucumbid al frío de la tumba.' WHERE `entry`='-1668491' ;
+UPDATE `script_texts` SET `content_loc7`='¡Todo perdido!' WHERE `entry`='-1668485' ;
+UPDATE `script_texts` SET `content_loc7`='Otro final sin salida.' WHERE `entry`='-1668492' ;
+UPDATE `script_texts` SET `content_loc7`='¡Esbirros, cogedlos! ¡Traedme sus cadáveres!' WHERE `entry`='-1668483' ;
+UPDATE `script_texts` SET `content_loc7`='¿Cuánto vais a aguantar?' WHERE `entry`='-1668493' ;
+UPDATE `script_texts` SET `content_loc7`='¡Jajaja! ¡No corráis! Sois míos...' WHERE `entry`='-1668504' ;
+UPDATE `script_texts` SET `content_loc7`='Insensata. Buscas lo que asesiné tiempo atrás. Ahora, no es más que un fantasma. Un eco lejano en mi mente.' WHERE `entry`='-1668473' ;
+UPDATE `script_texts` SET `content_loc7`='Han llegado tus aliados, Jaina, como prometiste. ¡Jajaja! Todos seréis poderosos agentes de la Plaga.' WHERE `entry`='-1668477' ;
+UPDATE `script_texts` SET `content_loc7`='No cometeré el mismo error, Sylvanas. Esta vez no habrá escapatoria. Me serviréis en la muerte.' WHERE `entry`='-1668478' ;
 
 UPDATE `gossip_texts` SET `content_loc7`='¡Lady Jaina, estamos listos!' WHERE `entry`='-3594536' ;
 UPDATE `gossip_texts` SET `content_loc7`='¡Vamos!' WHERE `entry`='-3594537' ;
@@ -848,12 +847,13 @@ UPDATE `script_texts` SET content_loc7 ='La Dama Oscura os protege. ¡Daos prisa
 
 -- MAESTRO DE FORJA GARGELUS
 
-UPDATE `script_texts` SET content_loc7 ='Bichejos a mis pies. ¡Traéis a Gargelus cosas ricas para comer!' WHERE entry = -1658001;
-UPDATE `script_texts` SET content_loc7 ='Hacha floja. Gargelus hace mejor y APLASTA.' WHERE entry =-1658005;
-UPDATE `script_texts` SET content_loc7 ='Gargelus cansado de débiles mortales. ¡Ahora huesos se hielan!' WHERE entry = -1658006;
-UPDATE `script_texts` SET content_loc7 ='Gargelus espera llevar calzones limpios. Mucha vergüenza si no. Luego.' WHERE entry = -1658004;
-UPDATE `script_texts` SET content_loc7 ='Guardaré para comer. Luego.' WHERE entry = -1658002;
-UPDATE `script_texts` SET content_loc7 ='Éste no tan rico para comerlo ahora. ¡Gargelus tonto! ¡MALO! ¡MALO!' WHERE entry = -1658003;
+UPDATE `script_texts` SET content_loc7 ='Bichejos a mis pies. ¡Traéis a Gargelus cosas ricas para comer!' WHERE entry = -1610051;
+UPDATE `script_texts` SET content_loc7 ='Hacha floja. Gargelus hace mejor y APLASTA.' WHERE entry = -1610055;
+UPDATE `script_texts` SET content_loc7 ='Gargelus cansado de débiles mortales. ¡Ahora huesos se hielan!' WHERE entry = -1610056;
+UPDATE `script_texts` SET content_loc7 ='Gargelus espera llevar calzones limpios. Mucha vergüenza si no. Luego.' WHERE entry = -1610057;
+UPDATE `script_texts` SET content_loc7 ='Guardaré para comer. Luego.' WHERE entry = -1610052;
+UPDATE `script_texts` SET content_loc7 ='Éste no tan rico para comerlo ahora. ¡Gargelus tonto! ¡MALO! ¡MALO!' WHERE entry = -1610054;
+UPDATE `script_texts` SET content_loc7 ='¡Maestro de Forja Gargelus lanza una roca gigante de saronita!' WHERE entry = -1610053;
 
 -- GORKUN TESTAHIERRO
 
@@ -862,19 +862,19 @@ UPDATE `script_texts` SET content_loc7 ='Hoy, habéis demostrado no sólo vuestr
 
 -- AGH & PUAGH
 
-UPDATE `script_texts` SET content_loc7 ='¡No se debe interrumpir nuestro trabajo! ¡Agh, ocúpate de ellos!' WHERE entry = -1658010;
-UPDATE `script_texts` SET content_loc7 ='He cambiado de idea. ¡A por ése mejor!' WHERE entry = -1658017;
-UPDATE `script_texts` SET content_loc7 ='¡Deja de moverte! Quieto mientras los estallo a todos.' WHERE entry = -1658013;
-UPDATE `script_texts` SET content_loc7 ='¡Rápido! Envenenalos mientras están cerca.' WHERE entry = -1658015;
-UPDATE `script_texts` SET content_loc7 ='¡Necesitamos brazos y piernas! ¡Gracias por la contribución!' WHERE entry = -1658012;
-UPDATE `script_texts` SET content_loc7 ='¡Seguro que podríamos usar estos trozos!' WHERE entry = -1658011;
-UPDATE `script_texts` SET content_loc7 ='¡No! ¡Ése! ¡Ése! ¡Ve a por ése!' WHERE entry = -1658016;
-UPDATE `script_texts` SET content_loc7 ='¿Para que lo atacas? ¡El peligroso está ahí, idiota!' WHERE entry = -1658018;
-UPDATE `script_texts` SET content_loc7 ='¡Esperad! ¡Parad! ¡No me matéis, por favor! ¡Os contaré todo!' WHERE entry = -1658030;
-UPDATE `script_texts` SET content_loc7 ='Lo que buscáis se encuentra en la guarida del maestro, pero debéis acabar con Tyrannus para entrar. Dentro de las Cámaras de Reflexión encontraréis a la Agonía de Escarcha. En ella... ella esconden la verdad.' WHERE entry = -1658033;
-UPDATE `script_texts` SET content_loc7 ='¡Os juro que es cierto! ¡Por favor, no me matéis!' WHERE entry = -1658036;
-UPDATE `script_texts` SET content_loc7 ='Urghh... ¡NOOO!' WHERE entry = -1658038;
-UPDATE `script_texts` SET content_loc7 ='¡%s comienza a invocar minas explosivas!' WHERE entry = -1658014;
+UPDATE `script_texts` SET content_loc7 ='¡No se debe interrumpir nuestro trabajo! ¡Agh, ocúpate de ellos!' WHERE entry = -1610060;
+UPDATE `script_texts` SET content_loc7 ='He cambiado de idea. ¡A por ése mejor!' WHERE entry = -1610064;
+UPDATE `script_texts` SET content_loc7 ='¡Deja de moverte! Quieto mientras los estallo a todos.' WHERE entry = -1610062;
+UPDATE `script_texts` SET content_loc7 ='¡Rápido! Envenenalos mientras están cerca.' WHERE entry = -1610061;
+UPDATE `script_texts` SET content_loc7 ='¡Necesitamos brazos y piernas! ¡Gracias por la contribución!' WHERE entry = -1610068;
+UPDATE `script_texts` SET content_loc7 ='¡Seguro que podríamos usar estos trozos!' WHERE entry = -1610067;
+UPDATE `script_texts` SET content_loc7 ='¡No! ¡Ése! ¡Ése! ¡Ve a por ése!' WHERE entry = -1610065;
+UPDATE `script_texts` SET content_loc7 ='¿Para qué lo atacas? ¡El peligroso está ahí, idiota!' WHERE entry = -1610066;
+UPDATE `script_texts` SET content_loc7 ='¡Esperad! ¡Parad! ¡No me matéis, por favor! ¡Os contaré todo!' WHERE entry = -1610069;
+UPDATE `script_texts` SET content_loc7 ='Lo que buscáis se encuentra en la guarida del maestro, pero debéis acabar con Tyrannus para entrar. Dentro de las Cámaras de Reflexión encontraréis a la Agonía de Escarcha. En ella... ella esconden la verdad.' WHERE entry = -1610072;
+UPDATE `script_texts` SET content_loc7 ='¡Os juro que es cierto! ¡Por favor, no me matéis!' WHERE entry = -1610075;
+UPDATE `script_texts` SET content_loc7 ='Urghh... ¡NOOO!' WHERE entry = -1610077;
+UPDATE `script_texts` SET content_loc7 ='¡%s comienza a invocar minas explosivas!' WHERE entry = -1610063;
 UPDATE `script_texts` SET content_loc7 ='¡%s comienza a desatar una nube de veneno tóxica!' WHERE entry = -1658020;
 UPDATE `script_texts` SET content_loc7 ='¡%s te persigue!' WHERE entry = -1658021;
 
@@ -887,8 +887,8 @@ UPDATE `script_texts` SET content_loc7 ='¡Imposible! Dientefrío... avisa...' W
 UPDATE `script_texts` SET content_loc7 ='Otro ocupará su lugar. Perdéis el tiempo.' WHERE entry = -1658007;
 UPDATE `script_texts` SET content_loc7 ='¡Dientefrío! ¡Atrápalos en el túnel! ¡Entiérralos vivos!' WHERE entry = 1658052;
 UPDATE `script_texts` SET content_loc7 ='Poder sobrecogedor...' WHERE entry = -1658061;
-UPDATE `script_texts` SET content_loc7 ='¡Bicho asqueroso! ¡La muerte es lo que te espera!' WHERE entry = -1658037;
-UPDATE `script_texts` SET content_loc7 ='No creáis que os voy a permitir la entrada al sagrario de maestro tan fácilmente. ¡Seguid si osáis!' WHERE entry = -1658039;
+UPDATE `script_texts` SET content_loc7 ='¡Bicho asqueroso! ¡La muerte es lo que te espera!' WHERE entry = -1610076;
+UPDATE `script_texts` SET content_loc7 ='No creáis que os voy a permitir la entrada al sagrario de maestro tan fácilmente. ¡Seguid si osáis!' WHERE entry = -1610078;
 UPDATE `script_texts` SET content_loc7 ='¡Dientefrío! ¡Destruye a éste insensato!' WHERE entry = -1658059;
 UPDATE `script_texts` SET content_loc7 ='Que vergüenza... ¡Estás mejor muerto!' WHERE entry = -1658056;
 UPDATE `script_texts` SET content_loc7 ='Quizá deberías haberte quedado... ¡en las montañas!' WHERE entry = -1658057;
@@ -899,20 +899,20 @@ UPDATE `script_texts` SET content_loc7 ='¡%s ruge y absorve energia oscura!' WH
 
 -- JAINA
 
-UPDATE `script_texts` SET content_loc7 ='No soy tan ingenua como para creerte cuando pides clemencia, pero te escucharé.' WHERE entry = -1658031;
-UPDATE `script_texts` SET content_loc7 ='¿La Agonía de Escarcha está sin vigilancia? ¡Imposible!' WHERE entry = -1658034;
-UPDATE `script_texts` SET content_loc7 ='Que final tan cruel. Vamos, héroes. Veamos si la historia del gnomo es cierta. Si separamos a Arthas de la Agonía de Escarcha, puede que logremos detenerle.' WHERE entry = -1658040;
-UPDATE `script_texts` SET content_loc7 ='¡Héroes, venid!' WHERE entry = -1658065;
-UPDATE `script_texts` SET content_loc7 ='La Reina de Escarcha se ha ido. Debemos seguir adelante. Nuestro objetivo está cerca.' WHERE entry = -1658067;
-UPDATE `script_texts` SET content_loc7 ='No... no pude salvarlos... ¡Maldito seas, Arthas! ¡MALDITO SEAS!' WHERE entry = -1658069;
+UPDATE `script_texts` SET content_loc7 ='No soy tan ingenua como para creerte cuando pides clemencia, pero te escucharé.' WHERE entry = -1610070;
+UPDATE `script_texts` SET content_loc7 ='¿La Agonía de Escarcha está sin vigilancia? ¡Imposible!' WHERE entry = -1610073;
+UPDATE `script_texts` SET content_loc7 ='Que final tan cruel. Vamos, héroes. Veamos si la historia del gnomo es cierta. Si separamos a Arthas de la Agonía de Escarcha, puede que logremos detenerle.' WHERE entry = -1610079;
+UPDATE `script_texts` SET content_loc7 ='¡Héroes, venid!' WHERE entry = -1610097;
+UPDATE `script_texts` SET content_loc7 ='La Reina de Escarcha se ha ido. Debemos seguir adelante. Nuestro objetivo está cerca.' WHERE entry = -1610099;
+UPDATE `script_texts` SET content_loc7 ='No... no pude salvarlos... ¡Maldito seas, Arthas! ¡MALDITO SEAS!' WHERE entry = -1610100;
 
 -- SYLVANAS
 
-UPDATE `script_texts` SET content_loc7 ='¿Por qué debería perdonarte la vida la Reina alma en pena?' WHERE entry = -1658032;
-UPDATE `script_texts` SET content_loc7 ='¿La Agonía de Escarcha? ¡El Rey Exánime nunca deja su espada! Si me mientes...' WHERE entry = -1658035;
-UPDATE `script_texts` SET content_loc7 ='Un final propio para un traidor. Vamos, debemos liberar a los esclavos y ver que hay en la estancia del Rey Exánime.' WHERE entry = -1658041;
-UPDATE `script_texts` SET content_loc7 ='¡Protegeos detrás de mi! ¡Rápido!' WHERE entry = -1658066;
-UPDATE `script_texts` SET content_loc7 ='Pensé que nunca se callaría. Por fin, Sindragosa silenció a ese loco impertinente. ¡A las Cámaras de Reflexión, campeones! Nuestro objetivo está cerca, lo presiento.' WHERE entry = -1658068;
+UPDATE `script_texts` SET content_loc7 ='¿Por qué debería perdonarte la vida la Reina alma en pena?' WHERE entry = -1610071;
+UPDATE `script_texts` SET content_loc7 ='¿La Agonía de Escarcha? ¡El Rey Exánime nunca deja su espada! Si me mientes...' WHERE entry = -1610074;
+UPDATE `script_texts` SET content_loc7 ='Un final propio para un traidor. Vamos, debemos liberar a los esclavos y ver que hay en la estancia del Rey Exánime.' WHERE entry = -1610080;
+UPDATE `script_texts` SET content_loc7 ='¡Protegeos detrás de mi! ¡Rápido!' WHERE entry = -1610096;
+UPDATE `script_texts` SET content_loc7 ='Pensé que nunca se callaría. Por fin, Sindragosa silenció a ese loco impertinente. ¡A las Cámaras de Reflexión, campeones! Nuestro objetivo está cerca, lo presiento.' WHERE entry = -1610098;
 
 -- PRUEBA DEL CRUZADO
 

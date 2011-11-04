@@ -26,18 +26,18 @@ EndScriptData */
 
 enum
 {
-    SAY_PREFIGHT_1                      = -1658050,
     SAY_GENERAL_TRASH                   = -1658051,
-    SAY_PREFIGHT_2                      = -1658052,
-    SAY_AGGRO                           = -1658053,
-    SAY_SLAY_1                          = -1658054,
-    SAY_SLAY_2                          = -1658055,
-    SAY_DEATH                           = -1658056,
-    SAY_MARK                            = -1658057,
-    SAY_SMASH                           = -1658058,
+    SAY_PREFIGHT_1                      = -1658053,
+    SAY_PREFIGHT_2                      = -1658054,
+    SAY_AGGRO                           = -1658055,
+    SAY_SLAY_1                          = -1658056,
+    SAY_SLAY_2                          = -1658057,
+    SAY_DEATH                           = -1658058,
+    SAY_MARK                            = -1658059,
+    SAY_SMASH                           = -1658061,
 
-    EMOTE_RIMEFANG_ICEBOLT              = -1658059,
-    EMOTE_SMASH                         = -1658060,
+    EMOTE_RIMEFANG_ICEBOLT              = -1658060,
+    EMOTE_SMASH                         = -1658062,
 
     SPELL_FORCEFUL_SMASH                = 69155,
     SPELL_FORCEFUL_SMASH_H              = 69627,
@@ -80,6 +80,7 @@ struct MANGOS_DLL_DECL boss_rimefangAI : public ScriptedAI
         m_uiIcyBlastTimer       = 35000;
         m_uiIcyBlastSlowTimer   = 30000;
         m_uiMainTargetGUID.Clear();
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
     }
 
     void SetMainTarget(ObjectGuid m_uiTargetGUID)
@@ -104,6 +105,7 @@ struct MANGOS_DLL_DECL boss_rimefangAI : public ScriptedAI
                 DoCastSpellIfCan(pTarget, SPELL_HOARFROST);
             else if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 DoCastSpellIfCan(pTarget, SPELL_HOARFROST);
+            DoScriptText(EMOTE_RIMEFANG_ICEBOLT, m_creature);
             m_uiHoarfrostTimer = 20000;
         }
         else
