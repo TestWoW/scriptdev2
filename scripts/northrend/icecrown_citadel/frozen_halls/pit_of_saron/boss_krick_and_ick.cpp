@@ -145,11 +145,16 @@ struct MANGOS_DLL_DECL boss_IckAI : public ScriptedAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_KRICK, DONE);
 
-            if(Creature* pKrick = m_creature->SummonCreature(NPC_KRICK, KrickPos[0], KrickPos[1], KrickPos[2], KrickPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
-            {
-                DoScriptText(SAY_STOP, pKrick);
-                m_uiKrickGUID = pKrick->GetGUID();
-            }
+        if(Creature* pKrick = m_creature->SummonCreature(NPC_KRICK, KrickPos[0], KrickPos[1], KrickPos[2], KrickPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
+        {
+            DoScriptText(SAY_STOP, pKrick);
+            m_uiKrickGUID = pKrick->GetGUID();
+        }
+
+        if (GameObject* pIceWall = m_pInstance->GetSingleGameObjectFromStorage(GO_ICEWALL))
+        {
+            pIceWall->Delete();
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)

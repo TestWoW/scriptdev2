@@ -112,6 +112,11 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GARFROST, DONE);
 
         DoScriptText(SAY_DEATH, m_creature, pKiller);
+
+        if (GameObject* pIceWall = m_pInstance->GetSingleGameObjectFromStorage(GO_ICEWALL))
+        {
+            pIceWall->Delete();
+        }
     }
 
     void KilledUnit(Unit* pVictim)

@@ -171,6 +171,11 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                     if(m_pInstance)
                         m_pInstance->SetData(TYPE_INTRO, IN_PROGRESS);
 
+                        m_creature->SummonGameobject(GO_ICEWALL, 932.267f,-80.6684f,591.676f, 2.28f, 0);
+
+                    if (GameObject* pIceWall = GetClosestGameObjectWithEntry(m_creature, GO_ICEWALL, 50.0f))
+                        pIceWall->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
+
                     if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 526.501f, 237.639f, 543.686f, 3.431f, TEMPSUMMON_TIMED_DESPAWN, 40000))
                     {
                         pTyrannus->GetMotionMaster()->MoveIdle();
