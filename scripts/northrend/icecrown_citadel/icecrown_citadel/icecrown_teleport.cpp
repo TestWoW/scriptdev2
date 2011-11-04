@@ -53,9 +53,12 @@ static t_Locations PortalLoc[]=
 
 bool GOGossipSelect_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo, uint32 sender, uint32 action)
 {
-    if(sender != GOSSIP_SENDER_MAIN) return false;
+    ScriptedInstance *pInstance = (ScriptedInstance *) pGo->GetInstanceData();
 
-    if(pPlayer->IsInCombat()) 
+    if(sender != GOSSIP_SENDER_MAIN)
+        return false;
+
+    if(pPlayer->IsInCombat() && pInstance->GetData(TYPE_LICH_KING) == IN_PROGRESS)
         return false;
 
     if(action >= 0 && action < PORTALS_COUNT)

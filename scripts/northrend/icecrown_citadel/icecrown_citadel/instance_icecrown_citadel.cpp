@@ -467,15 +467,9 @@ static Locations SpawnLoc[]=
                 m_auiEncounter[TYPE_SINDRAGOSA] = uiData;
 
                 if (uiData == IN_PROGRESS)
-                //{
                     DoCloseDoor(GO_SINDRAGOSA_ICEWALL);
-                    //DoCloseDoor(GO_SINDRAGOSA_ENTRANCE);
-                //}
                 else
-                //{
                     DoOpenDoor(GO_SINDRAGOSA_ICEWALL);
-                    //DoOpenDoor(GO_SINDRAGOSA_ENTRANCE);
-                //}
                 if (uiData == DONE)
                 {
                     if (m_auiEncounter[TYPE_PUTRICIDE] == DONE
@@ -485,6 +479,9 @@ static Locations SpawnLoc[]=
                 break;
              case TYPE_LICH_KING:
                 m_auiEncounter[TYPE_LICH_KING] = uiData;
+
+                if (uiData == IN_PROGRESS)
+                    SetSpecialAchievementCriteria(TYPE_NECK_DEEP_IN_VILE, true);
                 break;
              case TYPE_ICECROWN_QUESTS:
                 m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;
@@ -548,112 +545,6 @@ static Locations SpawnLoc[]=
              case TYPE_STINKY:        return m_uiStinkystate;
              case TYPE_PRECIOUS:      return m_uiPreciousstate;
              case TYPE_EVENT:         return m_auiEvent;
-             case TYPE_EVENT_TIMER:   return m_auiEventTimer;
-             case TYPE_EVENT_NPC:     switch (m_auiEvent)
-                                         {
-                                         case 12030:
-                                         case 12050:
-                                         case 12051:
-                                         case 12052:
-                                         case 12053:
-                                         case 12070:
-                                         case 12090:
-                                         case 12110:
-                                         case 12130:
-                                         case 12150:
-                                         case 12170:
-                                         case 13110:
-                                         case 13111:
-                                         case 13130:
-                                         case 13131:
-                                         case 13132:
-                                         case 13133:
-                                         case 13134:
-                                         case 13135:
-                                         case 13139:
-                                         case 13150:
-                                         case 13170:
-                                         case 13190:
-                                         case 13210:
-                                         case 13230:
-                                         case 13250:
-                                         case 13270:
-                                         case 13290:
-                                         case 13310:
-                                         case 13330:
-                                         case 13350:
-                                         case 13370:
-                                         case 14009:
-                                         case 14010:
-                                         case 14030:
-                                         case 14050:
-                                         case 14070:
-                                                return NPC_TIRION;
-                                                break;
-
-                                         case 12000:
-                                         case 12020:
-                                         case 12040:
-                                         case 12041:
-                                         case 12042:
-                                         case 12043:
-                                         case 12060:
-                                         case 12080:
-                                         case 12100:
-                                         case 12120:
-                                         case 12200:
-                                         case 12995:
-                                         case 12996:
-                                         case 12997:
-                                         case 12998:
-                                         case 12999:
-                                         case 13000:
-                                         case 13005:
-                                         case 13020:
-                                         case 13040:
-                                         case 13060:
-                                         case 13080:
-                                         case 13100:
-                                         case 13120:
-                                         case 13140:
-                                         case 13160:
-                                         case 13180:
-                                         case 13200:
-                                         case 13220:
-                                         case 13240:
-                                         case 13260:
-                                         case 13280:
-                                         case 13300:
-                                         case 14000:
-                                                return NPC_LICH_KING;
-                                                break;
-                                         case 500:
-                                         case 510:
-                                         case 550:
-                                         case 560:
-                                         case 570:
-                                         case 580:
-                                         case 590:
-                                         case 600:
-                                         case 610:
-                                         case 620:
-                                         case 630:
-                                         case 640:
-                                         case 650:
-                                         case 660:
-                                                return NPC_PROFESSOR_PUTRICIDE;
-                                                break;
-
-                                         case 800:
-                                         case 810:
-                                         case 820:
-                                                return NPC_LANATHEL_INTRO;
-                                                break;
-
-                                         default:
-                                                break;
-                                         };
-
         }
         return 0;
     }
