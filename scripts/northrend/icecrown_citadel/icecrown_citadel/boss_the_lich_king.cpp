@@ -302,7 +302,6 @@ struct MANGOS_DLL_DECL boss_the_lich_king_icc_eventAI : public ScriptedAI
                     {
                         m_guidTirion = pTemp->GetObjectGuid();
                         pTemp->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
                         pTemp->SetWalk(true);
                         StartMovement(2, pTemp);
                         NextStep(3000);
