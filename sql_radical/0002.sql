@@ -1,3 +1,4 @@
+
 DELETE FROM `script_texts` WHERE entry BETWEEN -1576022 AND -1576000;
 INSERT IGNORE INTO `script_texts` (`entry`,`content_default`,`content_loc6`,`content_loc7`,`sound`,`type`,`language`,`comment`) VALUES
 (-1576000,'You know what they say about curiosity.','¡Ya sabéis lo que dicen de la curiosidad!','¡Ya sabéis lo que dicen de la curiosidad!',13319,1,0,'telestra SAY_AGGRO'),
