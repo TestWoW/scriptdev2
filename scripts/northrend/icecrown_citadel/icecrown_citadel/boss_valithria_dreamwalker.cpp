@@ -143,7 +143,7 @@ enum
     SAY_SVALNA_AGGRO            = -1631136,
     SAY_SVALNA_DEATH            = -1631139,
     SAY_SVALNA_KILL             = -1631138,
-    SAY_SVALNA_ETER             = -1631134,
+    SAY_SVALNA_AETHER             = -1631134,
 
 };
 
@@ -269,6 +269,8 @@ struct MANGOS_DLL_DECL mob_svalnaAI : public ScriptedAI
     ScriptedInstance *m_pInstance;
     uint32 m_uiAetherBurstTimer;
     uint32 m_uiMortalwoundTimer;
+    bool m_bAether1;
+    bool m_bAether2;
 
     void Reset()
     {
@@ -278,6 +280,8 @@ struct MANGOS_DLL_DECL mob_svalnaAI : public ScriptedAI
         m_uiMortalwoundTimer = urand(2000, 5000);
 
         m_creature->RemoveAurasDueToSpell(71465);
+        m_bAether1 = false;
+        m_bAether2 = false;
     }
 
     void Aggro(Unit *pWho)
@@ -311,16 +315,22 @@ struct MANGOS_DLL_DECL mob_svalnaAI : public ScriptedAI
         else
             m_uiAetherBurstTimer -= uiDiff;
 
-        if (m_creature->GetHealthPercent() < 70.0f)
+        if (m_creature->GetHealthPercent() < 70.0f && !m_bAether1)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), 71463) == CAST_OK)
-            DoScriptText(SAY_SVALNA_ETER, m_creature);
+            {
+                DoScriptText(SAY_SVALNA_AETHER, m_creature);
+                m_bAether1 = true;
+            }
         }
 
-        if (m_creature->GetHealthPercent() < 30.0f)
+        if (m_creature->GetHealthPercent() < 30.0f && !m_bAether2)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), 71463) == CAST_OK)
-            DoScriptText(SAY_SVALNA_ETER, m_creature);
+            {
+                DoScriptText(SAY_SVALNA_AETHER, m_creature);
+                m_bAether2 = true;
+            }
         }
 
         DoMeleeAttackIfReady();

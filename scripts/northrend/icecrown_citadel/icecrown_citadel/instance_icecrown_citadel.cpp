@@ -480,8 +480,8 @@ static Locations SpawnLoc[]=
              case TYPE_LICH_KING:
                 m_auiEncounter[TYPE_LICH_KING] = uiData;
 
-                if (uiData == IN_PROGRESS)
-                    SetSpecialAchievementCriteria(TYPE_NECK_DEEP_IN_VILE, true);
+                /*if (uiData == IN_PROGRESS)
+                    SetSpecialAchievementCriteria(TYPE_NECK_DEEP_IN_VILE, true);*/
                 break;
              case TYPE_ICECROWN_QUESTS:
                 m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;

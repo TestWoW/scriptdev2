@@ -147,7 +147,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public ScriptedAI
     {
         ScriptedAI::MoveInLineOfSight(pWho);
 
-        if (m_bSaidIntro)
+        if (m_bSaidIntro || !(((Player*)pWho)->isGameMaster() && m_creature->GetDistance2d(pWho) < 50.0f))
             return;
 
         DoScriptText(SAY_INTRO, m_creature);
@@ -387,6 +387,7 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
     mob_bone_spikeAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = ((instance_icecrown_spire*)pCreature->GetInstanceData());
+        m_uiAchievTimer = 8000;
         m_victimGuid.Clear();
         m_bEmerged = false;
         SetCombatMovement(false);
@@ -400,6 +401,7 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
     void Reset()
     {
         m_uiAchievTimer = 8000;
+        m_victimGuid.Clear();
     }
 
     void AttackStart(Unit *pWho){}
@@ -408,7 +410,6 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
     {
         if (bBoarded)
         {
-            m_creature->CastSpell(pPassenger, SPELL_IMPALED, true);
             m_victimGuid = pPassenger->GetObjectGuid();
         }
         else

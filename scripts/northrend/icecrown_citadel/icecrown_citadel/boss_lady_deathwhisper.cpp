@@ -49,8 +49,8 @@ enum BossSpells
         SPELL_DEATHCHILL_BOLT                   = 70594,
         SPELL_DEATHCHILL_BLAST                  = 70906,
         SPELL_CURSE_OF_TORPOR                   = 71237,
-        SPELL_DARK_EMPOWERMENT                  = 70901, // dummy spell: 70896
-        SPELL_DARK_MARTYRDOM                    = 70903,
+        SPELL_DARK_EMPOWERMENT                  = 70896,
+        SPELL_DARK_MARTYRDOM                    = 70897,
         SPELL_ADHERENTS_DETERMINATION           = 71234,
 
         // Cult Fanatic
@@ -61,8 +61,7 @@ enum BossSpells
         SPELL_SHADOW_CLEAVE                     = 70670,
         SPELL_NECROTIC_STRIKE                   = 70659,
         SPELL_VAMPIRIC_MIGHT                    = 70674,
-        SPELL_DARK_TRANSFORMATION               = 70900, // dummy spell: 70895
-        //SPELL_DARK_MARTYRDOM                    = 70903,
+        SPELL_DARK_TRANSFORMATION               = 70895,
         SPELL_FANATICS_DETERMINATION            = 71235,
 
         // Vengeful Shade

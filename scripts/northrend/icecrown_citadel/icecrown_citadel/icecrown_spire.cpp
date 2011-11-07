@@ -61,6 +61,8 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public BSWScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
+
         timedCast(SPELL_CLEAVE, diff);
         timedCast(SPELL_BLIZZARD, diff);
         timedCast(SPELL_FROST_BREATH, diff);
@@ -84,7 +86,6 @@ struct MANGOS_DLL_DECL mob_frost_giantAI : public BSWScriptedAI
     }
 
     ScriptedInstance *pInstance;
-    uint8 stage;
 
     void Aggro(Unit *who)
     {
@@ -108,7 +109,6 @@ struct MANGOS_DLL_DECL mob_frost_giantAI : public BSWScriptedAI
     void Reset()
     {
         m_creature->SetRespawnDelay(7*DAY);
-        stage = 0;
         resetTimers();
     }
 
