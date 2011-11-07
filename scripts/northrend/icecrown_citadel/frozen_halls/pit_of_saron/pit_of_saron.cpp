@@ -74,6 +74,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
     npc_sylvanas_jaina_pos_startAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_lGuards.clear();
         Reset();
     }
 
@@ -85,6 +86,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
     uint32 creatureEntry;
 
     uint64 m_uiTyrannusGuid;
+    GUIDList m_lGuards;
 
     void Reset()
     {
@@ -118,6 +120,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_1_HORDE, SummonLoc[0].x + urand(0, 20), SummonLoc[0].y - urand(0, 20), SummonLoc[0].z, SummonLoc[0].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[0].x + urand(0, 40), MoveLoc[0].y - urand(0, 10), MoveLoc[0].z);
+                m_lGuards.push_back(pTemp->GetObjectGuid());
         }
 
         for (uint8 i = 5; i < 10; i++)
@@ -125,6 +128,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_2_HORDE, SummonLoc[1].x + urand(0, 20), SummonLoc[1].y + urand(0, 20), SummonLoc[1].z, SummonLoc[1].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x + urand(0, 40), MoveLoc[1].y + urand(0, 40), MoveLoc[1].z);
+                m_lGuards.push_back(pTemp->GetObjectGuid());
         }
 
         for (uint8 i = 10; i < 15; i++)
@@ -132,6 +136,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_3_HORDE, SummonLoc[2].x + urand(0, 20), SummonLoc[2].y + urand(0, 20), SummonLoc[2].z, SummonLoc[2].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x + urand(0, 40), MoveLoc[1].y + urand(0, 40), MoveLoc[1].z);
+                m_lGuards.push_back(pTemp->GetObjectGuid());
         }
     }
 
@@ -142,6 +147,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_1_ALLIANCE, SummonLoc[0].x + urand(0, 20), SummonLoc[0].y - urand(0, 20), SummonLoc[0].z, SummonLoc[0].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[0].x + urand(0, 40), MoveLoc[0].y - urand(0, 10), MoveLoc[0].z);
+                m_lGuards.push_back(pTemp->GetObjectGuid());
         }
 
         for (uint8 i = 5; i < 10; i++)
@@ -149,6 +155,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_2_ALLIANCE, SummonLoc[1].x + urand(0, 20), SummonLoc[1].y + urand(0, 20), SummonLoc[1].z, SummonLoc[1].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x + urand(0, 40), MoveLoc[1].y + urand(0, 40), MoveLoc[1].z);
+                m_lGuards.push_back(pTemp->GetObjectGuid());
         }
 
         for (uint8 i = 10; i < 15; i++)
@@ -156,6 +163,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_3_ALLIANCE, SummonLoc[2].x + urand(0, 20), SummonLoc[2].y + urand(0, 20), SummonLoc[2].z, SummonLoc[2].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[2].x + urand(0, 40), MoveLoc[2].y + urand(0, 40), MoveLoc[2].z);
+                m_lGuards.push_back(pTemp->GetObjectGuid());
         }
     }
 
@@ -171,11 +179,6 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                     if(m_pInstance)
                         m_pInstance->SetData(TYPE_INTRO, IN_PROGRESS);
 
-                        m_creature->SummonGameobject(GO_ICEWALL, 932.267f,-80.6684f,591.676f, 2.28f, 0);
-
-                    if (GameObject* pIceWall = GetClosestGameObjectWithEntry(m_creature, GO_ICEWALL, 50.0f))
-                        pIceWall->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
-
                     if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 526.501f, 237.639f, 543.686f, 3.431f, TEMPSUMMON_TIMED_DESPAWN, 40000))
                     {
                         pTyrannus->GetMotionMaster()->MoveIdle();
@@ -189,6 +192,11 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                         //pTyrannus->GetMotionMaster()->MovePoint(526.501f, 237.639f, 543.686f, 1);
                         DoScriptText(SAY_TYRANNUS1, pTyrannus);
                         m_uiTyrannusGuid = pTyrannus->GetGUID();
+
+                        /*m_creature->SummonGameobject(GO_ICEWALL, 932.267f,-80.6684f,591.676f, 2.28f, 0);
+
+                        if (GameObject* pIceWall = GetClosestGameObjectWithEntry(m_creature, GO_ICEWALL, 50.0f))
+                            pIceWall->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);*/
                     }
 
                     switch (creatureEntry)
@@ -225,6 +233,13 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                 case 3:
                     if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
                         DoScriptText(SAY_TYRANNUS3, pTyrannus);
+                    for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
+                    {
+                        if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
+                        {
+                            pTemp->_AddAura(70572);
+                        }
+                    }
                     ++m_uiIntro_Phase;
                     m_uiSpeech_Timer = 5000;
                     break;
@@ -233,6 +248,14 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                     {
                         pTyrannus->CastSpell(m_creature, SPELL_NECROTIC_POWER, false);
                         DoScriptText(SAY_TYRANNUS4, pTyrannus);
+                    }
+                    for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
+                    {
+                        if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
+                        {
+                            pTemp->setFaction(21);
+                            pTemp->SetDisplayId(1065);
+                        }
                     }
                     switch (creatureEntry)
                     {
@@ -249,6 +272,16 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                 case 5:
                     if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
                         DoScriptText(SAY_TYRANNUS5, pTyrannus);
+                    for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
+                    {
+                        if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
+                        {
+                            //pTemp->AI()->AttackStart(pTarget);
+                            //m_creature->GetMotionMaster()->MoveChase(pTarget);
+                            pTemp->RemoveAurasDueToSpell(70572);
+                        }
+                    }
+
                     ++m_uiIntro_Phase;
                     m_uiSpeech_Timer = 5000;
                     break;
@@ -291,8 +324,21 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                     if(m_pInstance)
                         m_pInstance->SetData(TYPE_INTRO,DONE);
                     ++m_uiIntro_Phase;
-                    m_bIsIntro = false;
                     m_uiSpeech_Timer = 10000;
+                    break;
+                case 9:
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        m_creature->ForcedDespawn();
+                        break;
+                    case NPC_SYLVANAS_PART1:
+                        m_creature->ForcedDespawn();
+                        break;
+                    }
+                    ++m_uiIntro_Phase;
+                    m_bIsIntro = false;
+                    m_uiSpeech_Timer = 1000;
                     break;
 
                 default:
