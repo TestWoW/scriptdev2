@@ -49,7 +49,7 @@ VALUES
 DELETE FROM `script_texts` WHERE `entry` = -1713569;
 INSERT INTO `script_texts` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`)
 VALUES
-	(-1713569, 'Welcome, Warchief Thrall. Overlord Hellscream.', NULL, NULL, NULL, NULL, NULL, '¡Bienvenidos, Jefe de Guerra Thrall! ¡Señor Supremo Grito Infernal!', '¡Bienvenidos, Jefe de Guerra Thrall! ¡Señor Supremo Grito Infernal!', NULL, 16056, 6, 0, 0, 'tirion_Harrival1');
+	(-1713569, 'Welcome, Warchief Thrall. Overlord Hellscream.', NULL, NULL, NULL, NULL, NULL, '¡Bienvenidos, Jefe de Guerra Thrall! ¡Senor Supremo Grito Infernal!', '¡Bienvenidos, Jefe de Guerra Thrall! ¡Senor Supremo Grito Infernal!', NULL, 16056, 6, 0, 0, 'tirion_Harrival1');
 	
 DELETE FROM `script_texts` WHERE `entry` = -1713570;
 INSERT INTO `script_texts` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`)
