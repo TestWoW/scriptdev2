@@ -5,3 +5,4 @@ UPDATE `script_texts` SET `content_loc6` = 'Hoy, habéis demostrado no sólo vue
 UPDATE `script_texts` SET `content_loc6` ='No creáis que os voy a permitir la entrada al sagrario de mi maestro tan fácilmente. ¡Seguid si osáis!' WHERE entry = -1610078;
 UPDATE `script_texts` SET `content_loc6` ='¡%s prepara un ataque helado!' WHERE entry = -1658060;
 UPDATE `script_texts` SET `content_loc6` ='¡%s ruge y absorbe energía oscura!' WHERE entry = -1658062;
+UPDATE `script_texts` SET `content_loc6` ='¡$N es empalado!' WHERE `entry` = -1604030;
