@@ -27,7 +27,7 @@ INSERT IGNORE INTO `script_texts` (`entry`,`content_default`,`content_loc6`,`con
 DELETE FROM `script_texts` WHERE entry BETWEEN -1601041 AND -1601025;
 INSERT IGNORE INTO `script_texts` (`entry`,`content_default`,`content_loc6`,`content_loc7`,`sound`,`type`,`language`,`comment`) VALUES
 (-1601025,'May the Light give me strength to provide a worthy challenge.','Que la luz me de fuerzas para ser un reto digno.','Que la luz me de fuerzas para ser un reto digno.',16246,1,0,'palestress SAY_AGGRO'),
-(-1601026,'Take this time to consider your past deeds.','Aprovecha este tiempo para pensar en tus hazanas.','Aprovecha este tiempo para pensar en tus hazanas.',16248,1,0,'palestress SAY_SUMMON'),
+(-1601026,'Take this time to consider your past deeds.','Aprovecha este tiempo para pensar en tus hazañas.','Aprovecha este tiempo para pensar en tus hazañas.',16248,1,0,'palestress SAY_SUMMON'),
 (-1601027,'Even the darkest memory fades when confronted!','Incluso el recuerdo más oscuro se desvanece al afrontarlo.','Incluso el recuerdo más oscuro se desvanece al afrontarlo.',16249,1,0,'palestress SAY_SUMMON_DEFEAT'),
 (-1601028,'Take your rest.','Descansa.','Descansa.',16250,1,0,'palestress SAY_SLAY1'),
 (-1601029,'Be at ease.','Ve en paz.','Ve en paz.',16251,1,0,'palestress SAY_SLAY2'),
