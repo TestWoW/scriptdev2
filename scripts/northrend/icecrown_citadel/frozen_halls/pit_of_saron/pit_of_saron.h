@@ -18,6 +18,7 @@ enum
     NPC_TYRANNUS_INTRO              = 36794,
     NPC_GARFROST                    = 36494,
     NPC_KRICK                       = 36477,
+    NPC_KRICK_EVENT                 = 37629,
     NPC_ICK                         = 36476,
     NPC_TYRANNUS                    = 36658,
     NPC_RIMEFANG                    = 36661,
@@ -79,6 +80,7 @@ class MANGOS_DLL_DECL instance_pit_of_saron : public ScriptedInstance
         uint64 m_uiTyrannusIntroGUID;
         uint64 m_uiGarfrostGUID;
         uint64 m_uiKrickGUID;
+        uint64 m_uiKrickEventGUID;
         uint64 m_uiIckGUID;
         uint64 m_uiTyrannusGUID;
         uint64 m_uiRimefangGUID;

@@ -129,93 +129,6 @@ static Locations SpawnLoc[]=
     {4472.54f, 3110.77f, 360.46f, 5.8f},
 
 };
-
-// Precious
-struct MANGOS_DLL_DECL mob_preciousAI : public ScriptedAI
-{
-    mob_preciousAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    uint32 m_uiDecimateTimer;
-    uint32 m_uiMortalwoundTimer;
-    uint32 m_uiZombiesTimer;
-    uint32 m_uiNumZombies;
-
-    void Reset()
-    {
-        m_uiDecimateTimer = urand(10000, 12000);
-        m_uiMortalwoundTimer = urand(2000, 5000);
-        m_uiZombiesTimer = urand (20000, 22000);
-        m_uiNumZombies = 10;
-
-        m_creature->SetSpeedRate(MOVE_RUN, 1.0f);
-        m_creature->SetSpeedRate(MOVE_WALK, 1.0f);
-    }
-
-    void JustDied(Unit *killer)
-    {
-        if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ROTFACE))
-            DoScriptText(SAY_PRECIOUS_DIES,pTemp,killer);
-    }
-
-    void JustSummoned(Unit *pSummoned)
-    {
-        if (pSummoned->GetEntry() == NPC_ZOMBIE)
-            pSummoned->setFaction(m_creature->getFaction());
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        // Decimate
-        if (m_uiDecimateTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PRECIOUS_DECIMATE) == CAST_OK)
-                m_uiDecimateTimer = 32000;
-        }
-        else
-            m_uiDecimateTimer -= uiDiff;
-
-        // Mortal wound
-        if (m_uiMortalwoundTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PRECIOUS_MORTALWOUND) == CAST_OK)
-                m_uiMortalwoundTimer = 10000;
-        }
-        else
-            m_uiMortalwoundTimer -= uiDiff;
-
-        // Zombies
-        if (m_uiZombiesTimer <= uiDiff)
-        {
-            DoScriptText(SAY_PRECIOUS_ZOMBIES, m_creature);
-            float x, y, z;
-            m_creature->GetNearPoint(m_creature, x, y, z, m_creature->GetObjectBoundingRadius(), 10.0f, frand(-M_PI_F, M_PI_F));
-            for (uint32 i = 0; i < m_uiNumZombies; i++)
-                if (Creature *pZombie = m_creature->SummonCreature(NPC_ZOMBIE, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
-                {
-                    pZombie->SetSpeedRate(MOVE_RUN, 0.5f);
-                }
-            m_uiZombiesTimer = 30000;
-        }
-        else
-            m_uiZombiesTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mob_precious(Creature *pCreature)
-{
-    return new mob_preciousAI(pCreature);
-}
-
 // Rotface
 struct MANGOS_DLL_DECL boss_rotfaceAI : public ScriptedAI
 {
@@ -604,6 +517,95 @@ struct MANGOS_DLL_DECL mob_sticky_oozeAI : public ScriptedAI
 CreatureAI* GetAI_mob_sticky_ooze(Creature* pCreature)
 {
     return new mob_sticky_oozeAI(pCreature);
+}
+
+
+// Precious
+struct MANGOS_DLL_DECL mob_preciousAI : public ScriptedAI
+{
+    mob_preciousAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        Reset();
+    }
+
+    ScriptedInstance *m_pInstance;
+    uint32 m_uiDecimateTimer;
+    uint32 m_uiMortalwoundTimer;
+    uint32 m_uiZombiesTimer;
+    uint32 m_uiNumZombies;
+
+    void Reset()
+    {
+        m_uiDecimateTimer = urand(10000, 12000);
+        m_uiMortalwoundTimer = urand(2000, 5000);
+        m_uiZombiesTimer = urand (20000, 22000);
+        m_uiNumZombies = 10;
+
+        m_creature->SetSpeedRate(MOVE_RUN, 1.0f);
+        m_creature->SetSpeedRate(MOVE_WALK, 1.0f);
+    }
+
+    void JustDied(Unit *killer)
+    {
+        if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ROTFACE))
+            DoScriptText(SAY_PRECIOUS_DIES,pTemp,killer);
+    }
+
+    void JustSummoned(Unit *pSummoned)
+    {
+        if (pSummoned->GetEntry() == NPC_ZOMBIE)
+            pSummoned->setFaction(m_creature->getFaction());
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        // Decimate
+        if (m_uiDecimateTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PRECIOUS_DECIMATE) == CAST_OK)
+                m_uiDecimateTimer = 32000;
+        }
+        else
+            m_uiDecimateTimer -= uiDiff;
+
+        // Mortal wound
+        if (m_uiMortalwoundTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PRECIOUS_MORTALWOUND) == CAST_OK)
+                m_uiMortalwoundTimer = 10000;
+        }
+        else
+            m_uiMortalwoundTimer -= uiDiff;
+
+        // Zombies
+        if (m_uiZombiesTimer <= uiDiff)
+        {
+            DoScriptText(SAY_PRECIOUS_ZOMBIES, m_creature);
+            float x, y, z;
+            for (uint32 i = 0; i < m_uiNumZombies; i++)
+            {
+                m_creature->GetNearPoint(m_creature, x, y, z, m_creature->GetObjectBoundingRadius(), 10.0f, frand(-M_PI_F, M_PI_F));
+                if (Creature *pZombie = m_creature->SummonCreature(NPC_ZOMBIE, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+                {
+                    pZombie->SetSpeedRate(MOVE_RUN, 0.5f);
+                }
+            }
+            m_uiZombiesTimer = 30000;
+        }
+        else
+            m_uiZombiesTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_mob_precious(Creature *pCreature)
+{
+    return new mob_preciousAI(pCreature);
 }
 
 void AddSC_boss_rotface()
