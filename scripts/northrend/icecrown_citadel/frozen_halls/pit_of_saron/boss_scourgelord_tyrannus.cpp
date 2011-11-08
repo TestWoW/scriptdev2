@@ -65,6 +65,8 @@ enum
     NPC_ICY_BLAST                       = 36731,
     SPELL_ICY_BLAST_AURA                = 69238,
     SPELL_ICY_BLAST_AURA_H              = 69628,
+
+    EQUIP_ID                      = 51796,
 };
 
 const float RimefangSummon[4] = {1013.827f, 169.71f, 628.157f, 5.31f};
@@ -198,6 +200,7 @@ struct MANGOS_DLL_DECL boss_tyrannusAI : public ScriptedAI
     {
         m_pInstance = (instance_pit_of_saron*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        SetEquipmentSlots(false, EQUIP_ID, -1, -1);
         Reset();
     }
 
