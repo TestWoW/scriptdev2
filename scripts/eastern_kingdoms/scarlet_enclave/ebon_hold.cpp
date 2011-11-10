@@ -3273,9 +3273,9 @@ struct MANGOS_DLL_DECL mob_acherus_ghoulAI : public ScriptedAI
 enum
 {
     SPELL_REVIVE    =    51918,
-};
 
-#define REVIVE_WHISPER "It is not yet your time, champion. Rise! Rise and fight once more!"
+    SAY_REVIVE      =    -1609089,
+};
 
 struct MANGOS_DLL_DECL npc_valkyr_battle_maidenAI : ScriptedAI
 {
@@ -3331,7 +3331,7 @@ struct MANGOS_DLL_DECL npc_valkyr_battle_maidenAI : ScriptedAI
                     break;
                 case 2:
                     DoCast(pPlayer, SPELL_REVIVE, true);
-                    m_creature->MonsterWhisper(REVIVE_WHISPER, pPlayer);
+                    m_creature->MonsterWhisper(SAY_REVIVE, pPlayer);
                     // cause 51918 has cast time of 2 seconds
                     m_uiPhaseTimer = 3000;
                     m_uiPhase++;
@@ -3507,12 +3507,12 @@ struct MANGOS_DLL_DECL npc_mine_carAI : public ScriptedAI
 
 enum
 {
-    SPELL_CAR_DRAG  = 52465,
-    SPELL_CAR_CHECK = 54173
-};
+    SPELL_CAR_DRAG       = 52465,
+    SPELL_CAR_CHECK      = 54173,
 
-#define SAY_SCARLET_MINER1  "Where'd this come from? I better get this down to the ships before the foreman sees it!"
-#define SAY_SCARLET_MINER2  "Now I can have a rest!"
+    SAY_SCARLET_MINER1   = -1609090,
+    SAY_SCARLET_MINER2   = -1609091,
+};
 
 struct MANGOS_DLL_DECL npc_scarlet_minerAI : public npc_escortAI
 {
@@ -4004,6 +4004,94 @@ struct MANGOS_DLL_DECL mob_scarlet_courierAI : ScriptedAI
     }
 };
 
+// Teleporter up
+
+enum
+{
+    GOSSIP_TELEPORT    = 50000,
+};
+
+bool GossipHello_teleport_acherus_up(Player* pPlayer, Creature* pCreature)
+{
+    char const* GOSSIP_OPTION_UP;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_OPTION_UP = "Quiero ir al piso de arriba.";
+                      break;
+     case LOCALE_esMX:
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_OPTION_UP = "I want go to up floor.";
+                      break;
+    };
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_UP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetGUID());
+
+    return true;
+}
+
+bool GossipSelect_teleport_acherus_up(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    switch (uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        pPlayer->TeleportTo(0, 2402.44f, -5633.27f, 420.66f, 3.71f);
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+    return true;
+}
+
+// Teleporter down
+
+bool GossipHello_teleport_acherus_down(Player* pPlayer, Creature* pCreature)
+{
+    char const* GOSSIP_OPTION_UP;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_OPTION_UP = "Quiero ir al piso de abajo.";
+                      break;
+     case LOCALE_esMX:
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_OPTION_UP = "I want go to down floor.";
+                      break;
+    };
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_UP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetGUID());
+
+    return true;
+}
+
+bool GossipSelect_teleport_acherus_down(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    switch (uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        pPlayer->TeleportTo(0, 2402.44f, -5633.27f, 377.02f, 3.71f);
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+    return true;
+}
 CreatureAI* GetAI_mob_scarlet_courier(Creature* pCreature)
 {
     return new mob_scarlet_courierAI(pCreature);
@@ -4166,5 +4254,17 @@ void AddSC_ebon_hold()
     pNewScript = new Script;
     pNewScript->Name= "mob_scarlet_courier";
     pNewScript->GetAI = &GetAI_mob_scarlet_courier;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "teleport_acherus_up";
+    pNewScript->pGossipHello = &GossipHello_teleport_acherus_up;
+    pNewScript->pGossipSelect = &GossipSelect_teleport_acherus_up;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "teleport_acherus_down";
+    pNewScript->pGossipHello = &GossipHello_teleport_acherus_down;
+    pNewScript->pGossipSelect = &GossipSelect_teleport_acherus_down;
     pNewScript->RegisterSelf();
 }
