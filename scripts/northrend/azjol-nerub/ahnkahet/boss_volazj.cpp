@@ -272,6 +272,23 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
         {
             m_creature->RemoveAurasDueToSpell(SPELL_INSANITY_CHANNEL);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+        Map* pMap = m_creature->GetMap();
+        if (pMap)
+        {
+            Map::PlayerList const &lPlayers = pMap->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE);
+                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_1);
+                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_2);
+                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_3);
+                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_4);
+                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_5);
+            }
+        }
+
             SetCombatMovement(true);
             m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
             m_uiPhase = PHASE_FIGHT;
