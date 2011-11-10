@@ -608,11 +608,6 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
                 break;
         }
 
-        m_creature->SummonGameobject(GO_ICE_WALL, WallLoc[wallNum].x,WallLoc[wallNum].y,WallLoc[wallNum].z, WallLoc[wallNum].o, 0);
-
-        if (GameObject* pIceWall = GetClosestGameObjectWithEntry(m_creature, GO_ICE_WALL, 50.0f))
-            pIceWall->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
-
         if (Creature* pWallTarget = m_creature->SummonCreature(NPC_ICE_WALL,WallLoc[wallNum].x,WallLoc[wallNum].y,WallLoc[wallNum].z,WallLoc[wallNum].o,TEMPSUMMON_MANUAL_DESPAWN,0, true))
         {
             pWallTarget->SetPhaseMask(65535, true);
@@ -628,15 +623,11 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
     {
         m_pInstance->DoOpenDoor(GO_ICE_WALL);
 
-        if (GameObject* pIceWall = m_pInstance->GetSingleGameObjectFromStorage(GO_ICE_WALL))
-        {
-            pIceWall->Delete();
-        }
-
         if (Creature* pWallTarget = m_creature->GetMap()->GetCreature(wallTarget))
         {
             pWallTarget->ForcedDespawn();
         }
+
         wallTarget =  ObjectGuid();
         m_wallNum = 0;
     }

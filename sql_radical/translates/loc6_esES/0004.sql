@@ -1,0 +1,1 @@
+UPDATE `script_texts` SET `content_loc6` = '¡%s comienza a desatar almas!' WHERE `entry` = -1632022;

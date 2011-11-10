@@ -149,7 +149,9 @@ struct MANGOS_DLL_DECL boss_IckAI : public ScriptedAI
             {
                 m_uiKrickGUID = pKrick->GetGUID();
             }
-            
+
+        if (Creature *pKrickTwo = m_pInstance->GetSingleCreatureFromStorage(NPC_KRICK))
+            pKrickTwo->ForcedDespawn();
     }
 
     void UpdateAI(const uint32 uiDiff)
