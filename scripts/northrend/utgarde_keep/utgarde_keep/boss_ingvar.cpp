@@ -36,6 +36,8 @@ enum
     EMOTE_ROAR                  = -1574022,
 
     NPC_ANNHYLDE                = 24068,
+    NPC_INGVAR_DEAD             = 23980,
+    NPC_DUMMY                   = 24012,
 
     //phase 1
     SPELL_CLEAVE                = 42724,
@@ -107,6 +109,7 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
     uint32 m_uiShadowAxeTimer;
 
     ObjectGuid m_uiAnnylideGuid;
+    ObjectGuid m_uiDummyGuid;
 
     void Reset()
     {
@@ -163,7 +166,6 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 477 : 489);
         DoScriptText(SAY_DEATH_SECOND, m_creature);
     }
 
@@ -177,8 +179,14 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
         if (pSummoned->GetEntry() == NPC_ANNHYLDE)
         {
             pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            pSummoned->MonsterMoveWithSpeed(pSummoned->GetPositionX(), pSummoned->GetPositionY(), pSummoned->GetPositionZ() + 15.0f, 0); 
+            pSummoned->GetMotionMaster()->MovePoint(0, pSummoned->GetPositionX(), pSummoned->GetPositionY(), pSummoned->GetPositionZ() + 15.0f);
             m_uiAnnylideGuid = pSummoned->GetObjectGuid();
+        }
+        else if(pSummoned->GetEntry() == NPC_DUMMY)
+        {
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            m_uiDummyGuid = pSummoned->GetObjectGuid();
         }
     }
 
@@ -188,12 +196,14 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
         {
             if (m_uiEventTimer <= uiDiff)
             {
-                Creature* pAnnylide = m_creature->GetMap()->GetCreature(m_uiAnnylideGuid);
+                Creature *pAnnylide = m_creature->GetMap()->GetCreature(m_uiAnnylideGuid);
+                Creature *pDummy = m_creature->GetMap()->GetCreature(m_uiDummyGuid);
                 switch(m_uiSubevent)
                 {
                     case 0:
                         SetCombatMovement(false);
                         DoCastSpellIfCan(m_creature, SPELL_SUMMON_BANSHEE, CAST_TRIGGERED);
+                        DoCastSpellIfCan(m_creature, SPELL_SCOURGE_RES_SUMMON, CAST_TRIGGERED);
                         ++m_uiSubevent;
                         m_uiEventTimer = 4000;
                         break;
@@ -203,12 +213,14 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
                             DoScriptText(SAY_ANNHYLDE_REZ, pAnnylide, m_creature);
                             pAnnylide->CastSpell(m_creature, SPELL_SCOURGE_RES_CHANNEL, false);
                         }
-                         DoCastSpellIfCan(m_creature, SPELL_SCOURGE_RES_BUBBLE, CAST_TRIGGERED);
+                        if (pDummy)
+                            pDummy->CastSpell(pDummy, SPELL_SCOURGE_RES_BUBBLE, true);
                         ++m_uiSubevent;
                         m_uiEventTimer = 15000;
                         break;
                     case 2:
-                        m_creature->RemoveAurasDueToSpell(SPELL_SCOURGE_RES_BUBBLE);
+                        if (pDummy)
+                            pDummy->ForcedDespawn();
                         m_creature->RemoveAurasDueToSpell(SPELL_FEIGN_DEATH);
                         DoCastSpellIfCan(m_creature, SPELL_SCOURGE_RES_HEAL, CAST_TRIGGERED);
                         m_uiEventTimer = 2000;
@@ -216,6 +228,8 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
                         return;
                     case 3:
                         DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
+                        m_creature->UpdateEntry(NPC_INGVAR_DEAD);
+                        m_creature->RemoveAurasDueToSpell(SPELL_SUMMON_BANSHEE);
                         if (pAnnylide)
                             pAnnylide->ForcedDespawn();
                         SetCombatMovement(true);
