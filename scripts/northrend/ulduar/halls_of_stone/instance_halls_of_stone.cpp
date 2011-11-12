@@ -55,6 +55,7 @@ struct MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
             case NPC_KRYSTALLUS:
             case NPC_GRIEF:
             case NPC_BRANN:
+            case NPC_BRANN_EVENT:
             case NPC_SJONNIR:
             case NPC_KADDRAK:
             case NPC_ABEDNEUM:

@@ -122,9 +122,6 @@ enum
     QUEST_HALLS_OF_STONE               = 13207,
 };
 
-#define GOSSIP_ITEM_START               "Brann, it would be our honor!"
-#define GOSSIP_ITEM_PROGRESS            "Let's move Brann, enough of the history lessons!"
-
 struct Locations
 {
     float x, y, z;
@@ -358,7 +355,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     m_pInstance->DoUseDoorOrButton(GO_TRIBUNAL_CONSOLE);
                 m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
                 SetEscortPaused(true);
-                JumpToNextStep(8500);
+                JumpToNextStep(3500);
                 break;
             case 18:
                 SetEscortPaused(true);
@@ -462,7 +459,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     if (m_pInstance)
                         if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ABEDNEUM))
                             DoScriptText(SAY_EVENT_INTRO_3_ABED, pTemp);
-                    JumpToNextStep(5500);
+                    JumpToNextStep(12000);
                     break;
                 case 6:
                     DoScriptText(SAY_EVENT_A_1, m_creature);
@@ -472,7 +469,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     if (m_pInstance)
                         if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_KADDRAK))
                             DoScriptText(SAY_EVENT_A_2_KADD, pTemp);
-                    JumpToNextStep(8500);
+                    JumpToNextStep(12000);
                     break;
                 case 8:
                     DoScriptText(SAY_EVENT_A_3, m_creature);
@@ -527,7 +524,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                         if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ABEDNEUM))
                             DoScriptText(SAY_EVENT_C_2_ABED, pTemp);
                     SpawnDwarf(1);
-                    JumpToNextStep(10000);
+                    JumpToNextStep(8000);
                     break;
                 case 18:
                     DoScriptText(SAY_EVENT_C_3, m_creature);
@@ -559,7 +556,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     break;
                 case 23:
                     SpawnDwarf(2);
-                    JumpToNextStep(15000);
+                    JumpToNextStep(8000);
                     break;
                 case 24:
                     DoScriptText(SAY_EVENT_D_3, m_creature);
@@ -620,7 +617,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     if (m_pInstance)
                         if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ABEDNEUM))
                             DoScriptText(SAY_EVENT_END_07_ABED, pTemp);
-                    JumpToNextStep(16500);
+                    JumpToNextStep(22000);
                     break;
                 case 35:
                     DoScriptText(SAY_EVENT_END_08, m_creature);
@@ -630,7 +627,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     if (m_pInstance)
                         if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_KADDRAK))
                             DoScriptText(SAY_EVENT_END_09_KADD, pTemp);
-                    JumpToNextStep(15500);
+                    JumpToNextStep(19500);
                     break;
                 case 37:
                     DoScriptText(SAY_EVENT_END_10, m_creature);
@@ -654,7 +651,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     break;
                 case 41:
                     DoScriptText(SAY_EVENT_END_14, m_creature);
-                    JumpToNextStep(9000);
+                    JumpToNextStep(10500);
                     break;
                 case 42:
                     if (m_pInstance)
@@ -670,11 +667,11 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     if (m_pInstance)
                         if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_MARNAK))
                             DoScriptText(SAY_EVENT_END_17_MARN, pTemp);
-                    JumpToNextStep(19500);
+                    JumpToNextStep(24500);
                     break;
                 case 45:
                     DoScriptText(SAY_EVENT_END_18, m_creature);
-                    JumpToNextStep(19500);
+                    JumpToNextStep(24000);
                     break;
                 case 46:
                     if (m_pInstance)
@@ -708,7 +705,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                     //DoCastSpellIfCan(m_creature, SPELL_ACHIEVEMENT_CHECK, CAST_TRIGGERED);
 
                     if (!m_bIsRegularMode)
-                    if (m_creature->GetHealthPercent() < 100.0f)
+                    if (m_creature->GetHealthPercent() == 100.0f)
                         m_pInstance->DoCompleteAchievement(BRANN_ACHIEVEMENT);
 
                     m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -737,6 +734,28 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
 bool GossipHello_npc_brann_hos(Player* pPlayer, Creature* pCreature)
 {
     ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+
+    char const* GOSSIP_ITEM_START;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_ITEM_START = "Será un honor para nosotros, Brann.";
+                      break;
+     case LOCALE_esMX:
+                      GOSSIP_ITEM_START = "Será un honor para nosotros, Brann.";
+                      break;
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_ITEM_START = "Brann, it would be our honor.";
+                      break;
+    };
 
     if (pCreature->isQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());

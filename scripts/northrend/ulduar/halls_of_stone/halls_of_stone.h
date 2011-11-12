@@ -32,6 +32,8 @@ enum
     NPC_KRYSTALLUS          = 27977,
     NPC_GRIEF               = 27975,
     NPC_BRANN               = 28070,
+    NPC_BRANN_EVENT         = 24575,
+    NPC_BRANN_OUTRO         = 24577,
     NPC_SJONNIR             = 27978,
 
     NPC_KADDRAK             = 30898, // left

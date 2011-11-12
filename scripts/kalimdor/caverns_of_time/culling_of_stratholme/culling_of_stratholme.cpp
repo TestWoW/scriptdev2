@@ -1,4 +1,5 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * Copyright (C) 2011 MangosR2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,9 +18,8 @@
 
 /* ScriptData
 SDName: instance_culling_of_stratholme
-SD%Complete: ?%
-SDComment: by MaxXx2021
-SDCategory: Culling of Stratholme
+SD%Complete: %
+SDComment:
 EndScriptData */
 
 #include "precompiled.h"
@@ -318,7 +318,6 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
         switch(uiPointId)
         {
            case 2:
-              DoScriptText(SAY_INTRO18, m_creature);
               SetRun(true);
               break;
            case 8:
@@ -326,6 +325,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
               SetEscortPaused(true);
               m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
               m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+              DoScriptText(SAY_INTRO18, m_creature);
               m_pInstance->SetData(TYPE_INTRO, DONE);
               SetRun(false);
               break;
@@ -504,12 +504,12 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
              DoScriptText(SAY_INTRO03, m_creature);
              m_creature->SetGuidValue(UNIT_FIELD_TARGET, 0);
              m_creature->GetMotionMaster()->MovePoint(0, 1908.334f, 1315.354f, 149.551f);
-             if(Creature* pUther = m_pInstance->instance->GetCreature(NPC_UTHER))
+             if(Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                 pUther->GetMotionMaster()->MovePoint(0, 1903.600f, 1296.678f, 143.383f);
              JumpNextStep(2000);
              break;
           case 3:
-             if(Creature* pJaina = m_pInstance->instance->GetCreature(NPC_JAINA))
+             if(Creature* pJaina = m_pInstance->GetSingleCreatureFromStorage(NPC_JAINA))
                 pJaina->GetMotionMaster()->MovePoint(0, 1899.641f, 1298.684f, 143.831f);
              JumpNextStep(7000);
              break;
@@ -523,18 +523,18 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
              JumpNextStep(10000);
              break;
           case 6:
-             if(Creature* pUther = m_pInstance->instance->GetCreature(NPC_UTHER))
+             if(Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                 DoScriptText(SAY_INTRO05, pUther);
              JumpNextStep(1000);
              break;
           case 7:
-             if(Creature* pUther = m_pInstance->instance->GetCreature(NPC_UTHER))
+             if(Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                 m_creature->SetGuidValue(UNIT_FIELD_TARGET, pUther->GetObjectGuid());
              DoScriptText(SAY_INTRO06, m_creature);
              JumpNextStep(4000);
              break;
           case 8:
-             if(Creature* pUther = m_pInstance->instance->GetCreature(NPC_UTHER))
+             if(Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                 DoScriptText(SAY_INTRO07, pUther);
              JumpNextStep(6000);
              break;
@@ -543,7 +543,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
              JumpNextStep(4000);
              break;
           case 10:
-             if(Creature* pUther = m_pInstance->instance->GetCreature(NPC_UTHER))
+             if(Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                 DoScriptText(SAY_INTRO09, pUther);
              JumpNextStep(8000);
              break;
@@ -552,7 +552,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
              JumpNextStep(4000);
              break;
           case 12:
-             if(Creature* pUther = m_pInstance->instance->GetCreature(NPC_UTHER))
+             if(Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                 DoScriptText(SAY_INTRO11, pUther);
              JumpNextStep(4000);
              break;
@@ -561,7 +561,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
              JumpNextStep(11000);
              break;
           case 14:
-             if(Creature* pJaina = m_pInstance->instance->GetCreature(NPC_JAINA))
+             if(Creature* pJaina = m_pInstance->GetSingleCreatureFromStorage(NPC_JAINA))
                 DoScriptText(SAY_INTRO13, pJaina);
              JumpNextStep(3000);
              break;
@@ -570,12 +570,12 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
              JumpNextStep(9000);
              break;
           case 16:
-             if(Creature* pUther = m_pInstance->instance->GetCreature(NPC_UTHER))
+             if(Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                 DoScriptText(SAY_INTRO15, pUther);
              JumpNextStep(5000);
              break;
           case 17:
-             if(Creature* pJaina = m_pInstance->instance->GetCreature(NPC_JAINA))
+             if(Creature* pJaina = m_pInstance->GetSingleCreatureFromStorage(NPC_JAINA))
              {
                 m_creature->SetGuidValue(UNIT_FIELD_TARGET, pJaina->GetObjectGuid());
                 pJaina->GetMotionMaster()->MovePoint(0, 1794.357f,1272.183f,140.558f);
@@ -587,7 +587,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
              JumpNextStep(1000);
              break;
           case 19:
-             if(Creature* pJaina = m_pInstance->instance->GetCreature(NPC_JAINA))
+             if(Creature* pJaina = m_pInstance->GetSingleCreatureFromStorage(NPC_JAINA))
                 DoScriptText(SAY_INTRO17, pJaina);
              JumpNextStep(3000);
              break;
@@ -1174,10 +1174,6 @@ struct MANGOS_DLL_DECL npc_utherAI : public npc_escortAI
 ## npc_chromi_middle
 ###*/
 
-#define GOSSIP_ITEM_CHROMI1 "What do you think they're up to?"
-#define GOSSIP_ITEM_CHROMI2 "What want me to do what?"
-#define GOSSIP_ITEM_CHROMI3 "Very well, Chromie."
-
 enum
 {
   QUEST_ROYAL_ESCORT               = 13151,
@@ -1189,6 +1185,28 @@ enum
 
 bool GossipHello_npc_chromi_middle(Player* pPlayer, Creature* pCreature)
 {
+    char const* GOSSIP_ITEM_CHROMI1;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_ITEM_CHROMI1 = "¿Qué te hace pensar que ellos quieran ayudarnos?";
+                      break;
+     case LOCALE_esMX:
+                      GOSSIP_ITEM_CHROMI1 = "¿Qué te hace pensar que ellos quieran ayudarnos?";
+                      break;
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_ITEM_CHROMI1 = "What do you think they're up to?";
+                      break;
+    }
+
     if (pCreature->isQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
@@ -1205,20 +1223,44 @@ bool GossipHello_npc_chromi_middle(Player* pPlayer, Creature* pCreature)
 
 bool GossipSelect_npc_chromi_middle(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
 {
+    char const* GOSSIP_ITEM_CHROMI2;
+    char const* GOSSIP_ITEM_CHROMI3;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_ITEM_CHROMI2 = "Sigue contando.";
+                      GOSSIP_ITEM_CHROMI3 = "Muy bien, Chromi.";
+                      break;
+     case LOCALE_esMX:
+                      GOSSIP_ITEM_CHROMI2 = "Sigue contando.";
+                      GOSSIP_ITEM_CHROMI3 = "Muy bien, Chromi.";
+                      break;
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_ITEM_CHROMI2 = "What want me to do what?";
+                      GOSSIP_ITEM_CHROMI3 = "Very well, Chromie.";
+                      break;
+    }
+
     if(ScriptedInstance* m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData()))
       if(m_pInstance->GetData(TYPE_INTRO) != NOT_STARTED) return true;
 
     if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
     {
        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_CHROMI2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-
        pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_CHROMI2, pCreature->GetObjectGuid());
     }
 
     if (uiAction == GOSSIP_ACTION_INFO_DEF+2)
     {
        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_CHROMI3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
-
        pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_CHROMI3, pCreature->GetObjectGuid());
     }
 
@@ -1283,16 +1325,51 @@ enum
    GOSSIP_MENU_ARTHAS_5                        = 100005
 };
 
-#define GOSSIP_ITEM_ARTHAS_0 "I'm ready to start Culling of Stratholme."
-#define GOSSIP_ITEM_ARTHAS_1 "Yes, my Prince. We're ready."
-#define GOSSIP_ITEM_ARTHAS_2 "We're only doing what is best for Loarderon your Highness."
-#define GOSSIP_ITEM_ARTHAS_3 "I'm ready."
-#define GOSSIP_ITEM_ARTHAS_4 "For Lordaeron!"
-#define GOSSIP_ITEM_ARTHAS_5 "I'm ready to battle the dreadlord, sire."
-
 bool GossipHello_npc_arthas(Player* pPlayer, Creature* pCreature)
 {
     ScriptedInstance* pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
+
+    char const* GOSSIP_ITEM_ARTHAS_0;
+    char const* GOSSIP_ITEM_ARTHAS_1;
+    char const* GOSSIP_ITEM_ARTHAS_2;
+    char const* GOSSIP_ITEM_ARTHAS_3;
+    char const* GOSSIP_ITEM_ARTHAS_4;
+    char const* GOSSIP_ITEM_ARTHAS_5;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_ITEM_ARTHAS_0 = "Estamos listos para comenzar con la matanza.";
+                      GOSSIP_ITEM_ARTHAS_1 = "Sí, mi príncipe. Estamos listos.";
+                      GOSSIP_ITEM_ARTHAS_2 = "Sólo lo haremos si es lo mejor para Lordaeron, mi majestad.";
+                      GOSSIP_ITEM_ARTHAS_3 = "Estamos listos.";
+                      GOSSIP_ITEM_ARTHAS_4 = "¡Por Lordaeron!";
+                      GOSSIP_ITEM_ARTHAS_5 = "Estamos listos para pelear contra Cronolord.";
+                      break;
+     case LOCALE_esMX:
+                      GOSSIP_ITEM_ARTHAS_0 = "Estamos listos para comenzar con la matanza.";
+                      GOSSIP_ITEM_ARTHAS_1 = "Sí, mi príncipe. Estamos listos.";
+                      GOSSIP_ITEM_ARTHAS_2 = "Sólo lo haremos si es lo mejor para Lordaeron, mi majestad.";
+                      GOSSIP_ITEM_ARTHAS_3 = "Estamos listos.";
+                      GOSSIP_ITEM_ARTHAS_4 = "¡Por Lordaeron!";
+                      GOSSIP_ITEM_ARTHAS_5 = "Estamos listos para pelear contra Cronolord.";
+                      break;
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_ITEM_ARTHAS_0 = "I'm ready to start Culling of Stratholme.";
+                      GOSSIP_ITEM_ARTHAS_1 = "Yes, my Prince. We're ready.";
+                      GOSSIP_ITEM_ARTHAS_2 = "We're only doing what is best for Loarderon your Highness.";
+                      GOSSIP_ITEM_ARTHAS_3 = "I'm ready.";
+                      GOSSIP_ITEM_ARTHAS_4 = "For Lordaeron!";
+                      GOSSIP_ITEM_ARTHAS_5 = "I'm ready to battle the dreadlord, sire.";
+                      break;
+    }
 
     if(pInstance && pInstance->GetData(TYPE_PHASE) == 0)
     {
@@ -1732,39 +1809,39 @@ CreatureAI* GetAI_npc_dark_conversion(Creature* pCreature)
 
 void AddSC_culling_of_stratholme()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "npc_chromi_middle";
-    newscript->pGossipHello =  &GossipHello_npc_chromi_middle;
-    newscript->pGossipSelect = &GossipSelect_npc_chromi_middle;
-    newscript->GetAI = &GetAI_npc_chromi_middle;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_chromi_middle";
+    pNewScript->pGossipHello =  &GossipHello_npc_chromi_middle;
+    pNewScript->pGossipSelect = &GossipSelect_npc_chromi_middle;
+    pNewScript->GetAI = &GetAI_npc_chromi_middle;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_uther";
-    newscript->GetAI = &GetAI_npc_uther;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_uther";
+    pNewScript->GetAI = &GetAI_npc_uther;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_arthas";
-    newscript->GetAI = &GetAI_npc_arthas;
-    newscript->pGossipHello =  &GossipHello_npc_arthas;
-    newscript->pGossipSelect = &GossipSelect_npc_arthas;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_arthas";
+    pNewScript->GetAI = &GetAI_npc_arthas;
+    pNewScript->pGossipHello =  &GossipHello_npc_arthas;
+    pNewScript->pGossipSelect = &GossipSelect_npc_arthas;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_arthas_priest";
-    newscript->GetAI = &GetAI_npc_arthas_priest;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_arthas_priest";
+    pNewScript->GetAI = &GetAI_npc_arthas_priest;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_arthas_marine";
-    newscript->GetAI = &GetAI_npc_arthas_marine;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_arthas_marine";
+    pNewScript->GetAI = &GetAI_npc_arthas_marine;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_dark_conversion";
-    newscript->GetAI = &GetAI_npc_dark_conversion;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_dark_conversion";
+    pNewScript->GetAI = &GetAI_npc_dark_conversion;
+    pNewScript->RegisterSelf();
 }
