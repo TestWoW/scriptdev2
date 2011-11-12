@@ -144,7 +144,7 @@ UPDATE `script_texts` SET `content_loc6` = '¿Qué ocurre?' WHERE `entry` = -159
 UPDATE `script_texts` SET `content_loc6` = '¿Qué has encontrado, chico?' WHERE `entry` = -1597298;
 UPDATE `script_texts` SET `content_loc6` = 'Esto no tiene buena pinta. Quédate aquí. Buscaré a un soldado.' WHERE `entry` = -1597299;
 
-- EL BASTION VIOLETA
+-- EL BASTION VIOLETA
 
 UPDATE `script_texts` SET `content_loc6`='¡El Kirin Tor debe ser destruido!' WHERE `entry`='-1608055' ;
 UPDATE `script_texts` SET `content_loc6`='¡Dalaran debe caer!' WHERE `entry`='-1608056' ;
