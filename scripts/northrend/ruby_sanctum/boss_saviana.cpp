@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: boss_ragefire
 SD%Complete: 99%
-SDComment: by notagain && /dev/rsa && carlos93
+SDComment: by carlos93
 SDCategory: ruby_sanctum
 EndScriptData */
 
@@ -172,6 +172,8 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public ScriptedAI
             {
                 if(DoCastSpellIfCan(m_creature, SPELL_FLAME_BREATH) == CAST_OK)
                     m_uiFlameBreathTimer = urand(10000,15000);
+                if (m_uiPhaseTimer <= 5000)
+                    m_uiPhaseTimer = 5000;
             }
             else m_uiFlameBreathTimer -= uiDiff;
 
@@ -181,6 +183,8 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public ScriptedAI
                 {
                     m_uiEnrageTimer = urand(20000,30000);
                     DoScriptText(SAY_ENRAGE, m_creature);
+                    if (m_uiPhaseTimer <= 10000)
+                        m_uiPhaseTimer = 10000;
                 }
             }
             else m_uiEnrageTimer -= uiDiff;
@@ -199,6 +203,9 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public ScriptedAI
             DoMeleeAttackIfReady();
             break;
         case PHASE_FLYING:
+            if (m_creature->IsNonMeleeSpellCasted(true))
+                return;
+
             if (m_uiFlyingTimer <= uiDiff)
             {
                 m_uiFlyingTimer = 30000;
