@@ -41,6 +41,8 @@ enum
     SAY_ENRAGE                  = -1576018,
     SAY_KILL                    = -1576019,
     SAY_DEATH                   = -1576020,
+
+    NPC_DAILY_DUNGEON           = 22852,
 };
 
 /*######
@@ -92,6 +94,8 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 301.69f, -5.44f, -15.56f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+
         DoScriptText(SAY_DEATH, m_creature);
 
         if (m_pInstance)

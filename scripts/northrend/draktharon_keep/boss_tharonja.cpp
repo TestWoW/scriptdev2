@@ -63,8 +63,9 @@ enum
 
     //achie hacks
     ACHIEVEMENT_NORMAL              = 482,
-    ACHIEVEMENT_HEROIC              = 493
+    ACHIEVEMENT_HEROIC              = 493,
 
+    NPC_DAILY_DUNGEON               = 22852,
 };
 
 //Phasses
@@ -128,6 +129,8 @@ struct MANGOS_DLL_DECL boss_tharonjaAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, -255.94f, 665.57f, 131.19f, 5.82f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+
         DoScriptText(SAY_DEATH, m_creature);
         DoCastSpellIfCan(pKiller, SPELL_ACHIEV_CHECK, CAST_TRIGGERED);
 

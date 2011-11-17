@@ -74,7 +74,9 @@ enum
 
     PHASE_BEFORE_RESSURECION    = 0,
     PHASE_RESS_SEQUENCE         = 1,
-    PHASE_RESSURECTED           = 2
+    PHASE_RESSURECTED           = 2,
+
+    NPC_DAILY_DUNGEON           = 22852,
 };
 
 /*######
@@ -166,6 +168,8 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 217.94f, -314.09f, 180.49f, 0.51f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+
         DoScriptText(SAY_DEATH_SECOND, m_creature);
     }
 

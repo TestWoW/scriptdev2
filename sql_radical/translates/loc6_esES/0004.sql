@@ -13,7 +13,7 @@ UPDATE `script_texts` SET `content_loc6` = 'Entonces debo considerar esto un act
 UPDATE `script_texts` SET `content_loc6` = '¿Eso crees? Lord Uther, ¡por mi derecho de sucesión y soberanía de mi corona, y a partir de este momento, te relevo de tu cargo y suspendo a tus paladines del servicio!' WHERE `entry` = -1594082;
 UPDATE `script_texts` SET `content_loc6` = '¡Ya está! Aquellos que tengáis la voluntad de salvar esta tierra, seguidme. Los demás... salid de mi vista.' WHERE `entry` = -1594084;
 UPDATE `script_texts` SET `content_loc6` = '¿Jaina?' WHERE `entry` = -1594086;
-UPDATE `script_texts` SET `content_loc6` = 'Colocaos aquí, y yo guiaré un pequeño ejército a Stratholme para comenzar la matanza. Debemos contener y purgar a los infectados por el bien de todo Lordaeron' WHERE `entry` = -1594088;
+UPDATE `script_texts` SET `content_loc6` = 'Colocaos aquí, y yo guiaré un pequeño ejército a Stratholme para comenzar la matanza. Debemos contener y purgar a los infectados por el bien de todo Lordaeron.' WHERE `entry` = -1594088;
 UPDATE `script_texts` SET `content_loc6` = 'Parece que todo el mundo está listo. Recordad: esta gente está infectada por la peste y pronto morirá. Debemos purgar Stratholme para proteger de la Plaga lo que queda de Lordaeron. Vamos.' WHERE `entry` = -1594089;
 UPDATE `script_texts` SET `content_loc6` = 'Príncipe Arthas, que la luz te bendiga. Mucha gente en la ciudad está teniendo serios problemas. ¿Puedes ayudarnos?' WHERE `entry` = -1594090;
 UPDATE `script_texts` SET `content_loc6` = 'Sólo puedo ayudarte con una muerte limpia.' WHERE `entry` = -1594091;
@@ -43,7 +43,7 @@ UPDATE `script_texts` SET `content_loc6` = 'Descansad un momento y limpiad vuest
 UPDATE `script_texts` SET `content_loc6` = '¡Ya basta! Debemos seguir moviéndonos. Mal\'Ganis espera.' WHERE `entry` = -1594162;
 UPDATE `script_texts` SET `content_loc6` = 'Al fin un poco de suerte. La pila del mercado todavía no se ha incendiado. Se supone que Mal\'Ganis está en la plaza de los cruzados que está justo delante. Cuando estéis listos para continuar, decídmelo.' WHERE `entry` = -1594163;
 UPDATE `script_texts` SET `content_loc6` = 'Se hará justicia.' WHERE `entry` = -1594164;
-UPDATE `script_texts` SET `content_loc6` = 'Vamos a poner fin a esto ahora, Mal\'Ganis.' WHERE `entry` = -1594181;
+UPDATE `script_texts` SET `content_loc6` = 'Vamos a poner fin a esto ahora, Mal\'Ganis. Somos tú y yo.' WHERE `entry` = -1594181;
 UPDATE `script_texts` SET `content_loc6` = '¡Te perseguiré hasta el fin del mundo si debo! ¿Me oyes? ¡HASTA EL FIN DEL MUNDO!' WHERE `entry` = -1594183;
 UPDATE `script_texts` SET `content_loc6` = 'Habéis actuado bien hoy. Cualquier cosa que Mal\'Ganis haya dejado atrás, es vuestra. Tomadla como recompensa. Ahora he de comenzar a planear una expedición a Rasganorte.' WHERE `entry` = -1594184;
 

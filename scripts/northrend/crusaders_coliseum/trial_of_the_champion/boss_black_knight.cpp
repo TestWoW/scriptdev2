@@ -59,7 +59,10 @@ enum
     SPELL_LEAP_H                   = 67880,
 
     //sword ID
-    EQUIP_SWORD                    = 40343
+    EQUIP_SWORD                    = 40343,
+
+    //NPC daily dungeon
+    NPC_DAILY_DUNGEON              = 22852,
 };
 
 // Risen Ghoul
@@ -206,10 +209,13 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
     {
         if (!m_pInstance)
             return;
+
         if (phase3 && !phase1 && !phase2)
         {
             m_pInstance->SetData(TYPE_BLACK_KNIGHT, DONE);
         }
+
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 746.70f, 654.52f, 411.60f, 4.7f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
 
         DoScriptText(SAY_BLACKNIGHT_DEATH, m_creature);
 
@@ -217,8 +223,6 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
             m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 4296 : 4298);
         else
             m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 3778 : 4297);
-
-
 
 /*        if (phase2 && !phase1 && !phase3)
             if (!m_creature->isAlive())

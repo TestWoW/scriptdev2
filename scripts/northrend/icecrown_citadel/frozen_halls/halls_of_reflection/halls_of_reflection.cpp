@@ -145,6 +145,8 @@ enum
 
   ACHIEV_COMPLETE_NORMAL             = 4518,
   ACHIEV_COMPLETE_HEROIC             = 4521,
+
+  NPC_DAILY_DUNGEON                  = 22852,
 };
 
 struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
@@ -880,6 +882,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
               m_pInstance->SetNextEvent(612,m_creature->GetEntry(),10000);
               break;
            case 612:
+              m_creature->SummonCreature(NPC_DAILY_DUNGEON, 5235.22f, 1671.81f, 784.302f, 0.02f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
               m_creature->CastSpell(m_creature,SPELL_ESCAPED_FROM_ARTHAS,false);
               m_pInstance->SetData(TYPE_LICH_KING, DONE);
               DoScriptText(SAY_ESCAPE_02, m_creature);
