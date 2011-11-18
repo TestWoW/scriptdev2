@@ -1,4 +1,4 @@
-UPDATE `script_texts` SET `content_loc6` = '¡%s comienza a desatar almas!' WHERE `entry` = -1632022;
+SET NAMES UTF8;
 
 -- Matanza de Stratholme
 
@@ -207,3 +207,5 @@ UPDATE `script_texts` SET `content_loc6`='¡Acabaré con el Kirin Tor!' WHERE `e
 UPDATE `script_texts` SET `content_loc6`='¡Dalaran caerá!' WHERE `entry`='-1608052' ;
 UPDATE `script_texts` SET `content_loc6`='¡Así acaba tu desafío al Tejehechizos!' WHERE `entry`='-1608053' ;
 UPDATE `script_texts` SET `content_loc6`='Quizá... os hallamos... subestimado...' WHERE `entry`='-1608054' ;
+
+UPDATE `script_texts` SET `content_loc7` = `content_loc6`;
