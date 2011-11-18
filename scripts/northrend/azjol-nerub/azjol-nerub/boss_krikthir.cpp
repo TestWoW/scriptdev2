@@ -25,6 +25,8 @@ EndScriptData */
 #include "precompiled.h"
 #include "azjol-nerub.h"
 
+bool DeadWatchers; // needed for achievement: Watch him die(1296)
+
 enum Spells
 {
     SPELL_MIND_FLAY                               = 52586,
@@ -71,7 +73,7 @@ enum Spells
     SAY_PREFIGHT_2                                = -1601018,
     SAY_PREFIGHT_3                                = -1601019,
 
-    ACHIEV_WATH_HIM_DIE                           = 1296
+    ACHIEVEMENT_WATCH_HIM_DIE                     = 1296,
 };
 
 struct Locations
@@ -96,10 +98,12 @@ struct MANGOS_DLL_DECL boss_krikthirAI : public ScriptedAI
     boss_krikthirAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
     ScriptedInstance* pInstance;
+    bool m_bIsRegularMode;
 
     uint32 uiMindFlayTimer;
     uint32 uiCurseFatigueTimer;
@@ -109,6 +113,8 @@ struct MANGOS_DLL_DECL boss_krikthirAI : public ScriptedAI
     {
         uiMindFlayTimer = 15000;
         uiCurseFatigueTimer = 12000;
+
+        DeadWatchers = false;
 
         if (pInstance)
             pInstance->SetData(TYPE_KRIKTHIR, NOT_STARTED);
@@ -181,6 +187,9 @@ struct MANGOS_DLL_DECL boss_krikthirAI : public ScriptedAI
     {
         DoScriptText(SAY_DEATH, m_creature);
 
+        if (!m_bIsRegularMode && !DeadWatchers)
+            pInstance->DoCompleteAchievement(ACHIEVEMENT_WATCH_HIM_DIE);
+
         if (pInstance)
         {
             pInstance->SetData(TYPE_KRIKTHIR, DONE);
@@ -209,7 +218,7 @@ struct MANGOS_DLL_DECL boss_krikthirAI : public ScriptedAI
 
 struct MANGOS_DLL_DECL npc_skittering_infectorAI : public ScriptedAI
 {
-    npc_skittering_infectorAI(Creature *pCreature) : ScriptedAI(pCreature) 
+    npc_skittering_infectorAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
@@ -237,7 +246,7 @@ CreatureAI* GetAI_npc_skittering_infector(Creature* pCreature)
 
 struct MANGOS_DLL_DECL npc_anub_ar_skirmisherAI : public ScriptedAI
 {
-    npc_anub_ar_skirmisherAI(Creature *c) : ScriptedAI(c) 
+    npc_anub_ar_skirmisherAI(Creature *c) : ScriptedAI(c)
     {
        Reset();
     }
@@ -247,7 +256,7 @@ struct MANGOS_DLL_DECL npc_anub_ar_skirmisherAI : public ScriptedAI
 
     void Reset()
     {
-        uiChargeTimer   = 11000;
+        uiChargeTimer = 11000;
         uiBackstabTimer = 7000;
     }
 
@@ -354,7 +363,7 @@ struct MANGOS_DLL_DECL npc_anub_ar_warriorAI : public ScriptedAI
 
 struct MANGOS_DLL_DECL npc_watcher_gashraAI : public ScriptedAI
 {
-    npc_watcher_gashraAI(Creature *pCreature) : ScriptedAI(pCreature) 
+    npc_watcher_gashraAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
        Reset();
     }
@@ -364,8 +373,13 @@ struct MANGOS_DLL_DECL npc_watcher_gashraAI : public ScriptedAI
 
     void Reset()
     {
-        uiWebWrapTimer      = 11000;
+        uiWebWrapTimer = 11000;
         uiInfectedBiteTimer = 4000;
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+        DeadWatchers = true;
     }
 
     void EnterCombat(Unit* who)
@@ -397,7 +411,7 @@ struct MANGOS_DLL_DECL npc_watcher_gashraAI : public ScriptedAI
 
 struct MANGOS_DLL_DECL npc_watcher_narjilAI : public ScriptedAI
 {
-    npc_watcher_narjilAI(Creature *pCreature) : ScriptedAI(pCreature) 
+    npc_watcher_narjilAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
        Reset();
     }
@@ -408,9 +422,14 @@ struct MANGOS_DLL_DECL npc_watcher_narjilAI : public ScriptedAI
 
     void Reset()
     {
-        uiWebWrapTimer      = 11000;
+        uiWebWrapTimer = 11000;
         uiInfectedBiteTimer = 4000;
         uiBindingWebsTimer = 17000;
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+        DeadWatchers = true;
     }
 
     void UpdateAI(const uint32 diff)
@@ -443,7 +462,7 @@ struct MANGOS_DLL_DECL npc_watcher_narjilAI : public ScriptedAI
 
 struct MANGOS_DLL_DECL npc_watcher_silthikAI : public ScriptedAI
 {
-    npc_watcher_silthikAI(Creature *pCreature) : ScriptedAI(pCreature) 
+    npc_watcher_silthikAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
        Reset();
     }
@@ -454,9 +473,14 @@ struct MANGOS_DLL_DECL npc_watcher_silthikAI : public ScriptedAI
 
     void Reset()
     {
-        uiWebWrapTimer      = 11000;
+        uiWebWrapTimer = 11000;
         uiInfectedBiteTimer = 4000;
-        uiPoisonSprayTimer  = 15000;
+        uiPoisonSprayTimer = 15000;
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+        DeadWatchers = true;
     }
 
     void UpdateAI(const uint32 diff)
@@ -568,4 +592,3 @@ void AddSC_boss_krikthir()
     newscript->GetAI = &GetAI_npc_watcher_narjil;
     newscript->RegisterSelf();
 }
-
