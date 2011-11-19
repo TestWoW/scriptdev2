@@ -51,22 +51,24 @@ enum
     SPELL_ICY_BLAST_SLOW                = 69238,
     SPELL_ICY_BLAST_SLOW_H              = 69628,
 
-    SAY_OUTRO1_SLAVE_HORDE        = -1610094,
-    SAY_OUTRO1_SLAVE_ALLY         = -1610101,
-    SAY_OUTRO2_SLAVE              = -1610095,
-    SAY_OUTRO3_HORDE              = -1610096,
-    SAY_OUTRO3_ALY                = -1610097,
-    SAY_OUTRO4_HORDE              = -1610098,
-    SAY_OUTRO4_ALY                = -1610099,
-    SAY_OUTRO5_ALY                = -1610100,
+    SAY_OUTRO1_SLAVE_HORDE              = -1610094,
+    SAY_OUTRO1_SLAVE_ALLY               = -1610101,
+    SAY_OUTRO2_SLAVE                    = -1610095,
+    SAY_OUTRO3_HORDE                    = -1610096,
+    SAY_OUTRO3_ALY                      = -1610097,
+    SAY_OUTRO4_HORDE                    = -1610098,
+    SAY_OUTRO4_ALY                      = -1610099,
+    SAY_OUTRO5_ALY                      = -1610100,
 
-    SPELL_FROST_BOMB              = 70521,
+    SPELL_FROST_BOMB                    = 70521,
 
     NPC_ICY_BLAST                       = 36731,
     SPELL_ICY_BLAST_AURA                = 69238,
     SPELL_ICY_BLAST_AURA_H              = 69628,
 
-    EQUIP_ID                      = 51796,
+    EQUIP_ID                            = 51796,
+
+    NPC_DAILY_DUNGEON                   = 22852,
 };
 
 const float RimefangSummon[4] = {1013.827f, 169.71f, 628.157f, 5.31f};
@@ -263,6 +265,8 @@ struct MANGOS_DLL_DECL boss_tyrannusAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 1032.35f, 198.31f, 628.15f, 4.73f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+
         DoScriptText(SAY_DEATH, m_creature);
 
         // Temp hack until outro is implemented

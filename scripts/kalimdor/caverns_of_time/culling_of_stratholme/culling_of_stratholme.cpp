@@ -258,7 +258,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
        m_creature->RemoveAllAuras();
        m_creature->DeleteThreatList();
        m_creature->CombatStop(true);
-       m_creature->LoadCreatureAddon();
+       m_creature->LoadCreatureAddon(false);
        m_uiExorcismTimer = 7400;
        m_uiHealTimer = 100;
 
@@ -1481,7 +1481,7 @@ struct MANGOS_DLL_DECL npc_arthas_priestAI : public ScriptedAI
       m_creature->RemoveAllAuras();
       m_creature->DeleteThreatList();
       m_creature->CombatStop(true);
-      m_creature->LoadCreatureAddon();
+      m_creature->LoadCreatureAddon(false);
 
       m_creature->SetLootRecipient(NULL);
 
@@ -1596,7 +1596,7 @@ struct MANGOS_DLL_DECL npc_arthas_marineAI : public ScriptedAI
       m_creature->RemoveAllAuras();
       m_creature->DeleteThreatList();
       m_creature->CombatStop(true);
-      m_creature->LoadCreatureAddon();
+      m_creature->LoadCreatureAddon(false);
 
       m_creature->SetLootRecipient(NULL);
       m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, LastX, LastY, LastZ);

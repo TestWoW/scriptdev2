@@ -47,6 +47,8 @@ enum
     SPELL_UNCONTROLLABLE_ENERGY               = 58688,
     SPELL_UNCONTROLLABLE_ENERGY_H             = 59281,
     SPELL_CYANIGOSA_TRANSFORM                 = 58668,
+
+    NPC_DAILY_DUNGEON                         = 22852,
 };
 
 struct MANGOS_DLL_DECL boss_cyanigosaAI : public ScriptedAI
@@ -159,6 +161,8 @@ struct MANGOS_DLL_DECL boss_cyanigosaAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 1844.23f, 804.02f, 44.12f, 6.28f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+
         DoScriptText(SAY_DEATH, m_creature);
 
         if (m_pInstance)

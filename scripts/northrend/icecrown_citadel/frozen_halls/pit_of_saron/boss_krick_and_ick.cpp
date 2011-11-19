@@ -144,14 +144,6 @@ struct MANGOS_DLL_DECL boss_IckAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_KRICK, DONE);
-
-            if(Creature* pKrick = m_creature->SummonCreature(NPC_KRICK_EVENT, m_creature->GetPositionX() - 5, m_creature->GetPositionY() - 5, m_creature->GetPositionZ(), KrickPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
-            {
-                m_uiKrickGUID = pKrick->GetGUID();
-            }
-
-        if (Creature *pKrickTwo = m_pInstance->GetSingleCreatureFromStorage(NPC_KRICK))
-            pKrickTwo->ForcedDespawn();
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -281,6 +273,14 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
             }
         }
         return faction;
+    }
+
+    void JustDied(Unit *victim)
+    {
+        m_creature->SummonCreature(NPC_KRICK_EVENT, m_creature->GetPositionX() - 5, m_creature->GetPositionY() - 5, m_creature->GetPositionZ(), KrickPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+
+        if (Creature *pKrickTwo = m_pInstance->GetSingleCreatureFromStorage(NPC_KRICK))
+            pKrickTwo->ForcedDespawn();
     }
 
     void UpdateAI(const uint32 uiDiff)
