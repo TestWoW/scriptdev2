@@ -88,12 +88,10 @@ enum
         SPELL_RUNE_OF_BLOOD_DEBUFF              = 72410,
 
         // Blood Nova
-        SPELL_BLOOD_NOVA_10                     = 72378,
-        SPELL_BLOOD_NOVA_25                     = 73058,
+        SPELL_BLOOD_NOVA                        = 72378,
 
         // Boiling Blood
-        SPELL_BOILING_BLOOD_10                  = 72385,
-        SPELL_BOILING_BLOOD_25                  = 72441,
+        SPELL_BOILING_BLOOD                     = 72385,
 
         // Grip of Agony
         SPELL_GRIP_OF_AGONY                     = 70572,
@@ -1506,7 +1504,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         // Boiling Blood
         if (m_uiBoilingBloodTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_BLOOD_NOVA_25 : SPELL_BLOOD_NOVA_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_BLOOD_NOVA) == CAST_OK)
                 m_uiBoilingBloodTimer = urand(10000, 35000);
         }
         else
@@ -1515,7 +1513,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         // Boiling Blood
         if (m_uiBloodNovaTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_BOILING_BLOOD_25 : SPELL_BOILING_BLOOD_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature,SPELL_BOILING_BLOOD) == CAST_OK)
                 m_uiBloodNovaTimer = urand(16000, 35000);
         }
         else
@@ -1537,7 +1535,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
             m_uiBloodBeastsTimer  = 40000;
 
             if (m_bIsHeroic)
-                m_uiScentOfBloodTimer = 7000; // 5 seconds after beasts engage in combat
+                m_uiScentOfBloodTimer = 7000; // 7 seconds after beasts engage in combat
 
             DoScriptText(SAY_BLOODBEASTS, m_creature);
         }

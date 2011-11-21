@@ -40,8 +40,7 @@ enum
     SPELL_BONE_SLICE_25                     = 70814,
 
     // Bone Storm
-    SPELL_BONE_STORM_10                     = 69076,
-    SPELL_BONE_STORM_25                     = 69076,
+    SPELL_BONE_STORM                        = 69076,
 
     // Coldflame
     SPELL_COLDFLAME                         = 69140, // not used, hacked with custom code
@@ -272,7 +271,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public ScriptedAI
                 // Bone Storm
                 if (m_uiBoneStormTimer <= uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_BONE_STORM_25 : SPELL_BONE_STORM_10) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature, SPELL_BONE_STORM) == CAST_OK)
                     {
                         SetCombatMovement(false);
                         m_uiBoneStormTimer = 90000;
@@ -330,7 +329,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public ScriptedAI
 
                         if (m_uiChargesCount >= m_uiMaxCharges)
                         {
-                            m_creature->RemoveAurasDueToSpell(m_bIs25Man ? SPELL_BONE_STORM_25 : SPELL_BONE_STORM_10);
+                            m_creature->RemoveAurasDueToSpell(SPELL_BONE_STORM);
                             m_creature->InterruptSpell(CURRENT_MELEE_SPELL); // Bone Slice related
                             m_uiBoneSliceTimer = 10000;
                             SetCombatMovement(true);

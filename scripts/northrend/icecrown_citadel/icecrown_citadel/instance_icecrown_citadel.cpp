@@ -359,7 +359,10 @@ static Locations SpawnLoc[]=
              case TYPE_ROTFACE:
                 m_auiEncounter[TYPE_ROTFACE] = uiData;
                 if (uiData == IN_PROGRESS)
+                {
                     DoCloseDoor(GO_GREEN_PLAGUE);
+                    SetSpecialAchievementCriteria(TYPE_DANCES_WITH_OOZES, true);
+                }
                 else
                     DoOpenDoor(GO_GREEN_PLAGUE);
                 if (uiData == DONE)
@@ -582,6 +585,11 @@ static Locations SpawnLoc[]=
         case CRITERIA_BONED_10H:
         case CRITERIA_BONED_25H:
             return m_abAchievCriteria[TYPE_BONED];
+        case CRITERIA_DANCES_WITH_OOZES_10N:
+        case CRITERIA_DANCES_WITH_OOZES_25N:
+        case CRITERIA_DANCES_WITH_OOZES_10H:
+        case CRITERIA_DANCES_WITH_OOZES_25H:
+            return m_abAchievCriteria[TYPE_DANCES_WITH_OOZES];
         default:
              return false;
         }

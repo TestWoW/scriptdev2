@@ -72,34 +72,27 @@ enum BossSpells
     SPELL_SUMMON_TIMER_ARCHMAGE     = 70916,
 
     // Risen Archmage
-    SPELL_FROSTBOLT_VOLLEY_10       = 70759,
-    SPELL_MANA_VOID_10              = 71179,
-    SPELL_FROSTBOLT_VOLLEY_25       = 71889,
-    SPELL_MANA_VOID_25              = 71741,
+    SPELL_FROSTBOLT_VOLLEY          = 70759,
+    SPELL_MANA_VOID                 = 71179,
     SPELL_VOID_BUFF                 = 71085,
     SPELL_COLUMN_OF_FROST           = 70704,
     SPELL_COLUMN_OF_FROST_VISUAL    = 70715,
     SPELL_COLUMN_OF_FROST_TRIG      = 70702,
 
     // Blazing Skeleton
-    SPELL_FIREBALL_10               = 70754,
-    SPELL_LAY_WASTE_10              = 69325,
-    SPELL_FIREBALL_25               = 71748,
-    SPELL_LAY_WASTE_25              = 71730,
+    SPELL_FIREBALL                  = 70754,
+    SPELL_LAY_WASTE                 = 69325,
 
     // Suppresser
-    SPELL_SUPPRESSION               = 70588, // NOTE: must stack from many casters
+    SPELL_SUPPRESSION               = 70588,
 
     // Blistering Zombie
-    SPELL_CORROSION_10              = 70749,
-    SPELL_ACID_BURST_10             = 70744, // 10 mode. 750ms cast time. seems like it is cast always before dying
-    SPELL_CORROSION_25              = 71738,
-    SPELL_ACID_BURST_25             = 71733, // 25 mode. 750ms cast time. seems like it is cast always before dying
+    SPELL_CORROSION                 = 70749,
+    SPELL_ACID_BURST                = 70744, // 10 mode. 750ms cast time. seems like it is cast always before dying
 
     // Gluttonous Abomination
-    SPELL_GUT_SPRAY_10              = 70633,
-    SPELL_GUT_SPRAY_25              = 71283,
-    SPELL_ROT_WORM_SPAWNER          = 70675, // cast around 30% HP or something?
+    SPELL_GUT_SPRAY                 = 70633,
+    SPELL_ROT_WORM_SPAWNER          = 70675,
     SPELL_ROT_WORM                  = 72962,
 
     NPC_RISEN_ARCHMAGE              = 37868,
@@ -792,7 +785,7 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
         // Gut Spray
         if (m_uiGutSprayTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_GUT_SPRAY_25 : SPELL_GUT_SPRAY_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GUT_SPRAY) == CAST_OK)
                 m_uiGutSprayTimer = urand(5000, 10000);
         }
         else
@@ -823,7 +816,7 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
 
     void Aggro(Unit *pWho)
     {
-        DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_CORROSION_25 : SPELL_CORROSION_10, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_CORROSION, CAST_TRIGGERED);
     }
 
     void DamageTaken(Unit *pDealer, uint32 &uiDamage)
@@ -832,7 +825,7 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
         {
             uiDamage = 0;
             SetCombatMovement(false);
-            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_ACID_BURST_25 : SPELL_ACID_BURST_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_ACID_BURST) == CAST_OK)
                 m_creature->ForcedDespawn(2000);
         }
     }
@@ -883,7 +876,7 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
         // Frostbolt Volley
         if (m_uiFrostboltVolleyTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_FROSTBOLT_VOLLEY_25 : SPELL_FROSTBOLT_VOLLEY_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_FROSTBOLT_VOLLEY) == CAST_OK)
                 m_uiFrostboltVolleyTimer = urand(5000, 15000);
         }
         else
@@ -906,7 +899,7 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
         {
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
-                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_MANA_VOID_25 : SPELL_MANA_VOID_10) == CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_MANA_VOID) == CAST_OK)
                     m_uiManaVoidTimer = urand(10000, 15000);
             }
         }
@@ -954,7 +947,7 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
         {
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
-                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_FIREBALL_25 : SPELL_FIREBALL_10) == CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_FIREBALL) == CAST_OK)
                     m_uiFireballTimer = urand(3000, 5000);
             }
         }
@@ -964,7 +957,7 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
         // Lay Waste
         if (m_uiLayWasteTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_LAY_WASTE_25 : SPELL_LAY_WASTE_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_LAY_WASTE) == CAST_OK)
                 m_uiLayWasteTimer = urand(10000, 15000);
         }
         else

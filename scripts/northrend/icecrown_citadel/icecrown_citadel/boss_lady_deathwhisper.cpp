@@ -31,14 +31,10 @@ enum BossSpells
         SPELL_INSIGNIFICANCE                    = 71204,
         SPELL_DOMINATE_MIND                     = 71289,
         SPELL_MANA_BARRIER                      = 70842,
-        SPELL_DEATH_AND_DECAY_10                = 71001,
-        SPELL_DEATH_AND_DECAY_25                = 72108,
-        SPELL_SHADOW_BOLT_10                    = 71254,
-        SPELL_SHADOW_BOLT_25                    = 72008,
-        SPELL_FROSTBOLT_10                      = 71420,
-        SPELL_FROSTBOLT_25                      = 72007,
-        SPELL_FROSTBOLT_VOLLEY_10               = 72905,
-        SPELL_FROSTBOLT_VOLLEY_25               = 72906,
+        SPELL_DEATH_AND_DECAY                   = 71001,
+        SPELL_SHADOW_BOLT                       = 71254,
+        SPELL_FROSTBOLT                         = 71420,
+        SPELL_FROSTBOLT_VOLLEY                  = 72905,
 
         // Cult Adherents
         NPC_CULT_ADHERENT                       = 37949,
@@ -400,7 +396,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
         {
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
             {
-                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_DEATH_AND_DECAY_25 : SPELL_DEATH_AND_DECAY_10) == CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_DEATH_AND_DECAY) == CAST_OK)
                     m_uiDeathAndDecayTimer = 30000;
             }
         }
@@ -414,7 +410,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
                 /* uncomment when spell implemented in core
                 for (int i = 0; i < m_uiMindControlCount; ++i)
                 {
-                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_DOMINATE_MIND, SELECT_FLAG_PLAYER))
                         DoCastSpellIfCan(pTarget, SPELL_DOMINATE_MIND, CAST_TRIGGERED);
                 }*/
 
@@ -458,8 +454,8 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
             {
                 if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
-                    if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_SHADOW_BOLT_25 : SPELL_SHADOW_BOLT_10) == CAST_OK)
-                        m_uiShadowBoltTimer = 5000;
+                    if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_BOLT) == CAST_OK)
+                        m_uiShadowBoltTimer = 8000;
                 }
             }
             else
@@ -491,7 +487,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
             {
                 if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
-                    if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_FROSTBOLT_25 : SPELL_FROSTBOLT_10) == CAST_OK)
+                    if (DoCastSpellIfCan(pTarget, SPELL_FROSTBOLT) == CAST_OK)
                         m_uiFrostboltTimer = urand(5000, 10000);
                 }
             }
@@ -500,7 +496,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
 
             if (m_uiFrostboltVolleyTimer <= uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_FROSTBOLT_VOLLEY_25 : SPELL_FROSTBOLT_VOLLEY_10) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_FROSTBOLT_VOLLEY) == CAST_OK)
                     m_uiFrostboltVolleyTimer = urand(15000, 20000);
             }
             else

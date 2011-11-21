@@ -35,8 +35,7 @@ enum
     SPELL_STINKY_MORTALWOUND    = 71127,
 
     // Gastric Bloat
-    SPELL_GASTRIC_BLOAT_10      = 72214, // proc aura, ~8 sec cooldown, currently not used
-    SPELL_GASTRIC_BLOAT_25      = 72551,
+    SPELL_GASTRIC_BLOAT         = 72214, // proc aura, ~8 sec cooldown, currently not used
     SPELL_GASTRIC_BLOAT_TRIG    = 72219,
 
     // Inhale Blight
@@ -45,8 +44,7 @@ enum
     SPELL_INHALED_BLIGHT_25     = 71912,
 
     // Pungent Blight
-    SPELL_PUNGENT_BLIGHT_10     = 69195,
-    SPELL_PUNGENT_BLIGHT_25     = 71219,
+    SPELL_PUNGENT_BLIGHT        = 69195,
 
     // Gaseous Blight
     // periodic auras spells
@@ -63,14 +61,12 @@ enum
     SPELL_REMOVE_INOCULENT      = 69298,
 
     // Gas Spore
-    SPELL_GAS_SPORE_10          = 69278,
-    SPELL_GAS_SPORE_25          = 71221,
+    SPELL_GAS_SPORE             = 69278,
 
     // Vile Gas
     SPELL_VILE_GAS_SUMMON       = 72288,
     SPELL_VILE_GAS_SUMMON_TRIG  = 72287,
-    SPELL_VILE_GAS_10           = 71307,
-    SPELL_VILE_GAS_25           = 71218,
+    SPELL_VILE_GAS              = 71307,
     SPELL_VILE_GAS_TRIGGERED    = 69240,
 
     // Malleable Goo
@@ -248,7 +244,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         // Gastric Bloat
         if (m_uiGastricBloatTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_GASTRIC_BLOAT_25 : SPELL_GASTRIC_BLOAT_TRIG) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GASTRIC_BLOAT_TRIG) == CAST_OK)
                 m_uiGastricBloatTimer = 10000;
         }
         else
@@ -266,7 +262,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
                 if (holder->GetStackAmount() >= 3)
                 {
                     // can't inhale anymore...
-                    if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_PUNGENT_BLIGHT_25 : SPELL_PUNGENT_BLIGHT_10) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature, SPELL_PUNGENT_BLIGHT) == CAST_OK)
                     {
                         DoScriptText(SAY_PUNGUENT_BLIGHT, m_creature);
                         DoScriptText(SAY_PUNGUENT_BLIGHT_EMOTE, m_creature);
@@ -293,7 +289,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         // Gas Spore
         if (m_uiGasSporeTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_GAS_SPORE_25 : SPELL_GAS_SPORE_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_GAS_SPORE) == CAST_OK)
             {
                 DoScriptText(SAY_SPORE, m_creature);
                 m_uiGasSporeTimer = 40000;
@@ -311,7 +307,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
             if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
             {
                 pTarget->CastSpell(pTarget, SPELL_VILE_GAS_SUMMON_TRIG, true);
-                DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_VILE_GAS_25 : SPELL_VILE_GAS_10, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
                 m_uiVileGasTimer = 30000;
             }
         }

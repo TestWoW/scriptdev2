@@ -78,11 +78,6 @@ enum BossSpells
     NPC_PUDDLE_STALKER          = 37013,
     NPC_LITTLE_OOZE             = 36897,
     NPC_BIG_OOZE                = 36899,
-
-    // Stinky
-    SPELL_STINKY_DECIMATE       = 71123,
-    SPELL_STINKY_MORTALWOUND    = 71127,
-    SPELL_STINKY_SOULFEST       = 71203,
 };
 
 static uint32 uiMutatedInfections[5] =
@@ -468,7 +463,7 @@ struct MANGOS_DLL_DECL mob_big_oozeAI : public ScriptedAI
                     {
                         if (Creature *pRotface = m_pInstance->GetSingleCreatureFromStorage(NPC_ROTFACE))
                         {
-                            //m_pInstance->SetSpecialAchievementCriteria(TYPE_DANCES_WITH_OOZES, false);
+                            m_pInstance->SetSpecialAchievementCriteria(TYPE_DANCES_WITH_OOZES, false);
                             DoScriptText(SAY_OOZE_EXPLODE, pRotface);
                             m_uiCheckTimer = 10000;
                         }
