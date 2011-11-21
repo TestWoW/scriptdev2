@@ -431,7 +431,6 @@ struct MANGOS_DLL_DECL mob_big_oozeAI : public ScriptedAI
     {
         m_uiStickyOozeTimer = 5000;
         m_uiCheckTimer = 1000;
-        exploded = false;
     }
 
     void EnterEvadeMode()

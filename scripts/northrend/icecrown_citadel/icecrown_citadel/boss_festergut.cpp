@@ -20,9 +20,6 @@ SD%Complete: 99%
 SDComment: targeting spells of Malleable Goo and Vile Gas unclear, coded targeting in script
 SDCategory: Icecrown Citadel
 EndScriptData */
-
-// Stinky scripted by Walkum. Decimate & Plague Stench repaired by Carlos93.
-
 #include "precompiled.h"
 #include "icecrown_citadel.h"
 
@@ -107,7 +104,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
 {
     boss_festergutAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
@@ -115,10 +112,11 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         Reset();
     }
 
-    ScriptedInstance *m_pInstance;
+    instance_icecrown_spire *m_pInstance;
     Difficulty m_uiMapDifficulty;
     bool m_bIsHeroic;
     bool m_bIs25Man;
+    bool m_bAchievFail;
 
     uint32 m_uiBerserkTimer;
     uint32 m_uiGastricBloatTimer;
@@ -126,6 +124,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
     uint32 m_uiGasSporeTimer;
     uint32 m_uiVileGasTimer;
     uint32 m_uiMalleableGooTimer;
+    uint32 m_uiCheckTimer;
 
     void Reset()
     {
@@ -135,6 +134,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         m_uiGasSporeTimer = 20000;
         m_uiVileGasTimer = 10000;
         m_uiMalleableGooTimer = urand(15000, 20000);
+        m_uiCheckTimer = 1000;
     }
 
     void Aggro(Unit *pWho)
@@ -222,6 +222,40 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         }
 
         return pResult;
+    }
+
+    void CheckAchievement()
+    {
+        if (!m_pInstance)
+            return;
+
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                {
+                    SpellAuraHolderPtr holder = pTarget->GetSpellAuraHolder(69291);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72101);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72102);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72103);
+                    if (holder)
+                    {
+                        if (holder->GetStackAmount() >= 3)
+                        {
+                            m_pInstance->SetSpecialAchievementCriteria(TYPE_FLU_SHORT_SHORTAGE, false);
+                            m_bAchievFail = true;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -339,6 +373,18 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
             else
                 m_uiMalleableGooTimer -= uiDiff;
         }
+
+        // Check achievement
+        if (!m_bAchievFail)
+        {
+            if (m_uiCheckTimer < uiDiff)
+            {
+                CheckAchievement();
+                m_uiCheckTimer = 1000;
+            }
+            else m_uiCheckTimer = uiDiff;
+        }
+
 
         DoMeleeAttackIfReady();
     }

@@ -110,13 +110,23 @@ static Locations SindragosaLoc[]=
 #define FROST_BOMB_MIN_Y 2437.0f
 #define FROST_BOMB_MAX_Y 2527.0f
 
-struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
+struct MANGOS_DLL_DECL boss_sindragosaAI : public ScriptedAI
 {
-    boss_sindragosaAI(Creature* pCreature) : base_icc_bossAI(pCreature)
+    boss_sindragosaAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         pCreature->SetSpeedRate(MOVE_RUN, 1.2f);
         Reset();
     }
+
+    instance_icecrown_spire* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
+    bool m_bAchievFail;
 
     uint32 m_uiPhase;
     uint32 m_uiPhaseTimer;
@@ -131,9 +141,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
     uint32 m_uiFrostBeaconTimer;
     uint32 m_uiIceTombTimer;
     uint32 m_uiFrostBombTimer;
+    uint32 m_uiCheckTimer;
 
     void Reset()
     {
+        m_bAchievFail               = false;
         m_uiPhase                   = PHASE_GROUND;
         m_uiPhaseTimer              = 45000;
         m_uiBerserkTimer            = 10 * MINUTE * IN_MILLISECONDS;
@@ -143,6 +155,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         m_uiIcyGripTimer            = 35000;
         m_uiBlisteringColdTimer     = 36000;
         m_uiUnchainedMagicTimer     = urand(15000, 30000);
+        m_uiCheckTimer              = 1000;
 
         m_uiFlyingTimer             = 60000; // debug code
     }
@@ -180,6 +193,40 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             m_pInstance->SetData(TYPE_SINDRAGOSA, DONE);
 
         DoScriptText(SAY_DEATH, m_creature);
+    }
+
+    void CheckAchievement()
+    {
+        if (!m_pInstance)
+            return;
+
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                {
+                    SpellAuraHolderPtr holder = pTarget->GetSpellAuraHolder(70127);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72528);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72529);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72530);
+                    if (holder)
+                    {
+                        if (holder->GetStackAmount() > 5)
+                        {
+                            m_pInstance->SetSpecialAchievementCriteria(TYPE_ALL_YOU_CAN_EAT, false);
+                            m_bAchievFail = true;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void MovementInform(uint32 uiMovementType, uint32 uiData)
@@ -244,6 +291,16 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         }
         else
             m_uiBerserkTimer -= uiDiff;
+
+        if (!m_bAchievFail)
+        {
+            if (m_uiCheckTimer < uiDiff)
+            {
+                CheckAchievement();
+                m_uiCheckTimer = 1000;
+            }
+            else m_uiCheckTimer -= uiDiff;
+        }
 
         switch(m_uiPhase)
         {
