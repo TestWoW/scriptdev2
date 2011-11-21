@@ -208,4 +208,50 @@ UPDATE `script_texts` SET `content_loc6`='¡Dalaran caerá!' WHERE `entry`='-160
 UPDATE `script_texts` SET `content_loc6`='¡Así acaba tu desafío al Tejehechizos!' WHERE `entry`='-1608053' ;
 UPDATE `script_texts` SET `content_loc6`='Quizá... os hallamos... subestimado...' WHERE `entry`='-1608054' ;
 
+-- EL OCULUS
+
+UPDATE `script_texts` SET `content_loc6`='¡Los prisioneros no serán liberados! ¡La palabra de Malygos es ley!' WHERE `entry`='-1578000' ;
+UPDATE `script_texts` SET `content_loc6`='¡Un castigo apropiado!' WHERE `entry`='-1578001' ;
+UPDATE `script_texts` SET `content_loc6`='¡Sentencia ejecutada!' WHERE `entry`='-1578002' ;
+UPDATE `script_texts` SET `content_loc6`='¡Otra baja de guerra!' WHERE `entry`='-1578003' ;
+UPDATE `script_texts` SET `content_loc6`='La guerra... continúa...' WHERE `entry`='-1578004' ;
+UPDATE `script_texts` SET `content_loc6`='¡Es demasiado tarde para correr!' WHERE `entry`='-1578005' ;
+UPDATE `script_texts` SET `content_loc6`='¡Reuníos!' WHERE `entry`='-1578006' ;
+UPDATE `script_texts` SET `content_loc6`='¡Nadie escapará!' WHERE `entry`='-1578007' ;
+UPDATE `script_texts` SET `content_loc6`='¡Os condeno... a... muerte!' WHERE `entry`='-1578008' ;
+UPDATE `script_texts` SET `content_loc6`='¡Temblad, gusanos!' WHERE `entry`='-1578009' ;
+UPDATE `script_texts` SET `content_loc6`='¡Os aplastaré!' WHERE `entry`='-1578010' ;
+UPDATE `script_texts` SET `content_loc6`='¿Podéis volar?' WHERE `entry`='-1578011' ;
+
+UPDATE `script_texts` SET `content_loc6`='¡Pobres necios ciegos!' WHERE `entry`='-1578012' ;
+UPDATE `script_texts` SET `content_loc6`='Si pudieras entenderlo...' WHERE `entry`='-1578013' ;
+UPDATE `script_texts` SET `content_loc6`='Ahora lo ves, ¿VERDAD?' WHERE `entry`='-1578014' ;
+UPDATE `script_texts` SET `content_loc6`='Desafortunado, pero necesario.' WHERE `entry`='-1578015' ;
+UPDATE `script_texts` SET `content_loc6`='Todo lo que he hecho... ha sido por Azeroth.' WHERE `entry`='-1578016' ;
+UPDATE `script_texts` SET `content_loc6`='¡Una muestra... una pequeña muestra del poder del Tejehechizos!' WHERE `entry`='-1578017' ;
+UPDATE `script_texts` SET `content_loc6`='Tanta energía inestable... ¡pero vale la pena correr el riesgo de destruiros!' WHERE `entry`='-1578018' ;
+UPDATE `script_texts` SET `content_loc6`='Qué tenemos aquí... ¿Aquellos que se atreven a desafiar al Tejehechizos? ¿Aquellos a los que les falta previsión y entendimiento? ¿Cómo puedo explicaroslo? ¡Malygos está intentado salvar al mundo de sí mismo! ¡Bah! ¡No malgastéis mi tiempo!' WHERE `entry`='-1578019' ;
+UPDATE `script_texts` SET `content_loc6`='Es evidente que mis mascotas han fracasado. Quizá sea necesaria otra demostración.' WHERE `entry`='-1578020' ;
+UPDATE `script_texts` SET `content_loc6`='Seguís luchando. Seguís aferrándoos a principios erróneos. Si sobrevivís, me encontraréis en el anillo central.' WHERE `entry`='-1578021' ;
+
+UPDATE `script_texts` SET `content_loc6`='No habrá piedad.' WHERE `entry`='-1578022' ;
+UPDATE `script_texts` SET `content_loc6`='¡El Oculus es nuestro!' WHERE `entry`='-1578023' ;
+UPDATE `script_texts` SET `content_loc6`='¡Te avisé!' WHERE `entry`='-1578024' ;
+UPDATE `script_texts` SET `content_loc6`='¡Son demasiado... fuertes! ¡Hemos subestimado... su fortaleza!' WHERE `entry`='-1578025' ;
+UPDATE `script_texts` SET `content_loc6`='¡Reventadlos! ¡Acabad con ellos!' WHERE `entry`='-1578026' ;
+UPDATE `script_texts` SET `content_loc6`='¡No toméis prisioneros! ¡Atacad!' WHERE `entry`='-1578027' ;
+UPDATE `script_texts` SET `content_loc6`='¡Atacad ahora! ¡Borradlos del mapa!' WHERE `entry`='-1578028' ;
+UPDATE `script_texts` SET `content_loc6`='Intrusos, vuestra victoria será efímera. Soy el comandante Varos Zancanubes. Mis dracos controlan el cielo y protegen este conducto. Yo me encargaré personalmente de que El Oculus no caiga en vuestro poder.' WHERE `entry`='-1578029' ;
+
+UPDATE `script_texts` SET `content_loc6`='¡Entrometidos descarados, estáis fuera de vuestro elemento! ¡Os enterraré!' WHERE `entry`='-1578030' ;
+UPDATE `script_texts` SET `content_loc6`='Hay mucha caída...' WHERE `entry`='-1578031' ;
+UPDATE `script_texts` SET `content_loc6`='¡Vuelve a la tierra!' WHERE `entry`='-1578032' ;
+UPDATE `script_texts` SET `content_loc6`='¡Disfruta de la caída!' WHERE `entry`='-1578033' ;
+UPDATE `script_texts` SET `content_loc6`='Saboread esta pequeña victoria, criaturitas insensatas. Vosotros y vuestros aliados dragones habéis ganado esta batalla, pero nosotros ganaremos la guerra de El Nexo.' WHERE `entry`='-1578034' ;
+UPDATE `script_texts` SET `content_loc6`='¡Mandamos sobre lo Arcano! ¡No se puede usar contra nosotros!' WHERE `entry`='-1578035' ;
+UPDATE `script_texts` SET `content_loc6`='¡Es absurdo intentar extinguir tu fuego!' WHERE `entry`='-1578036' ;
+UPDATE `script_texts` SET `content_loc6`='¡La magia de la naturaleza no os ayudará ahora!' WHERE `entry`='-1578037' ;
+UPDATE `script_texts` SET `content_loc6`='Tanta insolencia... tanta arrogancia... ¡Deben ser CASTIGADAS!' WHERE `entry`='-1578038' ;
+UPDATE `script_texts` SET `content_loc6`='Simplones, no podéis comprender las fuerzas que habéis puesto en marcha. El conducto de líneas ley no será interrumpido. Vuestra derrota será TOTAL.' WHERE `entry`='-1578039' ;
+
 UPDATE `script_texts` SET `content_loc7` = `content_loc6`;

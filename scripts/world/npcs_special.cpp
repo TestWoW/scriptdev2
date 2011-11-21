@@ -2148,6 +2148,67 @@ CreatureAI* GetAI_npc_eye_of_kilrogg(Creature* pCreature)
     return new npc_eye_of_kilrogg(pCreature);
 }
 
+bool GossipHello_pilgrim_table(Player* pPlayer, Creature* pCreature)
+{
+    char const* GOSSIP_SIT;
+    char const* GOSSIP_WAR_FOOD;
+    char const* GOSSIP_SHARE_FOOD;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_SIT         = "Sentarse a comer.";
+                      GOSSIP_WAR_FOOD    = "Lanzar comida a alguien.";
+                      GOSSIP_SHARE_FOOD  = "Ofrecer comida a alguien.";
+                      break;
+     case LOCALE_esMX:
+                      GOSSIP_SIT         = "Sentarse a comer.";
+                      GOSSIP_WAR_FOOD    = "Lanzar comida a alguien.";
+                      GOSSIP_SHARE_FOOD  = "Ofrecer comida a alguien.";
+                      break;
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_SIT         = "Sit down.";
+                      GOSSIP_WAR_FOOD    = "Throw food.";
+                      GOSSIP_SHARE_FOOD  = "Offer food.";
+                      break;
+    };
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SIT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WAR_FOOD, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SHARE_FOOD, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+
+    pPlayer->SEND_GOSSIP_MENU(50001, pCreature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_pilgrim_table(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    switch(uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CastSpell(pPlayer,65403,false);
+            pPlayer->CastSpell(pPlayer,61849,true);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+2:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(3579);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+3:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(3558);
+            break;
+    }
+    return true;
+}
+
 void AddSC_npcs_special()
 {
     Script* newscript;
@@ -2259,5 +2320,11 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_eye_of_kilrogg";
     newscript->GetAI = &GetAI_npc_eye_of_kilrogg;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "pilgrim_table";
+    newscript->pGossipHello = &GossipHello_pilgrim_table;
+    newscript->pGossipSelect = &GossipSelect_pilgrim_table;
     newscript->RegisterSelf();
 }
