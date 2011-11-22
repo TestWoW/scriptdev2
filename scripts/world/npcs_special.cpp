@@ -2577,9 +2577,9 @@ void AddSC_npcs_special()
     pNewScript->GetAI = &GetAI_npc_shade_of_horseman;
     pNewScript->RegisterSelf();
 
-    pNewscript = new Script;
-    pNewscript->Name = "pilgrim_table";
-    pNewscript->pGossipHello = &GossipHello_pilgrim_table;
-    pNewscript->pGossipSelect = &GossipSelect_pilgrim_table;
-    pNewscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "pilgrim_table";
+    pNewScript->pGossipHello = &GossipHello_pilgrim_table;
+    pNewScript->pGossipSelect = &GossipSelect_pilgrim_table;
+    pNewScript->RegisterSelf();
 }
