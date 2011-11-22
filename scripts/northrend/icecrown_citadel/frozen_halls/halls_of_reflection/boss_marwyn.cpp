@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: boss_marwyn
-SD%Complete: 60%
-SDComment:
+SD%Complete: 100%
+SDComment: full fixed by walkum
 SDAuthor: /dev/rsa, changed by MaxXx2021 aka Mioka
 SDCategory: Halls of Reflection
 EndScriptData */
@@ -45,31 +45,43 @@ enum
 
 struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
 {
-   boss_marwynAI(Creature *pCreature) : BSWScriptedAI(pCreature)
-   {
+    boss_marwynAI(Creature *pCreature) : BSWScriptedAI(pCreature)
+    {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
-   }
+    }
 
-   ScriptedInstance* m_pInstance;
-   bool m_bIsCall;
-   uint32 m_uiSummonTimer;
+    ScriptedInstance* m_pInstance;
+    bool m_bIsCall;
+    uint32 m_uiSummonTimer;
 
-   uint32 m_uiLocNo;
-   ObjectGuid m_uiSummonGUID[16];
-   uint32 m_uiCheckSummon;
+    uint32 m_uiObliterateTimer;
+    uint32 m_uiSharedSufferingTimer;
+    uint32 m_uiWellOfCorruptionTimer;
+    uint32 m_uiCorruptedFleshTimer;
+    uint32 m_uiBerserkTimer;
 
-   uint8 SummonCount;
+    uint32 m_uiLocNo;
+    ObjectGuid m_uiSummonGUID[16];
+    uint32 m_uiCheckSummon;
 
-   uint32 pSummon;
+    uint8 SummonCount;
 
-   void Reset()
-   {
-      SummonCount = 0;
-      m_bIsCall = false;
-      m_uiSummonTimer = 15000;
-      m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-      m_creature->SetVisibility(VISIBILITY_OFF);
+    uint32 pSummon;
+
+    void Reset()
+    {
+        SummonCount = 0;
+        m_bIsCall = false;
+        m_uiSummonTimer = 15000;
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetVisibility(VISIBILITY_OFF);
+
+        m_uiObliterateTimer = urand(8000, 12000);
+        m_uiSharedSufferingTimer = urand(15000, 20000);
+        m_uiWellOfCorruptionTimer = urand(25000, 30000);
+        m_uiCorruptedFleshTimer = urand(10000, 16000);
+        m_uiBerserkTimer = 180000;
     }
 
     void Summon()
@@ -128,8 +140,8 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
 
     void CallFallSoldier()
     {
-         for(uint8 i = 0; i < 4; i++)
-         {
+        for(uint8 i = 0; i < 4; i++)
+        {
             if(Creature* Summon = m_pInstance->instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
             {
                Summon->setFaction(14);
@@ -137,18 +149,18 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
                Summon->SetInCombatWithZone();
             }
             m_uiCheckSummon++;
-         }
+        }
     }
 
     void JustDied(Unit* pKiller)
     {
-      if(m_pInstance)
-      {
-         m_pInstance->SetData(TYPE_MARWYN, DONE);
-         m_pInstance->SetData(TYPE_PHASE, 3);
-      }
+        if(m_pInstance)
+        {
+            m_pInstance->SetData(TYPE_MARWYN, DONE);
+            m_pInstance->SetData(TYPE_PHASE, 3);
+        }
 
-      DoScriptText(SAY_MARWYN_DEATH, m_creature);
+        DoScriptText(SAY_MARWYN_DEATH, m_creature);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -211,16 +223,55 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
         if(!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        timedCast(SPELL_OBLITERATE, uiDiff);
-        timedCast(SPELL_WELL_OF_CORRUPTION, uiDiff);
+        if (m_uiObliterateTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_OBLITERATE) == CAST_OK)
+                m_uiObliterateTimer = urand(8000, 12000);
+        }
+        else
+            m_uiObliterateTimer -= uiDiff;
 
-        if (timedQuery(SPELL_SHARED_SUFFERING, uiDiff))
-            DoScriptText(SAY_MARWYN_SP01, m_creature);
+        if (m_uiWellOfCorruptionTimer <= uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+            {
+                if (DoCastSpellIfCan(pTarget, SPELL_WELL_OF_CORRUPTION) == CAST_OK)
+                    m_uiWellOfCorruptionTimer = urand(15000, 20000);
+            }
+        }
+        else
+            m_uiWellOfCorruptionTimer -= uiDiff;
 
-        if (timedQuery(SPELL_CORRUPTED_FLESH, uiDiff))
-            DoScriptText(SAY_MARWYN_SP02, m_creature);
+        if (m_uiSharedSufferingTimer <= uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+            {
+                if (DoCastSpellIfCan(pTarget, SPELL_SHARED_SUFFERING) == CAST_OK)
+                    DoScriptText(SAY_MARWYN_SP01, m_creature);
 
-        timedCast(SPELL_BERSERK, uiDiff);
+                    m_uiSharedSufferingTimer = urand(25000, 30000);
+            }
+        }
+        else
+            m_uiSharedSufferingTimer -= uiDiff;
+
+        if (m_uiCorruptedFleshTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_CORRUPTED_FLESH) == CAST_OK)
+                DoScriptText(SAY_MARWYN_SP02, m_creature);
+
+                m_uiCorruptedFleshTimer = urand(10000, 16000);
+        }
+        else
+            m_uiCorruptedFleshTimer -= uiDiff;
+
+        if (m_uiBerserkTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                m_uiBerserkTimer = 180000;
+        }
+        else
+            m_uiBerserkTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
@@ -233,10 +284,10 @@ CreatureAI* GetAI_boss_marwyn(Creature* pCreature)
 
 void AddSC_boss_marwyn()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_marwyn";
-    newscript->GetAI = &GetAI_boss_marwyn;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_marwyn";
+    pNewScript->GetAI = &GetAI_boss_marwyn;
+    pNewScript->RegisterSelf();
 }

@@ -897,7 +897,7 @@ UPDATE `script_texts` SET content_loc6 ='Quizá deberías haberte quedado... ¡e
 UPDATE `script_texts` SET content_loc6 ='Valientes aventureros, vuestra intromisión ha llegado a su fin. ¿Oís el ruido de huesos y acero acercándose por ese túnel? Es el sonido de vuestra inminente muerte.' WHERE entry = -1658053;
 UPDATE `script_texts` SET content_loc6 ='Un gesto tan divertido de la multitud. Cuando haya terminado con vosotros, la espada de mi maestro se alimentará de vuestras almas. ¡Morid!' WHERE entry = -1658054;
 UPDATE `script_texts` SET content_loc6 ='¡%s mira a $N y prepara un ataque helado!' WHERE entry = -1658060;
-UPDATE `script_texts` SET content_loc6 ='¡%s ruge y absorve energia oscura!' WHERE entry = -1658062;
+UPDATE `script_texts` SET content_loc6 ='¡%s ruge y absorbe energía oscura!' WHERE entry = -1658062;
 
 -- JAINA
 
