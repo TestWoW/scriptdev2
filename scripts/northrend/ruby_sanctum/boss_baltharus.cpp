@@ -40,14 +40,6 @@ enum Says
     SAY_BALTHARUS_YELL         = -1666305,
 };
 
-enum Equipment
-{
-    EQUIP_MAIN           = 49888,
-    EQUIP_OFFHAND        = EQUIP_NO_CHANGE,
-    EQUIP_RANGED         = EQUIP_NO_CHANGE,
-    EQUIP_DONE           = EQUIP_NO_CHANGE,
-};
-
 enum BossSpells
 {
     SPELL_BLADE_TEMPEST              = 75125, // every 22 secs
@@ -187,8 +179,6 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
         if (pDummyTarget)
             pDummyTarget->ForcedDespawn();
 
-        SetEquipmentSlots(false, EQUIP_MAIN, EQUIP_OFFHAND, EQUIP_RANGED);
-
         m_bInCombat = true;
         m_creature->InterruptNonMeleeSpells(true);
         SetCombatMovement(true);
@@ -204,14 +194,8 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
         if (!m_creature || !m_creature->isAlive())
             return;
 
-        /*if (pDoneBy->GetGUID() == m_creature->GetGUID())
-            return;*/
-
         if (pClone && pClone->isAlive())
-        {
-            //pDoneBy->DealDamage(pClone, uiDamage, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
             uiDamage = 0;
-        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -243,7 +227,8 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
         case 2:
             if (m_creature->IsNonMeleeSpellCasted(false))
                 return;
-            m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
+            if (m_bIs25Man)
+                m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
             m_uiStage = 3;
             break;
         case 3:
@@ -262,7 +247,8 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
         case 5:
             if (m_creature->IsNonMeleeSpellCasted(true))
                 return;
-            m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
+            if (m_bIs25Man)
+                m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
             m_uiStage = 6;
             break;
         case 6:
@@ -358,14 +344,14 @@ struct MANGOS_DLL_DECL mob_baltharus_cloneAI : public BSWScriptedAI
     {
         if (!m_pInstance)
             return;
+
+        m_creature->ForcedDespawn();
     }
 
     void Aggro(Unit* pWho)
     {
         if (!m_pInstance)
             return;
-
-        SetEquipmentSlots(false, EQUIP_MAIN, EQUIP_OFFHAND, EQUIP_RANGED);
 
         m_creature->SetInCombatWithZone();
     }

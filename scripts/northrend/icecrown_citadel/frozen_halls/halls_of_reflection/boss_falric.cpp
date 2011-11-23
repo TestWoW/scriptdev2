@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: boss_falric
-SD%Complete: 70%
-SDComment:
+SD%Complete: 80%
+SDComment: spells Hopelessness & Defiling Horror need core support
 SDAuthor: /dev/rsa, changed by MaxXx2021 aka Mioka
 SDCategory: Halls of Reflection
 EndScriptData */
@@ -37,9 +37,7 @@ enum
     SPELL_HOPELESSNESS                      = 72395,
     SPELL_IMPENDING_DESPAIR                 = 72426,
     SPELL_DEFILING_HORROR                   = 72435,
-    //SPELL_DEFILING_HORROR_H                 = 72452,
     SPELL_QUIVERING_STRIKE                  = 72422,
-    //SPELL_QUIVERING_STRIKE_H                = 72453,
 
     SPELL_BERSERK                           = 47008
 };
@@ -47,37 +45,48 @@ enum
 struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
 {
     boss_falricAI(Creature *pCreature) : BSWScriptedAI(pCreature)
-   {
+    {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
-   }
+    }
 
-   ScriptedInstance* m_pInstance;
-   bool m_bIsCall;
+    ScriptedInstance* m_pInstance;
+    bool m_bIsCall;
 
-   uint32 m_uiSummonTimer;
-   uint32 m_uiLocNo;
-   ObjectGuid m_uiSummonGUID[16];
-   uint32 m_uiCheckSummon;
+    uint32 m_uiHopelessnessTimer;
+    uint32 m_uiImpendingDespairTimer;
+    uint32 m_uiDefilingHorrorTimer;
+    uint32 m_uiQuiveringStrikeTimer;
+    uint32 m_uiBerserkTimer;
 
-   uint8 SummonCount;
+    uint32 m_uiSummonTimer;
+    uint32 m_uiLocNo;
+    ObjectGuid m_uiSummonGUID[16];
+    uint32 m_uiCheckSummon;
 
-   uint32 pSummon;
+    uint8 SummonCount;
+
+    uint32 pSummon;
 
     void Reset()
     {
-      SummonCount = 0;
-      m_bIsCall = false;
-      m_uiSummonTimer = 11000;
-      m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-      m_creature->SetVisibility(VISIBILITY_OFF);
+        SummonCount = 0;
+        m_bIsCall = false;
+        m_uiSummonTimer = 11000;
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetVisibility(VISIBILITY_OFF);
+
+        m_uiHopelessnessTimer = 1000;
+        m_uiImpendingDespairTimer = urand(15000, 25000);
+        m_uiDefilingHorrorTimer = urand(25000, 30000);
+        m_uiQuiveringStrikeTimer = urand(7000, 14000);
+        m_uiBerserkTimer = 180000;
     }
 
     void Aggro(Unit* pVictim)
     {
-      m_creature->SetWalk(false);
-      DoScriptText(SAY_FALRIC_AGGRO, m_creature);
-      DoCast(m_creature, SPELL_HOPELESSNESS);
+        m_creature->SetWalk(false);
+        DoScriptText(SAY_FALRIC_AGGRO, m_creature);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -91,9 +100,9 @@ struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-      if(!m_pInstance) return;
-      m_pInstance->SetData(TYPE_MARWYN, SPECIAL);
-      DoScriptText(SAY_FALRIC_DEATH, m_creature);
+        if(!m_pInstance) return;
+        m_pInstance->SetData(TYPE_MARWYN, SPECIAL);
+        DoScriptText(SAY_FALRIC_DEATH, m_creature);
     }
 
     void AttackStart(Unit* who)
@@ -152,9 +161,9 @@ struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
 
              if(Creature* Summon = m_creature->SummonCreature(pSummon, SpawnLoc[m_uiLocNo].x, SpawnLoc[m_uiLocNo].y, SpawnLoc[m_uiLocNo].z, SpawnLoc[m_uiLocNo].o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
              {
-                m_uiSummonGUID[i] = Summon->GetObjectGuid();
-                Summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                Summon->setFaction(974);
+                 m_uiSummonGUID[i] = Summon->GetObjectGuid();
+                 Summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                 Summon->setFaction(974);
              }
              m_uiLocNo++;
          }
@@ -164,13 +173,13 @@ struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
     {
          for(uint8 i = 0; i < 4; i++)
          {
-            if(Creature* Summon = m_pInstance->instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
-            {
-               Summon->setFaction(14);
-               Summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-               Summon->SetInCombatWithZone();
-            }
-            m_uiCheckSummon++;
+             if(Creature* Summon = m_pInstance->instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+             {
+                 Summon->setFaction(14);
+                 Summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                 Summon->SetInCombatWithZone();
+             }
+             m_uiCheckSummon++;
          }
     }
 
@@ -190,31 +199,71 @@ struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
 
             if (m_uiSummonTimer < uiDiff)
             {
-                    ++SummonCount;
-                    m_pInstance->SetData(DATA_WAVE_COUNT,SummonCount);
-                    if(SummonCount > 4)
-                    {
-                        m_pInstance->SetData(TYPE_FALRIC, IN_PROGRESS);
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        m_creature->SetInCombatWithZone();
-                    }
-                    else CallFallSoldier();
-                    m_uiSummonTimer = 60000;
-            } else m_uiSummonTimer -= uiDiff;
+                 ++SummonCount;
+                 m_pInstance->SetData(DATA_WAVE_COUNT,SummonCount);
+                 if(SummonCount > 4)
+                 {
+                      m_pInstance->SetData(TYPE_FALRIC, IN_PROGRESS);
+                      m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                      m_creature->SetInCombatWithZone();
+                 }
+                 else 
+                      CallFallSoldier();
+                 m_uiSummonTimer = 60000;
+
+            }
+            else m_uiSummonTimer -= uiDiff;
         }
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        timedCast(SPELL_QUIVERING_STRIKE, uiDiff);
+        if (m_uiHopelessnessTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOPELESSNESS) == CAST_OK)
+                m_uiHopelessnessTimer = 1000;
+        }
+        else
+            m_uiHopelessnessTimer -= uiDiff;
 
-        if (timedQuery(SPELL_IMPENDING_DESPAIR, uiDiff))
-            DoScriptText(SAY_FALRIC_SP01, m_creature);
+        if (m_uiImpendingDespairTimer <= uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+            {
+                if (DoCastSpellIfCan(pTarget, SPELL_IMPENDING_DESPAIR) == CAST_OK)
+                    DoScriptText(SAY_FALRIC_SP01, m_creature);
 
-        if (timedQuery(SPELL_DEFILING_HORROR, uiDiff))
-            DoScriptText(SAY_FALRIC_SP02, m_creature);
+                m_uiImpendingDespairTimer = urand(15000, 25000);
+            }
+        }
+        else
+            m_uiImpendingDespairTimer -= uiDiff;
 
-        timedCast(SPELL_BERSERK, uiDiff);
+        if (m_uiDefilingHorrorTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DEFILING_HORROR) == CAST_OK)
+                DoScriptText(SAY_FALRIC_SP02, m_creature);
+
+            m_uiDefilingHorrorTimer = urand(25000, 30000);
+        }
+        else
+            m_uiDefilingHorrorTimer -= uiDiff;
+
+        if (m_uiQuiveringStrikeTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_QUIVERING_STRIKE) == CAST_OK)
+                m_uiQuiveringStrikeTimer = urand(7000, 14000);
+        }
+        else
+            m_uiQuiveringStrikeTimer -= uiDiff;
+
+        if (m_uiBerserkTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BERSERK) == CAST_OK)
+                m_uiBerserkTimer = 180000;
+        }
+        else
+            m_uiBerserkTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
 
@@ -228,10 +277,10 @@ CreatureAI* GetAI_boss_falric(Creature* pCreature)
 
 void AddSC_boss_falric()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_falric";
-    newscript->GetAI = &GetAI_boss_falric;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_falric";
+    pNewScript->GetAI = &GetAI_boss_falric;
+    pNewScript->RegisterSelf();
 }
