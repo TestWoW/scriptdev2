@@ -56,7 +56,7 @@ enum
 
     //OTHER SPELLS
     //SPELL_CHARGE_UP                         = 52098,      // only used when starting walk from one platform to the other
-    //SPELL_TEMPORARY_ELECTRICAL_CHARGE       = 52092,      // triggered part of above
+    SPELL_TEMPORARY_ELECTRICAL_CHARGE       = 52092,      // triggered part of above
 
     NPC_STORMFORGED_LIEUTENANT              = 29240,
     SPELL_ARC_WELD                          = 59085,
@@ -65,7 +65,9 @@ enum
 
     STANCE_DEFENSIVE                        = 0,
     STANCE_BERSERKER                        = 1,
-    STANCE_BATTLE                           = 2
+    STANCE_BATTLE                           = 2,
+
+    ACHIEV_LIGHTNING_STRUCK                 = 1834,
 };
 
 /*######
@@ -105,6 +107,9 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
     uint32 m_uiMortalStrike_Timer;
     uint32 m_uiSlam_Timer;
 
+    uint32 m_uiTemporaryElectricalChargeTimer;
+    uint32 m_uiAchievTimer;
+
     ObjectGuid m_aStormforgedLieutenantGuid[2];             // TODO - not filled yet.
 
     void Reset()
@@ -127,6 +132,9 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
 
         m_uiMortalStrike_Timer = 8000;
         m_uiSlam_Timer = 10000;
+
+        m_uiTemporaryElectricalChargeTimer = urand(70000, 75000);
+        m_uiAchievTimer = 0;
 
         for(uint8 i = 0; i < 2; ++i)
         {
@@ -171,10 +179,16 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BJARNGRIM, DONE);
+
+        // Hacky mode but valid
+        if (!m_bIsRegularMode && m_uiAchievTimer > 75000)
+            m_pInstance->DoCompleteAchievement(ACHIEV_LIGHTNING_STRUCK);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
+        m_uiAchievTimer += uiDiff;
+
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -306,6 +320,14 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
                 break;
             }
         }
+
+        if (m_uiTemporaryElectricalChargeTimer <= uiDiff)
+        {
+            m_creature->_AddAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE);
+            m_uiTemporaryElectricalChargeTimer = urand(70000, 75000);
+        }
+        else
+            m_uiTemporaryElectricalChargeTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
