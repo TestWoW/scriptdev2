@@ -254,4 +254,24 @@ UPDATE `script_texts` SET `content_loc6`='¡La magia de la naturaleza no os ayud
 UPDATE `script_texts` SET `content_loc6`='Tanta insolencia... tanta arrogancia... ¡Deben ser CASTIGADAS!' WHERE `entry`='-1578038' ;
 UPDATE `script_texts` SET `content_loc6`='Simplones, no podéis comprender las fuerzas que habéis puesto en marcha. El conducto de líneas ley no será interrumpido. Vuestra derrota será TOTAL.' WHERE `entry`='-1578039' ;
 
+-- BRANN BARBABRONCE (CAMARAS DE PIEDRA)
+
+UPDATE `script_texts` SET `content_loc6`='¡¿Loken?! Ya me estoy hartando... puede que hayamos neutralizado a los enanos férreos, ¡pero apostaría a que en otra parte hay otra máquina escupiendo un montón de esos vrykuls férreos!' WHERE `entry` = '-1599062';
+UPDATE `script_texts` SET `content_loc6`='Usaré la Forja para hacer terráneos que harán guardia... pero nuestro gran desafío continua: ¡Encontrar y detener a Loken!' WHERE `entry` = '-1599063';
+UPDATE `script_texts` SET `content_loc6`='¡Tranquilos! ¡El viejo Brann os cubre las espaldas! Distraed a ese monstruo de metal y yo veré si puedo convencer a esta máquina de que os ayude.' WHERE `entry` = '-1599069';
+
+-- ORMOROK & ANOMALUS (ENTRADAS CORREGIDAS) (EL NEXO)
+
+UPDATE `script_texts` SET `content_loc6`='¡Nooo!' WHERE `entry` = '-1576006';
+UPDATE `script_texts` SET `content_loc6`='¡Aaaagh!' WHERE `entry` = '-1576007';
+UPDATE `script_texts` SET `content_loc6`='¡Atrás!' WHERE `entry` = '-1576008';
+UPDATE `script_texts` SET `content_loc6`='¡Devolver!' WHERE `entry` = '-1576009';
+UPDATE `script_texts` SET `content_loc6`='¡Sangrar!' WHERE `entry` = '-1576010';
+
+UPDATE `script_texts` SET `content_loc6`='El caos se avecina.' WHERE `entry`='-1576011' ;
+UPDATE `script_texts` SET `content_loc6`='Claro...' WHERE `entry`='-1576012' ;
+UPDATE `script_texts` SET `content_loc6`='La realidad... desterrada...' WHERE `entry`='-1576013' ;
+UPDATE `script_texts` SET `content_loc6`='Indestructible...' WHERE `entry`='-1576014' ;
+UPDATE `script_texts` SET `content_loc6`='La expiración... es necesaria...' WHERE `entry`='-1576015' ;
+
 UPDATE `script_texts` SET `content_loc7` = `content_loc6`;
