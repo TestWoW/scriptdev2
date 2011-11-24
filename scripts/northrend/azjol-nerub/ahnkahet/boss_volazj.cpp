@@ -90,6 +90,8 @@ enum
     PHASE_INSANITY_1                = 2,  // Wait five seconds until cast is complete, set unattackable
     PHASE_INSANITY_2                = 3, 
     PHASE_INSANITY_3                = 4, 
+
+    ACHIEV_FAST_DEMISE              = 1862,
 };
 struct Locations
 {
@@ -136,6 +138,7 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
     uint32 m_uiShadowBoltTimer;
     uint32 m_uiShiverTimer;
     uint32 m_uiCheckTimer;
+    uint32 m_uiAchievTimer;
 
     //Insanity
     uint32 m_uiInsanityCastTimer;
@@ -150,6 +153,7 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
         m_uiShiverTimer = 18000;
         m_uiCheckTimer = 1000;
         m_uiShiverJumpTimer = 0;
+        m_uiAchievTimer = 0;
 
         m_creature->SetRespawnDelay(DAY);
 
@@ -194,10 +198,15 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
         DoScriptText(urand(0, 1) ? SAY_DEATH_1 : SAY_DEATH_2, m_creature);
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VOLAZJ, DONE);
+
+        if (!m_bIsRegularMode && m_uiAchievTimer < 120000)
+            m_pInstance->DoCompleteAchievement(ACHIEV_FAST_DEMISE);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
+        m_uiAchievTimer += uiDiff;
+
         if(m_uiPhase == PHASE_FIGHT)
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
