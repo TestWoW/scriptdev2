@@ -647,13 +647,6 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
                                 pSindragosa->CastSpell(pGorkun, SPELL_FROST_BOMB, false);
                             }
                         }
-                        for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
-                        {
-                            if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
-                            {
-                                pTemp->_AddAura(70572);
-                            }
-                        }
                         DoScriptText(SAY_OUTRO3_HORDE, m_creature);
                         break;
                     }
