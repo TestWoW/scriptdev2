@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: Boss_Sjonnir
-SD%Complete: 20%
+SD%Complete:
 SDComment:
 SDCategory: Halls of Stone
 EndScriptData */
@@ -54,11 +54,12 @@ enum
     SPELL_LIGHTING_RING1_H      = 59848,
 
     NPC_FORGED_IRON_TROGG       = 27979,
-    NPC_MALFORMED_OOZE          = 27981,
     NPC_FORGED_IRON_DWARF       = 27982,
 
     ACHIEV_COMPLETE             = 485,
     ACHIEV_COMPLETE_H           = 496,
+
+    NPC_DAILY_DUNGEON           = 22852,
 };
 
 struct Locations
@@ -74,7 +75,7 @@ static Locations PipeLoc[]=
 };
 
 /*######
-## boss_sjonnir
+## brann_event
 ######*/
 
 struct MANGOS_DLL_DECL brann_outroAI : public ScriptedAI
@@ -111,44 +112,47 @@ struct MANGOS_DLL_DECL brann_outroAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if(m_bIsOutro)
+        if (m_bIsOutro)
         {
-        if (m_uiPhase_timer <= uiDiff)
-        {
-            switch(m_uiStep)
+            if (m_uiPhase_timer <= uiDiff)
             {
-                case 1:
-                if (m_pInstance)
-                    m_pInstance->DoUseDoorOrButton(GO_SJONNIR_CONSOLE);
-                    m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-                    JumpToNextStep(11000);
-                    break;
-                case 2:
-                    DoScriptText(SAY_BRANN_END_1, m_creature);
-                    JumpToNextStep(13000);
-                    break;
-                case 3:
-                    DoScriptText(SAY_BRANN_END_2, m_creature);
-                    JumpToNextStep(10000);
-                    break;
-                case 4:
-                    m_creature->SummonCreature(NPC_BRANN, 1307.582f, 666.809f, 189.607f, 6.28, TEMPSUMMON_MANUAL_DESPAWN, 30000);
-                    m_creature->ForcedDespawn();
+                switch (m_uiStep)
+                {
+                    case 1:
+                        m_creature->SetStandState(UNIT_STAND_STATE_STAND);
+                        JumpToNextStep(11000);
+                        break;
+                    case 2:
+                        m_creature->GetMotionMaster()->MovePoint(0, 1304.535f, 666.84f, 189.607f);
+                        DoScriptText(SAY_BRANN_END_1, m_creature);
+                        JumpToNextStep(13000);
+                        break;
+                    case 3:
+                        DoScriptText(SAY_BRANN_END_2, m_creature);
+                        JumpToNextStep(10000);
+                        break;
+                    case 4:
+                        m_creature->SummonCreature(NPC_BRANN, 1304.535f, 666.84f, 189.607f, 3.16, TEMPSUMMON_MANUAL_DESPAWN, 30000);
+                        m_creature->ForcedDespawn();
 
-                    if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN))
-                    {
-                        pBrann->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        pBrann->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    }
-                    break;
-                case 5:
-                    break;
+                        if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN))
+                        {
+                            pBrann->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                            pBrann->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                        }
+                        break;
+                    case 5:
+                        break;
+                }
             }
-        }
-        else m_uiPhase_timer -= uiDiff;
+            else m_uiPhase_timer -= uiDiff;
         }
     }
 };
+
+/*######
+## boss_sjonnir
+######*/
 
 struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
 {
@@ -163,6 +167,11 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
     bool m_bIsRegularMode;
     bool m_bIsFrenzy;
 
+    uint32 m_uiStep;
+    uint32 m_uiPhase_timer;
+
+    bool m_bBrannBattle;
+
     std::list<uint64> m_lDwarfGUIDList;
     uint32 m_uiChainLightning_Timer;
     uint32 m_uiLightningShield_Timer;
@@ -174,29 +183,33 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
     void Reset()
     {
         m_bIsFrenzy = false;
+        m_bBrannBattle = true;
 
         m_uiChainLightning_Timer = 3000 + rand()%5000;
         m_uiLightningShield_Timer = 20000 + rand()%5000;
         m_uiStaticCharge_Timer = 20000 + rand()%5000;
         m_uiLightningRing_Timer = 30000 + rand()%5000;
-        m_uiSummon_Timer = 5000;
+        m_uiSummon_Timer = 12000;
         m_uiFrenzy_Timer = 300000;
 
-        DespawnDwarf();
+        m_uiPhase_timer   = 2000;
+        m_uiStep          = 1;
 
-        if(m_pInstance)
-            m_pInstance->SetData(TYPE_GRIEF, NOT_STARTED);
+        DespawnDwarf();
 
         if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN_EVENT))
             pBrann->HandleEmote(EMOTE_STATE_READYUNARMED);
     }
 
+    void JumpToNextStep(uint32 uiTimer)
+    {
+        m_uiPhase_timer = uiTimer;
+        m_uiStep++;
+    }
+
     void Aggro(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
-
-        if(m_pInstance)
-            m_pInstance->SetData(TYPE_GRIEF, IN_PROGRESS);
 
         if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN_EVENT))
         {
@@ -218,10 +231,9 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        DoScriptText(SAY_DEATH, m_creature);
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 1310.10f, 649.66f, 189.60f, 2.49f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_GRIEF, DONE);
+        DoScriptText(SAY_DEATH, m_creature);
 
         m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_COMPLETE : ACHIEV_COMPLETE_H);
 
@@ -326,6 +338,46 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
         }
         else
             m_uiFrenzy_Timer -= uiDiff;
+
+        if (m_bBrannBattle)
+        {
+            if (m_uiPhase_timer <= uiDiff)
+            {
+                switch (m_uiStep)
+                {
+                    case 1:
+                        JumpToNextStep(8000);
+                        break;
+                    case 2:
+                        if (m_pInstance)
+                            m_pInstance->DoUseDoorOrButton(GO_SJONNIR_CONSOLE);
+
+                        if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN_EVENT))
+                        {
+                            DoScriptText(SAY_BRANN_IRON_SPAWN, pBrann);
+                        }
+                        JumpToNextStep(10000);
+                        break;
+                    case 3:
+                        if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN_EVENT))
+                        {
+                            DoScriptText(SAY_BRANN_TROGG_SPAWN, pBrann);
+                        }
+                        JumpToNextStep(9000);
+                        break;
+                    case 4:
+                        if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN_EVENT))
+                        {
+                            DoScriptText(SAY_BRANN_OOZE_SPAWN, pBrann);
+                        }
+                        JumpToNextStep(1000);
+                        break;
+                    case 5:
+                        break;
+                }
+            }
+            else m_uiPhase_timer -= uiDiff;
+        }
 
         DoMeleeAttackIfReady();
     }

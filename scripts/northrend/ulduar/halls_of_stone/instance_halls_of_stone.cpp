@@ -33,11 +33,14 @@ EndScriptData */
 
 struct MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
 {
-    instance_halls_of_stone(Map* pMap) : ScriptedInstance(pMap) {
-    Regular = pMap->IsRegularDifficulty();
-    Initialize();
+    instance_halls_of_stone(Map* pMap) : ScriptedInstance(pMap),
+    m_uiMalformedOozeKilled(0)
+    {
+        Regular = pMap->IsRegularDifficulty();
+        Initialize();
     };
 
+    uint32 m_uiMalformedOozeKilled;
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     bool Regular;
     std::string strSaveData;
@@ -63,6 +66,27 @@ struct MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
                 m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
                 break;
         }
+    }
+
+    void OnCreatureEnterCombat(Creature* pCreature)
+    {
+        if (pCreature->GetEntry() == NPC_SJONNIR)
+           SetData(TYPE_SJONNIR, IN_PROGRESS);
+    }
+
+    void OnCreatureEvade(Creature* pCreature)
+    {
+        if (pCreature->GetEntry() == NPC_SJONNIR)
+           SetData(TYPE_SJONNIR, FAIL);
+    }   
+
+    void OnCreatureDeath(Creature* pCreature)
+    {
+        if (pCreature->GetEntry() == NPC_MALFORMED_OOZE && m_auiEncounter[TYPE_SJONNIR] == IN_PROGRESS)
+            ++m_uiMalformedOozeKilled;
+
+        if (pCreature->GetEntry() == NPC_SJONNIR)
+            SetData(TYPE_SJONNIR, DONE);
     }
 
     void OnObjectCreate(GameObject* pGo)
@@ -91,6 +115,18 @@ struct MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
         m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
     }
 
+    bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+    {
+        switch (uiCriteriaId)
+        {
+            case ACHIEV_SJONNIR_OOZE: 
+                return m_uiMalformedOozeKilled >= 5;
+            
+            default:
+                return false;
+        }
+    }
+
     void SetData(uint32 uiType, uint32 uiData)
     {
         switch(uiType)
@@ -114,6 +150,8 @@ struct MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
                 m_auiEncounter[2] = uiData;
                 break;
             case TYPE_SJONNIR:
+                if (uiData == IN_PROGRESS)
+                    m_uiMalformedOozeKilled = 0;
                 m_auiEncounter[3] = uiData;
                 break;
         }
