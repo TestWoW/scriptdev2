@@ -27,12 +27,20 @@ enum
     TYPE_EREGOS,
     TYPE_ROBOTS,
     TYPE_UROM_PHASE,
+    TYPE_ACHIEV_EREGOS_KILL,
+    TYPE_ACHIEV_EREGOS_KILL_H,
     MAX_ENCOUNTERS,
 
     DATA_DRAKOS,
     DATA_VAROS,
     DATA_UROM,
     DATA_EREGOS,
+
+    NPC_TRIGGER            = 11364,
+
+    NPC_ETERNOS            = 27659,
+    NPC_BELGAR             = 27658,
+    NPC_VERDISA            = 27657,
 
     NPC_ROBOT              = 27641,
     NPC_BALGAR_IMAGE       = 28012,
@@ -51,6 +59,8 @@ enum
     BELGAR_TEXT_1          = 13268,
     BELGAR_TEXT_2          = 13269,
 
+    ACHIEV_EREGOS_KILL     = 206,
+    ACHIEV_EREGOS_KILL_H   = 6862,
 };
 
 #endif
