@@ -448,7 +448,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_fos_endAI: public ScriptedAI
                         }
                     }
                     ++m_uiOutro_Phase;
-                    m_uiSpeech_Timer = 5000;
+                    m_uiSpeech_Timer = 10000;
                     break;
                 case 1:
                     if (TeamInInstance == ALLIANCE)
