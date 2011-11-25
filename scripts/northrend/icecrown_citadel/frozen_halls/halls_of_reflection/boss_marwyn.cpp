@@ -82,6 +82,9 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
         m_uiWellOfCorruptionTimer = urand(25000, 30000);
         m_uiCorruptedFleshTimer = urand(10000, 16000);
         m_uiBerserkTimer = 180000;
+
+        for (uint32 i = 0; i < 16; i++)
+            m_uiSummonGUID[i].Clear();
     }
 
     void Summon()
