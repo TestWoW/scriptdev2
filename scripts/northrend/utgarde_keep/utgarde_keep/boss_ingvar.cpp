@@ -168,9 +168,12 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 217.94f, -314.09f, 180.49f, 0.51f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_INGVAR, DONE);
 
         DoScriptText(SAY_DEATH_SECOND, m_creature);
+        if (Player* pPlayerKiller = pKiller->GetCharmerOrOwnerPlayerOrPlayerItself())
+            pPlayerKiller->RewardPlayerAndGroupAtEvent(NPC_INGVAR_DEAD, m_creature);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -232,7 +235,6 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
                         return;
                     case 3:
                         DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
-                        m_creature->UpdateEntry(NPC_INGVAR_DEAD);
                         m_creature->RemoveAurasDueToSpell(SPELL_SUMMON_BANSHEE);
                         if (pAnnylide)
                             pAnnylide->ForcedDespawn();
