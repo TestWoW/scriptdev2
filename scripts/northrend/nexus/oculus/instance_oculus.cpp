@@ -67,7 +67,11 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
     {
         switch(pGo->GetEntry())
         {
-            case GO_DRAGON_CAGE_DOOR:
+            case GO_DRAGON_CAGE_DOOR_1:
+                break;
+            case GO_DRAGON_CAGE_DOOR_2:
+                break;
+            case GO_DRAGON_CAGE_DOOR_3:
                 break;
 
             default:

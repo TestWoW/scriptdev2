@@ -49,7 +49,9 @@ enum
     NPC_UROM               = 27655,
     NPC_EREGOS             = 27656,
 
-    GO_DRAGON_CAGE_DOOR    = 193995,
+    GO_DRAGON_CAGE_DOOR_1  = 193992,
+    GO_DRAGON_CAGE_DOOR_2  = 193993,
+    GO_DRAGON_CAGE_DOOR_3  = 193995,
     GO_EREGOS_CACHE        = 191349,
     GO_EREGOS_CACHE_H      = 193603,
     GO_SPOTLIGHT           = 191351,

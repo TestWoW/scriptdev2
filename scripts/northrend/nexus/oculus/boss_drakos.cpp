@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: Boss_Drakos
-SD%Complete: 80%
+SD%Complete:
 SDComment:
 SDAuthor: originally from TC, reworked by MaxXx2021 Aka Mioka, corrected by /dev/rsa
 SDCategory: Oculus
@@ -109,8 +109,18 @@ struct MANGOS_DLL_DECL drakos_eventAI : public ScriptedAI
             switch(m_uiStep)
             {
                 case 1:
-                    // TODO: Open doors.
-                    // (Only opened one door, is needed that open all doors).
+                    if (GameObject* pDoorOne = m_pInstance->GetSingleGameObjectFromStorage(GO_DRAGON_CAGE_DOOR_1))
+                    {
+                        pDoorOne->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    if (GameObject* pDoorTwo = m_pInstance->GetSingleGameObjectFromStorage(GO_DRAGON_CAGE_DOOR_2))
+                    {
+                        pDoorTwo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    if (GameObject* pDoorThree = m_pInstance->GetSingleGameObjectFromStorage(GO_DRAGON_CAGE_DOOR_3))
+                    {
+                        pDoorThree->SetGoState(GO_STATE_ACTIVE);
+                    }
                     JumpToNextStep(4000);
                     break;
                 case 2:
