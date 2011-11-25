@@ -64,7 +64,7 @@ enum
     PHASE_1                 = 1,
     PHASE_2                 = 2,
     PHASE_3                 = 3,
-    PHASE_4                 = 4
+    PHASE_4                 = 4,
 };
 
 /*######
@@ -89,6 +89,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
     uint32 m_uiFirebombTimer;
     uint32 m_uiIceNovaTimer;
     uint32 m_uiGravityWellTimer;
+    uint32 m_uiAchievTimer;
 
     void Reset()
     {
@@ -98,6 +99,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
         m_uiFirebombTimer = urand(2000, 4000);
         m_uiIceNovaTimer = urand(8000, 12000);
         m_uiGravityWellTimer = urand(15000, 25000);
+        m_uiAchievTimer = 0;
     }
 
     void JustReachedHome()
@@ -120,6 +122,9 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
     void Aggro(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_ACHIEV_TELESTRA, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller)
@@ -170,9 +175,15 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
     {
         switch(pSummoned->GetEntry())
         {
-            case NPC_TELEST_FIRE: pSummoned->CastSpell(pSummoned, SPELL_FIRE_VISUAL, true); break;
-            case NPC_TELEST_ARCANE: pSummoned->CastSpell(pSummoned, SPELL_ARCANE_VISUAL, true); break;
-            case NPC_TELEST_FROST: pSummoned->CastSpell(pSummoned, SPELL_FROST_VISUAL, true); break;
+            case NPC_TELEST_FIRE: 
+                pSummoned->CastSpell(pSummoned, SPELL_FIRE_VISUAL, true); 
+                break;
+            case NPC_TELEST_ARCANE: 
+                pSummoned->CastSpell(pSummoned, SPELL_ARCANE_VISUAL, true); 
+                break;
+            case NPC_TELEST_FROST: 
+                pSummoned->CastSpell(pSummoned, SPELL_FROST_VISUAL, true); 
+                break;
         }
     }
 
@@ -180,6 +191,9 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (!m_bIsRegularMode && m_uiAchievTimer > 5000)
+            m_pInstance->SetData(TYPE_ACHIEV_TELESTRA, FAIL);
 
         switch(m_uiPhase)
         {
@@ -210,6 +224,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                         if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_CLONES, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
                         {
                             DoScriptText(urand(0, 1) ? SAY_SPLIT_1 : SAY_SPLIT_2, m_creature);
+                            m_uiAchievTimer += uiDiff;
                             m_uiPhase = PHASE_2;
                         }
                     }

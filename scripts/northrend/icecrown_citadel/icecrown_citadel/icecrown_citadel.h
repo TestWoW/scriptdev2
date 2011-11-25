@@ -189,11 +189,26 @@ enum
     CRITERIA_BONED_10H                  = 13393,
     CRITERIA_BONED_25H                  = 13394,
 
+    // Lady Deathwhisper
+    CRITERIA_FULL_HOUSE_10N             = 12776,
+    CRITERIA_FULL_HOUSE_25N             = 12997,
+    CRITERIA_FULL_HOUSE_10H             = 12995,
+    CRITERIA_FULL_HOUSE_25H             = 12998,
+
+    // Deathbringer Saurfang
+    CRITERIA_DEATHBRINGER_DEAD_10N      = 12772,
+
     // Rotface
     CRITERIA_DANCES_WITH_OOZES_10N      = 12984,
     CRITERIA_DANCES_WITH_OOZES_25N      = 12966,
     CRITERIA_DANCES_WITH_OOZES_10H      = 12985,
     CRITERIA_DANCES_WITH_OOZES_25H      = 12983,
+
+    // Festergut
+    CRITERIA_FLU_SHORT_SHORTAGE_10N     = 12977,
+    CRITERIA_FLU_SHORT_SHORTAGE_25N     = 12967,
+    CRITERIA_FLU_SHORT_SHORTAGE_10H     = 12986,
+    CRITERIA_FLU_SHORT_SHORTAGE_25H     = 12982,
 
     // Professor Putricide
     CRITERIA_NAUSEA_10N                 = 12987,
@@ -214,6 +229,12 @@ enum
     CRITERIA_ONCE_BITTEN_TWICE_SHY_25N  = 13012,
     CRITERIA_ONCE_BITTEN_TWICE_SHY_10V  = 13011,
     CRITERIA_ONCE_BITTEN_TWICE_SHY_25V  = 13013,
+
+    // Sindragosa
+    CRITERIA_ALL_YOU_CAN_EAT_10N        = 12822,
+    CRITERIA_ALL_YOU_CAN_EAT_25N        = 12972,
+    CRITERIA_ALL_YOU_CAN_EAT_10H        = 12996,
+    CRITERIA_ALL_YOU_CAN_EAT_25H        = 12989,
 };
 
 class MANGOS_DLL_DECL instance_icecrown_spire : public BSWScriptedInstance

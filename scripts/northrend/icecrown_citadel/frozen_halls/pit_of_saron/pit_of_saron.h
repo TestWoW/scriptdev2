@@ -39,6 +39,8 @@ enum
     NPC_CHAMPION_2_ALLIANCE         = 37497,
     NPC_CHAMPION_3_ALLIANCE         = 37498,
 
+    NPC_SLAVE_1                     = 36770,
+
     NPC_SLAVE_HORDE_1               = 37578,
     NPC_SLAVE_HORDE_2               = 37577,
     NPC_SLAVE_HORDE_3               = 37579,
@@ -50,6 +52,7 @@ enum
     NPC_GORKUN_IRONSKULL_SLAVE      = 37592,
     NPC_GORKUN_IRONSKULL_END        = 37581,
 
+    GO_BALL_AND_CHAIN               = 201969,
     GO_ICEWALL                      = 201885,               // open after gafrost/krick
     GO_HALLS_OF_REFLECT_PORT        = 201848,               // unlocked by jaina/sylvanas at last outro
 };
@@ -79,6 +82,7 @@ class MANGOS_DLL_DECL instance_pit_of_saron : public ScriptedInstance
         // Creature GUIDs
         uint64 m_uiTyrannusIntroGUID;
         uint64 m_uiGarfrostGUID;
+        uint64 m_uiSlaveOneGUID;
         uint64 m_uiKrickGUID;
         uint64 m_uiKrickEventGUID;
         uint64 m_uiIckGUID;

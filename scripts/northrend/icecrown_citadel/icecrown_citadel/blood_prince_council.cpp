@@ -314,14 +314,23 @@ CreatureAI* GetAI_npc_blood_orb_control(Creature* pCreature)
 }
 
 // base struct for Blood Prince Council
-struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
+struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public ScriptedAI
 {
-    base_blood_prince_council_bossAI(Creature* pCreature) : base_icc_bossAI(pCreature)
+    base_blood_prince_council_bossAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
         DoCastSpellIfCan(m_creature, SPELL_FEIGN_DEATH, CAST_TRIGGERED);
     }
     
+    instance_icecrown_spire* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
+
     bool m_bIsEmpowered;
     bool m_bIsSaidSpecial; // 1st spell cast after being empowered is followed by special say
     uint32 m_uiEmpowermentFadeTimer;
@@ -349,6 +358,17 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
     {
         if (!m_bIsEmpowered && pDealer->GetEntry() != NPC_BLOOD_ORB_CONTROL)
             uiDamage = 0;
+    }
+
+    void DamageDeal(Unit *pDoneTo, uint32 &uiDamage)
+    {
+        if (pDoneTo->GetTypeId() == TYPEID_PLAYER)
+        {
+            SpellSchoolMask damageSchoolMask;
+
+            if ((damageSchoolMask & SPELL_SCHOOL_MASK_SPELL) && uiDamage >= 23000)
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ORB_WHISPERER, false);
+        }
     }
 
     void JustDied(Unit *pKiller)

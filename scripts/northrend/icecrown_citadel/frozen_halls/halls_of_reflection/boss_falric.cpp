@@ -81,6 +81,9 @@ struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
         m_uiDefilingHorrorTimer = urand(25000, 30000);
         m_uiQuiveringStrikeTimer = urand(7000, 14000);
         m_uiBerserkTimer = 180000;
+
+        for (uint32 i = 0; i < 16; i++)
+            m_uiSummonGUID[i].Clear();
     }
 
     void Aggro(Unit* pVictim)
@@ -100,7 +103,8 @@ struct MANGOS_DLL_DECL boss_falricAI : public BSWScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        if(!m_pInstance) return;
+        if(!m_pInstance)
+            return;
         m_pInstance->SetData(TYPE_MARWYN, SPECIAL);
         DoScriptText(SAY_FALRIC_DEATH, m_creature);
     }

@@ -209,7 +209,6 @@ struct MANGOS_DLL_DECL npc_martin_gorkunAI: public ScriptedAI
                     {
                         pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
                         pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         m_uiTyrannusGuid = pTyrannus->GetGUID();
                     }
                     ++m_uiOutro_Phase;

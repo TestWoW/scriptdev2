@@ -20,9 +20,6 @@ SD%Complete: 99%
 SDComment: targeting spells of Malleable Goo and Vile Gas unclear, coded targeting in script
 SDCategory: Icecrown Citadel
 EndScriptData */
-
-// Stinky scripted by Walkum. Decimate & Plague Stench repaired by Carlos93.
-
 #include "precompiled.h"
 #include "icecrown_citadel.h"
 
@@ -35,8 +32,7 @@ enum
     SPELL_STINKY_MORTALWOUND    = 71127,
 
     // Gastric Bloat
-    SPELL_GASTRIC_BLOAT_10      = 72214, // proc aura, ~8 sec cooldown, currently not used
-    SPELL_GASTRIC_BLOAT_25      = 72551,
+    SPELL_GASTRIC_BLOAT         = 72214, // proc aura, ~8 sec cooldown, currently not used
     SPELL_GASTRIC_BLOAT_TRIG    = 72219,
 
     // Inhale Blight
@@ -45,8 +41,7 @@ enum
     SPELL_INHALED_BLIGHT_25     = 71912,
 
     // Pungent Blight
-    SPELL_PUNGENT_BLIGHT_10     = 69195,
-    SPELL_PUNGENT_BLIGHT_25     = 71219,
+    SPELL_PUNGENT_BLIGHT        = 69195,
 
     // Gaseous Blight
     // periodic auras spells
@@ -63,14 +58,12 @@ enum
     SPELL_REMOVE_INOCULENT      = 69298,
 
     // Gas Spore
-    SPELL_GAS_SPORE_10          = 69278,
-    SPELL_GAS_SPORE_25          = 71221,
+    SPELL_GAS_SPORE             = 69278,
 
     // Vile Gas
     SPELL_VILE_GAS_SUMMON       = 72288,
     SPELL_VILE_GAS_SUMMON_TRIG  = 72287,
-    SPELL_VILE_GAS_10           = 71307,
-    SPELL_VILE_GAS_25           = 71218,
+    SPELL_VILE_GAS              = 71307,
     SPELL_VILE_GAS_TRIGGERED    = 69240,
 
     // Malleable Goo
@@ -111,7 +104,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
 {
     boss_festergutAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
@@ -119,10 +112,11 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         Reset();
     }
 
-    ScriptedInstance *m_pInstance;
+    instance_icecrown_spire *m_pInstance;
     Difficulty m_uiMapDifficulty;
     bool m_bIsHeroic;
     bool m_bIs25Man;
+    bool m_bAchievFail;
 
     uint32 m_uiBerserkTimer;
     uint32 m_uiGastricBloatTimer;
@@ -130,6 +124,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
     uint32 m_uiGasSporeTimer;
     uint32 m_uiVileGasTimer;
     uint32 m_uiMalleableGooTimer;
+    uint32 m_uiCheckTimer;
 
     void Reset()
     {
@@ -139,6 +134,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         m_uiGasSporeTimer = 20000;
         m_uiVileGasTimer = 10000;
         m_uiMalleableGooTimer = urand(15000, 20000);
+        m_uiCheckTimer = 1000;
     }
 
     void Aggro(Unit *pWho)
@@ -228,6 +224,40 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         return pResult;
     }
 
+    void CheckAchievement()
+    {
+        if (!m_pInstance)
+            return;
+
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                {
+                    SpellAuraHolderPtr holder = pTarget->GetSpellAuraHolder(69291);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72101);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72102);
+                    if (!holder)
+                        holder = pTarget->GetSpellAuraHolder(72103);
+                    if (holder)
+                    {
+                        if (holder->GetStackAmount() >= 3)
+                        {
+                            m_pInstance->SetSpecialAchievementCriteria(TYPE_FLU_SHORT_SHORTAGE, false);
+                            m_bAchievFail = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -248,7 +278,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         // Gastric Bloat
         if (m_uiGastricBloatTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_GASTRIC_BLOAT_25 : SPELL_GASTRIC_BLOAT_TRIG) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GASTRIC_BLOAT_TRIG) == CAST_OK)
                 m_uiGastricBloatTimer = 10000;
         }
         else
@@ -266,7 +296,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
                 if (holder->GetStackAmount() >= 3)
                 {
                     // can't inhale anymore...
-                    if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_PUNGENT_BLIGHT_25 : SPELL_PUNGENT_BLIGHT_10) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature, SPELL_PUNGENT_BLIGHT) == CAST_OK)
                     {
                         DoScriptText(SAY_PUNGUENT_BLIGHT, m_creature);
                         DoScriptText(SAY_PUNGUENT_BLIGHT_EMOTE, m_creature);
@@ -293,7 +323,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
         // Gas Spore
         if (m_uiGasSporeTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_GAS_SPORE_25 : SPELL_GAS_SPORE_10) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_GAS_SPORE) == CAST_OK)
             {
                 DoScriptText(SAY_SPORE, m_creature);
                 m_uiGasSporeTimer = 40000;
@@ -311,7 +341,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
             if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
             {
                 pTarget->CastSpell(pTarget, SPELL_VILE_GAS_SUMMON_TRIG, true);
-                DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_VILE_GAS_25 : SPELL_VILE_GAS_10, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
                 m_uiVileGasTimer = 30000;
             }
         }
@@ -343,6 +373,18 @@ struct MANGOS_DLL_DECL boss_festergutAI : public ScriptedAI
             else
                 m_uiMalleableGooTimer -= uiDiff;
         }
+
+        // Check achievement
+        if (!m_bAchievFail)
+        {
+            if (m_uiCheckTimer < uiDiff)
+            {
+                CheckAchievement();
+                m_uiCheckTimer = 1000;
+            }
+            else m_uiCheckTimer = uiDiff;
+        }
+
 
         DoMeleeAttackIfReady();
     }

@@ -26,6 +26,7 @@ EndScriptData */
 
 instance_pit_of_saron::instance_pit_of_saron(Map* pMap) : ScriptedInstance(pMap),
     m_uiTyrannusIntroGUID(0),
+    m_uiSlaveOneGUID(0),
     m_uiGarfrostGUID(0),
     m_uiKrickGUID(0),
     m_uiKrickEventGUID(0),
@@ -48,6 +49,7 @@ void instance_pit_of_saron::OnCreatureCreate(Creature* pCreature)
     switch(pCreature->GetEntry())
     {
         case NPC_TYRANNUS_INTRO: m_uiTyrannusIntroGUID = pCreature->GetGUID(); break;
+        case NPC_SLAVE_1:        m_uiSlaveOneGUID      = pCreature->GetGUID(); break;
         case NPC_GARFROST:       m_uiGarfrostGUID      = pCreature->GetGUID(); break;
         case NPC_KRICK:          m_uiKrickGUID         = pCreature->GetGUID(); break;
         case NPC_KRICK_EVENT:    m_uiKrickEventGUID    = pCreature->GetGUID(); break; 
@@ -154,6 +156,7 @@ uint64 instance_pit_of_saron::GetData64(uint32 uiData)
     switch(uiData)
     {
         case NPC_TYRANNUS_INTRO: return m_uiTyrannusIntroGUID;
+        case NPC_SLAVE_1:        return m_uiSlaveOneGUID;
         case NPC_GARFROST:       return m_uiGarfrostGUID;
         case NPC_KRICK:          return m_uiKrickGUID;
         case NPC_KRICK_EVENT:    return m_uiKrickEventGUID;

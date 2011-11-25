@@ -53,7 +53,7 @@ enum
     SPELL_WATER_GLOBULE                       = 54268,
     SPELL_WATER_GLOBULE_2                     = 54260,
     GLOBULE_HEAL_H                            = 9000,
-    GLOBULE_HEAL                              = 5000
+    GLOBULE_HEAL                              = 5000,
 };
 
 struct MANGOS_DLL_DECL boss_ichoronAI : public ScriptedAI
@@ -101,6 +101,7 @@ struct MANGOS_DLL_DECL boss_ichoronAI : public ScriptedAI
     {
         if (m_pInstance)
         {
+            m_pInstance->SetData(TYPE_ACHIEV_ICHORON, FAIL);
             m_pInstance->SetData(TYPE_ICHORON, FAIL);
             m_pInstance->SetData(TYPE_EVENT, FAIL);
             m_pInstance->SetData(TYPE_RIFT, FAIL);
@@ -113,6 +114,7 @@ struct MANGOS_DLL_DECL boss_ichoronAI : public ScriptedAI
         if (!m_pInstance) return;
 
         DoScriptText(SAY_AGGRO, m_creature);
+        m_pInstance->SetData(TYPE_ACHIEV_ICHORON, IN_PROGRESS);
         m_pInstance->SetData(TYPE_ICHORON, IN_PROGRESS);
         SetCombatMovement(true);
     }
@@ -236,9 +238,8 @@ struct MANGOS_DLL_DECL boss_ichoronAI : public ScriptedAI
                             m_creature->SummonCreature(NPC_ICHOR_GLOBULE, PortalLoc[tmp].x, PortalLoc[tmp].y, PortalLoc[tmp].z, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                         }
                     DoScriptText(EMOTE_ICHORON_PROTECTIVE_BUBBLE, m_creature);
-                    //DoScriptText(SAY_SHATTER, m_creature);
+                    DoScriptText(SAY_SHATTER, m_creature);
                     m_creature->DealDamage(m_creature, m_creature->GetMaxHealth()*0.25, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                    m_creature->SetVisibility(VISIBILITY_OFF);
                     m_bIsExploded = true;
                     m_uiVisible_Timer = 15000;
                 }
@@ -294,7 +295,7 @@ struct MANGOS_DLL_DECL boss_ichoronAI : public ScriptedAI
             else {m_pInstance->SetData(TYPE_PORTAL12, DONE);}
         }
 
-        if(m_creature->GetVisibility() == VISIBILITY_OFF)
+        if (m_creature->GetVisibility() == VISIBILITY_OFF)
             m_creature->SetVisibility(VISIBILITY_ON);
     }
 
@@ -345,6 +346,7 @@ struct MANGOS_DLL_DECL mob_ichor_globuleAI : public ScriptedAI
                         ((boss_ichoronAI*)pIchoron->AI())->WaterElementHit();
 
                         m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                        m_pInstance->SetData(TYPE_ACHIEV_ICHORON, FAIL);
                     }
                 }
             }

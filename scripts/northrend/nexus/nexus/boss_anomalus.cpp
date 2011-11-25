@@ -24,8 +24,6 @@ EndScriptData */
 #include "precompiled.h"
 #include "nexus.h"
 
-bool DeadChaoticRift; // needed for achievement: Chaos Theory(2037)
-
 enum eEnums
 {
     // Spells
@@ -52,9 +50,6 @@ enum eEnums
     
     EMOTE_GUARDIAN_PORTAL               = -1576021,
     EMOTE_DRAGONFLIGHT_PORTAL           = -1576022,
-
-    // Achievements
-    ACHIEVEMENT_CHAOS_THEORY            = 2037,
 };
 
 float RiftLocation[6][3]=
@@ -89,10 +84,17 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
         m_uiSparkTimer = 5*IN_MILLISECONDS;
         m_ChaoticRiftGuid.Clear();
 
-        DeadChaoticRift = false;
-
         if (m_pInstance)
             m_pInstance->SetData(TYPE_ANOMALUS, NOT_STARTED);
+    }
+
+    void JustReachedHome()
+    {
+        if (m_pInstance)
+        {
+            m_pInstance->SetData(TYPE_ANOMALUS, FAIL);
+            m_pInstance->SetData(TYPE_ACHIEV_ANOMALUS, FAIL);
+        }
     }
 
     void KilledUnit(Unit* pVictim)
@@ -103,26 +105,14 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
     void EnterCombat(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
+
+        if (!m_bIsRegularMode)
+            m_pInstance->SetData(TYPE_ACHIEV_ANOMALUS, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller)
     {
         DoScriptText(SAY_DEATH, m_creature);
-
-        if (!m_bIsRegularMode && !DeadChaoticRift)
-        {
-            AchievementEntry const *AchievChaosTheory = GetAchievementStore()->LookupEntry(ACHIEVEMENT_CHAOS_THEORY);
-            if (AchievChaosTheory)
-            {
-                Map* pMap = m_creature->GetMap();
-                if (pMap && pMap->IsDungeon())
-                {
-                    Map::PlayerList const &players = pMap->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        itr->getSource()->CompletedAchievement(AchievChaosTheory);
-                }
-            }
-        }
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_ANOMALUS, DONE);
@@ -236,9 +226,10 @@ struct MANGOS_DLL_DECL npc_chaotic_riftAI : public Scripted_NoMovementAI
         DoCast(m_creature, SPELL_ARCANEFORM, false);
     }
 
-    void JustDied(Unit *pKiller)
+    void JustDied(Unit* pKiller)
     {
-        DeadChaoticRift = true;
+        if (m_pInstance->GetData(TYPE_ANOMALUS) == IN_PROGRESS)
+            m_pInstance->SetData(TYPE_ACHIEV_ANOMALUS, FAIL);
     }
 
     void UpdateAI(const uint32 uiDiff)

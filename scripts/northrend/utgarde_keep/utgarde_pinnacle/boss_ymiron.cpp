@@ -68,7 +68,7 @@ enum
 
     MODEL_ID_INVISIBLE                      = 11686,
 
-    NPC_SPIRIT_FOUNT                        = 27339
+    NPC_SPIRIT_FOUNT                        = 27339,
 };
 
 struct Locations
@@ -156,6 +156,7 @@ struct MANGOS_DLL_DECL boss_ymironAI : public ScriptedAI
     void Aggro(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
+        m_pInstance->SetData(TYPE_ACHIEV_KINGS_BANE, IN_PROGRESS);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -220,6 +221,17 @@ struct MANGOS_DLL_DECL boss_ymironAI : public ScriptedAI
         m_creature->GetMotionMaster()->MovementExpired(false);
         m_creature->GetMotionMaster()->Clear();
         m_creature->StopMoving();
+    }
+
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpellEntry)
+    {
+        switch (pSpellEntry->Id)
+        {
+            case SPELL_BANE_H:
+                if (m_pInstance)
+                    m_pInstance->SetData(TYPE_ACHIEV_KINGS_BANE, FAIL);
+                break;
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)

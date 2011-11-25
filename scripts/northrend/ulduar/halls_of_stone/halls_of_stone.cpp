@@ -301,7 +301,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
             m_bIsLowHP = false;
             m_bIsBattle = false;
 
-            m_uiStep = 0;
+            m_uiStep = 1;
             m_uiPhase_timer = 0;
 
             m_uiControllerGUID.Clear();

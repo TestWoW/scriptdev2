@@ -290,7 +290,10 @@ static Locations SpawnLoc[]=
              case TYPE_DEATHWHISPER:
                 m_auiEncounter[TYPE_DEATHWHISPER] = uiData;
                 if (uiData == IN_PROGRESS)
+                {
                     DoCloseDoor(GO_ORATORY_DOOR);
+                    SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, false);
+                }
                 else
                     DoOpenDoor(GO_ORATORY_DOOR);
 
@@ -342,7 +345,10 @@ static Locations SpawnLoc[]=
                 m_auiEncounter[TYPE_FESTERGUT] = uiData;
 
                 if (uiData == IN_PROGRESS)
+                {
                     DoCloseDoor(GO_ORANGE_PLAGUE);
+                    SetSpecialAchievementCriteria(TYPE_FLU_SHORT_SHORTAGE, true);
+                }
                 else
                     DoOpenDoor(GO_ORANGE_PLAGUE);
 
@@ -359,7 +365,10 @@ static Locations SpawnLoc[]=
              case TYPE_ROTFACE:
                 m_auiEncounter[TYPE_ROTFACE] = uiData;
                 if (uiData == IN_PROGRESS)
+                {
                     DoCloseDoor(GO_GREEN_PLAGUE);
+                    SetSpecialAchievementCriteria(TYPE_DANCES_WITH_OOZES, true);
+                }
                 else
                     DoOpenDoor(GO_GREEN_PLAGUE);
                 if (uiData == DONE)
@@ -389,7 +398,10 @@ static Locations SpawnLoc[]=
                 m_auiEncounter[TYPE_BLOOD_COUNCIL] = uiData;
 
                 if (uiData == IN_PROGRESS)
+                {
                     DoCloseDoor(GO_CRIMSON_HALL_DOOR);
+                    SetSpecialAchievementCriteria(TYPE_ORB_WHISPERER, true);
+                }
                 else
                     DoOpenDoor(GO_CRIMSON_HALL_DOOR);
 
@@ -467,7 +479,10 @@ static Locations SpawnLoc[]=
                 m_auiEncounter[TYPE_SINDRAGOSA] = uiData;
 
                 if (uiData == IN_PROGRESS)
+                {
                     DoCloseDoor(GO_SINDRAGOSA_ICEWALL);
+                    SetSpecialAchievementCriteria(TYPE_ALL_YOU_CAN_EAT, true);
+                }
                 else
                     DoOpenDoor(GO_SINDRAGOSA_ICEWALL);
                 if (uiData == DONE)
@@ -582,6 +597,58 @@ static Locations SpawnLoc[]=
         case CRITERIA_BONED_10H:
         case CRITERIA_BONED_25H:
             return m_abAchievCriteria[TYPE_BONED];
+        case CRITERIA_FULL_HOUSE_10N:
+        case CRITERIA_FULL_HOUSE_25N:
+        case CRITERIA_FULL_HOUSE_10H:
+        case CRITERIA_FULL_HOUSE_25H:
+            return m_abAchievCriteria[TYPE_FULL_HOUSE];
+        /*case CRITERIA_DEATHBRINGER_DEAD_10N:
+            if (GetData(TYPE_SAURFANG) == DONE && Difficulty == RAID_DIFFICULTY_10MAN_NORMAL)
+                return true;*/
+        case CRITERIA_DANCES_WITH_OOZES_10N:
+        case CRITERIA_DANCES_WITH_OOZES_25N:
+        case CRITERIA_DANCES_WITH_OOZES_10H:
+        case CRITERIA_DANCES_WITH_OOZES_25H:
+            return m_abAchievCriteria[TYPE_DANCES_WITH_OOZES];
+        case CRITERIA_FLU_SHORT_SHORTAGE_10N:
+        case CRITERIA_FLU_SHORT_SHORTAGE_25N:
+        case CRITERIA_FLU_SHORT_SHORTAGE_10H:
+        case CRITERIA_FLU_SHORT_SHORTAGE_25H:
+            return m_abAchievCriteria[TYPE_FLU_SHORT_SHORTAGE];
+        case CRITERIA_ORB_WHISPERER_10N:
+        case CRITERIA_ORB_WHISPERER_25N:
+        case CRITERIA_ORB_WHISPERER_10H:
+        case CRITERIA_ORB_WHISPERER_25H:
+            return m_abAchievCriteria[TYPE_ORB_WHISPERER];
+        case CRITERIA_ONCE_BITTEN_TWICE_SHY_10N:
+            if (!pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_10MAN_NORMAL || Difficulty == RAID_DIFFICULTY_10MAN_HEROIC))
+                return true;
+            else
+                return false;
+            break;
+        case CRITERIA_ONCE_BITTEN_TWICE_SHY_25N:
+            if (!pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_25MAN_NORMAL || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC))
+                return true;
+            else
+                return false;
+            break;
+        case CRITERIA_ONCE_BITTEN_TWICE_SHY_10V:
+            if (pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_10MAN_NORMAL || Difficulty == RAID_DIFFICULTY_10MAN_HEROIC))
+                return true;
+            else
+                return false;
+            break;
+        case CRITERIA_ONCE_BITTEN_TWICE_SHY_25V:
+            if (pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_25MAN_NORMAL || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC))
+                return true;
+            else
+                return false;
+            break;
+        case CRITERIA_ALL_YOU_CAN_EAT_10N:
+        case CRITERIA_ALL_YOU_CAN_EAT_25N:
+        case CRITERIA_ALL_YOU_CAN_EAT_10H:
+        case CRITERIA_ALL_YOU_CAN_EAT_25H:
+            return m_abAchievCriteria[TYPE_ALL_YOU_CAN_EAT];
         default:
              return false;
         }

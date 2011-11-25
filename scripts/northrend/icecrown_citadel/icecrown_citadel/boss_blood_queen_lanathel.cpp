@@ -26,26 +26,26 @@ EndScriptData */
 
 enum BossSpells
 {
-        SPELL_BERSERK                           = 47008,
-        SPELL_INCITE_TERROR                     = 73070,
-        SPELL_SHROUD_OF_SORROW                  = 72981,
-        SPELL_DELIRIOUS_SLASH                   = 72261,
-        SPELL_BLOOD_MIRROR_TANK                 = 70821,
-        SPELL_BLOOD_MIRROR_OFF                  = 70838,
-        SPELL_VAMPIRIC_BITE                     = 71726,
-        SPELL_ESSENCE_OF_BLOOD_QUEEN            = 70867,
-        SPELL_ESSENCE_OF_BLOOD_QUEEN_2          = 70871,
-        SPELL_FRENZIED_BLOODTHIRST              = 70877,
-        SPELL_UNCONTROLLABLE_FRENZY             = 70923,
-        SPELL_PACT_OF_DARKFALLEN                = 71340,
-        SPELL_SWARMING_SHADOWS                  = 71264,
-        SPELL_TWILIGHT_BLOODBOLT                = 72313,
-        SPELL_BLOODBOLT_WHIRL                   = 71772,
-        SPELL_PRESENCE_OF_DARKFALLEN            = 71952,
+    SPELL_BERSERK                           = 47008,
+    SPELL_INCITE_TERROR                     = 73070,
+    SPELL_SHROUD_OF_SORROW                  = 72981,
+    SPELL_DELIRIOUS_SLASH                   = 72261,
+    SPELL_BLOOD_MIRROR_TANK                 = 70821,
+    SPELL_BLOOD_MIRROR_OFF                  = 70838,
+    SPELL_VAMPIRIC_BITE                     = 71726,
+    SPELL_ESSENCE_OF_BLOOD_QUEEN            = 70867,
+    SPELL_ESSENCE_OF_BLOOD_QUEEN_2          = 70871,
+    SPELL_FRENZIED_BLOODTHIRST              = 70877,
+    SPELL_UNCONTROLLABLE_FRENZY             = 70923,
+    SPELL_PACT_OF_DARKFALLEN                = 71340,
+    SPELL_SWARMING_SHADOWS                  = 71264,
+    SPELL_TWILIGHT_BLOODBOLT                = 72313,
+    SPELL_BLOODBOLT_WHIRL                   = 71772,
+    SPELL_PRESENCE_OF_DARKFALLEN            = 71952,
 
-        NPC_SWARMING_SHADOWS                    = 38163,
-        SPELL_SWARMING_SHADOWS_VISUAL           = 71267,
-        THIRST_QUENCHED_AURA                    = 72154,
+    NPC_SWARMING_SHADOWS                    = 38163,
+    SPELL_SWARMING_SHADOWS_VISUAL           = 71267,
+    THIRST_QUENCHED_AURA                    = 72154,
 };
 
 // talks
@@ -69,9 +69,9 @@ static Locations SpawnLoc[]=
 };
 
 
-struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
 {
-    boss_blood_queen_lanathelAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    boss_blood_queen_lanathelAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
@@ -277,12 +277,12 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public BSWScriptedAI
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 0);
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
 
-        doRemoveFromAll(getSpellWithDifficulty(SPELL_ESSENCE_OF_BLOOD_QUEEN));
-        doRemoveFromAll(SPELL_ESSENCE_OF_BLOOD_QUEEN_2);
-        doRemoveFromAll(SPELL_FRENZIED_BLOODTHIRST);
-        doRemoveFromAll(SPELL_PACT_OF_DARKFALLEN);
-        doRemoveFromAll(SPELL_BLOOD_MIRROR_TANK);
-        doRemoveFromAll(SPELL_BLOOD_MIRROR_OFF);
+        DoRemoveFromAll(SPELL_ESSENCE_OF_BLOOD_QUEEN);
+        DoRemoveFromAll(SPELL_ESSENCE_OF_BLOOD_QUEEN_2);
+        DoRemoveFromAll(SPELL_FRENZIED_BLOODTHIRST);
+        DoRemoveFromAll(SPELL_PACT_OF_DARKFALLEN);
+        DoRemoveFromAll(SPELL_BLOOD_MIRROR_TANK);
+        DoRemoveFromAll(SPELL_BLOOD_MIRROR_OFF);
     }
 
 

@@ -21,7 +21,6 @@ enum
     TYPE_PORTAL6            = 9,
     TYPE_PORTAL12           = 10,
 
-
     WORLD_STATE_VH          = 3816,
     WORLD_STATE_VH_PRISON   = 3815,
     WORLD_STATE_VH_PORTALS  = 3810,
@@ -32,6 +31,8 @@ enum
 
     TYPE_DISRUPTIONS        = 101,
     TYPE_LASTBOSS_ID        = 102,
+    TYPE_ACHIEV_ZURAMAT     = 103,
+    TYPE_ACHIEV_ICHORON     = 104,
 
     DATA_EREKEM             = 23,
     DATA_MORAGG             = 24,
@@ -84,7 +85,10 @@ enum
 
     EMOTE_GUARDIAN_PORTAL       = -1608005,
     EMOTE_DRAGONFLIGHT_PORTAL   = -1608006,
-    EMOTE_KEEPER_PORTAL         = -1608007
+    EMOTE_KEEPER_PORTAL         = -1608007,
+
+    ACHIEV_DANCE_WITH_VOID      = 7587,
+    ACHIEV_DESHIDRATATION       = 7320,
 };
 
 struct Locations

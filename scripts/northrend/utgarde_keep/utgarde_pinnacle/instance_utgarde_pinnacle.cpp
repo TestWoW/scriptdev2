@@ -38,6 +38,7 @@ void instance_pinnacle::OnCreatureCreate(Creature* pCreature)
 {
     switch(pCreature->GetEntry())
     {
+        case NPC_HULK:
         case NPC_GRAUF:
         case NPC_SKADI:
             pCreature->SetActiveObjectState(true);
@@ -91,6 +92,9 @@ void instance_pinnacle::SetData(uint32 uiType, uint32 uiData)
         case TYPE_YMIRON:
             m_auiEncounter[uiType] = uiData;
             break;
+        case TYPE_ACHIEV_KINGS_BANE:
+            m_bCriteriaKingsBaneFailed = (uiData == FAIL);
+            return;
         default:
             error_log("SD2: Instance Pinnacle: SetData = %u for type %u does not exist/not implemented.", uiType, uiData);
             return;
@@ -139,6 +143,17 @@ void instance_pinnacle::Load(const char* chrIn)
     }
 
     OUT_LOAD_INST_DATA_COMPLETE;
+}
+
+bool instance_pinnacle::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+{
+    switch (uiCriteriaId)
+    {
+        case ACHIEV_KINGS_BANE:
+            return !m_bCriteriaKingsBaneFailed;
+        default:
+            return 0;
+    }
 }
 
 InstanceData* GetInstanceData_instance_pinnacle(Map* pMap)

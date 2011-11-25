@@ -48,7 +48,10 @@ enum
     SAY_LOCUST_3                                  = -1601007,
     SAY_SUBMERGE_1                                = -1601008,
     SAY_SUBMERGE_2                                = -1601009,
-    SAY_DEATH                                     = -1601004
+    SAY_DEATH                                     = -1601004,
+
+    //Achievements
+    ACHIEVEMENT_GOTTA_GO = 1860,
 };
 
 struct Locations
@@ -68,10 +71,12 @@ struct MANGOS_DLL_DECL boss_anubarakAI : public ScriptedAI
     boss_anubarakAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
     ScriptedInstance *pInstance;
+    bool m_bIsRegularMode;
 
     bool bChanneling;
     bool bGuardianSummoned;
@@ -89,6 +94,7 @@ struct MANGOS_DLL_DECL boss_anubarakAI : public ScriptedAI
     uint32 uiUndergroundTimer;
     uint32 uiVenomancerTimer;
     uint32 uiDatterTimer;
+    uint32 m_uiEncounterTimer;
 
     //SummonList lSummons;
 
@@ -99,6 +105,7 @@ struct MANGOS_DLL_DECL boss_anubarakAI : public ScriptedAI
         uiLeechingSwarmTimer = 20000;
         uiImpaleTimer = 9000;
         uiPoundTimer = 15000;
+        m_uiEncounterTimer = 0;
 
         uiPhase = 0;
         uiPhaseTimer = 0;
@@ -183,6 +190,8 @@ struct MANGOS_DLL_DECL boss_anubarakAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
+        m_uiEncounterTimer += diff;
+
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -319,6 +328,9 @@ struct MANGOS_DLL_DECL boss_anubarakAI : public ScriptedAI
     void JustDied(Unit *pKiller)
     {
         DoScriptText(SAY_DEATH, m_creature);
+
+        if (!m_bIsRegularMode && m_uiEncounterTimer < 240000)
+            pInstance->DoCompleteAchievement(ACHIEVEMENT_GOTTA_GO);
 
         if (pInstance)
             pInstance->SetData(TYPE_ANUBARAK, DONE);

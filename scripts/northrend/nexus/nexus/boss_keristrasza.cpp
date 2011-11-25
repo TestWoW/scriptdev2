@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: Boss_Keristrasza
-SD%Complete: 65%
-SDComment: timers tuning, add achievement
+SD%Complete: 80%
+SDComment: timers tuning
 SDCategory: Nexus
 EndScriptData */
 
@@ -62,10 +62,12 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
     bool m_bIsRegularMode;
 
     bool m_bIsEnraged;
+    bool m_bAchievFailed;
     uint32 m_uiCrystalChainTimer;
     uint32 m_uiTailSweepTimer;
     uint32 m_uiCrystalfireBreathTimer;
     uint32 m_uiCrystallizeTimer;
+    uint32 m_uiCheckTimer;
 
     void Reset()
     {
@@ -73,7 +75,9 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
         m_uiTailSweepTimer = urand(5*IN_MILLISECONDS, 7.5*IN_MILLISECONDS);
         m_uiCrystalfireBreathTimer = urand(10*IN_MILLISECONDS, 20*IN_MILLISECONDS);
         m_uiCrystallizeTimer = urand(20*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+        m_uiCheckTimer = 1000;
         m_bIsEnraged = false;
+        m_bAchievFailed = false;
 
         if (!m_pInstance)
             return;
@@ -85,11 +89,26 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
         }
     }
 
+    void JustReachedHome()
+    {
+        if (m_pInstance)
+        {
+            m_pInstance->SetData(TYPE_KERISTRASZA, FAIL);
+            m_pInstance->SetData(TYPE_ACHIEV_KERISTRASZA, FAIL);
+        }
+    }
+
     void Aggro(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
         m_creature->CastSpell(m_creature, SPELL_INTENSE_COLD, true);
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_KERISTRASZA, IN_PROGRESS);
+
+        if (!m_bIsRegularMode)
+            m_pInstance->SetData(TYPE_ACHIEV_KERISTRASZA, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller)
@@ -108,10 +127,47 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
             DoScriptText(SAY_KILL, m_creature);
     }
 
+    void CheckAchievement()
+    {
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                {
+                    SpellAuraHolderPtr holder = pTarget->GetSpellAuraHolder(48095);
+                    if (holder)
+                    {
+                        if (holder->GetStackAmount() > 2)
+                        {
+                            m_pInstance->SetData(TYPE_ACHIEV_KERISTRASZA, FAIL);
+                            m_bAchievFailed = true;
+                        }
+                        else
+                            m_bAchievFailed = false;
+                    }
+                }
+            }
+        }
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (!m_bAchievFailed)
+        {
+            if (m_uiCheckTimer < uiDiff)
+            {
+                CheckAchievement();
+                m_uiCheckTimer = 1000;
+            }
+            else m_uiCheckTimer -= uiDiff;
+        }
 
         if (!m_bIsEnraged && m_creature->GetHealthPercent() < 25.0f)
         {
