@@ -129,8 +129,6 @@ struct MANGOS_DLL_DECL mob_xerestraszaAI : public ScriptedAI
             debug_log("EventMGR: creature %u received signal %u ",m_creature->GetEntry(),pInstance->GetData(TYPE_EVENT));
             switch (pInstance->GetData(TYPE_EVENT))
                 {
-                    case 0:
-                          break;
 // Xerestrasza intro
                     case 10:
                           UpdateTimer = 7000;

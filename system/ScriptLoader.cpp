@@ -7,20 +7,11 @@
 // battlegrounds
 extern void AddSC_battleground();
 extern void AddSC_battlegroundSA();
+extern void AddSC_battlegroundIC();
 
 // custom
 extern void AddSC_mob_teleguy();
 extern void AddSC_npc_arena_honor();
-
-// OutdoorPvP zone scripts
-extern void AddSC_outdoor_pvp_eastern_plaguelands();
-extern void AddSC_outdoor_pvp_silithus();
-
-// OutdoorPvP
-extern void AddSC_outdoor_pvp_eastern_kingdoms();
-extern void AddSC_outdoor_pvp_kalimdor();
-extern void AddSC_outdoor_pvp_northrend();
-extern void AddSC_outdoor_pvp_outland();
 
 // examples
 extern void AddSC_example_creature();
@@ -78,7 +69,8 @@ extern void AddSC_boss_chromaggus();
 extern void AddSC_boss_nefarian();
 extern void AddSC_boss_victor_nefarius();
 extern void AddSC_instance_blackwing_lair();
-extern void AddSC_deadmines();                              // deadmines
+extern void AddSC_boss_mr_smite();                          // deadmines
+extern void AddSC_deadmines();
 extern void AddSC_instance_deadmines();
 extern void AddSC_gnomeregan();                             // gnomeregan
 extern void AddSC_boss_thermaplugg();
@@ -541,16 +533,11 @@ void AddScripts()
     // battlegrounds
     AddSC_battleground();
     AddSC_battlegroundSA();
+    AddSC_battlegroundIC();
 
     // custom
     AddSC_mob_teleguy();
     AddSC_npc_arena_honor();
-    AddSC_outdoor_pvp_eastern_plaguelands();                // OutdoorPvP zone scripts. Must be _before_ map scripts call!
-    AddSC_outdoor_pvp_silithus();
-    AddSC_outdoor_pvp_eastern_kingdoms();                   // OutdoorPvP
-    AddSC_outdoor_pvp_kalimdor();
-    AddSC_outdoor_pvp_northrend();
-    AddSC_outdoor_pvp_outland();
 
     // examples
     AddSC_example_creature();
@@ -608,6 +595,8 @@ void AddScripts()
     AddSC_boss_victor_nefarius();
     AddSC_instance_blackwing_lair();
     AddSC_deadmines();                                      // deadmines
+    AddSC_boss_mr_smite();
+    AddSC_boss_mr_smite();
     AddSC_instance_deadmines();
     AddSC_gnomeregan();                                     // gnomeregan
     AddSC_boss_thermaplugg();

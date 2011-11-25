@@ -1,5 +1,3 @@
-SET NAMES UTF8;
-
 -- ULDUAR
 
 -- FREYA
@@ -815,7 +813,7 @@ UPDATE `script_texts` SET content_loc6 ='¡No se puede amainar la marejada de al
 UPDATE `script_texts` SET content_loc6 ='¡No se puede amainar la marejada de almas! Sólo posponéis lo inevitable.' WHERE entry = -1632019;
 UPDATE `script_texts` SET content_loc6 ='¡No se puede amainar la marejada de almas! Sólo posponéis lo inevitable.' WHERE entry = -1632020;
 UPDATE `script_texts` SET content_loc6 ='¡%s lanza Alma reflejada!' WHERE entry = -1632021;
-UPDATE `script_texts` SET `content_loc6` = '¡%s comienza a desatar almas!' WHERE `entry` = -1632022;
+UPDATE `script_texts` SET content_loc6 ='¡%s comienza a |c40233desatar almas!|r' WHERE entry = -1632022;
 UPDATE `script_texts` SET content_loc6 ='¡SUFRIMIENTO! ¡ANGUSTIA! ¡CAOS! ¡ALZAOS Y COMED!' WHERE entry = -1632023;
 UPDATE `script_texts` SET content_loc6 ='¡SUFRIMIENTO! ¡ANGUSTIA! ¡CAOS! ¡ALZAOS Y COMED!' WHERE entry = -1632024;
 UPDATE `script_texts` SET content_loc6 ='¡SUFRIMIENTO! ¡ANGUSTIA! ¡CAOS! ¡ALZAOS Y COMED!' WHERE entry = -1632025;
@@ -897,7 +895,7 @@ UPDATE `script_texts` SET content_loc6 ='Quizá deberías haberte quedado... ¡e
 UPDATE `script_texts` SET content_loc6 ='Valientes aventureros, vuestra intromisión ha llegado a su fin. ¿Oís el ruido de huesos y acero acercándose por ese túnel? Es el sonido de vuestra inminente muerte.' WHERE entry = -1658053;
 UPDATE `script_texts` SET content_loc6 ='Un gesto tan divertido de la multitud. Cuando haya terminado con vosotros, la espada de mi maestro se alimentará de vuestras almas. ¡Morid!' WHERE entry = -1658054;
 UPDATE `script_texts` SET content_loc6 ='¡%s mira a $N y prepara un ataque helado!' WHERE entry = -1658060;
-UPDATE `script_texts` SET content_loc6 ='¡%s ruge y absorbe energía oscura!' WHERE entry = -1658062;
+UPDATE `script_texts` SET content_loc6 ='¡%s ruge y absorve energia oscura!' WHERE entry = -1658062;
 
 -- JAINA
 
@@ -1379,5 +1377,3 @@ UPDATE `script_texts` SET `content_loc6`='¡%s entra en frenesí!', `sound`='0',
 UPDATE `script_texts` SET `content_loc6`='¡%s entra en rabia!', `sound`='0', `type`='2', `language`='0', `emote`='0' WHERE `entry`='-1000003';
 UPDATE `script_texts` SET `content_loc6`='¡%s entra en ira rabiosa!', `sound`='0', `type`='2', `language`='0', `emote`='0' WHERE `entry`='-1000004';
 UPDATE `script_texts` SET `content_loc6`='¡%s entra en frenesí!', `sound`='0', `type`='3', `language`='0', `emote`='0' WHERE `entry`='-1000005';
-
-UPDATE `script_texts` SET `content_loc7` = `content_loc6`;

@@ -17,8 +17,8 @@
 
 
 /* ScriptData
-SDName: boss_meathook
-SD%Complete:
+SDName: instance_culling_of_stratholme
+SD%Complete: %
 SDComment:
 EndScriptData */
 
@@ -42,40 +42,39 @@ enum
 
 struct MANGOS_DLL_DECL boss_meathookAI : public ScriptedAI
 {
-    boss_meathookAI(Creature *pCreature) : ScriptedAI(pCreature)
-    {
+   boss_meathookAI(Creature *pCreature) : ScriptedAI(pCreature)
+   {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsHeroic = pCreature->GetMap()->IsRaidOrHeroicDungeon();
         m_creature->SetActiveObjectState(true);
-        m_creature->SetInCombatWithZone();
         Reset();
-    }
+   }
 
-    ScriptedInstance* m_pInstance;
-    bool m_bIsHeroic;
+   ScriptedInstance* m_pInstance;
+   bool m_bIsHeroic;
 
-    uint32 m_uiChain_Timer;
-    uint32 m_uiExploded_Timer;
-    uint32 m_uiFrenzy_Timer;
+   uint32 Chain_Timer;
+   uint32 Exploded_Timer;
+   uint32 Frenzy_Timer;
 
-    void Reset()
-    {
-        m_uiChain_Timer = 6300;
-        m_uiExploded_Timer = 5000;
-        m_uiFrenzy_Timer = 22300;
-    }
+   void Reset() 
+   {
+     Chain_Timer = 6300;
+     Exploded_Timer = 5000;
+     Frenzy_Timer = 22300;
+   }
 
-    void Aggro(Unit* pWho)
-    {
-        DoScriptText(SAY_MEATHOOK_AGGRO, m_creature);
-    }
+   void Aggro(Unit* who)
+   {
+     DoScriptText(SAY_MEATHOOK_AGGRO, m_creature);
+   }
 
-    void JustDied(Unit *pKiller)
-    {
-        DoScriptText(SAY_MEATHOOK_DEATH, m_creature);
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_PHASE, 3);
-    }
+   void JustDied(Unit *killer)
+   {
+       DoScriptText(SAY_MEATHOOK_DEATH, m_creature);
+       if(m_pInstance)
+          m_pInstance->SetData(TYPE_PHASE, 3);
+   }
 
     void KilledUnit(Unit* pVictim)
     {
@@ -87,37 +86,39 @@ struct MANGOS_DLL_DECL boss_meathookAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
-    {
+   void UpdateAI(const uint32 diff)
+   {
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_uiChain_Timer < uiDiff)
+        DoMeleeAttackIfReady();
+
+        if (Chain_Timer < diff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                DoCast(pTarget, m_bIsHeroic ? SPELL_CHAIN_H : SPELL_CHAIN_N);
+            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+                DoCast(target, m_bIsHeroic ? SPELL_CHAIN_H : SPELL_CHAIN_N);
 
-            m_uiChain_Timer = 6300;
-        }else m_uiChain_Timer -= uiDiff;
+            Chain_Timer = 6300;
+        }else Chain_Timer -= diff;
 
-        if (m_uiExploded_Timer < uiDiff)
+        if (Exploded_Timer < diff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                DoCast(pTarget, m_bIsHeroic ? SPELL_EXPLODED_H : SPELL_EXPLODED_N);
+            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+                DoCast(target, m_bIsHeroic ? SPELL_EXPLODED_H : SPELL_EXPLODED_N);
 
-            m_uiExploded_Timer = 5000;
-        }else m_uiExploded_Timer -= uiDiff;
+            Exploded_Timer = 5000;
+        }else Exploded_Timer -= diff;
 
-        if (m_uiFrenzy_Timer < uiDiff)
+        if (Frenzy_Timer < diff)
         {
                 m_creature->InterruptNonMeleeSpells(false);
                 DoCast(m_creature,SPELL_FRENZY);
 
-            m_uiFrenzy_Timer = 23300;
-        }else m_uiFrenzy_Timer -= uiDiff;
+            Frenzy_Timer = 23300;
+        }else Frenzy_Timer -= diff;
 
-        DoMeleeAttackIfReady();
-   }
+  }
 };
 
 CreatureAI* GetAI_boss_meathook(Creature* pCreature)

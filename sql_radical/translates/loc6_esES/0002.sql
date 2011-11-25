@@ -1,5 +1,3 @@
-SET NAMES UTF8;
-
 UPDATE `script_texts` SET `content_loc6` = '¡Ah!, al fin ganaron los viejos dedos mágicos. Ahora pongámonos a...' WHERE `entry` = -1599037;
 UPDATE `script_texts` SET `content_loc6` = '¿Necro que demo...? Habla el maldito común, ¿quieres?' WHERE `entry` = -1599046;
 UPDATE `script_texts` SET `content_loc6` = 'Dioses antíguos ,¿eh? Así que lanzaron a los Terráneos esta maldición de la carne. ¿Y después qué?' WHERE `entry` = -1599048;
@@ -19,4 +17,4 @@ UPDATE `script_texts` SET `content_loc6` = '¿Pero qué...? ¿Dónde? ¡Acabaré
 UPDATE `script_texts` SET `content_loc6` = '¡Juego de niños!' WHERE `entry` = -1575017;
 UPDATE `script_texts` SET `content_loc6` = '¿Qué chuchos son los que se atreven a irrumpir aquí? ¡Adelante, hermanos! ¡Un festín para quien me traiga sus cabezas!' WHERE `entry` = -1575019;
 
-UPDATE `script_texts` SET `content_loc7` = `content_loc6`;
+
