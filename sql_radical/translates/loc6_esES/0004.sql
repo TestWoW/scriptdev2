@@ -274,4 +274,16 @@ UPDATE `script_texts` SET `content_loc6`='La realidad... desterrada...' WHERE `e
 UPDATE `script_texts` SET `content_loc6`='Indestructible...' WHERE `entry`='-1576014' ;
 UPDATE `script_texts` SET `content_loc6`='La expiración... es necesaria...' WHERE `entry`='-1576015' ;
 
+-- MATANZA
+
+UPDATE `script_texts` SET `content_loc6`='Mmm... ¿qué es ese mal olor?' WHERE `entry`='-1597280' ;
+UPDATE `script_texts` SET `content_loc6`='No puedo ser yo, me bañé hace 3 días.' WHERE `entry`='-1597281' ;
+UPDATE `script_texts` SET `content_loc6`='Oh, mierda... parece ser que viene de este grano.' WHERE `entry`='-1597282' ;
+UPDATE `script_texts` SET `content_loc6`='Espera un momento... se supone que este grano lo están buscando. Voy a avisar a un guardia.' WHERE `entry`='-1597283' ;
+UPDATE `script_texts` SET `content_loc6`='No puede ser...' WHERE `entry`='-1597295' ;
+
+-- VARIOS
+
+UPDATE `script_texts` SET `content_loc6`='¿Qué chuchos son los que se atreven a irrumpir aquí? ¡Adelante, hermanos! ¡Un festín para quien me traiga sus cabezas!' WHERE `entry`='-1575019' ;
+
 UPDATE `script_texts` SET `content_loc7` = `content_loc6`;
