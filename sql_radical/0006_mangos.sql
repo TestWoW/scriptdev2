@@ -190,6 +190,8 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equ
 (700008, 30571, 595, 3, 1, 0, 0, 1553.37, 578.078, 99.7624, 5.83105, 300, 0, 0, 8982, 0, 0, 0),
 (700009, 27884, 595, 3, 1, 0, 0, 1636.7, 725.642, 113.662, 0.893359, 300, 0, 0, 8982, 0, 0, 0);
 
+SET NAMES UTF8;
+
 UPDATE `locales_npc_text` SET `Text0_0_loc6` = '¿Estáis dispuestos a hacer lo que haga falta para proteger Lordaeron?' WHERE `entry` = 13076;
 UPDATE `locales_npc_text` SET `Text0_0_loc6` = 'Debéis de ser los soldados que acaben con los soldados de la Plaga de Mal\'Ganis. ¿Seréis capaces?' WHERE `entry` = 13125;
 UPDATE `locales_npc_text` SET `Text0_0_loc6` = 'Estad alerta, tenemos que darnos prisa.' WHERE `entry` = 13177;
