@@ -47,7 +47,9 @@ enum
 
     SPELL_PULSING_SHOCKWAVE_N           = 52961,
     SPELL_PULSING_SHOCKWAVE_H           = 59836,
-    SPELL_PULSING_SHOCKWAVE_AURA        = 59414
+    SPELL_PULSING_SHOCKWAVE_AURA        = 59414,
+
+    ACHIEV_TIMELY_DEATH                 = 1867,
 };
 
 /*######
@@ -72,6 +74,7 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
     uint32 m_uiLightningNova_Timer;
     uint32 m_uiPulsingShockwave_Timer;
     uint32 m_uiResumePulsingShockwave_Timer;
+    uint32 m_uiAchievTimer;
 
     uint32 m_uiHealthAmountModifier;
 
@@ -83,6 +86,7 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
         m_uiLightningNova_Timer = 20000;
         m_uiPulsingShockwave_Timer = 2000;
         m_uiResumePulsingShockwave_Timer = 15000;
+        m_uiAchievTimer = 0;
 
         m_uiHealthAmountModifier = 1;
 
@@ -104,6 +108,9 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LOKEN, DONE);
+
+        if (!m_bIsRegularMode && m_uiAchievTimer < 120000)
+             m_pInstance->DoCompleteAchievement(ACHIEV_TIMELY_DEATH);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -118,6 +125,8 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+        m_uiAchievTimer += uiDiff;
+
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

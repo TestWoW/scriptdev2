@@ -427,7 +427,6 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                     pTyrannus->GetMotionMaster()->MoveIdle();
                     pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
                     pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     pTyrannus->SetUInt32Value(UNIT_FIELD_BYTES_0, 50331648);
                     pTyrannus->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
                     pTyrannus->GetMotionMaster()->MoveIdle();
@@ -624,7 +623,6 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                 {
                     pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
                     pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     m_uiTyrannusGuid = pTyrannus->GetGUID();
                 }
                 ++Step;

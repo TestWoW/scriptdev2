@@ -13,8 +13,11 @@ enum
     TYPE_GORTOK                     = 1,
     TYPE_SKADI                      = 2,
     TYPE_YMIRON                     = 3,
+    TYPE_ACHIEV_KINGS_BANE          = 4,
 
     GO_DOOR_SKADI                   = 192173,
+
+    NPC_HULK                        = 26555,     
 
     NPC_GORTOK                      = 26687,
     NPC_FURLBORG                    = 26684,
@@ -42,7 +45,9 @@ enum
     GO_HARPOON                      = 192539,
     GO_HARPOON_LAUNCHER_1           = 192175,
     GO_HARPOON_LAUNCHER_2           = 192176,
-    GO_HARPOON_LAUNCHER_3           = 192177
+    GO_HARPOON_LAUNCHER_3           = 192177,
+
+    ACHIEV_KINGS_BANE               = 7598,
 };
 
 class MANGOS_DLL_DECL instance_pinnacle : public ScriptedInstance
@@ -54,6 +59,7 @@ class MANGOS_DLL_DECL instance_pinnacle : public ScriptedInstance
 
         void OnCreatureCreate(Creature* pCreature);
         void OnObjectCreate(GameObject* pGo);
+        bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
 
         void SetData(uint32 uiType, uint32 uiData);
         uint32 GetData(uint32 uiType);
@@ -64,6 +70,8 @@ class MANGOS_DLL_DECL instance_pinnacle : public ScriptedInstance
     private:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string m_strInstData;
+
+        bool m_bCriteriaKingsBaneFailed;
 };
 
 #endif

@@ -118,11 +118,23 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
+    void JustReachedHome()
+    {
+        if (m_pInstance)
+        {
+            m_pInstance->SetData(TYPE_EREGOS, FAIL);
+            m_pInstance->SetData(m_bIsRegularMode ? TYPE_ACHIEV_EREGOS_KILL : TYPE_ACHIEV_EREGOS_KILL_H, FAIL);
+        }
+    }
+
     void Aggro(Unit* who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
         if (m_pInstance)
+        { 
             m_pInstance->SetData(TYPE_EREGOS, IN_PROGRESS);
+            m_pInstance->SetData(m_bIsRegularMode ? TYPE_ACHIEV_EREGOS_KILL : TYPE_ACHIEV_EREGOS_KILL_H, IN_PROGRESS);
+        }
     }
 
     void KilledUnit(Unit *victim)

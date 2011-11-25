@@ -17,8 +17,8 @@
 
 
 /* ScriptData
-SDName: instance_culling_of_stratholme
-SD%Complete: %
+SDName: trash_culling_of_stratholme
+SD%Complete:
 SDComment:
 EndScriptData */
 

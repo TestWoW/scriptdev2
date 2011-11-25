@@ -74,8 +74,10 @@ enum
     
     GO_HARPOON_1                    = 65483,
     GO_HARPOON_2                    = 65497,
-    GO_HARPOON_3                    = 65512
+    GO_HARPOON_3                    = 65512,
 
+    ACHIEV_TRALARI_LOVES_SKADI      = 1873,
+    ACHIEV_GIRL_LOVES_SKADI         = 2156,
 };
 
 #define SKADI_X         343.02f
@@ -145,6 +147,9 @@ struct MANGOS_DLL_DECL boss_skadiAI : public ScriptedAI
     uint32 m_uiPoisonedSpearTimer;
     uint32 m_uiWhirlwindTimer;
 
+    uint32 m_uiAchievTralariTimer;
+    uint32 m_uiAchievGirlTimer;
+
     uint8 m_uiFireStack;
     uint8 m_uiBreathSide;
 
@@ -168,6 +173,9 @@ struct MANGOS_DLL_DECL boss_skadiAI : public ScriptedAI
         m_uiPoisonedSpearTimer = 10000;
         m_uiWhirlwindTimer = 17000;
 
+        m_uiAchievTralariTimer = 0;
+        m_uiAchievGirlTimer = 0;
+
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         SetCombatMovement(false);
         m_creature->SetLevitate(true);
@@ -188,7 +196,6 @@ struct MANGOS_DLL_DECL boss_skadiAI : public ScriptedAI
     void Aggro(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
-        m_creature->SetInCombatWithZone();
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
         if (m_pInstance)
@@ -211,6 +218,13 @@ struct MANGOS_DLL_DECL boss_skadiAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SKADI, DONE);
+
+        if (!m_bIsRegularMode && m_uiAchievTralariTimer < 180000)
+             m_pInstance->DoCompleteAchievement(ACHIEV_TRALARI_LOVES_SKADI);
+
+        // Hacky mode
+        if (!m_bIsRegularMode && m_uiAchievGirlTimer < 90000)
+             m_pInstance->DoCompleteAchievement(ACHIEV_GIRL_LOVES_SKADI);
     }
 
     void JustSummoned(Creature* pCreature)
@@ -316,7 +330,7 @@ struct MANGOS_DLL_DECL boss_skadiAI : public ScriptedAI
             case 5:
                 MoveGrauf(479.678f, -513.855f, 116.717f, 2000);
                 m_bCanLaunchHarpoon = false;
-                m_creature->MonsterTextEmote("Grauf takes a deep breath.", 0, true);
+                m_creature->MonsterTextEmote("Grauf aterriza.", 0, true);
                 break;
             case 6:
                 switch (urand(0, 2))
@@ -362,8 +376,13 @@ struct MANGOS_DLL_DECL boss_skadiAI : public ScriptedAI
     
     void UpdateAI(const uint32 uiDiff)
     {
+        m_uiAchievTralariTimer += uiDiff;
+        m_uiAchievGirlTimer += uiDiff;
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        m_creature->SetInCombatWithZone();
 
         if (m_bIsFirstPhase)
         {
@@ -377,7 +396,7 @@ struct MANGOS_DLL_DECL boss_skadiAI : public ScriptedAI
                             switch (m_uiIntroCount)
                             {
                                 case 0:
-                                   // m_creature->EnterVehicle(pGrauf->GetVehicleKit(), 0);
+                                    //m_creature->EnterVehicle(pGrauf->GetVehicleKit(), 0);
                                     for (uint8 i = 3; i < 13; ++i)
                                         if (Creature * pWarrior = m_creature->SummonCreature(NPC_YMIRJAR_WARRIOR, 479.391f, -510.158f+urand(0, 6), 104.736f, 4.73f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
                                             pWarrior->GetMotionMaster()->MovePoint(1, SkadiSummonMove[i].x, SkadiSummonMove[i].y, SkadiSummonMove[i].z);
@@ -503,7 +522,6 @@ struct MANGOS_DLL_DECL boss_graufAI : public ScriptedAI
     
     void Aggro(Unit* pWho)
     {
-        m_creature->SetInCombatWithZone();
     }
 
     void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
@@ -564,6 +582,8 @@ struct MANGOS_DLL_DECL boss_graufAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+        m_creature->SetInCombatWithZone();
+
         if (m_bIsSpeechPause)
         {
             if (uiSpeechPauseTimer <= uiDiff)
