@@ -75,12 +75,12 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
 {
     boss_telestraAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_nexus*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_nexus* m_pInstance;
     bool m_bIsRegularMode;
 
     uint8 m_uiPhase;
@@ -100,11 +100,17 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
         m_uiIceNovaTimer = urand(8000, 12000);
         m_uiGravityWellTimer = urand(15000, 25000);
         m_uiAchievTimer = 0;
+
+        if (m_pInstance)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, false);
     }
 
     void JustReachedHome()
     {
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+        if (m_pInstance)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, false);
     }
 
     void AttackStart(Unit* pWho)
@@ -123,8 +129,8 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_ACHIEV_TELESTRA, IN_PROGRESS);
+        if (m_pInstance && !m_bIsRegularMode)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, true);
     }
 
     void JustDied(Unit* pKiller)
@@ -157,7 +163,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                     m_creature->RemoveAurasDueToSpell(SPELL_SUMMON_CLONES);
                     m_creature->CastSpell(m_creature, SPELL_SPAWN_BACK_IN, false);
 
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
                     DoScriptText(SAY_MERGE, m_creature);
 
@@ -166,7 +172,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                 break;
             }
             case SPELL_SUMMON_CLONES:
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 break;
         }
     }
@@ -192,8 +198,8 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (!m_bIsRegularMode && m_uiAchievTimer > 5000)
-            m_pInstance->SetData(TYPE_ACHIEV_TELESTRA, FAIL);
+        if (!m_bIsRegularMode && m_uiAchievTimer > 8000) // Added 3 sec because must not count cast time
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, false);
 
         switch(m_uiPhase)
         {
@@ -224,8 +230,8 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                         if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_CLONES, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
                         {
                             DoScriptText(urand(0, 1) ? SAY_SPLIT_1 : SAY_SPLIT_2, m_creature);
-                            m_uiAchievTimer += uiDiff;
                             m_uiPhase = PHASE_2;
+                            m_uiAchievTimer = 0;
                         }
                     }
 
@@ -235,6 +241,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                         {
                             DoScriptText(urand(0, 1) ? SAY_SPLIT_1 : SAY_SPLIT_2, m_creature);
                             m_uiPhase = PHASE_2;
+                            m_uiAchievTimer = 0;
                         }
                     }
 
@@ -253,6 +260,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
             }
             case PHASE_2:
             {
+                m_uiAchievTimer += uiDiff;
                 break;
             }
         }

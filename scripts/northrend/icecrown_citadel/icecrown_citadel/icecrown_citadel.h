@@ -41,6 +41,18 @@ enum
     NPC_KELESETH                        = 37972,
     NPC_LANATHEL                        = 37955,
 
+    NPC_HORDE_1                         = 37032,
+    NPC_HORDE_2                         = 37028,
+    NPC_HORDE_3                         = 37029,
+    NPC_HORDE_4                         = 37030,
+    NPC_HORDE_5                         = 37146,
+
+    NPC_ALLY_1                          = 37003,
+    NPC_ALLY_2                          = 37017,
+    NPC_ALLY_3                          = 37021,
+    NPC_ALLY_4                          = 37026,
+    NPC_ALLY_5                          = 37027,
+
     NPC_CROK                            = 37129,
     NPC_ARNATH                          = 37122,
     NPC_BRANDON                         = 37123,
@@ -196,7 +208,10 @@ enum
     CRITERIA_FULL_HOUSE_25H             = 12998,
 
     // Deathbringer Saurfang
-    CRITERIA_DEATHBRINGER_DEAD_10N      = 12772,
+    CRITERIA_IVE_MADE_AND_MESS_10N      = 12778,
+    CRITERIA_IVE_MADE_AND_MESS_25N      = 13036,
+    CRITERIA_IVE_MADE_AND_MESS_10H      = 13035,
+    CRITERIA_IVE_MADE_AND_MESS_25H      = 13037,
 
     // Rotface
     CRITERIA_DANCES_WITH_OOZES_10N      = 12984,
@@ -229,6 +244,13 @@ enum
     CRITERIA_ONCE_BITTEN_TWICE_SHY_25N  = 13012,
     CRITERIA_ONCE_BITTEN_TWICE_SHY_10V  = 13011,
     CRITERIA_ONCE_BITTEN_TWICE_SHY_25V  = 13013,
+
+    // Valthiria Dreamwalker
+    CRITERIA_PORTAL_JOCKEY_10N          = 12978,
+    CRITERIA_PORTAL_JOCKEY_25N          = 12971,
+    CRITERIA_PORTAL_JOCKEY_10H          = 12979,
+    CRITERIA_PORTAL_JOCKEY_25H          = 12980,
+
 
     // Sindragosa
     CRITERIA_ALL_YOU_CAN_EAT_10N        = 12822,

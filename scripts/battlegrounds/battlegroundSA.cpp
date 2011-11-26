@@ -15,6 +15,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+/* ScriptData
+SDName: Battleground_SA
+SD%Complete: %?
+SDComment: Battleground Strand of Ancients
+SDCategory: Battleground_SA
+EndScriptData */
+
 #include "precompiled.h"
 #include "BattleGroundSA.h"
 #include "Vehicle.h"
@@ -106,7 +113,7 @@ struct MANGOS_DLL_DECL npc_sa_demolisherAI : public ScriptedAI
             {
                 if (factionSet == false)
                 {
-                    m_creature->setFaction(bg->GetVehicleFaction(VEHICLE_BG_DEMOLISHER));  
+                    m_creature->setFaction(bg->GetVehicleFaction(VEHICLE_BG_DEMOLISHER));
                     factionSet = true;
                 }
 
@@ -153,7 +160,7 @@ struct MANGOS_DLL_DECL npc_sa_cannonAI : public ScriptedAI
     {
         if (BattleGround *bg = pPlayer->GetBattleGround())
         {
-            if (bg->GetDefender() != pPlayer->GetTeam() || bg->GetStatus() == STATUS_WAIT_JOIN)
+            if (bg->GetDefender() != pPlayer->GetTeam())
                 return;
 
             if (VehicleKit *vehicle = pCreature->GetVehicleKit())
@@ -305,9 +312,9 @@ bool GossipHello_npc_sa_vendor(Player* pPlayer, Creature* pCreature)
             if (BattleGround *bg = pPlayer->GetBattleGround())
                 if (bg->GetDefender() != pPlayer->GetTeam())
                 {
-                    if (bg->GetDefender() != ALLIANCE && bg->GetGydController(gyd) == BG_SA_GARVE_STATUS_ALLY_OCCUPIED)
+                    if (bg->GetDefender() != ALLIANCE && bg->GetGydController(gyd) == BG_SA_GRAVE_STATUS_ALLY_OCCUPIED)
                         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                    if (bg->GetDefender() != HORDE && bg->GetGydController(gyd) == BG_SA_GARVE_STATUS_HORDE_OCCUPIED)
+                    if (bg->GetDefender() != HORDE && bg->GetGydController(gyd) == BG_SA_GRAVE_STATUS_HORDE_OCCUPIED)
                         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
                 }
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_START_EVENT_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);

@@ -33,7 +33,7 @@ UPDATE `locales_npc_text` SET `Text0_0_loc7` = `Text0_0_loc6`, `Text0_1_loc7` = 
 
 -- Forge of Souls final event
 
-UPDATE `creature_template` SET `ScriptName` = 'npc_sylvanas_jaina_fos_end' WHERE `entry` in (38160, 38161);
+UPDATE `creature_template` SET `ScriptName` = 'npc_sylvanas_jaina_fos_end' WHERE `entry` = 38160, 38161;
 
 -- Ahn'kahet Jedoga & Nadox
 

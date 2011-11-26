@@ -1,4 +1,5 @@
 /* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 MangosR2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -75,12 +76,12 @@ struct MANGOS_DLL_DECL boss_taldaramAI : public ScriptedAI
 {
     boss_taldaramAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_ahnkahet*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_ahnkahet* m_pInstance;
     bool m_bIsRegularMode;
     uint8 m_uiVanishPhase;
     uint32 m_uiDamageTaken;
@@ -104,6 +105,7 @@ struct MANGOS_DLL_DECL boss_taldaramAI : public ScriptedAI
         m_uiDamageTaken = 0;
         if (m_pInstance)
             m_pInstance->SetData(TYPE_TALDARAM, NOT_STARTED);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void Aggro(Unit* pWho)
@@ -151,7 +153,8 @@ struct MANGOS_DLL_DECL boss_taldaramAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (!m_pInstance) return;
+        if (!m_pInstance)
+            return;
 
         if(m_uiVanishPhase != 0)
         {
@@ -243,6 +246,7 @@ CreatureAI* GetAI_boss_taldaram(Creature* pCreature)
 {
     return new boss_taldaramAI(pCreature);
 }
+
 /*######
 ## mob_flame_orb
 ######*/
@@ -251,12 +255,12 @@ struct MANGOS_DLL_DECL mob_flame_orbAI : public ScriptedAI
 {
     mob_flame_orbAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_ahnkahet*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_ahnkahet* m_pInstance;
     bool m_bIsRegularMode;
     bool m_bIsFlying;
     int8 direction;

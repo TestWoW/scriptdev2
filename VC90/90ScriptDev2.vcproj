@@ -711,6 +711,10 @@
 					Name="deadmines"
 					>
 					<File
+                      RelativePath="..\scripts\eastern_kingdoms\deadmines\boss_mr_smite.cpp"
+                      >
+                    </File>
+                    <File
 						RelativePath="..\scripts\eastern_kingdoms\deadmines\deadmines.cpp"
 						>
 					</File>
@@ -1560,6 +1564,10 @@
 					>
 					<File
 						RelativePath="..\scripts\kalimdor\razorfen_downs\boss_amnennar_the_coldbringer.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\scripts\kalimdor\razorfen_downs\boss_tuten_kash.cpp"
 						>
 					</File>
 					<File

@@ -89,7 +89,6 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
         m_creature->SetRespawnDelay(7*DAY);
         m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_NONE);
         stage = 0;
-	 m_creature->SetHealth(m_creature->GetMaxHealth());
     }
 
     void JustReachedHome()
@@ -250,7 +249,6 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
         m_creature->SetRespawnDelay(7*DAY);
         m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_NONE);
         stage = 0;
-	 m_creature->SetHealth(m_creature->GetMaxHealth());
     }
 
     void JustReachedHome()

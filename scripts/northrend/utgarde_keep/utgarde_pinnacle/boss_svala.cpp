@@ -206,9 +206,12 @@ struct MANGOS_DLL_DECL boss_svalaAI : public ScriptedAI
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             m_bIsIntroDone = true;
         }
+
+        if (Creature *pRitual = m_pInstance->GetSingleCreatureFromStorage(NPC_RITUAL_TARGET))
+            pRitual->ForcedDespawn();
     }
 
-	Unit* SelectTargetForSacrifice()
+    Unit* SelectTargetForSacrifice()
     {
          std::list<Unit*> lPotentialTargets;
          ThreatList const& tList = m_creature->getThreatManager().getThreatList();
@@ -261,6 +264,9 @@ struct MANGOS_DLL_DECL boss_svalaAI : public ScriptedAI
         m_creature->SetLevitate(false);
         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, 0);
         DoScriptText(SAY_AGGRO, m_creature);
+
+        if (Creature *pRitual = m_pInstance->GetSingleCreatureFromStorage(NPC_RITUAL_TARGET))
+            pRitual->ForcedDespawn();
     }
 
     void JustSummoned(Creature* pSummoned)

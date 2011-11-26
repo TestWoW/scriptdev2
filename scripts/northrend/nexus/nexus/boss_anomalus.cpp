@@ -37,10 +37,6 @@ enum eEnums
     SPELL_CHARGED_CHAOTIC_ENERGY_BURST  = 47737,
     SPELL_ARCANEFORM                    = 48019, // Chaotic Rift visual
 
-    // NPC's
-    NPC_CRAZED_MANA_WRAITH              = 26746,
-    NPC_CHAOTIC_RIFT                    = 26918,
-
     // Texts
     SAY_AGGRO                           = -1576011,
     SAY_DEATH                           = -1576012,
@@ -66,12 +62,12 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
 {
     boss_anomalusAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_nexus*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_nexus* m_pInstance;
     bool m_bIsRegularMode;
 
     uint8 m_uiPhase;
@@ -85,7 +81,9 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
         m_ChaoticRiftGuid.Clear();
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_ANOMALUS, NOT_STARTED);
+        }
     }
 
     void JustReachedHome()
@@ -93,7 +91,6 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_ANOMALUS, FAIL);
-            m_pInstance->SetData(TYPE_ACHIEV_ANOMALUS, FAIL);
         }
     }
 
@@ -106,8 +103,12 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
-        if (!m_bIsRegularMode)
-            m_pInstance->SetData(TYPE_ACHIEV_ANOMALUS, IN_PROGRESS);
+        if (m_pInstance)
+        {
+            m_pInstance->SetData(TYPE_ANOMALUS, IN_PROGRESS);
+            if (!m_bIsRegularMode)
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_CHAOS_THEORY, true);
+        }
     }
 
     void JustDied(Unit* pKiller)
@@ -127,7 +128,7 @@ struct MANGOS_DLL_DECL boss_anomalusAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
         uint8 tmp = urand(0,5);
-        Creature* pRift = m_creature->SummonCreature(NPC_CHAOTIC_RIFT, RiftLocation[tmp][0], RiftLocation[tmp][1], RiftLocation[tmp][2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000);
+        Creature* pRift = m_creature->SummonCreature(NPC_CHAOTIC_RIFT, RiftLocation[tmp][0], RiftLocation[tmp][1], RiftLocation[tmp][2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
         if (pRift)
         {
             //DoCast(Rift, SPELL_CHARGE_RIFT);
@@ -226,12 +227,6 @@ struct MANGOS_DLL_DECL npc_chaotic_riftAI : public Scripted_NoMovementAI
         DoCast(m_creature, SPELL_ARCANEFORM, false);
     }
 
-    void JustDied(Unit* pKiller)
-    {
-        if (m_pInstance->GetData(TYPE_ANOMALUS) == IN_PROGRESS)
-            m_pInstance->SetData(TYPE_ACHIEV_ANOMALUS, FAIL);
-    }
-
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -241,10 +236,12 @@ struct MANGOS_DLL_DECL npc_chaotic_riftAI : public Scripted_NoMovementAI
         {
             Unit* Anomalus = m_creature->GetMap()->GetUnit(ObjectGuid(m_pInstance ? m_pInstance->GetData64(TYPE_ANOMALUS) : 0));
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            {
                 if (Anomalus && Anomalus->HasAura(SPELL_RIFT_SHIELD))
                     DoCast(pTarget, SPELL_CHARGED_CHAOTIC_ENERGY_BURST);
                 else
                     DoCast(pTarget, SPELL_CHAOTIC_ENERGY_BURST);
+            }
 
             m_uiChaoticEnergyBurstTimer = 1*IN_MILLISECONDS;
         }

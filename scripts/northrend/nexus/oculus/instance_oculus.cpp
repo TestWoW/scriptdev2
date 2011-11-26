@@ -77,7 +77,6 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
             default:
                 return;
         }
-
         m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
     }
 
@@ -95,9 +94,9 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
             case NPC_UROM:
             case NPC_EREGOS:
             case NPC_BALGAR_IMAGE:
-                m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
                 break;
         }
+        m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
     }
 
     bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
@@ -234,9 +233,9 @@ bool GOUse_go_oculus_portal(Player* pPlayer, GameObject* pGo)
 { 
     switch(pGo->GetEntry()) 
     {
-    case GO_ORB_OF_NEXUS: 
-        pPlayer->TeleportTo(571,3876.159912f,6984.439941f,106.32f,6.279f); 
-        return true; 
+        case GO_ORB_OF_NEXUS: 
+            pPlayer->TeleportTo(571,3876.159912f,6984.439941f,106.32f,6.279f); 
+            return true; 
     } 
     return false; 
 }

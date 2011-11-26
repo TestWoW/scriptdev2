@@ -13,14 +13,15 @@
 */
 enum
 {
-    MAX_ENCOUNTER          = 5,
+    MAX_ENCOUNTER          = 7,
 
     TYPE_SLADRAN           = 0,
     TYPE_MOORABI           = 1,
     TYPE_COLOSSUS          = 2,
     TYPE_GALDARAH          = 3,
     TYPE_ECK               = 4,
-    TYPE_ACHIEV_SLADRAN    = 5,
+    TYPE_ACHIEV_GALDARAH   = 5,
+    TYPE_ACHIEV_MOORABI    = 6,
 
     NPC_SLADRAN            = 29304,
     NPC_MOORABI            = 29305,
@@ -59,6 +60,9 @@ enum
     TIMER_VISUAL_KEY       = 2000,
 
     ACHIEV_SNAKES          = 7363,
+    ACHIEV_SHARE_THE_LOVE  = 7583,
+    ACHIEV_WHAT_THE_ECK    = 7136,
+    ACHIEV_LESS_RABI       = 7319,
 };
 
 typedef std::map<uint8, uint32> TypeTimerMap;
@@ -97,7 +101,8 @@ class MANGOS_DLL_DECL instance_gundrak : public ScriptedInstance
         TypeTimerMap m_mBeamInProgress;
         TypeTimerMap m_mKeyInProgress;
 
-        bool m_bCriteriaSnakesWhySnakesFailed;
+        bool m_bCriteriaShareTheLove;
+        bool m_bCriteriaLessRabi;
 
         GUIDList m_luiStalkerGUIDs;
         GUIDVector m_vStalkerCasterGuids;

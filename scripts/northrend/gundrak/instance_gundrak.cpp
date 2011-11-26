@@ -182,7 +182,17 @@ bool instance_gundrak::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player 
     switch (uiCriteriaId)
     {
         case ACHIEV_SNAKES:
-            return !m_bCriteriaSnakesWhySnakesFailed;
+            if (!pSource->HasAura(61476))
+                return true;
+            else return false;
+        case ACHIEV_WHAT_THE_ECK:
+            if (pSource->HasAura(55817))
+                return true;
+            else return false;
+        case ACHIEV_SHARE_THE_LOVE:
+            return m_bCriteriaShareTheLove;
+        case ACHIEV_LESS_RABI:
+            return !m_bCriteriaLessRabi;
         default:
             return 0;
     }
@@ -236,8 +246,11 @@ void instance_gundrak::SetData(uint32 uiType, uint32 uiData)
             if (uiData == DONE)
                 DoUseDoorOrButton(GO_ECK_UNDERWATER_DOOR);
             break;
-        case TYPE_ACHIEV_SLADRAN:
-            m_bCriteriaSnakesWhySnakesFailed = (uiData == FAIL);
+        case TYPE_ACHIEV_GALDARAH:
+            m_bCriteriaShareTheLove = (uiData == DONE);
+            return;
+        case TYPE_ACHIEV_MOORABI:
+            m_bCriteriaLessRabi = (uiData == FAIL);
             return;
         default:
             error_log("SD2: Instance Gundrak: ERROR SetData = %u for type %u does not exist/not implemented.", uiType, uiData);

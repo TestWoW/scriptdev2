@@ -265,6 +265,7 @@
     <ClCompile Include="..\scripts\eastern_kingdoms\blasted_lands.cpp" />
     <ClCompile Include="..\scripts\eastern_kingdoms\boss_kruul.cpp" />
     <ClCompile Include="..\scripts\eastern_kingdoms\burning_steppes.cpp" />
+    <ClCompile Include="..\scripts\eastern_kingdoms\deadmines\boss_mr_smite.cpp" />
     <ClCompile Include="..\scripts\eastern_kingdoms\deadmines\deadmines.cpp" />
     <ClCompile Include="..\scripts\eastern_kingdoms\deadmines\instance_deadmines.cpp" />
     <ClCompile Include="..\scripts\eastern_kingdoms\dun_morogh.cpp" />
@@ -440,6 +441,7 @@
     <ClCompile Include="..\scripts\kalimdor\onyxias_lair\instance_onyxias_lair.cpp" />
     <ClCompile Include="..\scripts\kalimdor\orgrimmar.cpp" />
     <ClCompile Include="..\scripts\kalimdor\razorfen_downs\boss_amnennar_the_coldbringer.cpp" />
+    <ClCompile Include="..\scripts\kalimdor\razorfen_downs\boss_tuten_kash.cpp" />
     <ClCompile Include="..\scripts\kalimdor\razorfen_downs\razorfen_downs.cpp" />
     <ClCompile Include="..\scripts\kalimdor\razorfen_kraul\instance_razorfen_kraul.cpp" />
 	<ClCompile Include="..\scripts\kalimdor\razorfen_kraul\razorfen_kraul.cpp" />

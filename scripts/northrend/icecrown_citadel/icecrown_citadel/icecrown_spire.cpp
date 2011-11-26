@@ -56,6 +56,39 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public BSWScriptedAI
         resetTimers();
     }
 
+    void MoveInLineOfSight(Unit* pWho)
+    {
+         if(Creature* pHordeOne = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_1))
+             pHordeOne->HandleEmote(EMOTE_STATE_READY1H);
+
+         if(Creature* pHordeTwo = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_2))
+             pHordeTwo->HandleEmote(EMOTE_STATE_READY1H);
+
+         if(Creature* pHordeThree = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_3))
+             pHordeThree->HandleEmote(EMOTE_STATE_READY2H);
+
+         if(Creature* pHordeFour = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_4))
+             pHordeFour->HandleEmote(EMOTE_STATE_READY2H);
+
+         if(Creature* pHordeFive = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_5))
+             pHordeFive->HandleEmote(EMOTE_STATE_READY1H);
+
+         if(Creature* pAllyOne = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_1))
+             pAllyOne->HandleEmote(EMOTE_STATE_READY1H);
+
+         if(Creature* pAllyTwo = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_2))
+             pAllyTwo->HandleEmote(EMOTE_STATE_READY1H);
+
+         if(Creature* pAllyThree = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_3))
+             pAllyThree->HandleEmote(EMOTE_STATE_READY1H);
+
+         if(Creature* pAllyFour = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_4))
+             pAllyFour->HandleEmote(EMOTE_STATE_READY1H);
+
+         if(Creature* pAllyFive = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_5))
+             pAllyFive->HandleEmote(EMOTE_STATE_READY2H);
+    }
+
     void UpdateAI(const uint32 diff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
