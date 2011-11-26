@@ -67,6 +67,7 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
     {
         switch(pGo->GetEntry())
         {
+<<<<<<< HEAD
             case GO_DRAGON_CAGE_DOOR_1:
                 break;
             case GO_DRAGON_CAGE_DOOR_2:
@@ -78,6 +79,14 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
                 return;
         }
 
+=======
+            case GO_DRAGON_CAGE_DOOR:
+                break;
+
+           default:
+                return;
+        }
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
         m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
     }
 
@@ -87,17 +96,24 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
         {
             case NPC_VAROS:
                 pCreature->SetActiveObjectState(true);
+<<<<<<< HEAD
             case NPC_TRIGGER:
             case NPC_ETERNOS:
             case NPC_VERDISA:
             case NPC_BELGAR:
+=======
+                break;
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
             case NPC_DRAKOS:
             case NPC_UROM:
             case NPC_EREGOS:
+            case NPC_BELGARISTRASZ:
+            case NPC_VERDISA:
+            case NPC_ETERNOS:
             case NPC_BALGAR_IMAGE:
-                m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
                 break;
         }
+        m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
     }
 
     bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
@@ -234,9 +250,9 @@ bool GOUse_go_oculus_portal(Player* pPlayer, GameObject* pGo)
 { 
     switch(pGo->GetEntry()) 
     {
-    case GO_ORB_OF_NEXUS: 
-        pPlayer->TeleportTo(571,3876.159912f,6984.439941f,106.32f,6.279f); 
-        return true; 
+        case GO_ORB_OF_NEXUS: 
+            pPlayer->TeleportTo(571,3876.159912f,6984.439941f,106.32f,6.279f); 
+            return true; 
     } 
     return false; 
 }

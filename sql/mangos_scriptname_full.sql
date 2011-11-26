@@ -238,7 +238,7 @@ UPDATE instance_template SET ScriptName='instance_azjol-nerub' WHERE map=601;
 UPDATE creature_template SET ScriptName='npc_rizzle_sprysprocket' WHERE entry=23002;
 UPDATE creature_template SET ScriptName='npc_depth_charge' WHERE entry=23025;
 UPDATE gameobject_template SET ScriptName='go_southfury_moonstone' WHERE entry=185566;
-UPDATE creature_template SET ScriptName='mobs_spitelashes' WHERE entry IN (6190,6193,6194,6195,6196,7885,7886,12204,12205);
+UPDATE creature_template SET ScriptName='mobs_spitelashes' WHERE entry IN (6190,6193,6194,6195,6196);
 UPDATE creature_template SET ScriptName='npc_loramus_thalipedes' WHERE entry=7783;
 
 /* AZUREMYST ISLE */
@@ -1065,6 +1065,10 @@ UPDATE creature_template SET ScriptName='boss_muru' WHERE entry=25741;
 UPDATE creature_template SET ScriptName='boss_entropius' WHERE entry=25840;
 UPDATE creature_template SET ScriptName='npc_portal_target' WHERE entry=25770;
 UPDATE creature_template SET ScriptName='npc_void_sentinel_summoner' WHERE entry=25782;
+<<<<<<< HEAD
+=======
+UPDATE creature_template SET ScriptName='boss_kiljaeden' WHERE entry=25315;
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 
 /* SWAMP OF SORROWS */
 UPDATE creature_template SET ScriptName='npc_galen_goodward' WHERE entry=5391;

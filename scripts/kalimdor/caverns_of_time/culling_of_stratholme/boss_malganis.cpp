@@ -17,8 +17,13 @@
 
 
 /* ScriptData
+<<<<<<< HEAD
 SDName: boss_malganis
 SD%Complete:
+=======
+SDName: instance_culling_of_stratholme
+SD%Complete: %
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 SDComment:
 EndScriptData */
 
@@ -83,6 +88,7 @@ struct MANGOS_DLL_DECL boss_malganisAI : public ScriptedAI
         m_uiSleep_Timer = 17300;
         m_uiVampire_Timer = 30000;
     }
+<<<<<<< HEAD
 
     void AttackStart(Unit* pWho)
     {
@@ -90,6 +96,15 @@ struct MANGOS_DLL_DECL boss_malganisAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_MALGANIS) != IN_PROGRESS) return;
 
+=======
+
+    void AttackStart(Unit* pWho)
+    {
+        if (m_pInstance->GetData(TYPE_PHASE) > 9) return;
+
+        if (m_pInstance->GetData(TYPE_MALGANIS) != IN_PROGRESS) return;
+
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
         if (!pWho || pWho == m_creature)
             return;
 

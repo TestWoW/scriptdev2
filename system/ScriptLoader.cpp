@@ -236,6 +236,7 @@ extern void AddSC_boss_ptheradras();
 extern void AddSC_boss_onyxia();                            // onyxias_lair
 extern void AddSC_instance_onyxias_lair();
 extern void AddSC_boss_amnennar_the_coldbringer();          // razorfen_downs
+extern void AddSC_boss_tuten_kash();
 extern void AddSC_razorfen_downs();
 extern void AddSC_instance_razorfen_kraul();                // razorfen_kraul
 extern void AddSC_razorfen_kraul();
@@ -596,7 +597,10 @@ void AddScripts()
     AddSC_instance_blackwing_lair();
     AddSC_deadmines();                                      // deadmines
     AddSC_boss_mr_smite();
+<<<<<<< HEAD
     AddSC_boss_mr_smite();
+=======
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
     AddSC_instance_deadmines();
     AddSC_gnomeregan();                                     // gnomeregan
     AddSC_boss_thermaplugg();
@@ -762,6 +766,7 @@ void AddScripts()
     AddSC_boss_onyxia();                                    // onyxias_lair
     AddSC_instance_onyxias_lair();
     AddSC_boss_amnennar_the_coldbringer();                  // razorfen_downs
+    AddSC_boss_tuten_kash();
     AddSC_razorfen_downs();
     AddSC_instance_razorfen_kraul();                        // razorfen_kraul
     AddSC_razorfen_kraul();

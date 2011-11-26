@@ -1,7 +1,6 @@
--- For YTDB s
-DELETE FROM scripted_areatrigger WHERE entry=3626;
-INSERT INTO scripted_areatrigger VALUES (3626, 'at_vaelastrasz');
-
+-- ----------------------
+-- QUEST && Ect Support -
+-- ----------------------
 -- temp fix need to find true fix
 -- help fix quest 12813 currently
 -- insert been commented out til i figure out how to handle this guy in this area  he shouldn't be here like this or in this form or something
@@ -10,72 +9,65 @@ DELETE FROM `creature` WHERE `id`=29560;
 -- (88692, 29560, 571, 1, 1, 0, 0, 7458.74, 4846.24, 54.1606, 0.0676441, 300, 0, 0, 63000, 19970, 0, 0);
 
 
--- -----------------------------------
--- mangosR2 EAI CleanUp for quests/sd2
--- -----------------------------------
-
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 25316;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 26127;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 27483;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 27600;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 28610;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 28939;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 29199;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 29200;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 29204;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 29206;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 29219;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 32149;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 32257;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 36626;
-DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 36678;
-
--- fixes for YTDB DB update
-UPDATE creature_template SET ScriptName='' WHERE entry IN (35035, 35770, 35771, 35766);
-UPDATE creature_template SET ScriptName='' WHERE entry=36549;
-UPDATE `creature_template` SET `npcflag`=1, `scriptname`='npc_toc_announcer' WHERE `entry`=34816;  -- needed to be rerun
-UPDATE `creature_template` SET `pickpocketloot` = 0 WHERE `entry` = 37444;
-UPDATE `creature_template` SET `pickpocketloot` = 0 WHERE `entry` = 31818;
-UPDATE `creature_template` SET `pickpocketloot` = 0 WHERE `entry` = 37283;
-UPDATE `creature_template` SET `AIName` = 'EventAI', `ScriptName` = '' WHERE `entry` = 20159;
-
-
-DELETE FROM `gameobject` WHERE `id`=190643;
-INSERT INTO `gameobject` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`position_x`,`position_y`,`position_z`,`orientation`,`rotation0`,`rotation1`,`rotation2`,`rotation3`,`spawntimesecs`,`animprogress`,`state`) VALUES
-(310000, 190643, 571, 1, 1, 5545.45, 5767.53, -77.8042, 5.39307, 0, 0, 0.959937, 0.280215, -25, 0, 1),
-(47391, 190643, 571, 1, 1, 5547.61, 5767.75, -78.0231, 4.08966, 0, 0, 0.889734, -0.456479, -120, 100, 1);
-
--- EAI Text clean up for quests/sd2
-DELETE FROM `creature_ai_texts` WHERE (`entry`='-1120') OR (`entry`='-1121') OR (`entry`='-1122') OR (`entry`='-1123') OR (`entry`='-1124') OR (`entry`='-1125') OR (`entry`='-1126') OR (`entry`='-1127') OR (`entry`='-1128');
-DELETE FROM `creature_ai_texts` WHERE (`entry`='-555') OR (`entry`='-556') OR (`entry`='-557') OR (`entry`='-558') OR (`entry`='-559') OR (`entry`='-560') OR (`entry`='-561') OR (`entry`='-562') OR (`entry`='-563') OR (`entry`='-564') OR (`entry`='-565');
-DELETE FROM `creature_ai_texts` WHERE (`entry`='-696') OR (`entry`='-697');
-DELETE FROM `creature_ai_texts` WHERE (`entry`='-312491') OR (`entry`='-312492') OR (`entry`='-312493');
-
--- Official Sd2 Clean up
-DELETE FROM scripted_event_id WHERE id = 9735;
-
--- ------------------------------------
--- -   Events, Holidays & Ect  Area ---
--- -------------------------------- ---
-
--- Fixed Correct spell on bobbing apples ( Hallo Event )
-UPDATE `item_template` SET `spellid_1` = 24707 WHERE `entry` = 20516;
-
 -- ----------------------------------------------------------------
 -- Start of Quest and related data and fixes ----------------------
 -- ----------------------------------------------------------------
 
+
+-- -------------
+-- Quest 11560 -
+-- -------------
+UPDATE `gameobject_template` SET `ScriptName` = "", `data2` = 11560 WHERE `entry` = 187373;
+UPDATE `creature_template` SET `ScriptName` = "npc_tadpole" WHERE `entry` = 25201;
+UPDATE `creature` SET `MovementType` = 0 WHERE `id` = 25201;
+DELETE FROM `scripted_event_id` WHERE `id` = 11560;
+INSERT INTO `scripted_event_id` (`id`,`ScriptName`) VALUES (11560,"go_tadpole_cage"); 
+
+-- --------------
+-- Quest 12240  -
+-- --------------
+UPDATE `creature_template` SET `modelid_1` = 17612 WHERE `entry` = 27353;
+DELETE FROM `creature` WHERE `id`=27238;
+UPDATE `creature_template` SET `armor` = 7618, `faction_A` = 67, `faction_H` = 67 WHERE `entry` = 27238;
+
+-- -------------
+-- Quest 14104 -
+-- -------------
+DELETE FROM `event_scripts` WHERE `id` = 22030;
+INSERT INTO `event_scripts` (`id`,`delay`,`command`,`datalong`,`datalong2`,`x`,`y`,`z`,`o`,`comments`) VALUES (22030,3,10,35012,300000,10006.4,650.6,10.34,4.542,"");
+
+DELETE FROM `creature_equip_template` WHERE (`entry`=110000);
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES (110000, 34816, 34816, 0);
+
+UPDATE `creature_template` SET `equipment_id` = 110000 WHERE `entry` = 35012;
+
+-- ------------
+-- Quest 9164 -
+-- ------------
+UPDATE `creature_template` SET `modelid_2` = 18682 WHERE `entry` = 16206;
+DELETE FROM `creature` WHERE `id`=16206;
+INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`) VALUES
+(75331, 16206, 530, 1, 1, 0, 0, 6435.93, -6636.06, 108.881, 0.270366, 600, 0, 0, 247, 0, 0, 0);
+
+UPDATE `creature_template` SET `modelid_2` = 16113 WHERE `entry` = 16208;
+DELETE FROM `creature` WHERE `id`=16208;
+INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`) VALUES
+(81222, 16208, 530, 1, 1, 0, 0, 6640.26, -6343.53, 8.94499, 4.61578, 600, 0, 0, 247, 0, 0, 0);
+
+UPDATE `creature_template` SET `modelid_2` = 18683 WHERE `entry` = 16209;
+DELETE FROM `creature` WHERE `id`=16209;
+INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`) VALUES
+(81221, 16209, 530, 1, 1, 0, 0, 6287.23, -6365.73, 79.4685, 4.04323, 600, 0, 0, 247, 0, 0, 0);
+
 -- ---
 -- -Quest 8468
 -- ---
-
 -- Thaelis has wrong faction was gettting killed by his own kind 8P
 UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16 WHERE `entry` = 15949;
 
 -- ------------
 -- Quest 13663
 -- ------------
-
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_black_knights_gryphon' WHERE `entry` = 33519;
 UPDATE creature_template SET vehicle_id = 402 WHERE entry = 33519; -- vehicle_id can be 88 107 108 112 143 etc.
 UPDATE creature_template SET KillCredit1 = 33341 WHERE entry = 33229;
@@ -645,20 +637,26 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equ
 -- -------------------------------------------------
 
 -- Azaloth (21506)
--- UPDATE `creature_template` SET `AIName` = 'EventAI', `ScriptName` = '' WHERE `entry` = 21506;
--- UPDATE `creature_template` SET `modelid_2` = 17287 WHERE `entry` = 21506; -- this isnt correct display yet
 
--- DELETE FROM creature_ai_scripts WHERE creature_id=21506;
--- INSERT INTO creature_ai_scripts VALUES
--- (2150601,21506,8,0,100,1,37834,-1,0,0,1,-21506,0,0,21,6,0,0,16,21892,37834,6,'Azaloth  - Yell and Start Combat Movements'),
--- (2150602,21506,3,0,100,0,0,0,0,0,0,28,0,37833,0,0,0,0,0,0,0,0,'Azaloth  - Yell and Start Combat Movements'),
--- (2150603,21506,0,0,100,1,4000,4000,8000,8000,11,40504,1,0,0,0,0,0,0,0,0,0,'Azaloth - Cast Cleave'),
--- (2150604,21506,0,0,100,1,3000,3000,17000,17000,11,11443,1,1,0,0,0,0,0,0,0,0,'Azaloth Cast Cripple'),
--- (2150605,21506,0,0,100,1,10000,12000,33000,33000,11,38741,4,3,0,0,0,0,0,0,0,0,'Azaloth - Cast Rain of Fire'),
--- (2150606,21506,0,0,100,1,6000,6000,14000,14000,11,38750,1,3,0,0,0,0,0,0,0,0,'Azaloth - Cast War Stomp');
+-- TODO ( really tired right now)
+-- still need to make him attack and make the circle of casters around him being channeled a dumby spell -> only visual stuff is missing
 
--- DELETE FROM creature_ai_texts WHERE entry=-21506;
--- INSERT INTO creature_ai_texts (entry,content_default,type,comment) VALUES
--- (-21506,'Illidan\s lapdogs! You will pay for my imprisonment with your lives!',1,'Azaloth yell1');
+UPDATE `creature_template` SET `AIName` = 'EventAI', `ScriptName` = '' WHERE `entry` = 21506;
+UPDATE `creature_template` SET `modelid_2` = 17287 WHERE `entry` = 21506; -- this isnt correct display yet
 
--- not finished with this
+DELETE FROM creature_ai_scripts WHERE creature_id=21506;
+INSERT INTO creature_ai_scripts VALUES
+(2150601, 21506, 8, 0, 100, 1, 37834, -1, 0, 0, 1, -21506, 0, 0, 28, 0, 37833, 0, 33, 21892, 6, 0, 'Azaloth  - Yell and Start Combat Movements -R2'),
+(2150602,21506,0,0,100,1,4000,4000,8000,8000,11,40504,1,0,0,0,0,0,0,0,0,0,'Azaloth - Cast Cleave-R2'),
+(2150603,21506,0,0,100,1,3000,3000,17000,17000,11,11443,1,1,0,0,0,0,0,0,0,0,'Azaloth Cast Cripple-R2'),
+(2150604,21506,0,0,100,1,10000,12000,33000,33000,11,38741,4,3,0,0,0,0,0,0,0,0,'Azaloth - Cast Rain of Fire-R2'),
+(2150605,21506,0,0,100,1,6000,6000,14000,14000,11,38750,1,3,0,0,0,0,0,0,0,0,'Azaloth - Cast War Stomp-R2');
+
+
+DELETE FROM creature_ai_texts WHERE entry=-21506;
+INSERT INTO creature_ai_texts (entry,content_default,type,comment) VALUES
+(-21506,'Illidan\s lapdogs! You will pay for my imprisonment with your lives!',1,'Azaloth yell1');
+
+DELETE FROM `creature_template_addon` WHERE (`entry`=21506);
+INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_pvp_state`, `emote`, `moveflags`, `auras`) VALUES (21506, 0, 0, 0, 0, 0, 0, '');
+

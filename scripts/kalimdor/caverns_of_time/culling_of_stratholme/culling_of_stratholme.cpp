@@ -17,8 +17,13 @@
 
 
 /* ScriptData
+<<<<<<< HEAD
 SDName: culling_of_stratholme
 SD%Complete:
+=======
+SDName: instance_culling_of_stratholme
+SD%Complete: %
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 SDComment:
 EndScriptData */
 
@@ -1179,6 +1184,7 @@ bool GossipHello_npc_chromi_middle(Player* pPlayer, Creature* pCreature)
 
 bool GossipSelect_npc_chromi_middle(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
 {
+<<<<<<< HEAD
     char const* GOSSIP_ITEM_CHROMI2;
     char const* GOSSIP_ITEM_CHROMI3;
 
@@ -1205,6 +1211,8 @@ bool GossipSelect_npc_chromi_middle(Player* pPlayer, Creature* pCreature, uint32
                       break;
     }
 
+=======
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
     if (ScriptedInstance* m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData()))
       if (m_pInstance->GetData(TYPE_INTRO) != NOT_STARTED) return true;
 
@@ -1287,6 +1295,7 @@ bool GossipHello_npc_arthas(Player* pPlayer, Creature* pCreature)
 {
     ScriptedInstance* pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
 
+<<<<<<< HEAD
     char const* GOSSIP_ITEM_ARTHAS_1;
     char const* GOSSIP_ITEM_ARTHAS_2;
     char const* GOSSIP_ITEM_ARTHAS_3;
@@ -1321,6 +1330,8 @@ bool GossipHello_npc_arthas(Player* pPlayer, Creature* pCreature)
                       break;
     }
 
+=======
+>>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
     if (pInstance && pInstance->GetData(TYPE_PHASE) == 0)
     {
        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_ARTHAS_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
