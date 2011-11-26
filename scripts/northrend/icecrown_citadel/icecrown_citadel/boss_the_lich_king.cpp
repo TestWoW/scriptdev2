@@ -769,7 +769,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
         m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
-        m_creature->LoadCreatureAddon(false);
+        m_creature->LoadCreatureAddon();
         m_bIsFinalPhase = false;
         m_bInFrostmourne = false;
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
