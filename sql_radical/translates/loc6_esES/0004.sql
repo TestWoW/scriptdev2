@@ -1,4 +1,4 @@
-UPDATE `script_texts` SET `content_loc6` = '¡%s comienza a desatar almas!' WHERE `entry` = -1632022;
+SET NAMES UTF8;
 
 -- Matanza de Stratholme
 
@@ -13,7 +13,7 @@ UPDATE `script_texts` SET `content_loc6` = 'Entonces debo considerar esto un act
 UPDATE `script_texts` SET `content_loc6` = '¿Eso crees? Lord Uther, ¡por mi derecho de sucesión y soberanía de mi corona, y a partir de este momento, te relevo de tu cargo y suspendo a tus paladines del servicio!' WHERE `entry` = -1594082;
 UPDATE `script_texts` SET `content_loc6` = '¡Ya está! Aquellos que tengáis la voluntad de salvar esta tierra, seguidme. Los demás... salid de mi vista.' WHERE `entry` = -1594084;
 UPDATE `script_texts` SET `content_loc6` = '¿Jaina?' WHERE `entry` = -1594086;
-UPDATE `script_texts` SET `content_loc6` = 'Colocaos aquí, y yo guiaré un pequeño ejército a Stratholme para comenzar la matanza. Debemos contener y purgar a los infectados por el bien de todo Lordaeron' WHERE `entry` = -1594088;
+UPDATE `script_texts` SET `content_loc6` = 'Colocaos aquí, y yo guiaré un pequeño ejército a Stratholme para comenzar la matanza. Debemos contener y purgar a los infectados por el bien de todo Lordaeron.' WHERE `entry` = -1594088;
 UPDATE `script_texts` SET `content_loc6` = 'Parece que todo el mundo está listo. Recordad: esta gente está infectada por la peste y pronto morirá. Debemos purgar Stratholme para proteger de la Plaga lo que queda de Lordaeron. Vamos.' WHERE `entry` = -1594089;
 UPDATE `script_texts` SET `content_loc6` = 'Príncipe Arthas, que la luz te bendiga. Mucha gente en la ciudad está teniendo serios problemas. ¿Puedes ayudarnos?' WHERE `entry` = -1594090;
 UPDATE `script_texts` SET `content_loc6` = 'Sólo puedo ayudarte con una muerte limpia.' WHERE `entry` = -1594091;
@@ -43,7 +43,7 @@ UPDATE `script_texts` SET `content_loc6` = 'Descansad un momento y limpiad vuest
 UPDATE `script_texts` SET `content_loc6` = '¡Ya basta! Debemos seguir moviéndonos. Mal\'Ganis espera.' WHERE `entry` = -1594162;
 UPDATE `script_texts` SET `content_loc6` = 'Al fin un poco de suerte. La pila del mercado todavía no se ha incendiado. Se supone que Mal\'Ganis está en la plaza de los cruzados que está justo delante. Cuando estéis listos para continuar, decídmelo.' WHERE `entry` = -1594163;
 UPDATE `script_texts` SET `content_loc6` = 'Se hará justicia.' WHERE `entry` = -1594164;
-UPDATE `script_texts` SET `content_loc6` = 'Vamos a poner fin a esto ahora, Mal\'Ganis.' WHERE `entry` = -1594181;
+UPDATE `script_texts` SET `content_loc6` = 'Vamos a poner fin a esto ahora, Mal\'Ganis. Somos tú y yo.' WHERE `entry` = -1594181;
 UPDATE `script_texts` SET `content_loc6` = '¡Te perseguiré hasta el fin del mundo si debo! ¿Me oyes? ¡HASTA EL FIN DEL MUNDO!' WHERE `entry` = -1594183;
 UPDATE `script_texts` SET `content_loc6` = 'Habéis actuado bien hoy. Cualquier cosa que Mal\'Ganis haya dejado atrás, es vuestra. Tomadla como recompensa. Ahora he de comenzar a planear una expedición a Rasganorte.' WHERE `entry` = -1594184;
 
@@ -207,3 +207,83 @@ UPDATE `script_texts` SET `content_loc6`='¡Acabaré con el Kirin Tor!' WHERE `e
 UPDATE `script_texts` SET `content_loc6`='¡Dalaran caerá!' WHERE `entry`='-1608052' ;
 UPDATE `script_texts` SET `content_loc6`='¡Así acaba tu desafío al Tejehechizos!' WHERE `entry`='-1608053' ;
 UPDATE `script_texts` SET `content_loc6`='Quizá... os hallamos... subestimado...' WHERE `entry`='-1608054' ;
+
+-- EL OCULUS
+
+UPDATE `script_texts` SET `content_loc6`='¡Los prisioneros no serán liberados! ¡La palabra de Malygos es ley!' WHERE `entry`='-1578000' ;
+UPDATE `script_texts` SET `content_loc6`='¡Un castigo apropiado!' WHERE `entry`='-1578001' ;
+UPDATE `script_texts` SET `content_loc6`='¡Sentencia ejecutada!' WHERE `entry`='-1578002' ;
+UPDATE `script_texts` SET `content_loc6`='¡Otra baja de guerra!' WHERE `entry`='-1578003' ;
+UPDATE `script_texts` SET `content_loc6`='La guerra... continúa...' WHERE `entry`='-1578004' ;
+UPDATE `script_texts` SET `content_loc6`='¡Es demasiado tarde para correr!' WHERE `entry`='-1578005' ;
+UPDATE `script_texts` SET `content_loc6`='¡Reuníos!' WHERE `entry`='-1578006' ;
+UPDATE `script_texts` SET `content_loc6`='¡Nadie escapará!' WHERE `entry`='-1578007' ;
+UPDATE `script_texts` SET `content_loc6`='¡Os condeno... a... muerte!' WHERE `entry`='-1578008' ;
+UPDATE `script_texts` SET `content_loc6`='¡Temblad, gusanos!' WHERE `entry`='-1578009' ;
+UPDATE `script_texts` SET `content_loc6`='¡Os aplastaré!' WHERE `entry`='-1578010' ;
+UPDATE `script_texts` SET `content_loc6`='¿Podéis volar?' WHERE `entry`='-1578011' ;
+
+UPDATE `script_texts` SET `content_loc6`='¡Pobres necios ciegos!' WHERE `entry`='-1578012' ;
+UPDATE `script_texts` SET `content_loc6`='Si pudieras entenderlo...' WHERE `entry`='-1578013' ;
+UPDATE `script_texts` SET `content_loc6`='Ahora lo ves, ¿VERDAD?' WHERE `entry`='-1578014' ;
+UPDATE `script_texts` SET `content_loc6`='Desafortunado, pero necesario.' WHERE `entry`='-1578015' ;
+UPDATE `script_texts` SET `content_loc6`='Todo lo que he hecho... ha sido por Azeroth.' WHERE `entry`='-1578016' ;
+UPDATE `script_texts` SET `content_loc6`='¡Una muestra... una pequeña muestra del poder del Tejehechizos!' WHERE `entry`='-1578017' ;
+UPDATE `script_texts` SET `content_loc6`='Tanta energía inestable... ¡pero vale la pena correr el riesgo de destruiros!' WHERE `entry`='-1578018' ;
+UPDATE `script_texts` SET `content_loc6`='Qué tenemos aquí... ¿Aquellos que se atreven a desafiar al Tejehechizos? ¿Aquellos a los que les falta previsión y entendimiento? ¿Cómo puedo explicaroslo? ¡Malygos está intentado salvar al mundo de sí mismo! ¡Bah! ¡No malgastéis mi tiempo!' WHERE `entry`='-1578019' ;
+UPDATE `script_texts` SET `content_loc6`='Es evidente que mis mascotas han fracasado. Quizá sea necesaria otra demostración.' WHERE `entry`='-1578020' ;
+UPDATE `script_texts` SET `content_loc6`='Seguís luchando. Seguís aferrándoos a principios erróneos. Si sobrevivís, me encontraréis en el anillo central.' WHERE `entry`='-1578021' ;
+
+UPDATE `script_texts` SET `content_loc6`='No habrá piedad.' WHERE `entry`='-1578022' ;
+UPDATE `script_texts` SET `content_loc6`='¡El Oculus es nuestro!' WHERE `entry`='-1578023' ;
+UPDATE `script_texts` SET `content_loc6`='¡Te avisé!' WHERE `entry`='-1578024' ;
+UPDATE `script_texts` SET `content_loc6`='¡Son demasiado... fuertes! ¡Hemos subestimado... su fortaleza!' WHERE `entry`='-1578025' ;
+UPDATE `script_texts` SET `content_loc6`='¡Reventadlos! ¡Acabad con ellos!' WHERE `entry`='-1578026' ;
+UPDATE `script_texts` SET `content_loc6`='¡No toméis prisioneros! ¡Atacad!' WHERE `entry`='-1578027' ;
+UPDATE `script_texts` SET `content_loc6`='¡Atacad ahora! ¡Borradlos del mapa!' WHERE `entry`='-1578028' ;
+UPDATE `script_texts` SET `content_loc6`='Intrusos, vuestra victoria será efímera. Soy el comandante Varos Zancanubes. Mis dracos controlan el cielo y protegen este conducto. Yo me encargaré personalmente de que El Oculus no caiga en vuestro poder.' WHERE `entry`='-1578029' ;
+
+UPDATE `script_texts` SET `content_loc6`='¡Entrometidos descarados, estáis fuera de vuestro elemento! ¡Os enterraré!' WHERE `entry`='-1578030' ;
+UPDATE `script_texts` SET `content_loc6`='Hay mucha caída...' WHERE `entry`='-1578031' ;
+UPDATE `script_texts` SET `content_loc6`='¡Vuelve a la tierra!' WHERE `entry`='-1578032' ;
+UPDATE `script_texts` SET `content_loc6`='¡Disfruta de la caída!' WHERE `entry`='-1578033' ;
+UPDATE `script_texts` SET `content_loc6`='Saboread esta pequeña victoria, criaturitas insensatas. Vosotros y vuestros aliados dragones habéis ganado esta batalla, pero nosotros ganaremos la guerra de El Nexo.' WHERE `entry`='-1578034' ;
+UPDATE `script_texts` SET `content_loc6`='¡Mandamos sobre lo Arcano! ¡No se puede usar contra nosotros!' WHERE `entry`='-1578035' ;
+UPDATE `script_texts` SET `content_loc6`='¡Es absurdo intentar extinguir tu fuego!' WHERE `entry`='-1578036' ;
+UPDATE `script_texts` SET `content_loc6`='¡La magia de la naturaleza no os ayudará ahora!' WHERE `entry`='-1578037' ;
+UPDATE `script_texts` SET `content_loc6`='Tanta insolencia... tanta arrogancia... ¡Deben ser CASTIGADAS!' WHERE `entry`='-1578038' ;
+UPDATE `script_texts` SET `content_loc6`='Simplones, no podéis comprender las fuerzas que habéis puesto en marcha. El conducto de líneas ley no será interrumpido. Vuestra derrota será TOTAL.' WHERE `entry`='-1578039' ;
+
+-- BRANN BARBABRONCE (CAMARAS DE PIEDRA)
+
+UPDATE `script_texts` SET `content_loc6`='¡¿Loken?! Ya me estoy hartando... puede que hayamos neutralizado a los enanos férreos, ¡pero apostaría a que en otra parte hay otra máquina escupiendo un montón de esos vrykuls férreos!' WHERE `entry` = '-1599062';
+UPDATE `script_texts` SET `content_loc6`='Usaré la Forja para hacer terráneos que harán guardia... pero nuestro gran desafío continua: ¡Encontrar y detener a Loken!' WHERE `entry` = '-1599063';
+UPDATE `script_texts` SET `content_loc6`='¡Tranquilos! ¡El viejo Brann os cubre las espaldas! Distraed a ese monstruo de metal y yo veré si puedo convencer a esta máquina de que os ayude.' WHERE `entry` = '-1599069';
+
+-- ORMOROK & ANOMALUS (ENTRADAS CORREGIDAS) (EL NEXO)
+
+UPDATE `script_texts` SET `content_loc6`='¡Nooo!' WHERE `entry` = '-1576006';
+UPDATE `script_texts` SET `content_loc6`='¡Aaaagh!' WHERE `entry` = '-1576007';
+UPDATE `script_texts` SET `content_loc6`='¡Atrás!' WHERE `entry` = '-1576008';
+UPDATE `script_texts` SET `content_loc6`='¡Devolver!' WHERE `entry` = '-1576009';
+UPDATE `script_texts` SET `content_loc6`='¡Sangrar!' WHERE `entry` = '-1576010';
+
+UPDATE `script_texts` SET `content_loc6`='El caos se avecina.' WHERE `entry`='-1576011' ;
+UPDATE `script_texts` SET `content_loc6`='Claro...' WHERE `entry`='-1576012' ;
+UPDATE `script_texts` SET `content_loc6`='La realidad... desterrada...' WHERE `entry`='-1576013' ;
+UPDATE `script_texts` SET `content_loc6`='Indestructible...' WHERE `entry`='-1576014' ;
+UPDATE `script_texts` SET `content_loc6`='La expiración... es necesaria...' WHERE `entry`='-1576015' ;
+
+-- MATANZA
+
+UPDATE `script_texts` SET `content_loc6`='Mmm... ¿qué es ese mal olor?' WHERE `entry`='-1597280' ;
+UPDATE `script_texts` SET `content_loc6`='No puedo ser yo, me bañé hace 3 días.' WHERE `entry`='-1597281' ;
+UPDATE `script_texts` SET `content_loc6`='Oh, mierda... parece ser que viene de este grano.' WHERE `entry`='-1597282' ;
+UPDATE `script_texts` SET `content_loc6`='Espera un momento... se supone que este grano lo están buscando. Voy a avisar a un guardia.' WHERE `entry`='-1597283' ;
+UPDATE `script_texts` SET `content_loc6`='No puede ser...' WHERE `entry`='-1597295' ;
+
+-- VARIOS
+
+UPDATE `script_texts` SET `content_loc6`='¿Qué chuchos son los que se atreven a irrumpir aquí? ¡Adelante, hermanos! ¡Un festín para quien me traiga sus cabezas!' WHERE `entry`='-1575019' ;
+
+UPDATE `script_texts` SET `content_loc7` = `content_loc6`;
