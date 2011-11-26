@@ -597,10 +597,6 @@ void AddScripts()
     AddSC_instance_blackwing_lair();
     AddSC_deadmines();                                      // deadmines
     AddSC_boss_mr_smite();
-<<<<<<< HEAD
-    AddSC_boss_mr_smite();
-=======
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
     AddSC_instance_deadmines();
     AddSC_gnomeregan();                                     // gnomeregan
     AddSC_boss_thermaplugg();

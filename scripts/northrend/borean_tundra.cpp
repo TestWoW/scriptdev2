@@ -835,25 +835,17 @@ enum
 
 const int32 textNotOnQuest[3] =
 {
-<<<<<<< HEAD
--1039999, -1039998, -1039997
-=======
     -1999825, 
     -1999826,
     -1999827
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 };
 
 const int32 textOnQuest[4] =
 {
-<<<<<<< HEAD
-   -1039996, -1039995, -1039994, -1039993
-=======
    -1999828,
    -1999829,
    -1999830,
    -1999831
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 };
 
 bool ProcessEventId_go_tadpole_cage(uint32 uiEventId, Object* pSource, Object* pTarget, bool bIsStart)

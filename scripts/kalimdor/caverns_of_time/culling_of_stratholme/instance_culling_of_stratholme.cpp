@@ -18,11 +18,7 @@
 
 /* ScriptData
 SDName: instance_culling_of_stratholme
-<<<<<<< HEAD
 SD%Complete:
-=======
-SD%Complete: %
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 SDComment:
 EndScriptData */
 
@@ -166,11 +162,7 @@ struct MANGOS_DLL_DECL instance_culling_of_stratholme : public ScriptedInstance
        {
            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
            {
-<<<<<<< HEAD
                 pChromi->MonsterWhisper("Has hecho un buen trabajo con las cajas. Ven a verme a la entrada de Stratholme, te estaré esperando.", i->getSource(), false);
-=======
-                pChromi->MonsterWhisper("Good work with crates! Come to me in front of Stratholme for your next assignment!", i->getSource(), false);
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
                 i->getSource()->KilledMonsterCredit(NPC_CRATE_KC_BUNNY, pChromi->GetObjectGuid());
                 i->getSource()->DestroyItemCount(ITEM_ARCANE_DISRUPTOR, 1, true);
             }

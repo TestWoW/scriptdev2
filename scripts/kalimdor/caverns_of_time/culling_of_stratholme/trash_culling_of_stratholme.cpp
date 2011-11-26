@@ -17,13 +17,8 @@
 
 
 /* ScriptData
-<<<<<<< HEAD
 SDName: trash_culling_of_stratholme
 SD%Complete:
-=======
-SDName: instance_culling_of_stratholme
-SD%Complete: %
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 SDComment:
 EndScriptData */
 
@@ -1096,8 +1091,4 @@ void AddSC_trash_culling_of_stratholme()
     pNewScript->Name = "npc_time_riftCS";
     pNewScript->GetAI = &GetAI_npc_time_riftCS;
     pNewScript->RegisterSelf();
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b

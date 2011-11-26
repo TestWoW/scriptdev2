@@ -15,8 +15,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-<<<<<<< HEAD
-=======
 /* ScriptData
 SDName: Battleground_IoC
 SD%Complete: %?
@@ -24,7 +22,6 @@ SDComment: Battleground isle of conquest
 SDCategory: Battleground_IoC
 EndScriptData */
 
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 #include "precompiled.h"
 #include "BattleGroundIC.h"
 #include "Vehicle.h"

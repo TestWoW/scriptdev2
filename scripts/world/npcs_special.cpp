@@ -2165,11 +2165,7 @@ CreatureAI* GetAI_npc_eye_of_kilrogg(Creature* pCreature)
 }
 
 /*########
-<<<<<<< HEAD
-# npc_horseman_fire_bunnyAI
-=======
 # npc_fire_bunny
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 #########*/
 
 enum
@@ -2241,11 +2237,7 @@ CreatureAI* GetAI_npc_horseman_fire_bunny(Creature* pCreature)
 };
 
 /*########
-<<<<<<< HEAD
-npc_shade_of_horseman
-=======
 # npc_shade of horseman
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 #########*/
 
 struct MANGOS_DLL_DECL npc_shade_of_horsemanAI : public ScriptedAI
@@ -2272,11 +2264,7 @@ struct MANGOS_DLL_DECL npc_shade_of_horsemanAI : public ScriptedAI
         m_uiEventTimer = 2.5*MINUTE*IN_MILLISECONDS;
 
         m_uiConflagrationTimer = 30000;
-<<<<<<< HEAD
-        m_uiConflagrationProcTimer = 1500;
-=======
         m_uiConflagrationProcTimer = 2000;
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 
         DoCastSpellIfCan(m_creature, SPELL_HORSEMAN_MOUNT);
         DoCastSpellIfCan(m_creature, SPELL_HORSMAN_SHADE_VIS);
@@ -2348,11 +2336,7 @@ struct MANGOS_DLL_DECL npc_shade_of_horsemanAI : public ScriptedAI
             bIsConflagrating = !bIsConflagrating;
             m_creature->GetMotionMaster()->MovementExpired();
             m_creature->GetMotionMaster()->MoveTargetedHome();
-<<<<<<< HEAD
-            m_uiConflagrationProcTimer = 1500;
-=======
             m_uiConflagrationProcTimer = 2000;
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
             m_uiConflagrationTimer = bIsConflagrating ? 10000 : 30000;
             if (bIsConflagrating)
                 DoScriptText(YELL_CONFLAGRATION, m_creature);
@@ -2363,11 +2347,7 @@ struct MANGOS_DLL_DECL npc_shade_of_horsemanAI : public ScriptedAI
         if (bIsConflagrating)
             if (m_uiConflagrationProcTimer < uiDiff)
             {
-<<<<<<< HEAD
-                m_uiConflagrationProcTimer = 1500;
-=======
                 m_uiConflagrationProcTimer = 2000;
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
                 if (lFireBunnies.empty())
                 {
                     std::list<Creature*> tempFireBunnies;
@@ -2391,24 +2371,12 @@ struct MANGOS_DLL_DECL npc_shade_of_horsemanAI : public ScriptedAI
                     if (Creature* pFireBunny = m_creature->GetMap()->GetCreature(*itr))
                         if (!pFireBunny->HasAura(SPELL_FLAMES_LARGE))
                         {
-<<<<<<< HEAD
-                            if (m_creature->GetDistance(pFireBunny) > 25.0f)
-                            {
-                                float x,y,z;
-                                pFireBunny->GetPosition(x,y,z);
-                                m_creature->GetMotionMaster()->MovePoint(0, x, y, z+20);
-                            }
-                            else
-                            {
-                                DoCastSpellIfCan(pFireBunny, SPELL_CONFLAGRATE, CAST_TRIGGERED);
-=======
                             if (DoCastSpellIfCan(pFireBunny, SPELL_CONFLAGRATE) != CAST_OK)
                             {
                                 float x,y,z;
                                 pFireBunny->GetPosition(x,y,z);
                                 pFireBunny->GetClosePoint(x,y,z,0,5,0);
                                 m_creature->GetMotionMaster()->MovePoint(0, x,y,z+15);
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
                                 break;
                             }
                         }
@@ -2423,7 +2391,6 @@ CreatureAI* GetAI_npc_shade_of_horseman(Creature* pCreature)
     return new npc_shade_of_horsemanAI (pCreature);
 };
 
-<<<<<<< HEAD
 bool GossipHello_pilgrim_table(Player* pPlayer, Creature* pCreature)
 {
     char const* GOSSIP_SIT;
@@ -2484,8 +2451,6 @@ bool GossipSelect_pilgrim_table(Player* pPlayer, Creature* pCreature, uint32 uiS
     }
     return true;
 }
-=======
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 
 void AddSC_npcs_special()
 {
@@ -2609,13 +2574,10 @@ void AddSC_npcs_special()
     pNewScript->Name = "npc_shade_of_horseman";
     pNewScript->GetAI = &GetAI_npc_shade_of_horseman;
     pNewScript->RegisterSelf();
-<<<<<<< HEAD
 
     pNewScript = new Script;
     pNewScript->Name = "pilgrim_table";
     pNewScript->pGossipHello = &GossipHello_pilgrim_table;
     pNewScript->pGossipSelect = &GossipSelect_pilgrim_table;
     pNewScript->RegisterSelf();
-=======
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 }

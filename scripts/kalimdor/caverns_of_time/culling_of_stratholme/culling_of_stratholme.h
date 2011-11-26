@@ -15,16 +15,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-<<<<<<< HEAD
-=======
-
-/* ScriptData
-SDName: instance_culling_of_stratholme
-SD%Complete: %
-SDComment:
-EndScriptData */
-
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 #ifndef DEF_CULLING_OF_STRATHOLME_H
 #define DEF_CULLING_OF_STRATHOLME_H
 

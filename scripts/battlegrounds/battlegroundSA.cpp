@@ -113,11 +113,7 @@ struct MANGOS_DLL_DECL npc_sa_demolisherAI : public ScriptedAI
             {
                 if (factionSet == false)
                 {
-<<<<<<< HEAD
-                    m_creature->setFaction(bg->GetVehicleFaction(VEHICLE_BG_DEMOLISHER));  
-=======
                     m_creature->setFaction(bg->GetVehicleFaction(VEHICLE_BG_DEMOLISHER));
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
                     factionSet = true;
                 }
 

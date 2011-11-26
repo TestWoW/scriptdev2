@@ -17,13 +17,8 @@
 
 
 /* ScriptData
-<<<<<<< HEAD
 SDName: boss_infinite_corruptor
 SD%Complete:
-=======
-SDName: instance_culling_of_stratholme
-SD%Complete: %
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 SDComment:
 EndScriptData */
 
@@ -87,7 +82,6 @@ struct MANGOS_DLL_DECL boss_infinite_corruptorAI : public ScriptedAI
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
         m_creature->LoadCreatureAddon();
-<<<<<<< HEAD
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BONUS, IN_PROGRESS);
@@ -97,17 +91,6 @@ struct MANGOS_DLL_DECL boss_infinite_corruptorAI : public ScriptedAI
 
         m_creature->SetLootRecipient(NULL);
 
-=======
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_BONUS, IN_PROGRESS);
-
-        if (m_creature->isAlive())
-            m_creature->GetMotionMaster()->MoveTargetedHome();
-
-        m_creature->SetLootRecipient(NULL);
-
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
         Reset();
     }
 
@@ -148,8 +131,4 @@ void AddSC_boss_infinite_corruptor()
     pNewScript->Name = "boss_infinite_corruptor";
     pNewScript->GetAI = &GetAI_boss_infinite_corruptor;
     pNewScript->RegisterSelf();
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b

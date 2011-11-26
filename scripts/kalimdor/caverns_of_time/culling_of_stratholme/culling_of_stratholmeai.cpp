@@ -17,13 +17,8 @@
 
 
 /* ScriptData
-<<<<<<< HEAD
 SDName: culling_of_stratholmeai
 SD%Complete:
-=======
-SDName: instance_culling_of_stratholme
-SD%Complete: %
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 SDComment:
 EndScriptData */
 

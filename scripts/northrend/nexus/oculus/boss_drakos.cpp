@@ -404,22 +404,10 @@ void AddSC_boss_drakos()
 {
     Script *pNewScript;
 
-<<<<<<< HEAD
-    newscript = new Script;
-    newscript->Name = "drakos_event";
-    newscript->GetAI = &GetAI_drakos_event;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "boss_drakos";
-    newscript->GetAI = &GetAI_boss_drakos;
-    newscript->RegisterSelf();
-=======
     pNewScript = new Script;
     pNewScript->Name = "boss_drakos";
     pNewScript->GetAI = &GetAI_boss_drakos;
     pNewScript->RegisterSelf();
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
 
     pNewScript = new Script;
     pNewScript->Name = "npc_unstable_sphere";

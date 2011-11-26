@@ -242,10 +242,6 @@ class MANGOS_DLL_DECL instance_naxxramas : public ScriptedInstance
         std::string m_strInstData;
 
         GUIDList m_lThadTeslaCoilList;
-<<<<<<< HEAD
-        GUIDList m_lFaerlinaAddGUIDs;
-=======
->>>>>>> c07beaca8a3bcf7e50a1b9bbfb5d06c09b2d161b
         GUIDList m_lGothTriggerList;
 
         UNORDERED_MAP<ObjectGuid, GothTrigger> m_mGothTriggerMap;
