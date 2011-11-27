@@ -88,6 +88,7 @@ struct MANGOS_DLL_DECL boss_galdarahAI : public ScriptedAI
     uint32 m_uiStompTimer;
     uint32 m_uiEnrageTimer;
     uint8 m_uiAbilityCount;
+    uint32 m_uiAchievCount;
 
     void Reset()
     {
@@ -98,6 +99,7 @@ struct MANGOS_DLL_DECL boss_galdarahAI : public ScriptedAI
         m_uiPunctureTimer       = 25000;
         m_uiPhaseChangeTimer    = 7000;
         m_uiAbilityCount        = 0;
+        m_uiAchievCount         = 0;
     }
 
     void Aggro(Unit* pWho)
@@ -106,13 +108,19 @@ struct MANGOS_DLL_DECL boss_galdarahAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_GALDARAH , IN_PROGRESS);
+            m_pInstance->SetData(TYPE_ACHIEV_GALDARAH, IN_PROGRESS);
+        }
     }
 
      void JustReachedHome()
     {
         if(m_pInstance)
+        {
             m_pInstance->SetData(TYPE_GALDARAH, NOT_STARTED);
+            m_pInstance->SetData(TYPE_ACHIEV_GALDARAH, FAIL);
+        }
     }
     void KilledUnit(Unit* pVictim)
     {
@@ -129,10 +137,12 @@ struct MANGOS_DLL_DECL boss_galdarahAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_GALDARAH, DONE);
+            if (m_uiAchievCount >= 5)
+                m_pInstance->SetData(TYPE_ACHIEV_GALDARAH, DONE);
+        }
 
-        if (pKiller->HasAura(55817))
-            m_pInstance->DoCompleteAchievement(ACHIEVEMENT_WHAT_THE_ECK);
     }
 
     void JustSummoned(Creature* pSummoned)
@@ -247,8 +257,7 @@ struct MANGOS_DLL_DECL boss_galdarahAI : public ScriptedAI
                 {
                     DoScriptText(EMOTE_IMPALED, m_creature, pTarget);
                     m_uiSpecialAbilityTimer = 12000;
-
-                    
+                    ++m_uiAchievCount;
                 }
                 ++m_uiAbilityCount;
             }
