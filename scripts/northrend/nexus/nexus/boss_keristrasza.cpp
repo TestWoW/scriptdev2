@@ -129,6 +129,9 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
 
     void CheckAchievement()
     {
+        if (!m_pInstance)
+            return;
+
         Map* pMap = m_creature->GetMap();
         Map::PlayerList const& pPlayers = pMap->GetPlayers();
         if (!pPlayers.isEmpty())
@@ -146,8 +149,6 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
                             m_pInstance->SetData(TYPE_ACHIEV_KERISTRASZA, FAIL);
                             m_bAchievFailed = true;
                         }
-                        else
-                            m_bAchievFailed = false;
                     }
                 }
             }

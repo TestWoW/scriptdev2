@@ -192,7 +192,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (!m_bIsRegularMode && m_uiAchievTimer > 5000)
+        if (!m_bIsRegularMode && m_uiAchievTimer > 8000) // Added 3 sec because must not count cast time
             m_pInstance->SetData(TYPE_ACHIEV_TELESTRA, FAIL);
 
         switch(m_uiPhase)
@@ -224,8 +224,8 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                         if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_CLONES, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
                         {
                             DoScriptText(urand(0, 1) ? SAY_SPLIT_1 : SAY_SPLIT_2, m_creature);
-                            m_uiAchievTimer += uiDiff;
                             m_uiPhase = PHASE_2;
+                            m_uiAchievTimer = 0;
                         }
                     }
 
@@ -235,6 +235,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                         {
                             DoScriptText(urand(0, 1) ? SAY_SPLIT_1 : SAY_SPLIT_2, m_creature);
                             m_uiPhase = PHASE_2;
+                            m_uiAchievTimer = 0;
                         }
                     }
 
@@ -253,6 +254,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
             }
             case PHASE_2:
             {
+                m_uiAchievTimer += uiDiff;
                 break;
             }
         }
