@@ -1,5 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 MangosR2
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +16,7 @@
 
 /* ScriptData
 SDName: instance_ahnkahet
-SD%Complete: 0
+SD%Complete: 80%
 SDComment:
 SDCategory: Ahn'kahet
 EndScriptData */
@@ -26,8 +25,7 @@ EndScriptData */
 #include "ahnkahet.h"
 
 instance_ahnkahet::instance_ahnkahet(Map* pMap) : ScriptedInstance(pMap),
-
-m_uiDevicesActivated(0)
+    m_uiDevicesActivated(0)
 {
     Initialize();
 }
@@ -47,11 +45,16 @@ void instance_ahnkahet::OnCreatureCreate(Creature* pCreature)
         case NPC_JEDOGA_SHADOWSEEKER:
         case NPC_TALDARAM:
             break;
+        case NPC_TWILIGHT_INITIATE:
+            m_lTwilightInitiate.push_back(pCreature->GetObjectGuid());
+            break;
+        default:
+            return;
     }
     m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
 }
-
-void instance_ahnkahet::OnCreatureDeath(Creature *pCreature)
+	
+void instance_ahnkahet::OnCreatureDeath(Creature *pCreature)	
 {
     switch(pCreature->GetEntry())
     {
@@ -61,12 +64,12 @@ void instance_ahnkahet::OnCreatureDeath(Creature *pCreature)
         break;
     case NPC_TWILIGHT_VOLUNTEER:
         if (GetData(TYPE_JEDOGA) == IN_PROGRESS)
-            SetSpecialAchievementCriteria(TYPE_RESPECT_YOUR_ELDERS, false);
+            SetSpecialAchievementCriteria(TYPE_VOLUNTEER_WORK, false);
         break;
     default:
         break;
     }
-}
+}	
 
 void instance_ahnkahet::OnObjectCreate(GameObject* pGo)
 {
@@ -88,6 +91,8 @@ void instance_ahnkahet::OnObjectCreate(GameObject* pGo)
             if (m_auiEncounter[TYPE_TALDARAM] != NOT_STARTED)
                 DoUseDoorOrButton(GO_VORTEX);
             break;
+        default:
+            return;
     }
     m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
 }
@@ -171,7 +176,6 @@ void instance_ahnkahet::Load(const char* chrIn)
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }
-
 uint32 instance_ahnkahet::GetData(uint32 uiType)
 {
     switch(uiType)
@@ -208,7 +212,6 @@ void instance_ahnkahet::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet
     if (uiType < MAX_SPECIAL_ACHIEV_CRITS)
         m_abAchievCriteria[uiType] = bIsMet;
 }
-
 
 InstanceData* GetInstanceData_instance_ahnkahet(Map* pMap)
 {

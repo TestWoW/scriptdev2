@@ -409,8 +409,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
         if (m_bCombatStarted)
             return;
 
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster() &&
-            m_creature->GetDistance(pWho) < 50.0f)
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster() && m_creature->GetDistance(pWho) < 50.0f)
         {
             DoScriptText(SAY_AGGRO, m_creature);
             DoCastSpellIfCan(m_creature, SPELL_IMMUNITY, CAST_TRIGGERED);
@@ -462,6 +461,21 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
         m_uiSummonIter = (m_uiSummonIter + 1) % SUMMON_TYPES_NUMBER;
 
         m_creature->SummonCreature(uiEntry, SpawnLoc[loc].x, SpawnLoc[loc].y, SpawnLoc[loc].z, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+    }
+
+    void CheckAchiev(Unit *pCreature)
+    {
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                    pCreature->CastSpell(pTarget, SPELL_CHECK_ACHIEVEMENT, true);
+            }
+        }
     }
 
     void JustSummoned(Creature *pCreature)
@@ -523,9 +537,13 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
                 if (m_pInstance)
                 {
                     if (Creature *pDummy = m_pInstance->GetSingleCreatureFromStorage(NPC_COMBAT_TRIGGER))
+                    {
+                        CheckAchiev(pDummy);
                         m_creature->DealDamage(pDummy, pDummy->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
-                }
+                    }
 
+                    m_pInstance->SetData(TYPE_VALITHRIA, DONE);
+                }
                 m_uiOutroTimer = 30000;
                 m_creature->ForcedDespawn(10000);
             }
@@ -563,12 +581,9 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
             // check if encounter is completed
             if (fHP > 95.0f)
             {
-                DoCastSpellIfCan(m_creature, SPELL_CHECK_ACHIEVEMENT, CAST_TRIGGERED);
                 if (DoCastSpellIfCan(m_creature, SPELL_DREAMWALKER_RAGE) == CAST_OK)
                 {
                     DoScriptText(SAY_VICTORY, m_creature);
-                    //if (m_pInstance)
-                    //    m_pInstance->SetData(TYPE_VALITHRIA, DONE);
                     m_creature->RemoveAllAuras();
                     m_bIsHealed = true;
                     return;
@@ -785,6 +800,9 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         // Gut Spray
         if (m_uiGutSprayTimer <= uiDiff)

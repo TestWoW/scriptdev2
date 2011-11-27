@@ -169,10 +169,10 @@ struct MANGOS_DLL_DECL boss_devourer_of_soulsAI : public ScriptedAI
         m_lWellGuids.clear();
 
         if(TeamInInstance == ALLIANCE)
-            Creature *pJaina = m_creature->SummonCreature(NPC_JAINA_END, 5606.34033f, 2436.32129f, 705.9351f, 0.89f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            m_creature->SummonCreature(NPC_JAINA_END, 5606.34033f, 2436.32129f, 705.9351f, 0.89f, TEMPSUMMON_DEAD_DESPAWN, 0);
 
         if(TeamInInstance == HORDE)
-            Creature *pSylvanas = m_creature->SummonCreature(NPC_SILVANA_END, 5606.34033f, 2436.32129f, 705.9351f, 0.89f, TEMPSUMMON_DEAD_DESPAWN, 0);
+            m_creature->SummonCreature(NPC_SILVANA_END, 5606.34033f, 2436.32129f, 705.9351f, 0.89f, TEMPSUMMON_DEAD_DESPAWN, 0);
     }
 
     void JustReachedHome()
@@ -400,9 +400,11 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_fos_endAI: public ScriptedAI
         {
             Creature *pTemp = m_creature->SummonCreature(TeamInInstance == HORDE ? aEventEndLocations[i].uiEntryHorde : aEventEndLocations[i].uiEntryAlliance, aEventEndLocations[i].fSpawnX, aEventEndLocations[i].fSpawnY, aEventEndLocations[i].fSpawnZ, aEventEndLocations[i].fStartO, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->SetWalk(false);
                 pTemp->GetMotionMaster()->MovePoint(0, aEventEndLocations[i].fEndX, aEventEndLocations[i].fEndY, aEventEndLocations[i].fEndZ);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
     }
 
