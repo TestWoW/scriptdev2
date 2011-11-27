@@ -157,7 +157,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                     m_creature->RemoveAurasDueToSpell(SPELL_SUMMON_CLONES);
                     m_creature->CastSpell(m_creature, SPELL_SPAWN_BACK_IN, false);
 
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
                     DoScriptText(SAY_MERGE, m_creature);
 
@@ -166,7 +166,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
                 break;
             }
             case SPELL_SUMMON_CLONES:
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 break;
         }
     }
