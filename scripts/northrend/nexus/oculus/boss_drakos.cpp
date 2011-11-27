@@ -405,6 +405,11 @@ void AddSC_boss_drakos()
     Script *pNewScript;
 
     pNewScript = new Script;
+    pNewScript->Name = "drakos_event";
+    pNewScript->GetAI = &GetAI_drakos_event;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
     pNewScript->Name = "boss_drakos";
     pNewScript->GetAI = &GetAI_boss_drakos;
     pNewScript->RegisterSelf();
