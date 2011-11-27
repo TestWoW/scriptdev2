@@ -53,12 +53,12 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
 {
     boss_keristraszaAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_nexus*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_nexus* m_pInstance;
     bool m_bIsRegularMode;
 
     bool m_bIsEnraged;
@@ -94,7 +94,6 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_KERISTRASZA, FAIL);
-            m_pInstance->SetData(TYPE_ACHIEV_KERISTRASZA, FAIL);
         }
     }
 
@@ -108,7 +107,7 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
             m_pInstance->SetData(TYPE_KERISTRASZA, IN_PROGRESS);
 
         if (!m_bIsRegularMode)
-            m_pInstance->SetData(TYPE_ACHIEV_KERISTRASZA, IN_PROGRESS);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_INTENSE_COLD, true);
     }
 
     void JustDied(Unit* pKiller)
@@ -146,7 +145,7 @@ struct MANGOS_DLL_DECL boss_keristraszaAI : public ScriptedAI
                     {
                         if (holder->GetStackAmount() > 2)
                         {
-                            m_pInstance->SetData(TYPE_ACHIEV_KERISTRASZA, FAIL);
+                            m_pInstance->SetSpecialAchievementCriteria(TYPE_INTENSE_COLD, false);
                             m_bAchievFailed = true;
                         }
                     }

@@ -75,12 +75,12 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
 {
     boss_telestraAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_nexus*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_nexus* m_pInstance;
     bool m_bIsRegularMode;
 
     uint8 m_uiPhase;
@@ -100,11 +100,17 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
         m_uiIceNovaTimer = urand(8000, 12000);
         m_uiGravityWellTimer = urand(15000, 25000);
         m_uiAchievTimer = 0;
+
+        if (m_pInstance)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, false);
     }
 
     void JustReachedHome()
     {
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+        if (m_pInstance)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, false);
     }
 
     void AttackStart(Unit* pWho)
@@ -123,8 +129,8 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_ACHIEV_TELESTRA, IN_PROGRESS);
+        if (m_pInstance && !m_bIsRegularMode)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, true);
     }
 
     void JustDied(Unit* pKiller)
@@ -193,7 +199,7 @@ struct MANGOS_DLL_DECL boss_telestraAI : public ScriptedAI
             return;
 
         if (!m_bIsRegularMode && m_uiAchievTimer > 8000) // Added 3 sec because must not count cast time
-            m_pInstance->SetData(TYPE_ACHIEV_TELESTRA, FAIL);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_DOUBLE_PERSONALITY, false);
 
         switch(m_uiPhase)
         {
