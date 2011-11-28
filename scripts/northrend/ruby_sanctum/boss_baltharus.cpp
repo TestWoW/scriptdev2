@@ -247,8 +247,7 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
         case 5:
             if (m_creature->IsNonMeleeSpellCasted(true))
                 return;
-            if (m_bIs25Man)
-                m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
+            m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
             m_uiStage = 6;
             break;
         case 6:
@@ -267,7 +266,8 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
         case 8:
             if (m_creature->IsNonMeleeSpellCasted(true))
                 return;
-            m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
+            if (m_bIs25Man)
+                m_creature->CastSpell(m_creature, SPELL_REPELLING_WAVE, false);
             m_uiStage = 9;
             break;
         case 9:
@@ -345,7 +345,7 @@ struct MANGOS_DLL_DECL mob_baltharus_cloneAI : public BSWScriptedAI
         if (!m_pInstance)
             return;
 
-        m_creature->ForcedDespawn();
+        m_creature->SetVisibility(VISIBILITY_OFF);
     }
 
     void Aggro(Unit* pWho)
