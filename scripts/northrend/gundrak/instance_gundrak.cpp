@@ -181,20 +181,20 @@ bool instance_gundrak::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player 
 {
     switch (uiCriteriaId)
     {
-    case ACHIEV_SNAKES:
-        if (!pSource->HasAura(61476))
-            return true;
-        else return false;
-    case ACHIEV_WHAT_THE_ECK:
-        if (pSource->HasAura(55817))
-            return true;
-        else return false;
-    case ACHIEV_SHARE_THE_LOVE:
-        return m_bCriteriaShareTheLove;
-    case ACHIEV_LESS_RABI:
-        return !m_bCriteriaLessRabi;
-    default:
-        return 0;
+        case ACHIEV_SNAKES:
+            if (!pSource->HasAura(61476))
+                return true;
+            else return false;
+        case ACHIEV_WHAT_THE_ECK:
+            if (pSource->HasAura(55817))
+                return true;
+            else return false;
+        case ACHIEV_SHARE_THE_LOVE:
+            return m_bCriteriaShareTheLove;
+        case ACHIEV_LESS_RABI:
+            return !m_bCriteriaLessRabi;
+        default:
+            return 0;
     }
 }
 
