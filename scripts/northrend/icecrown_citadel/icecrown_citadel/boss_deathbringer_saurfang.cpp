@@ -111,6 +111,8 @@ enum
         SPELL_BERSERK                           = 26662,
         SPELL_FRENZY                            = 72737,
 
+        SPELL_CHECK_ACHIEVEMENT                 = 72928,
+
         //summons
         NPC_BLOOD_BEAST                         = 38508,
 };
@@ -165,7 +167,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
 {
     boss_deathbringer_saurfang_eventAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_powerBloodPower = m_creature->getPowerType(); // don't call this function multiple times in script
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
@@ -188,7 +190,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
         m_lGuards.clear();
     }
 
-    ScriptedInstance *m_pInstance;
+    instance_icecrown_spire *m_pInstance;
 
     uint32 m_uiNextEventTimer;
     uint32 m_uiEventStep;
@@ -359,6 +361,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
 
         DoCastSpellIfCan(m_creature, SPELL_REMOVE_MARKS, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_CHECK_ACHIEVEMENT, CAST_TRIGGERED);
     }
 
     void NextStep(uint32 uiTime = 1000)
@@ -1315,7 +1318,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
 {
     boss_deathbringer_saurfangAI(Creature* pCreature) : boss_deathbringer_saurfang_eventAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
         m_powerBloodPower = m_creature->getPowerType(); // don't call this function multiple times in script
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
@@ -1324,7 +1327,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         ResetFight();
     }
 
-    ScriptedInstance *m_pInstance;
+    instance_icecrown_spire *m_pInstance;
 
     uint32 m_uiRuneOfBloodTimer;
     uint32 m_uiBoilingBloodTimer;
@@ -1332,10 +1335,13 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     uint32 m_uiBloodBeastsTimer;
     uint32 m_uiScentOfBloodTimer;
     uint32 m_uiBerserkTimer;
+    uint32 m_uiCheckTimer;
+    uint32 m_uiMarksCount;
 
     bool m_bIsFrenzied;
     bool m_bIsHeroic;
     bool m_bIs25Man;
+    bool m_bAchievFailed;
 
     Powers m_powerBloodPower;
     Difficulty m_uiMapDifficulty;
@@ -1348,11 +1354,13 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         m_uiBloodBeastsTimer    = 40000;
         m_uiScentOfBloodTimer   = 47000; // 5 seconds after beasts engage in combat
         m_uiBerserkTimer        = (m_bIsHeroic ? 6 : 8) * MINUTE * IN_MILLISECONDS;
+        m_uiCheckTimer          = 1000;
+        m_uiMarksCount          = 0;
 
         m_bIsFrenzied = false;
+        m_bAchievFailed = false;
 
         m_creature->SetPower(m_powerBloodPower, 0);
-        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
     void Aggro(Unit *pWho)
@@ -1375,6 +1383,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
             m_pInstance->SetData(TYPE_SAURFANG, FAIL);
 
         m_creature->SetPower(m_powerBloodPower, 0);
+        m_uiMarksCount = 0;
     }
 
     // used for unlocking bugged encounter
@@ -1452,6 +1461,20 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (!m_bAchievFailed)
+        {
+            if (m_uiCheckTimer < uiDiff)
+            {
+                if (m_uiMarksCount >= 3)
+                {
+                    m_pInstance->SetSpecialAchievementCriteria(TYPE_IVE_MADE_AND_MESS, false);
+                    m_bAchievFailed = true;
+                }
+                m_uiCheckTimer = 1000;
+            }
+            else m_uiCheckTimer -= uiDiff;
+        }
+
         // Mark of the Fallen Champion
         if (m_creature->GetPower(m_powerBloodPower) >= 100)
         {
@@ -1465,6 +1488,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
                     int32 power = m_creature->GetPower(m_powerBloodPower);
                     m_creature->CastCustomSpell(m_creature, 72371, &power, &power, NULL, true);
                     DoScriptText(SAY_FALLENCHAMPION, m_creature);
+                    ++m_uiMarksCount;
                 }
             }
         }
@@ -1474,9 +1498,11 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         {
             if (m_creature->GetHealthPercent() <= 30.0f)
             {
-                DoCastSpellIfCan(m_creature, SPELL_FRENZY, CAST_TRIGGERED);
-                DoScriptText(SAY_BERSERK, m_creature);
-                m_bIsFrenzied = true;
+                if (DoCastSpellIfCan(m_creature, SPELL_FRENZY, CAST_TRIGGERED))
+                {
+                    DoScriptText(SAY_BERSERK, m_creature);
+                    m_bIsFrenzied = true;
+                }
             }
         }
 
@@ -1535,7 +1561,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
             m_uiBloodBeastsTimer  = 40000;
 
             if (m_bIsHeroic)
-                m_uiScentOfBloodTimer = 7000; // 7 seconds after beasts engage in combat
+                m_uiScentOfBloodTimer = 5000; // 5 seconds after beasts engage in combat
 
             DoScriptText(SAY_BLOODBEASTS, m_creature);
         }
