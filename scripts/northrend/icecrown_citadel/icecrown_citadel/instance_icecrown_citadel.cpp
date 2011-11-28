@@ -182,6 +182,16 @@ static Locations SpawnLoc[]=
             case NPC_KELESETH:
             case NPC_LANATHEL:
             case NPC_LANATHEL_INTRO:
+            case NPC_HORDE_1:
+            case NPC_HORDE_2:
+            case NPC_HORDE_3:
+            case NPC_HORDE_4:
+            case NPC_HORDE_5:
+            case NPC_ALLY_1:
+            case NPC_ALLY_2:
+            case NPC_ALLY_3:
+            case NPC_ALLY_4:
+            case NPC_ALLY_5:
             case NPC_SVALNA:
             case NPC_CROK:
             case NPC_VALITHRIA:

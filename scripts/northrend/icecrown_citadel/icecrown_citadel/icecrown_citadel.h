@@ -41,6 +41,18 @@ enum
     NPC_KELESETH                        = 37972,
     NPC_LANATHEL                        = 37955,
 
+    NPC_HORDE_1                         = 37032,
+    NPC_HORDE_2                         = 37028,
+    NPC_HORDE_3                         = 37029,
+    NPC_HORDE_4                         = 37030,
+    NPC_HORDE_5                         = 37146,
+
+    NPC_ALLY_1                          = 37003,
+    NPC_ALLY_2                          = 37017,
+    NPC_ALLY_3                          = 37021,
+    NPC_ALLY_4                          = 37026,
+    NPC_ALLY_5                          = 37027,
+
     NPC_CROK                            = 37129,
     NPC_ARNATH                          = 37122,
     NPC_BRANDON                         = 37123,
