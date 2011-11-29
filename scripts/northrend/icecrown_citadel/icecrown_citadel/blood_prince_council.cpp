@@ -382,7 +382,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public ScriptedAI
                     if (pTmp->isAlive())
                     {
                         pTmp->RemoveAurasDueToSpell(SPELL_INVOCATION_VALANAR);
-                        pTmp->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+                        pKiller->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
                     }
                 }
             }
@@ -394,7 +394,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public ScriptedAI
                     if (pTmp->isAlive())
                     {
                         pTmp->RemoveAurasDueToSpell(SPELL_INVOCATION_KELESETH);
-                        pTmp->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+                        pKiller->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
                     }
                 }
             }
@@ -406,7 +406,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public ScriptedAI
                     if (pTmp->isAlive())
                     {
                         pTmp->RemoveAurasDueToSpell(SPELL_INVOCATION_TALDARAM);
-                        pTmp->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+                        pKiller->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
                     }
                 }
             }
