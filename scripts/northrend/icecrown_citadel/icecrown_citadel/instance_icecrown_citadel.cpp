@@ -338,6 +338,8 @@ static Locations SpawnLoc[]=
                 break;
              case TYPE_SAURFANG:
                 m_auiEncounter[TYPE_SAURFANG] = uiData;
+                if (uiData == IN_PROGRESS)
+                    SetSpecialAchievementCriteria(TYPE_IVE_MADE_AND_MESS, true);
                 if (uiData == DONE)
                 {
                     DoOpenDoor(GO_SAURFANG_DOOR);
@@ -442,6 +444,7 @@ static Locations SpawnLoc[]=
 
                 if (uiData == IN_PROGRESS)
                 {
+                    SetSpecialAchievementCriteria(TYPE_PORTAL_JOCKEY, false);
                     DoCloseDoor(GO_GREEN_DRAGON_DOOR_1);
                     DoOpenDoor(GO_VALITHRIA_DOOR_1);
                     DoOpenDoor(GO_VALITHRIA_DOOR_2);
@@ -612,9 +615,11 @@ static Locations SpawnLoc[]=
         case CRITERIA_FULL_HOUSE_10H:
         case CRITERIA_FULL_HOUSE_25H:
             return m_abAchievCriteria[TYPE_FULL_HOUSE];
-        /*case CRITERIA_DEATHBRINGER_DEAD_10N:
-            if (GetData(TYPE_SAURFANG) == DONE && Difficulty == RAID_DIFFICULTY_10MAN_NORMAL)
-                return true;*/
+        case CRITERIA_IVE_MADE_AND_MESS_10N:
+        case CRITERIA_IVE_MADE_AND_MESS_10H:
+        case CRITERIA_IVE_MADE_AND_MESS_25N:
+        case CRITERIA_IVE_MADE_AND_MESS_25H:
+            return m_abAchievCriteria[TYPE_IVE_MADE_AND_MESS];
         case CRITERIA_DANCES_WITH_OOZES_10N:
         case CRITERIA_DANCES_WITH_OOZES_25N:
         case CRITERIA_DANCES_WITH_OOZES_10H:
@@ -654,6 +659,11 @@ static Locations SpawnLoc[]=
             else
                 return false;
             break;
+        case CRITERIA_PORTAL_JOCKEY_10N:
+        case CRITERIA_PORTAL_JOCKEY_25N:
+        case CRITERIA_PORTAL_JOCKEY_10H:
+        case CRITERIA_PORTAL_JOCKEY_25H:
+            return m_abAchievCriteria[TYPE_PORTAL_JOCKEY];
         case CRITERIA_ALL_YOU_CAN_EAT_10N:
         case CRITERIA_ALL_YOU_CAN_EAT_25N:
         case CRITERIA_ALL_YOU_CAN_EAT_10H:

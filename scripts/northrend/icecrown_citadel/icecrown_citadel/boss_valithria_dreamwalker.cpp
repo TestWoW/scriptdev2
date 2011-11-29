@@ -39,6 +39,7 @@ static Locations SpawnLoc[]=
 
 enum BossSpells
 {
+    SPELL_CHECK_ACHIEVEMENT         = 72706,
     SPELL_NIGHTMARE_PORTAL_PRE      = 71977,
     SPELL_NIGHTMARE_PORTAL          = 71987,
     SPELL_TWISTED_NIGHTMARES        = 71941,
@@ -526,7 +527,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
                 }
 
                 m_uiOutroTimer = 30000;
-                m_creature->ForcedDespawn(1000);
+                m_creature->ForcedDespawn(10000);
             }
             else
                 m_uiOutroTimer -= uiDiff;
@@ -562,9 +563,12 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
             // check if encounter is completed
             if (fHP > 95.0f)
             {
+                DoCastSpellIfCan(m_creature, SPELL_CHECK_ACHIEVEMENT, CAST_TRIGGERED);
                 if (DoCastSpellIfCan(m_creature, SPELL_DREAMWALKER_RAGE) == CAST_OK)
                 {
                     DoScriptText(SAY_VICTORY, m_creature);
+                    //if (m_pInstance)
+                    //    m_pInstance->SetData(TYPE_VALITHRIA, DONE);
                     m_creature->RemoveAllAuras();
                     m_bIsHealed = true;
                     return;
