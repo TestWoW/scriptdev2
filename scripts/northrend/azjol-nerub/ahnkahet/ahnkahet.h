@@ -1,5 +1,4 @@
 /* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 MangosR2
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -43,7 +42,7 @@ enum
     NPC_TWILIGHT_VOLUNTEER              = 30385,
 
     ACHIEV_CRITERIA_VOLUNTEER_WORK      = 7359,
-    ACHIEV_CRITERIA_RESPECT_YOUR_ELDERS = 7317,
+    ACHIEV_CRITERIA_RESPECT_YOUR_ELDERS = 7317
 };
 
 class MANGOS_DLL_DECL instance_ahnkahet : public ScriptedInstance
@@ -59,18 +58,26 @@ class MANGOS_DLL_DECL instance_ahnkahet : public ScriptedInstance
         void OnObjectCreate(GameObject* pGo);
 
         void SetData(uint32 uiType, uint32 uiData);
+        void SetAchiev(uint32 uiType, bool get);
         uint32 GetData(uint32 uiType);
 
         bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
+
         void SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet);
 
         const char* Save() { return strInstData.c_str(); }
         void Load(const char* chrIn);
 
+        GUIDList m_lTwilightInitiate;
+
+
     protected:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string strInstData;
-        bool m_abAchievCriteria[MAX_SPECIAL_ACHIEV_CRITS];
+
+        bool   m_abAchievCriteria[MAX_SPECIAL_ACHIEV_CRITS];
+        bool   m_bCriteriaVolunteerWork;
+        bool   m_bCriteriaRespectYourElders;
 
         uint8  m_uiDevicesActivated;
 };

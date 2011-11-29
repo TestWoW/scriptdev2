@@ -1,5 +1,4 @@
 /* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- * Copyright (C) 2011 MangosR2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -44,7 +43,6 @@ enum
     NPC_HEALTHY_MUSHROOM     = 30391,
     NPC_POISONOUS_MUSHROOM   = 30435,
 };
-
 /*######
 ## boss_amanitar
 ######*/
@@ -53,12 +51,12 @@ struct MANGOS_DLL_DECL boss_amanitarAI : public ScriptedAI
 {
     boss_amanitarAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (instance_ahnkahet*)pCreature->GetInstanceData();
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    instance_ahnkahet* m_pInstance;
+    ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
 
     uint32 m_uiBashTimer;
@@ -98,7 +96,6 @@ struct MANGOS_DLL_DECL boss_amanitarAI : public ScriptedAI
     }
     void JustDied(Unit* pKiller)
     {
-        ShowMushrooms(false);
         if (m_pInstance)
             m_pInstance->SetData(TYPE_AMANITAR, DONE);
     }
@@ -163,7 +160,6 @@ CreatureAI* GetAI_boss_amanitar(Creature* pCreature)
 {
     return new boss_amanitarAI(pCreature);
 }
-
 /*######
 ## npc_amanitar_mushroom
 ######*/
@@ -172,12 +168,12 @@ struct MANGOS_DLL_DECL npc_amanitar_mushroomAI : public ScriptedAI
 {
     npc_amanitar_mushroomAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (instance_ahnkahet*)pCreature->GetInstanceData();
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    instance_ahnkahet* m_pInstance;
+    ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
 
     uint8 m_uiMushroomType; //0 = healthy, 1 = poisinous
