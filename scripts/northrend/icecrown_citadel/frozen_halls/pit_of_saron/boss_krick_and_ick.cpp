@@ -80,13 +80,14 @@ struct MANGOS_DLL_DECL boss_IckAI : public ScriptedAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        m_uiKrickGUID.Clear();
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
 
-    uint64 m_uiKrickGUID;
+    ObjectGuid m_uiKrickGUID;
 
     uint32 m_uiPoisonNovaTimer;
     uint32 m_uiPursueTimer;
@@ -95,7 +96,7 @@ struct MANGOS_DLL_DECL boss_IckAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiKrickGUID       = 0;
+        m_uiKrickGUID.Clear();
         m_uiPoisonNovaTimer = 30000;
         m_uiPursueTimer     = 10000;
         m_uiPursueDelayTimer= 30000;
@@ -214,6 +215,9 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_uiJainaGuid.Clear();
+        m_uiSylvanasGuid.Clear();
+        m_uiTyrannusGuid.Clear();
         Reset();
     }
 
@@ -234,15 +238,15 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
 
     uint32 TeamInInstance;
 
-    uint64 m_uiJainaGuid;
-    uint64 m_uiSylvanasGuid;
-    uint64 m_uiTyrannusGuid;
+    ObjectGuid m_uiJainaGuid;
+    ObjectGuid m_uiSylvanasGuid;
+    ObjectGuid m_uiTyrannusGuid;
 
     void Reset()
     {
-        m_uiJainaGuid       = 0;
-        m_uiSylvanasGuid    = 0;
-        m_uiTyrannusGuid    = 0;
+        m_uiJainaGuid.Clear();
+        m_uiSylvanasGuid.Clear();
+        m_uiTyrannusGuid.Clear();
 
         m_uiToxicWasteTimer      = 5000;
         m_uiShadowboltTimer      = 15000;
@@ -277,10 +281,10 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
 
     void JustDied(Unit *victim)
     {
-        m_creature->SummonCreature(NPC_KRICK_EVENT, m_creature->GetPositionX() - 5, m_creature->GetPositionY() - 5, m_creature->GetPositionZ(), KrickPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+        //m_creature->SummonCreature(NPC_KRICK_EVENT, m_creature->GetPositionX() - 5, m_creature->GetPositionY() - 5, m_creature->GetPositionZ(), KrickPos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
 
-        if (Creature *pKrickTwo = m_pInstance->GetSingleCreatureFromStorage(NPC_KRICK))
-            pKrickTwo->ForcedDespawn();
+        /*if (Creature *pKrickTwo = m_pInstance->GetSingleCreatureFromStorage(NPC_KRICK))
+            pKrickTwo->ForcedDespawn();*/ // Unnecesary
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -484,6 +488,9 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_uiJainaGuid.Clear();
+        m_uiSylvanasGuid.Clear();
+        m_uiTyrannusGuid.Clear();
         Reset();
     }
 
@@ -504,15 +511,15 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
 
     uint32 TeamInInstance;
 
-    uint64 m_uiJainaGuid;
-    uint64 m_uiSylvanasGuid;
-    uint64 m_uiTyrannusGuid;
+    ObjectGuid m_uiJainaGuid;
+    ObjectGuid m_uiSylvanasGuid;
+    ObjectGuid m_uiTyrannusGuid;
 
     void Reset()
     {
-        m_uiJainaGuid       = 0;
-        m_uiSylvanasGuid    = 0;
-        m_uiTyrannusGuid    = 0;
+        m_uiJainaGuid.Clear();
+        m_uiSylvanasGuid.Clear();
+        m_uiTyrannusGuid.Clear();
 
         m_uiToxicWasteTimer      = 5000;
         m_uiShadowboltTimer      = 15000;

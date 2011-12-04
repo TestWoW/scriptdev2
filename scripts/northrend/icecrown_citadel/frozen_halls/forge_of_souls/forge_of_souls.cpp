@@ -255,25 +255,27 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_FSextroAI : public ScriptedAI
         Reset();
    }
 
-ScriptedInstance* m_pInstance;
+    ScriptedInstance* m_pInstance;
 
-uint32 StepTimer;
-uint32 Step;
-uint64 m_uiLiderGUID;
-uint32 uiSummon_counter;
+    uint32 StepTimer;
+    uint32 Step;
+    uint32 uiSummon_counter;
 
     void Reset()
     {
-            if (m_pInstance)
-               if (m_pInstance->GetData(TYPE_DEVOURER_OF_SOULS) != DONE)
-                  {
-                   m_pInstance->SetData(TYPE_DEVOURER_OF_SOULS, NOT_STARTED);
-                   Step = 0;
-                   m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                   m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                  } else Step = 10;
-            StepTimer = 100;
-            m_creature->SetVisibility(VISIBILITY_OFF);
+        if (m_pInstance)
+        {
+            if (m_pInstance->GetData(TYPE_DEVOURER_OF_SOULS) != DONE)
+            {
+                m_pInstance->SetData(TYPE_DEVOURER_OF_SOULS, NOT_STARTED);
+                Step = 0;
+                m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+            else Step = 10;
+        }
+        StepTimer = 100;
+        m_creature->SetVisibility(VISIBILITY_OFF);
     }
 
    void UpdateAI(const uint32 diff)

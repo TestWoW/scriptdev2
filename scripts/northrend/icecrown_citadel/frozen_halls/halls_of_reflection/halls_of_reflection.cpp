@@ -534,6 +534,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
    {
         m_pInstance = (BSWScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        wallTarget.Clear();
         oldflag = 0;
         Reset();
    }
@@ -558,7 +559,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
         HoldTimer = 10000;
         Fight = true;
         m_wallNum = 0;
-        wallTarget = ObjectGuid();
+        wallTarget.Clear();
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
@@ -630,7 +631,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
             pWallTarget->ForcedDespawn();
         }
 
-        wallTarget =  ObjectGuid();
+        wallTarget.Clear();
         m_wallNum = 0;
     }
 
@@ -1152,6 +1153,7 @@ struct MANGOS_DLL_DECL npc_spiritual_reflectionAI : public BSWScriptedAI
     npc_spiritual_reflectionAI(Creature *pCreature) : BSWScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        victimGuid.Clear();
         Reset();
     }
 
@@ -1164,7 +1166,7 @@ struct MANGOS_DLL_DECL npc_spiritual_reflectionAI : public BSWScriptedAI
         if (!m_pInstance)
             return;
         isMirror = false;
-        victimGuid = ObjectGuid();
+        victimGuid.Clear();
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
