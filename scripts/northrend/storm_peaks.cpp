@@ -78,7 +78,7 @@ struct MANGOS_DLL_DECL npc_thorim_eventAI : public ScriptedAI
         m_creature->SetWalk(false);
         m_creature->SetSpeedRate(MOVE_RUN, 1.0f);
 
-        m_VeranusGuid;
+        m_VeranusGuid.Clear();
         m_LokenGuid.Clear();
         m_RuneforgedOneGuid.Clear();
         m_RuneforgedTwoGuid.Clear();
