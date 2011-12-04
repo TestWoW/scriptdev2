@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: Storm_Peaks
 SD%Complete: 0
-SDComment: Placeholder
+SDComment: Quest support: 13047
 SDCategory: Storm Peaks
 EndScriptData */
 
@@ -330,7 +330,7 @@ struct MANGOS_DLL_DECL npc_thorim_eventAI : public ScriptedAI
                         break;
                     }
                     default:
-                        return true;
+                        return;
                 } 
             }
             else
