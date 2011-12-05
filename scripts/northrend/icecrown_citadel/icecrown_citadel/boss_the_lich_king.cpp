@@ -27,37 +27,27 @@ EndScriptData */
 
 #include "precompiled.h"
 #include "icecrown_citadel.h"
+#include "Vehicle.h"
 
 enum BossSpells
 {
     //////////////// LICH KING ////////////////
     // Phase 1
-    SPELL_INFEST_10N                    = 70541,
-    SPELL_INFEST_25N                    = 73779,
-    SPELL_INFEST_10H                    = 73780,
-    SPELL_INFEST_25H                    = 73781,
-    SPELL_NECROTIC_PLAGUE_10N           = 70337,
-    SPELL_NECROTIC_PLAGUE_25N           = 73785,
-    SPELL_NECROTIC_PLAGUE_10H           = 73786,
-    SPELL_NECROTIC_PLAGUE_25H           = 73787,
+    SPELL_INFEST                        = 70541,
+    SPELL_NECROTIC_PLAGUE               = 70337,
     SPELL_SUMMON_SHAMBLING_HORROR       = 70372,
     SPELL_SUMMON_DRUDGE_GHOULS          = 70358,
     SPELL_SUMMON_SHADOW_TRAP            = 73539, // Heroic only
 
     // Phase 2
-    SPELL_SOUL_REAPER_10N               = 69409,
-    SPELL_SOUL_REAPER_25N               = 73797,
-    SPELL_SOUL_REAPER_10H               = 73798,
-    SPELL_SOUL_REAPER_25H               = 73799,
+    SPELL_SOUL_REAPER                   = 69409,
     SPELL_SUMMON_DEFILE                 = 72762,
     SPELL_SUMMON_VALKYR_10              = 69037,
     SPELL_SUMMON_VALKYR_25              = 74361,
 
     // Phase 3
-    SPELL_HARVEST_SOUL_10N              = 68980,
-    SPELL_HARVEST_SOUL_25N              = 74325,
-    SPELL_HARVEST_SOUL_10H              = 74296,
-    SPELL_HARVEST_SOUL_25H              = 74297,
+    SPELL_HARVEST_SOUL                  = 68980,
+    SPELL_HARVEST_SOULS                 = 74296,
     SPELL_SUMMON_VILE_SPIRITS           = 70498,
 
     // Intro / Outro visuals
@@ -76,22 +66,15 @@ enum BossSpells
     SPELL_SOUL_BARRAGE                  = 72305,
 
     // Transition phase
-    SPELL_REMORSELESS_WINTER_10N        = 68981,
-    SPELL_REMORSELESS_WINTER_25N        = 74270,
-    SPELL_REMORSELESS_WINTER_10H        = 74271,
-    SPELL_REMORSELESS_WINTER_25H        = 74272,
-    SPELL_PAIN_AND_SUFFERING_10N        = 72133,
-    SPELL_PAIN_AND_SUFFERING_25N        = 73788,
-    SPELL_PAIN_AND_SUFFERING_10H        = 73789,
-    SPELL_PAIN_AND_SUFFERING_25H        = 73790,
+    SPELL_REMORSELESS_WINTER            = 68981,
+    SPELL_PAIN_AND_SUFFERING            = 72133,
     SPELL_SUMMON_ICE_SPHERE             = 69104,
     SPELL_SUMMON_RAGING_SPIRIT          = 69200,
     SPELL_QUAKE                         = 72262,
 
     // Defile
     SPELL_DEFILE                        = 72743,
-    SPELL_DEFILE_GROW_10                = 72756,
-    SPELL_DEFILE_GROW_25                = 74164,
+    SPELL_DEFILE_GROW                   = 72756,
 
     // Raging spirit
     SPELL_SOUL_SHRIEK                   = 69242,
@@ -99,10 +82,7 @@ enum BossSpells
 
     // Ice sphere
     SPELL_ICE_PULSE                     = 69091,
-    SPELL_ICE_BURST_10N                 = 69108,
-    SPELL_ICE_BURST_25N                 = 73773,
-    SPELL_ICE_BURST_10H                 = 73774,
-    SPELL_ICE_BURST_25H                 = 73775,
+    SPELL_ICE_BURST                     = 69108,
     SPELL_ICE_SPHERE_VISUAL             = 69090,
 
     // Shadow Trap
@@ -122,6 +102,8 @@ enum BossSpells
     SPELL_WINGS_OF_THE_DAMNED           = 74352,
     SPELL_VALKYR_CHARGE                 = 74399,
     SPELL_VALKYR_CARRY                  = 74445,
+    SPELL_VALKYR_EJECT                  = 68576,
+    SPELL_LIFE_SIPHON                   = 73783,
 
     // Terenas Menethil Final
     SPELL_MASS_RESURRECT                = 72429,
@@ -191,7 +173,14 @@ enum
 
 enum Common
 {
-     FINAL_ARTHAS_MOVIE             = 16,
+     FINAL_ARTHAS_MOVIE         = 16,
+};
+
+enum Points
+{
+    POINT_CENTER                = 10,
+    POINT_WEST                  = 11,
+    POINT_EAST                  = 12,
 };
 
 enum Equipment
@@ -215,6 +204,9 @@ static Locations SpawnLoc[]=
     {520.311f, -2124.709961f, 1040.859985f},      // 7 Frostmourne
     {517.378f, -2124.905762f, 1040.861328f},      // 8 Tirion see Lich
     {502.66f, -2124.43f, 1040.859985f},           // 9 Tirion jumps
+    {503.97330f, -2123.921800f, 1057.4666000f},   // 10 Valkyr Center (heroic)
+    {503.37330f, -2213.671800f, 1043.6766000f},   // 11 Valkyr West
+    {502.66666f, -2041.245483f, 1043.7098000f},   // 12 Valkyr East
 };
 
 struct MANGOS_DLL_DECL boss_the_lich_king_icc_eventAI : public ScriptedAI
@@ -385,7 +377,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_icc_eventAI : public ScriptedAI
                 case 10:
                     if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
                     {
-                        m_creature->CastSpell(m_creature, SPELL_ICE_LOCK, true);
+                        m_creature->CastSpell(pTemp, SPELL_ICE_LOCK, true);
                         NextStep(1500);
                     }
                     break;
@@ -509,7 +501,6 @@ struct MANGOS_DLL_DECL boss_the_lich_king_icc_eventAI : public ScriptedAI
                         m_creature->CastSpell(m_creature, SPELL_SUMMON_BROKEN_FROSTMOURNE_2, true);
                         m_creature->CastSpell(m_creature, SPELL_SUMMON_BROKEN_FROSTMOURNE, false);
                         DoScriptText(SAY_OUTRO_7, m_creature);
-                        //StartMovement(5, pTemp);
                         pTemp->HandleEmote(EMOTE_ONESHOT_SPECIALATTACK1H);
                         pTemp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                         NextStep(3000);
@@ -536,7 +527,6 @@ struct MANGOS_DLL_DECL boss_the_lich_king_icc_eventAI : public ScriptedAI
                             pFrostmourne->CastSpell(pFrostmourne, SPELL_FROSTMOURNE_TRIGGER, true);
                             m_creature->RemoveAurasDueToSpell(SPELL_SUMMON_BROKEN_FROSTMOURNE);
                             m_creature->RemoveAllAuras();
-                            //m_creature->SetLevitate(true);
                             m_creature->GetPosition(x, y, z);
                             m_creature->GetMotionMaster()->MovePoint(0, x, y, z + 2.0f);
                             m_creature->CastSpell(m_creature, SPELL_SOUL_BARRAGE, true);
@@ -790,7 +780,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
         DoScriptText(SAY_SLAY_1 - urand(0, 1), m_creature, pVictim);
     }
 
-    /*void JustReachedHome()
+    void JustReachedHome()
     {
         if (!m_pInstance)
             return;
@@ -798,14 +788,17 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
         m_pInstance->SetData(TYPE_LICH_KING, FAIL);
         m_bIsFinalPhase = false;
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-    }*/
+
+        if (Creature *pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
+            pTemp->AI()->EnterEvadeMode();
+    }
 
     void JustSummoned(Creature* pSummoned)
     {
         if(!m_pInstance || !pSummoned)
             return;
 
-        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))  // Should be 1, 0 its for debug
         {
            pSummoned->SetInCombatWith(pTarget);
            pSummoned->AddThreat(pTarget, 100.0f);
@@ -857,7 +850,6 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
         DoScriptText(SAY_OUTRO_14, m_creature);
         m_pInstance->SetData(TYPE_LICH_KING, DONE);
 
-        m_pInstance->SetData(TYPE_EVENT,14009);
         DespawnMobs();
 
     }
@@ -896,16 +888,8 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     // Infest
                     if (m_uiInfestTimer < uiDiff)
                     {
-                        if (m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_INFEST_25H : SPELL_INFEST_10H) == CAST_OK)
-                                m_uiInfestTimer = 30000;
-                        }
-                        if (!m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_INFEST_25N : SPELL_INFEST_10N) == CAST_OK)
-                                m_uiInfestTimer = 30000;
-                        }
+                        if (DoCastSpellIfCan(m_creature, SPELL_INFEST) == CAST_OK)
+                            m_uiInfestTimer = 30000;
                     }
                     else m_uiInfestTimer -= uiDiff;
 
@@ -928,21 +912,10 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     // Necrotic Plague                 
                     if (m_uiNecroticPlagueTimer < uiDiff)
                     {
-                        if (m_bIsHeroic)
+                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
                         {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_NECROTIC_PLAGUE_25H : SPELL_NECROTIC_PLAGUE_10H) == CAST_OK)
-                                    m_uiNecroticPlagueTimer = urand(30000, 35000);
-                            }
-                        }
-                        if (!m_bIsHeroic)
-                        {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_NECROTIC_PLAGUE_25N : SPELL_NECROTIC_PLAGUE_10N) == CAST_OK)
-                                    m_uiNecroticPlagueTimer = urand(30000, 35000);
-                            }
+                            if (DoCastSpellIfCan(pTarget,SPELL_NECROTIC_PLAGUE) == CAST_OK)
+                                m_uiNecroticPlagueTimer = urand(30000, 35000);
                         }
                     }
                     else m_uiNecroticPlagueTimer -= uiDiff;
@@ -983,11 +956,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     if (m_bMovementStarted)
                         return;
 
-                    if (m_bIsHeroic)
-                        m_creature->CastSpell(m_creature, m_bIs25Man ? SPELL_REMORSELESS_WINTER_25H : SPELL_REMORSELESS_WINTER_10H, false);
-
-                    if (!m_bIsHeroic)
-                        m_creature->CastSpell(m_creature, m_bIs25Man ? SPELL_REMORSELESS_WINTER_25N : SPELL_REMORSELESS_WINTER_10N, false);
+                    m_creature->CastSpell(m_creature, SPELL_REMORSELESS_WINTER, false);
 
                     DoScriptText(SAY_REMORSELESS_WINTER, m_creature);
                     NextStep(3000);
@@ -1033,32 +1002,21 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     // Pain And Suffering
                     if (m_uiPainAndSufferingTimer < uiDiff)
                     {
-                        if (m_bIsHeroic)
-                        {
                             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_PAIN_AND_SUFFERING_25H : SPELL_PAIN_AND_SUFFERING_10H) == CAST_OK)
-                                    m_uiPainAndSufferingTimer = 1500;
-                            }
-                        }
-                        if (!m_bIsHeroic)
                         {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_PAIN_AND_SUFFERING_25N : SPELL_PAIN_AND_SUFFERING_10N) == CAST_OK)
-                                    m_uiPainAndSufferingTimer = 1500;
-                            }
+                            if (DoCastSpellIfCan(pTarget, SPELL_PAIN_AND_SUFFERING) == CAST_OK)
+                                m_uiPainAndSufferingTimer = 1500;
                         }
                     }
                     else m_uiPainAndSufferingTimer -= uiDiff;
 
-                    if (!m_creature->HasAura(SPELL_REMORSELESS_WINTER_10N) && !m_creature->HasAura(SPELL_REMORSELESS_WINTER_25N) && !m_creature->HasAura(SPELL_REMORSELESS_WINTER_10H) && !m_creature->HasAura(SPELL_REMORSELESS_WINTER_25H))
+                    if (!m_creature->HasAuraOfDifficulty(SPELL_REMORSELESS_WINTER))
                     {
                         DoScriptText(SAY_SHATTER_ARENA, m_creature);
                         m_creature->CastSpell(m_creature, SPELL_QUAKE, false);
                         if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
                             pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
-                        NextStep(7500);
+                        NextStep(8000);
                     }
                     break;
 
@@ -1114,16 +1072,8 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     // Soul Reaper
                     if (m_uiSoulReaperTimer < uiDiff)
                     {
-                        if (m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_SOUL_REAPER_25H : SPELL_SOUL_REAPER_10H) == CAST_OK)
-                                m_uiSoulReaperTimer = 30000;
-                        }
-                        if (!m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_SOUL_REAPER_25N : SPELL_SOUL_REAPER_10N) == CAST_OK)
-                                m_uiSoulReaperTimer = 30000;
-                        }
+                        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_REAPER) == CAST_OK)
+                            m_uiSoulReaperTimer = 30000;
                     }
                     else m_uiSoulReaperTimer -= uiDiff;
 
@@ -1141,16 +1091,8 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     // Infest          
                     if (m_uiInfestTimer < uiDiff)
                     {
-                        if (m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_INFEST_25H : SPELL_INFEST_10H) == CAST_OK)
+                            if (DoCastSpellIfCan(m_creature, SPELL_INFEST) == CAST_OK)
                                 m_uiInfestTimer = 30000;
-                        }
-                        if (!m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_INFEST_25N : SPELL_INFEST_10N) == CAST_OK)
-                                m_uiInfestTimer = 30000;
-                        }
                     }
                     else m_uiInfestTimer -= uiDiff;
 
@@ -1175,11 +1117,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     if (m_bMovementStarted)
                         return;
 
-                    if (m_bIsHeroic)
-                        m_creature->CastSpell(m_creature, m_bIs25Man ? SPELL_REMORSELESS_WINTER_25H : SPELL_REMORSELESS_WINTER_10H, false);
-
-                    if (!m_bIsHeroic)
-                        m_creature->CastSpell(m_creature, m_bIs25Man ? SPELL_REMORSELESS_WINTER_25N : SPELL_REMORSELESS_WINTER_10N, false);
+                    m_creature->CastSpell(m_creature, SPELL_REMORSELESS_WINTER, false);
 
                     DoScriptText(SAY_REMORSELESS_WINTER, m_creature);
                     NextStep(2500);
@@ -1223,26 +1161,15 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     // Pain And Suffering
                     if (m_uiPainAndSufferingTimer < uiDiff)
                     {
-                        if (m_bIsHeroic)
+                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
                         {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_PAIN_AND_SUFFERING_25H : SPELL_PAIN_AND_SUFFERING_10H) == CAST_OK)
-                                    m_uiPainAndSufferingTimer = 1500;
-                            }
-                        }
-                        if (!m_bIsHeroic)
-                        {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_PAIN_AND_SUFFERING_25N : SPELL_PAIN_AND_SUFFERING_10N) == CAST_OK)
-                                    m_uiPainAndSufferingTimer = 1500;
-                            }
+                            if (DoCastSpellIfCan(pTarget, SPELL_PAIN_AND_SUFFERING) == CAST_OK)
+                                m_uiPainAndSufferingTimer = 1500;
                         }
                     }
                     else m_uiPainAndSufferingTimer -= uiDiff;
 
-                    if (!m_creature->HasAura(SPELL_REMORSELESS_WINTER_10N) && !m_creature->HasAura(SPELL_REMORSELESS_WINTER_25N) && !m_creature->HasAura(SPELL_REMORSELESS_WINTER_10H) && !m_creature->HasAura(SPELL_REMORSELESS_WINTER_25H))
+                    if (!m_creature->HasAuraOfDifficulty(SPELL_REMORSELESS_WINTER))
                     {
                         DoScriptText(SAY_SHATTER_ARENA, m_creature);
                         m_creature->CastSpell(m_creature, SPELL_QUAKE, false);
@@ -1304,16 +1231,8 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     // Soul Reaper
                     if (m_uiSoulReaperTimer < uiDiff)
                     {
-                        if (m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_SOUL_REAPER_25H : SPELL_SOUL_REAPER_10H) == CAST_OK)
-                                m_uiSoulReaperTimer = 30000;
-                        }
-                        if (!m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_SOUL_REAPER_25N : SPELL_SOUL_REAPER_10N) == CAST_OK)
-                                m_uiSoulReaperTimer = 30000;
-                        }
+                        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_REAPER) == CAST_OK)
+                            m_uiSoulReaperTimer = 30000;
                     }
                     else m_uiSoulReaperTimer -= uiDiff;
 
@@ -1322,7 +1241,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     {
                         if (m_bIsHeroic)
                         {
-                            if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_HARVEST_SOUL_25H : SPELL_HARVEST_SOUL_10H) == CAST_OK)
+                            if (DoCastSpellIfCan(m_creature, SPELL_HARVEST_SOULS) == CAST_OK)
                             {
                                 m_bInFrostmourne = true;
                                 m_uiHarvestSoulTimer = 70000;
@@ -1333,7 +1252,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                         {
                             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
                             {
-                                if (DoCastSpellIfCan(pTarget, m_bIs25Man ? SPELL_HARVEST_SOUL_25N : SPELL_HARVEST_SOUL_10N) == CAST_OK)
+                                if (DoCastSpellIfCan(pTarget, SPELL_HARVEST_SOUL) == CAST_OK)
                                 {
                                     m_bInFrostmourne = true;
                                     m_uiHarvestSoulTimer = 70000;
@@ -1389,7 +1308,6 @@ struct MANGOS_DLL_DECL boss_tirion_iccAI : public ScriptedAI
     }
 
     ScriptedInstance *m_pInstance;
-    uint32 UpdateTimer;
     uint32 nextEvent;
     uint32 nextPoint;
     uint32 m_uiEventStep;
@@ -1474,7 +1392,7 @@ struct MANGOS_DLL_DECL boss_tirion_iccAI : public ScriptedAI
             NextStep();
         }
 
-        if (m_uiNextEventTimer <= uiDiff)
+        if (m_uiNextEventTimer <= uiDiff && m_bTirionStarted)
         {
             switch (m_uiEventStep)
             {
@@ -1593,6 +1511,14 @@ struct MANGOS_DLL_DECL  mob_ice_sphere_iccAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
     }
 
+    void Aggro(Unit *pWho)
+    {
+        if (!pWho)
+            return;
+
+        m_creature->CastSpell(pWho, SPELL_ICE_PULSE, true);
+    }
+
 
     void UpdateAI(const uint32 uiDiff)
     {
@@ -1624,16 +1550,7 @@ struct MANGOS_DLL_DECL  mob_ice_sphere_iccAI : public ScriptedAI
             SetCombatMovement(true);
 
             if (m_creature->IsWithinDistInMap(m_creature->getVictim(), 2.0f))
-            {
-                if (m_bIsHeroic)
-                {
-                    m_creature->CastSpell(m_creature, m_bIs25Man ? SPELL_ICE_BURST_25H : SPELL_ICE_BURST_10H, false);
-                }
-                if (!m_bIsHeroic)
-                {
-                    m_creature->CastSpell(m_creature, m_bIs25Man ? SPELL_ICE_BURST_25N : SPELL_ICE_BURST_10N, false);
-                }
-            }
+                m_creature->CastSpell(m_creature, SPELL_ICE_BURST, false);
 
             m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
 
@@ -1684,10 +1601,12 @@ struct MANGOS_DLL_DECL mob_defiler_iccAI : public BSWScriptedAI
 
     }
 
-    bool doSearchPlayers()
+    bool DoSearchPlayers(float range)
     {
-        if(GetPlayerAtMinimumRange(m_Size * 3.0f)) return true;
-        else return false;
+        if(GetPlayerAtMinimumRange(m_Size * range))
+            return true;
+        else
+            return false;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1701,18 +1620,11 @@ struct MANGOS_DLL_DECL mob_defiler_iccAI : public BSWScriptedAI
         }
         else m_uiLifeTimer -= uiDiff;
 
-        if (doSearchPlayers() && m_Size <= m_Size0 * 6.0f) {
-                m_Size = m_Size*1.01;
-                m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, m_Size);
-                }
-
-        /*if(Player *pPlayer = GetPlayerAtMinimumRange((m_creature->GetObjectScale() * 3.0f)))
+        if (DoSearchPlayers(3.0f) && m_Size <= m_Size0 * 6.0f)
         {
-            if (pPlayer)
-            {
-                m_creature->CastSpell(m_creature, m_bIs25Man ? SPELL_DEFILE_GROW_25 : SPELL_DEFILE_GROW_10, false);
-            }
-        }*/
+            m_Size = m_Size*1.01;
+            m_creature->SetObjectScale(m_Size);
+        }
     }
 
 };
@@ -1862,32 +1774,68 @@ struct MANGOS_DLL_DECL mob_valkyrAI : public ScriptedAI
     mob_valkyrAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     ScriptedInstance *m_pInstance;
-    uint32 m_uiFrostTrampTimer;
-    uint32 m_uiMortalHitTimer;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
+    bool m_bIsCarry;
+    bool m_bIsInCenter;
+    bool m_bInMovement;
+    uint32 m_uiLifeSiphonTimer;
 
     void Reset()
     {
-        m_uiFrostTrampTimer = 4000;
-        m_uiMortalHitTimer = 19000;
+        m_bIsCarry = false;
+        m_bIsInCenter = false;
+        m_bInMovement = false;
+        m_uiLifeSiphonTimer = 10000;
+        SetCombatMovement(true);
+        m_creature->SetLevitate(false);
+        m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
     }
 
-    void JustDied(Unit *pKiller)
+    void MovementInform(uint32 uiMovementType, uint32 uiData)
     {
-        /*Map* pMap = m_creature->GetMap();
-        if (pMap)
+        if (uiMovementType != POINT_MOTION_TYPE)
+            return;
+
+        if (uiData == POINT_WEST || uiData == POINT_EAST)
         {
-            Map::PlayerList const &lPlayers = pMap->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+            if (m_bIsCarry)
             {
-                Unit *pTarget = itr->getSource();
-                if (pTarget->HasAura(22856))
-                    pTarget->RemoveAurasDueToSpell(22856);
+                //DoCastSpellIfCan(m_creature, SPELL_VALKYR_EJECT);
+                if (VehicleKit *pVehKit = m_creature->GetVehicleKit())
+                    pVehKit->RemoveAllPassengers();
+                m_bIsCarry = false;
+                m_bInMovement = false;
             }
-        }*/
+        }
+        else if (uiData == POINT_CENTER)
+        {
+            m_bIsInCenter = true;
+            m_bInMovement = false;
+        }
+    }
+
+    void MoveToClosestPoint()
+    {
+        float WestDistance, EastDistance;
+        m_creature->GetMotionMaster()->Clear();
+        m_bInMovement = true;
+
+        WestDistance = m_creature->GetDistance2d(SpawnLoc[11].x, SpawnLoc[11].y);
+        EastDistance = m_creature->GetDistance2d(SpawnLoc[12].x, SpawnLoc[12].y);
+
+        if (WestDistance < EastDistance)
+            m_creature->GetMotionMaster()->MovePoint(POINT_WEST, SpawnLoc[11].x, SpawnLoc[11].y, SpawnLoc[11].z);
+        else
+            m_creature->GetMotionMaster()->MovePoint(POINT_EAST, SpawnLoc[12].x, SpawnLoc[12].y, SpawnLoc[12].z);
     }
 
     void Aggro(Unit *pWho)
@@ -1895,66 +1843,52 @@ struct MANGOS_DLL_DECL mob_valkyrAI : public ScriptedAI
         if (!m_pInstance || !pWho)
             return;
 
-        DoCastSpellIfCan(pWho, SPELL_VALKYR_CHARGE, CAST_TRIGGERED);
         DoCastSpellIfCan(m_creature, SPELL_WINGS_OF_THE_DAMNED, CAST_TRIGGERED);
-        m_creature->AddThreat(pWho, 100000.0f);
-    }
-
-    void PassengerBoarded(Unit *pPassenger, int8 seat, bool bBoarded)
-    {
-        /*if (bBoarded)
-        {
-            m_creature->CastSpell(pPassenger, SPELL_IMPALED, true);
-            m_victimGuid = pPassenger->GetObjectGuid();
-        }
-        else
-        {
-            pPassenger->RemoveAurasDueToSpell(SPELL_IMPALED);
-            m_creature->ForcedDespawn();
-        }*/
+        //m_creature->AddThreat(pWho, 100.0f);
+        m_creature->SetInCombatWithZone();
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_bIsCarry && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
 
-        /*m_creature->AddThreat(m_creature->getVictim(), 1000000.0f);           // TODO, NEED REVISION
-
-        // Frost Tramp
-        if (m_uiFrostTrampTimer <= uiDiff)
+        if (!m_bIsCarry && m_creature->CanReachWithMeleeAttack(m_creature->getVictim()) && !m_bInMovement && !m_bIsInCenter)
         {
-            if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0), 22856) == CAST_OK)
-                m_uiFrostTrampTimer = 50000;
-        }
-        else
-            m_uiFrostTrampTimer -= uiDiff;
-
-        // Mortalhit
-        if (m_uiMortalHitTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 64592) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VALKYR_CARRY) == CAST_OK)
             {
-                if (Unit *pTarget = m_creature->getVictim())
-                    m_creature->CastSpell(pTarget, 64592, true);
-                    if (Unit *pTarget = m_creature->getVictim())
-                        m_creature->CastSpell(pTarget, 64592, true);
-                        if (Unit *pTarget = m_creature->getVictim())
-                            m_creature->CastSpell(pTarget, 64592, true);
-                            if (Unit *pTarget = m_creature->getVictim())
-                                m_creature->CastSpell(pTarget, 64592, true);
-                                if (Unit *pTarget = m_creature->getVictim())
-                                    m_creature->CastSpell(pTarget, 64592, true);
-
-                m_uiMortalHitTimer = 12000;
+                m_creature->getVictim()->EnterVehicle(m_creature->GetVehicleKit(), 0);
+                m_bIsCarry = true;
             }
         }
-        else
-            m_uiMortalHitTimer -= uiDiff;*/
 
-        m_creature->CastSpell(m_creature->getVictim(), SPELL_VALKYR_CARRY, true);
+        if (m_bIsCarry && !m_bInMovement)
+            MoveToClosestPoint();
 
-        DoMeleeAttackIfReady();
+        if (m_bIsHeroic && !m_bIsInCenter)
+        {
+            if (m_creature->GetHealthPercent() <= 50)
+            {
+                //DoCastSpellIfCan(m_creature, SPELL_VALKYR_EJECT);
+                if (VehicleKit *pVehKit = m_creature->GetVehicleKit())
+                    pVehKit->RemoveAllPassengers();
+                m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+                SetCombatMovement(false);
+                m_creature->SetLevitate(true);
+                m_creature->GetMotionMaster()->Clear();
+                m_creature->GetMotionMaster()->MovePoint(POINT_CENTER, SpawnLoc[10].x + urand(1, 4), SpawnLoc[10].y + urand (1, 4), SpawnLoc[10].z + urand (1, 4));
+            }
+        }
+        if (m_bIsInCenter)
+        {
+            if (m_uiLifeSiphonTimer < uiDiff)
+            {
+                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    if (DoCastSpellIfCan(pTarget, SPELL_LIFE_SIPHON) == CAST_OK)
+                        m_uiLifeSiphonTimer = 10000;
+            }
+            else m_uiLifeSiphonTimer -= uiDiff;
+        }
     }
 };
 
