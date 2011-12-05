@@ -74,6 +74,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
     npc_sylvanas_jaina_pos_startAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiTyrannusGuid.Clear();
         m_lGuards.clear();
         Reset();
     }
@@ -85,7 +86,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
     bool m_bIsIntro;
     uint32 creatureEntry;
 
-    uint64 m_uiTyrannusGuid;
+    ObjectGuid m_uiTyrannusGuid;
     GUIDList m_lGuards;
 
     void Reset()
@@ -93,7 +94,8 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
         m_uiIntro_Phase     = 0;
         m_uiSpeech_Timer    = 1000;
         m_bIsIntro          = false;
-        m_uiTyrannusGuid    = 0;
+        m_uiTyrannusGuid.Clear();
+        m_lGuards.clear();
         creatureEntry = m_creature->GetEntry();
 
         if(m_pInstance)
@@ -105,11 +107,13 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
         if (pWho->isInAccessablePlaceFor(m_creature) && !m_bIsIntro && pWho->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(pWho, 50) && m_creature->IsWithinLOSInMap(pWho))
         {
             if(m_pInstance && m_creature->GetPositionZ() > 525.0f)
+            {
                 if(m_pInstance->GetData(TYPE_INTRO) != DONE)
                 {
                     m_bIsIntro = true;
                     m_uiSpeech_Timer = 5000;
                 }
+            }
         }
     }
 
@@ -119,24 +123,30 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_1_HORDE, SummonLoc[0].x + urand(0, 15), SummonLoc[0].y - urand(0, 15), SummonLoc[0].z, SummonLoc[0].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->HandleEmote(EMOTE_STATE_READY1H);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 5; i < 10; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_2_HORDE, SummonLoc[1].x + urand(0, 15), SummonLoc[1].y + urand(0, 15), SummonLoc[1].z, SummonLoc[1].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->HandleEmote(EMOTE_STATE_READY1H);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 10; i < 15; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_3_HORDE, SummonLoc[2].x + urand(0, 15), SummonLoc[2].y + urand(0, 15), SummonLoc[2].z, SummonLoc[2].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->HandleEmote(EMOTE_STATE_READY1H);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
     }
 
@@ -146,24 +156,30 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_1_ALLIANCE, SummonLoc[0].x + urand(0, 15), SummonLoc[0].y + urand(0, 15), SummonLoc[0].z, SummonLoc[0].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->HandleEmote(EMOTE_STATE_READY1H);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 5; i < 10; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_2_ALLIANCE, SummonLoc[1].x + urand(0, 15), SummonLoc[1].y + urand(0, 15), SummonLoc[1].z, SummonLoc[1].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->HandleEmote(EMOTE_STATE_READY1H);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 10; i < 15; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_CHAMPION_3_ALLIANCE, SummonLoc[2].x + urand(0, 15), SummonLoc[2].y + urand(0, 15), SummonLoc[2].z, SummonLoc[2].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->HandleEmote(EMOTE_STATE_READY1H);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
     }
 

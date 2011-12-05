@@ -101,6 +101,7 @@ struct MANGOS_DLL_DECL npc_martin_gorkunAI: public ScriptedAI
     npc_martin_gorkunAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiTyrannusGuid.Clear();
         Reset();
     }
 
@@ -111,14 +112,14 @@ struct MANGOS_DLL_DECL npc_martin_gorkunAI: public ScriptedAI
     bool m_bIsOutro;
     uint32 creatureEntry;
 
-    uint64 m_uiTyrannusGuid;
+    ObjectGuid m_uiTyrannusGuid;
 
     void Reset()
     {
         m_uiOutro_Phase     = 0;
         m_uiSpeech_Timer    = 1000;
         m_bIsOutro          = true;
-        m_uiTyrannusGuid    = 0;
+        m_uiTyrannusGuid.Clear();
         creatureEntry = m_creature->GetEntry();
     }
 
@@ -207,7 +208,7 @@ struct MANGOS_DLL_DECL npc_martin_gorkunAI: public ScriptedAI
                 case 2:
                     if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 695.46f, -156.31f, 546.061f, 4.7f, TEMPSUMMON_TIMED_DESPAWN, 10000))
                     {
-                        pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                        //pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
                         pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         m_uiTyrannusGuid = pTyrannus->GetGUID();
                     }

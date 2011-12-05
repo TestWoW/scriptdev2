@@ -124,6 +124,7 @@ struct MANGOS_DLL_DECL boss_rimefangAI : public ScriptedAI
         m_pInstance = (instance_pit_of_saron*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         SetCombatMovement(false);
+        m_uiMainTargetGUID.Clear();
         Reset();
     }
 
@@ -203,6 +204,7 @@ struct MANGOS_DLL_DECL boss_tyrannusAI : public ScriptedAI
         m_pInstance = (instance_pit_of_saron*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         SetEquipmentSlots(false, EQUIP_ID, -1, -1);
+        m_uiRimefangGUID.Clear();
         Reset();
     }
 
@@ -215,7 +217,7 @@ struct MANGOS_DLL_DECL boss_tyrannusAI : public ScriptedAI
     uint32 m_uiMarkOfRimefangTimer;
     uint32 TeamInInstance;
 
-    uint64 m_uiRimefangGUID;
+    ObjectGuid m_uiRimefangGUID;
 
     uint32 GetFaction()
     {
@@ -236,7 +238,7 @@ struct MANGOS_DLL_DECL boss_tyrannusAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiRimefangGUID = 0;
+        m_uiRimefangGUID.Clear();
         m_uiForcefulSmashTimer  = 10000;
         m_uiOverlordsBrandTimer = 35000;
         m_uiDarkMightTimer      = 40000;
@@ -284,12 +286,16 @@ struct MANGOS_DLL_DECL boss_tyrannusAI : public ScriptedAI
             m_pInstance->SetData(TYPE_TYRANNUS, DONE);
 
         if(TeamInInstance == ALLIANCE)
-            Creature *pMartin = m_creature->SummonCreature(NPC_MARTIN_VICTUS_END, 1060.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-            Creature *pJaina = m_creature->SummonCreature(NPC_JAINA_PART2, 1065.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_DEAD_DESPAWN, 0);
+        {
+            m_creature->SummonCreature(NPC_MARTIN_VICTUS_END, 1060.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            m_creature->SummonCreature(NPC_JAINA_PART2, 1065.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_DEAD_DESPAWN, 0);
+        }
 
         if(TeamInInstance == HORDE)
-            Creature *pGorkun = m_creature->SummonCreature(NPC_GORKUN_IRONSKULL_END, 1065.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-            Creature *pSylvanas = m_creature->SummonCreature(NPC_SYLVANAS_PART2, 1060.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_DEAD_DESPAWN, 0);
+        {
+            m_creature->SummonCreature(NPC_GORKUN_IRONSKULL_END, 1065.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            m_creature->SummonCreature(NPC_SYLVANAS_PART2, 1060.983f, 94.954f, 630.997f, 2.247f, TEMPSUMMON_DEAD_DESPAWN, 0);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -390,6 +396,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_lGuards.clear();
+        lSlavesList.clear();
         Reset();
     }
 
@@ -401,10 +408,10 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
     uint32 creatureEntry;
     uint32 TeamInInstance;
 
-    uint64 m_uiMartinGuid;
-    uint64 m_uiGorkunGuid;
-    uint64 m_uiTyrannusGuid;
-    uint64 m_uiSindragosaGuid;
+    ObjectGuid m_uiMartinGuid;
+    ObjectGuid m_uiGorkunGuid;
+    ObjectGuid m_uiTyrannusGuid;
+    ObjectGuid m_uiSindragosaGuid;
     GUIDList m_lGuards;
 
     std::list<Creature*> lSlavesList;
@@ -428,6 +435,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
 
     void Reset()
     {
+        m_lGuards.clear();
         lSlavesList.clear();
         m_uiOutro_Phase     = 0;
         m_uiSpeech_Timer    = 1000;
@@ -435,10 +443,10 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
         TeamInInstance = GetFaction();
         creatureEntry = m_creature->GetEntry();
 
-        m_uiMartinGuid      = 0;
-        m_uiGorkunGuid      = 0;
-        m_uiTyrannusGuid    = 0;
-        m_uiSindragosaGuid  = 0;
+        m_uiMartinGuid.Clear();
+        m_uiGorkunGuid.Clear();
+        m_uiTyrannusGuid.Clear();
+        m_uiSindragosaGuid.Clear();
     }
 
     void TeleportPlayers()
@@ -464,24 +472,30 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_SLAVE_HORDE_1, SummonLoc[0].x + urand(0, 20), SummonLoc[0].y + urand(0, 20), SummonLoc[0].z, SummonLoc[0].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[0].x + urand(0, 20), MoveLoc[0].y + urand(0, 20), MoveLoc[0].z);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 5; i < 10; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_SLAVE_HORDE_2, SummonLoc[1].x + urand(0, 10), SummonLoc[1].y - urand(0, 10), SummonLoc[1].z, SummonLoc[1].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[2].x + urand(0, 20), MoveLoc[2].y - urand(0, 20), MoveLoc[2].z);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 10; i < 15; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_SLAVE_HORDE_3, SummonLoc[2].x - urand(0, 20), SummonLoc[2].y - urand(0, 20), SummonLoc[2].z, SummonLoc[2].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x - urand(0, 20), MoveLoc[1].y - urand(0, 20), MoveLoc[1].z);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
     }
 
@@ -491,24 +505,30 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_SLAVE_ALY_1, SummonLoc[0].x + urand(0, 20), SummonLoc[0].y + urand(0, 20), SummonLoc[0].z, SummonLoc[0].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[0].x + urand(0, 20), MoveLoc[0].y + urand(0, 20), MoveLoc[0].z);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 5; i < 10; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_SLAVE_ALY_2, SummonLoc[1].x + urand(0, 10), SummonLoc[1].y - urand(0, 10), SummonLoc[1].z, SummonLoc[1].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[2].x + urand(0, 20), MoveLoc[2].y - urand(0, 20), MoveLoc[2].z);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
 
         for (uint8 i = 10; i < 15; i++)
         {
             Creature *pTemp = m_creature->SummonCreature(NPC_SLAVE_ALY_3, SummonLoc[2].x - urand(0, 20), SummonLoc[2].y - urand(0, 20), SummonLoc[2].z, SummonLoc[2].o, TEMPSUMMON_DEAD_DESPAWN, 0);
             if (pTemp)
+            {
                 pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x - urand(0, 20), MoveLoc[1].y - urand(0, 20), MoveLoc[1].z);
                 m_lGuards.push_back(pTemp->GetObjectGuid());
+            }
         }
     }
 

@@ -351,6 +351,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_fos_endAI: public ScriptedAI
     npc_sylvanas_jaina_fos_endAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        lSlavesList.clear();
         m_lGuards.clear();
         Reset();
     }
@@ -387,6 +388,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_fos_endAI: public ScriptedAI
     void Reset()
     {
         lSlavesList.clear();
+        m_lGuards.clear();
         m_uiOutro_Phase     = 0;
         m_uiSpeech_Timer    = 1000;
         m_bIsOutro          = true;
