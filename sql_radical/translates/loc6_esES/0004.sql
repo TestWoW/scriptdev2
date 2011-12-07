@@ -285,5 +285,7 @@ UPDATE `script_texts` SET `content_loc6`='No puede ser...' WHERE `entry`='-15972
 -- VARIOS
 
 UPDATE `script_texts` SET `content_loc6`='¿Qué chuchos son los que se atreven a irrumpir aquí? ¡Adelante, hermanos! ¡Un festín para quien me traiga sus cabezas!' WHERE `entry`='-1575019' ;
+UPDATE `script_texts` SET `content_loc6`='¡El Resguardo destructivo gana poder!' WHERE `entry`='-1000664' ;
+UPDATE `script_texts` SET `content_loc6`='¡El Resguardo destructivo ha sido totalmente cargado!' WHERE `entry`='-1000665' ;
 
 UPDATE `script_texts` SET `content_loc7` = `content_loc6`;

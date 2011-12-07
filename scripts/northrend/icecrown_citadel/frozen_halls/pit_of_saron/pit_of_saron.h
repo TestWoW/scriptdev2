@@ -93,5 +93,6 @@ class MANGOS_DLL_DECL instance_pit_of_saron : public ScriptedInstance
         uint64 m_uiIcewallGUID;
         uint64 m_uiHallsPortGUID;
 };
+ 
 
 #endif
