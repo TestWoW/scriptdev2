@@ -300,6 +300,17 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_uiEnrageTimer < uiDiff  && !m_bEnrage)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+            {
+                DoScriptText(SAY_HALION_BERSERK, m_creature);
+                m_uiEnrageTimer = 8*MINUTE*IN_MILLISECONDS;
+                m_bEnrage = true;
+            }
+        }
+        else m_uiEnrageTimer -= uiDiff;
+
         switch (m_uiStage)
         {
         case 0: //PHASE 1 PHYSICAL REALM
@@ -356,7 +367,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             if (m_creature->GetHealthPercent() < 75.0f)
                 m_uiStage = 1;
             break;
-        case 1: // Switch to phase 2
+        case 1:
             if (m_creature->IsNonMeleeSpellCasted(true))
                 return;
 
@@ -365,19 +376,19 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             DoScriptText(SAY_HALION_PHASE_2,m_creature);
             SetCombatMovement(false);
             StartMovement(0);
-            if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
+            m_uiStage = 2;
             {
-                if (!pControl->isAlive())
-                    pControl->Respawn();
+            Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL);
+            if (!pControl)
+                pControl = m_creature->SummonCreature(NPC_HALION_CONTROL, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
+            else if (!pControl->isAlive())
+                pControl->Respawn();
 
-                pControl->SetActiveObjectState(true);
-                pControl->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                m_creature->SetInCombatWith(pControl);
-                pControl->SetInCombatWith(m_creature);
-                m_uiStage = 2;
+            pControl->SetActiveObjectState(true);
+            pControl->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->SetInCombatWith(pControl);
+            pControl->SetInCombatWith(m_creature);
             }
-            else
-                m_creature->SummonCreature(NPC_HALION_CONTROL, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 1000);
             break;
         case 2:
             if (m_bMovementStarted)
@@ -412,7 +423,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                 else if (!pTwilight->isAlive())
                     pTwilight->Respawn();
                 pTwilight->SetCreatorGuid(ObjectGuid());
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 m_uiStage = 5;
             }
             break;
@@ -514,17 +525,6 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
         default:
             break;
         }
-
-        if (m_uiEnrageTimer < uiDiff  && !m_bEnrage)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-            {
-                DoScriptText(SAY_HALION_BERSERK, m_creature);
-                m_uiEnrageTimer = 8*MINUTE*IN_MILLISECONDS;
-                m_bEnrage = true;
-            }
-        }
-        else m_uiEnrageTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
