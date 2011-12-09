@@ -370,7 +370,6 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
                     SetCombatMovement(false);
 
                     // TODO This should actually be jump movement
-                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_creature->GetMotionMaster()->MovePoint(PHASE_BLADE_ENCHANTMENT, aGarfrostMoveLocs[0][0], aGarfrostMoveLocs[0][1], aGarfrostMoveLocs[0][2]);
                     m_uiPhase = PHASE_MOVEMENT;
 
@@ -387,7 +386,6 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
                     SetCombatMovement(false);
 
                     // TODO This should actually be jump movement
-                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_creature->GetMotionMaster()->MovePoint(PHASE_MACE_ENCHANTMENT, aGarfrostMoveLocs[1][0], aGarfrostMoveLocs[1][1], aGarfrostMoveLocs[1][2]);
                     m_uiPhase = PHASE_MOVEMENT;
 
