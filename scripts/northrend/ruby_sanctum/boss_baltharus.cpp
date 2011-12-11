@@ -271,6 +271,7 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
             m_uiStage = 9;
             break;
         case 9:
+            break;
         default:
             break;
         }
@@ -284,7 +285,7 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
 
         if (m_uiEnervatingBrandTimer < uiDiff)
         {
-            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_ENERVATING_BRAND, SELECT_FLAG_PLAYER))
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_ENERVATING_BRAND) == CAST_OK)
                     m_uiEnervatingBrandTimer = urand(10000, 13000);
@@ -312,9 +313,9 @@ CreatureAI* GetAI_boss_baltharus(Creature* pCreature)
 ## mob_baltharus_clone
 ######*/
 
-struct MANGOS_DLL_DECL mob_baltharus_cloneAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_baltharus_cloneAI : public ScriptedAI
 {
-    mob_baltharus_cloneAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    mob_baltharus_cloneAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
@@ -376,7 +377,7 @@ struct MANGOS_DLL_DECL mob_baltharus_cloneAI : public BSWScriptedAI
 
         if (m_uiEnervatingBrandTimer < uiDiff)
         {
-            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_ENERVATING_BRAND, SELECT_FLAG_PLAYER))
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_ENERVATING_BRAND) == CAST_OK)
                     m_uiEnervatingBrandTimer = urand(10000, 13000);

@@ -196,6 +196,7 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public ScriptedAI
                 SetCombatMovement(false);
                 m_creature->SetLevitate(true);
                 m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(POINT_AIR, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z);
             }
             else m_uiPhaseTimer -= uiDiff;
@@ -221,6 +222,7 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public ScriptedAI
             {
                 m_uiPhase = PHASE_FLYING;
                 m_uiPhaseTimer = 30000;
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(POINT_LAND, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z);
             }
             else m_uiPhaseTimer -= uiDiff;

@@ -342,7 +342,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             // Fiery Combustion
             if (m_uiFieryCombustionTimer < uiDiff)
             {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_FIERY_COMBUSTION, SELECT_FLAG_PLAYER))
+                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_FIERY_COMBUSTION) == CAST_OK)
                         m_uiFieryCombustionTimer = 25000;
@@ -394,8 +394,8 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             if (m_bMovementStarted)
                 return;
 
-            m_creature->CastSpell(m_creature, SPELL_SUMMON_TWILIGHT_PORTAL, true);
-            if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
+            //m_creature->CastSpell(m_creature, SPELL_SUMMON_TWILIGHT_PORTAL, true);
+            if (GameObject* pGoPortal = m_creature->SummonGameobject(GO_HALION_PORTAL_1, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, 0))
                   pGoPortal->SetPhaseMask(31,true);
             if (GameObject* pGoRing = m_pInstance->GetSingleGameObjectFromStorage(GO_FLAME_RING))
                   pGoRing->SetPhaseMask(65535,true);
