@@ -62,6 +62,7 @@ enum
 
     NPC_VALITHRIA                       = 36789,
     NPC_VALITHRIA_QUEST                 = 38589,
+    NPC_LICH_TRIGGER                    = 37181,
     NPC_SINDRAGOSA                      = 36853,
     NPC_LICH_KING                       = 36597,
 
