@@ -196,6 +196,7 @@ static Locations SpawnLoc[]=
             case NPC_CROK:
             case NPC_VALITHRIA:
             case NPC_VALITHRIA_QUEST:
+            case NPC_LICH_TRIGGER:
             case NPC_SINDRAGOSA:
             case NPC_LICH_KING:
             case NPC_RIMEFANG:

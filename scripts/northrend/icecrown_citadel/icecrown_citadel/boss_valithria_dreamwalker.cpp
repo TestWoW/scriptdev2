@@ -35,6 +35,7 @@ static Locations SpawnLoc[]=
     {4236.000000f, 2479.500000f, 364.869995f},  // 6 Mob 2
     {4235.410156f, 2489.300049f, 364.872009f},  // 7 Mob 3
     {4228.509766f, 2500.310059f, 364.876007f},  // 8 Mob 4
+    {4236.767090f, 2484.514648f, 364.871216f},  // 9 LK
 };
 
 enum BossSpells
@@ -116,19 +117,20 @@ enum BossSpells
 };
 
 enum
-// Valithria
 {
+    // Valithria
     SAY_AGGRO                   = -1631140,
+    SAY_LICH_AGGRO              = -1631194,
     SAY_PORTAL                  = -1631141,
-    SAY_SURPRESSER              = -1631595,
     SAY_75_HEALTH               = -1631142,
     SAY_25_HEALTH               = -1631143,
     SAY_0_HEALTH                = -1631144,
-    SAY_PLAYER_DIES             = -1631145,
+    SAY_SLAY_1                  = -1631595,
+    SAY_SLAY_2                  = -1631145,
     SAY_BERSERK                 = -1631146,
     SAY_VICTORY                 = -1631147,
 
-// Svalna
+    // Svalna
     SAY_SVALNA_1                = -1631133,
     SAY_CROK_1                  = -1631130,
     SAY_SVALNA_2                = -1631135,
@@ -137,7 +139,7 @@ enum
     SAY_SVALNA_AGGRO            = -1631136,
     SAY_SVALNA_DEATH            = -1631139,
     SAY_SVALNA_KILL             = -1631138,
-    SAY_SVALNA_AETHER             = -1631134,
+    SAY_SVALNA_AETHER           = -1631134,
 
 };
 
@@ -166,7 +168,9 @@ struct MANGOS_DLL_DECL mob_svalna_eventAI : public ScriptedAI
     bool m_bIsEventStarted;
     bool m_bIsEventFinished;
 
-    void Reset(){}
+    void Reset()
+    {
+    }
 
     void NextStep(uint32 uiTimer)
     {
@@ -196,10 +200,19 @@ struct MANGOS_DLL_DECL mob_svalna_eventAI : public ScriptedAI
 
         if (m_uiEventTimer <= uiDiff)
         {
+            if (Creature* pSvalna = m_pInstance->GetSingleCreatureFromStorage(NPC_SVALNA))
+            {
+                if (!pSvalna->isAlive())
+                {
+                    m_bIsEventFinished = true;
+                }
+            }
+
             switch (m_uiStep)
             {
                 case 0:
                 {
+                    NextStep(1000);
                     break;
                 }
                 case 1:
@@ -357,6 +370,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
     bool m_bIs25Man;
 
     bool m_bCombatStarted;
+    bool m_bLichAggro;
     bool m_bIsEnrage;
     bool m_bSaidOver25;
     bool m_bSaidOver75;
@@ -365,6 +379,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
     uint32 m_uiEnrageTimer;
     uint32 m_uiHealthCheckTimer;
     uint32 m_uiSummonPortalsTimer;
+    uint32 m_uiLichAggroTimer;
     uint32 m_uiOutroTimer;
 
     uint32 m_uiSummonCounter;
@@ -382,6 +397,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
 
         m_uiEnrageTimer         = 7 * MINUTE * IN_MILLISECONDS;
         m_uiHealthCheckTimer    = 30000; // no need to check in the beginning of the fight
+        m_uiLichAggroTimer      = 10000;
         m_uiOutroTimer          = 4000;
         m_uiSummonPortalsTimer  = 30000;
 
@@ -417,6 +433,9 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
             if (m_pInstance)
             {
                 m_pInstance->SetData(TYPE_VALITHRIA, IN_PROGRESS);
+                m_bLichAggro = true;
+
+                m_creature->SummonCreature(NPC_LICH_TRIGGER, SpawnLoc[9].x, SpawnLoc[9].y, SpawnLoc[9].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000);
 
                 if (Creature *pTmp = m_pInstance->GetSingleCreatureFromStorage(NPC_COMBAT_TRIGGER))
                 {
@@ -436,7 +455,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
     void KilledUnit(Unit* pVictim)
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
-            DoScriptText(SAY_PLAYER_DIES, m_creature, pVictim);
+            DoScriptText(SAY_SLAY_1 + urand(0, 450), m_creature, pVictim);
     }
 
     void JustDied(Unit *pKiller)
@@ -528,6 +547,21 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
     {
         if (!m_bCombatStarted)
             return;
+
+        // Lich Aggro
+        if (m_bLichAggro)
+        {
+            if (m_uiLichAggroTimer <= uiDiff)
+            {
+                if (Creature *pLich = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_TRIGGER))
+                {
+                    DoScriptText(SAY_LICH_AGGRO, pLich);
+                    m_bLichAggro = false;
+                }
+            }
+            else
+                m_uiLichAggroTimer -= uiDiff;
+        }
 
         // Outro
         if (m_bIsHealed)
@@ -791,6 +825,14 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
             pCreature->DealDamage(pCreature, pCreature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
     }
 
+    void KilledUnit(Unit *pVictim)
+    {
+        if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
+        {
+            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+        }
+    }
+
     void JustDied (Unit *pVictim)
     {
         m_creature->CastSpell(m_creature, SPELL_ROT_WORM_SPAWNER, false);
@@ -827,18 +869,28 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
 {
     mob_blistering_zombieAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
     }
 
     bool m_bIs25Man;
     Difficulty m_uiMapDifficulty;
+    ScriptedInstance *m_pInstance;
 
     void Reset(){}
 
     void Aggro(Unit *pWho)
     {
         DoCastSpellIfCan(m_creature, SPELL_CORROSION, CAST_TRIGGERED);
+    }
+
+    void KilledUnit(Unit *pVictim)
+    {
+        if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
+        {
+            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+        }
     }
 
     void DamageTaken(Unit *pDealer, uint32 &uiDamage)
@@ -871,6 +923,7 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
 {
     mob_risen_archmageAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
@@ -882,12 +935,21 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
 
     bool m_bIs25Man;
     Difficulty m_uiMapDifficulty;
+    ScriptedInstance *m_pInstance;
 
     void Reset()
     {
         m_uiFrostboltVolleyTimer = urand(3000, 5000);
         m_uiColumnOfFrostTimer = urand(3000, 5000);
         m_uiManaVoidTimer = urand(5000, 10000);
+    }
+
+    void KilledUnit(Unit *pVictim)
+    {
+        if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
+        {
+            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -942,6 +1004,7 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
 {
     mob_blazing_skeletonAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
@@ -952,11 +1015,20 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
 
     bool m_bIs25Man;
     Difficulty m_uiMapDifficulty;
+    ScriptedInstance *m_pInstance;
 
     void Reset()
     {
         m_uiFireballTimer = urand(3000, 5000);
         m_uiLayWasteTimer = urand(5000, 15000);
+    }
+
+    void KilledUnit(Unit *pVictim)
+    {
+        if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
+        {
+            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1008,20 +1080,16 @@ struct MANGOS_DLL_DECL mob_suppresserAI : public ScriptedAI
 
     bool m_bIsCasting;
     bool m_bIs25Man;
-    ScriptedInstance *m_pInstance;
 
+    ScriptedInstance *m_pInstance;
     Difficulty m_uiMapDifficulty;
+
     void Reset()
     {
-
     }
 
     void JustDied(Unit *pKiller)
     {
-         if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA)) 
-         {
-              DoScriptText(SAY_SURPRESSER, pTemp);
-         }
     }
 
     void UpdateAI(const uint32 uiDiff)
