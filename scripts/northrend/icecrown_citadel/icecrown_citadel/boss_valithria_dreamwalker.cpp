@@ -829,7 +829,12 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
     {
         if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
         {
-            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+            switch(urand(0,1))
+            {
+            case 0: DoScriptText(SAY_SLAY_1 ,pValithria, pVictim); break;
+            case 1: DoScriptText(SAY_SLAY_2 ,pValithria, pVictim); break;
+            default: break;
+            }
         }
     }
 
@@ -889,10 +894,14 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
     {
         if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
         {
-            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+            switch(urand(0,1))
+            {
+            case 0: DoScriptText(SAY_SLAY_1 ,pValithria, pVictim); break;
+            case 1: DoScriptText(SAY_SLAY_2 ,pValithria, pVictim); break;
+            default: break;
+            }
         }
     }
-
     void DamageTaken(Unit *pDealer, uint32 &uiDamage)
     {
         if (uiDamage > m_creature->GetHealth())
@@ -948,7 +957,12 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     {
         if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
         {
-            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+            switch(urand(0,1))
+            {
+            case 0: DoScriptText(SAY_SLAY_1 ,pValithria, pVictim); break;
+            case 1: DoScriptText(SAY_SLAY_2 ,pValithria, pVictim); break;
+            default: break;
+            }
         }
     }
 
@@ -1027,7 +1041,12 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
     {
         if (Creature *pValithria = m_pInstance->GetSingleCreatureFromStorage(NPC_VALITHRIA))
         {
-            DoScriptText(SAY_SLAY_1 + urand(0, 450), pValithria, pVictim);
+            switch(urand(0,1))
+            {
+            case 0: DoScriptText(SAY_SLAY_1 ,pValithria, pVictim); break;
+            case 1: DoScriptText(SAY_SLAY_2 ,pValithria, pVictim); break;
+            default: break;
+            }
         }
     }
 
