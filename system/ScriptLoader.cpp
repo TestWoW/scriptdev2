@@ -241,6 +241,7 @@ extern void AddSC_razorfen_downs();
 extern void AddSC_instance_razorfen_kraul();                // razorfen_kraul
 extern void AddSC_razorfen_kraul();
 extern void AddSC_boss_ayamiss();                           // ruins_of_ahnqiraj
+extern void AddSC_boss_ossirian();
 extern void AddSC_boss_kurinnaxx();
 extern void AddSC_boss_moam();
 extern void AddSC_ruins_of_ahnqiraj();
@@ -767,6 +768,7 @@ void AddScripts()
     AddSC_instance_razorfen_kraul();                        // razorfen_kraul
     AddSC_razorfen_kraul();
     AddSC_boss_ayamiss();                                   // ruins_of_ahnqiraj
+    AddSC_boss_ossirian();
     AddSC_boss_kurinnaxx();
     AddSC_boss_moam();
     AddSC_ruins_of_ahnqiraj();
