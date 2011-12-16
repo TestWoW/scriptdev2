@@ -2482,7 +2482,6 @@ bool GossipHello_wintern_reveler(Player* pPlayer, Creature* pCreature)
         pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
         return true;
     }
-    return false;
 
     if (pPlayer->HasAura(26272))
     {
@@ -2490,7 +2489,6 @@ bool GossipHello_wintern_reveler(Player* pPlayer, Creature* pCreature)
         pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
         return true;
     }
-    return false;
 
     if (pPlayer->HasAura(26273))
     {
@@ -2498,7 +2496,6 @@ bool GossipHello_wintern_reveler(Player* pPlayer, Creature* pCreature)
         pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
         return true;
     }
-    return false;
 
     if (pPlayer->HasAura(26274))
     {
@@ -2506,7 +2503,6 @@ bool GossipHello_wintern_reveler(Player* pPlayer, Creature* pCreature)
         pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
         return true;
     }
-    return false;
 
     if (pPlayer->HasAura(26275))
     {
