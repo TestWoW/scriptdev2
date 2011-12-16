@@ -2476,7 +2476,7 @@ bool GossipHello_wintern_reveler(Player* pPlayer, Creature* pCreature)
                       break;
     };
 
-    if (pPlayer->HasAura(26157) && pPlayer->HasAura(26272) && pPlayer->HasAura(26273) && pPlayer->HasAura(26274) && pPlayer->HasAura(26275))
+    if (pPlayer->HasAura(26157) || pPlayer->HasAura(26272) || pPlayer->HasAura(26273) || pPlayer->HasAura(26274) || pPlayer->HasAura(26275))
     {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
