@@ -257,7 +257,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public ScriptedAI
                 {
                     if (m_uiBoneSpikeTimer <= uiDiff)
                     {
-                            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                             {
                                 m_creature->CastSpell(pTarget, m_bIs25Man ? SPELL_BONE_SPIKE_25 : SPELL_BONE_SPIKE_10, false);
                                 m_uiBoneSpikeTimer = urand(20000, 30000);
@@ -387,24 +387,31 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
     {
         m_pInstance = ((instance_icecrown_spire*)pCreature->GetInstanceData());
         m_uiAchievTimer = 8000;
+        m_victimGuid.Clear();
         m_bEmerged = false;
         SetCombatMovement(false);
     }
 
     instance_icecrown_spire* m_pInstance;
     bool m_bEmerged;
+    ObjectGuid m_victimGuid;
     uint32 m_uiAchievTimer;
 
     void Reset()
     {
         m_uiAchievTimer = 8000;
+        m_victimGuid.Clear();
     }
 
     void AttackStart(Unit *pWho){}
 
     void PassengerBoarded(Unit *pPassenger, int8 seat, bool bBoarded)
     {
-        if (!bBoarded)
+        if (bBoarded)
+        {
+            m_victimGuid = pPassenger->GetObjectGuid();
+        }
+        else
         {
             pPassenger->RemoveAurasDueToSpell(SPELL_IMPALED);
             m_creature->ForcedDespawn();
@@ -422,6 +429,12 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
         if (m_uiAchievTimer < uiDiff)
             m_pInstance->SetSpecialAchievementCriteria(TYPE_BONED, false);
         else m_uiAchievTimer -= uiDiff;
+    }
+
+    void JustDied(Unit *pKiller)
+    {
+        if (Player* pVictim = m_creature->GetMap()->GetPlayer(m_victimGuid))
+            pVictim->RemoveAurasDueToSpell(SPELL_IMPALED);
     }
 };
 

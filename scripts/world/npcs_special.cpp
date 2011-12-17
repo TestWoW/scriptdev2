@@ -2452,83 +2452,6 @@ bool GossipSelect_pilgrim_table(Player* pPlayer, Creature* pCreature, uint32 uiS
     return true;
 }
 
-bool GossipHello_wintern_reveler(Player* pPlayer, Creature* pCreature)
-{
-    char const* GOSSIP_HELP;
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-     case LOCALE_enUS:
-     case LOCALE_koKR:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-                      GOSSIP_HELP        = "Ofrecer ayuda.";
-                      break;
-     case LOCALE_esMX:
-                      GOSSIP_HELP        = "Ofrecer ayuda.";
-                      break;
-     case LOCALE_ruRU:
-     default:
-                      GOSSIP_HELP        = "Help them.";
-                      break;
-    };
-
-    if (pPlayer->HasAura(26157))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
-        return true;
-    }
-    return false;
-
-    if (pPlayer->HasAura(26272))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
-        return true;
-    }
-    return false;
-
-    if (pPlayer->HasAura(26273))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
-        return true;
-    }
-    return false;
-
-    if (pPlayer->HasAura(26274))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
-        return true;
-    }
-    return false;
-
-    if (pPlayer->HasAura(26275))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
-        return true;
-    }
-    return false;
-}
-
-bool GossipSelect_wintern_reveler(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch(uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(252);
-            break;
-    }
-    return true;
-}
-
 void AddSC_npcs_special()
 {
     Script* pNewScript;
@@ -2656,11 +2579,5 @@ void AddSC_npcs_special()
     pNewScript->Name = "pilgrim_table";
     pNewScript->pGossipHello = &GossipHello_pilgrim_table;
     pNewScript->pGossipSelect = &GossipSelect_pilgrim_table;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "wintern_reveler";
-    pNewScript->pGossipHello = &GossipHello_wintern_reveler;
-    pNewScript->pGossipSelect = &GossipSelect_wintern_reveler;
     pNewScript->RegisterSelf();
 }
