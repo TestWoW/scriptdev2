@@ -214,6 +214,10 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
 
     Powers m_powerBloodPower;
 
+    virtual void ResetFight() 
+    {
+    }
+
     void Reset()
     {
         if (m_bIsAlliance)
@@ -1334,11 +1338,11 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     uint32 m_uiBloodNovaTimer;
     uint32 m_uiBloodBeastsTimer;
     uint32 m_uiScentOfBloodTimer;
+    uint32 m_uiFrenzyTimer;
     uint32 m_uiBerserkTimer;
     uint32 m_uiCheckTimer;
     uint32 m_uiMarksCount;
 
-    bool m_bIsFrenzied;
     bool m_bIsHeroic;
     bool m_bIs25Man;
     bool m_bAchievFailed;
@@ -1353,9 +1357,11 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         m_uiBloodNovaTimer      = urand(16000, 35000);
         m_uiBloodBeastsTimer    = 40000;
         m_uiScentOfBloodTimer   = 47000; // 5 seconds after beasts engage in combat
+        m_uiFrenzyTimer         = 0;
         m_uiBerserkTimer        = (m_bIsHeroic ? 6 : 8) * MINUTE * IN_MILLISECONDS;
         m_uiCheckTimer          = 1000;
         m_uiMarksCount          = 0;
+        
 
         m_bIsFrenzied = false;
         m_bAchievFailed = false;
@@ -1494,16 +1500,17 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         }
 
         // Frenzy (soft enrage)
-        if (!m_bIsFrenzied)
+        if (m_creature->GetHealthPercent() <= 30.0f)
         {
-            if (m_creature->GetHealthPercent() <= 30.0f)
+            if (m_uiFrenzyTimer <= uiDiff)
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_FRENZY, CAST_TRIGGERED))
-                {
                     DoScriptText(SAY_BERSERK, m_creature);
-                    m_bIsFrenzied = true;
-                }
+
+                m_uiFrenzyTimer = 60000; // dummy timer
             }
+            else 
+                m_uiFrenzyTimer -= uiDiff;
         }
 
         // Berserk (hard enrage)
