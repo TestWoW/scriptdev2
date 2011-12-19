@@ -1363,7 +1363,6 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         m_uiMarksCount          = 0;
         
 
-        m_bIsFrenzied = false;
         m_bAchievFailed = false;
 
         m_creature->SetPower(m_powerBloodPower, 0);
