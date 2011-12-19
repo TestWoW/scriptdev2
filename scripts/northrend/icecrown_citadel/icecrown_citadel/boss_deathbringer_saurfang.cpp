@@ -1362,9 +1362,9 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         m_uiCheckTimer          = 1000;
         m_uiMarksCount          = 0;
         
-
         m_bAchievFailed = false;
 
+        DoCastSpellIfCan(m_creature, SPELL_REMOVE_MARKS, CAST_TRIGGERED);
         m_creature->SetPower(m_powerBloodPower, 0);
     }
 
