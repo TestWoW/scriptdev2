@@ -24,37 +24,19 @@ EndScriptData */
 #include "precompiled.h"
 #include "trial_of_the_crusader.h"
 
-struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstance
-{
-    instance_trial_of_the_crusader(Map* pMap) : BSWScriptedInstance(pMap)
+    instance_trial_of_the_crusader::instance_trial_of_the_crusader(Map* pMap) : BSWScriptedInstance(pMap)
     {
         Difficulty = pMap->GetDifficulty();
         Initialize();
     }
 
-    uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
-    uint32 m_auiEventTimer;
-    uint32 m_auiEventNPCId;
-    uint32 m_auiNorthrendBeasts;
-    uint8 Difficulty;
-    std::string m_strInstData;
-    bool needsave;
-
-    uint32 m_uiDataDamageFjola;
-    uint32 m_uiDataDamageEydis;
-    uint32 m_uiValkyrsCasting;
-
-    uint32 m_uiTributeChest1;
-    uint32 m_uiTributeChest2;
-    uint32 m_uiTributeChest3;
-    uint32 m_uiTributeChest4;
-
-    uint32 m_auiCrusadersCount;
-
-    void Initialize()
+    void instance_trial_of_the_crusader::Initialize()
     {
         for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
             m_auiEncounter[i] = NOT_STARTED;
+
+        for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS; ++i)
+            m_bAchievCriteria[i] = false;
 
         m_auiEncounter[0] = 0;
         m_auiEncounter[7] = 50;
@@ -66,7 +48,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         needsave = false;
     }
 
-    bool IsEncounterInProgress() const
+    bool instance_trial_of_the_crusader::IsEncounterInProgress() const
     {
         for(uint8 i = 1; i < MAX_ENCOUNTERS-2 ; ++i)
             if (m_auiEncounter[i] == IN_PROGRESS)
@@ -75,7 +57,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         return false;
     }
 
-    void OnPlayerEnter(Player *m_player)
+    void instance_trial_of_the_crusader::OnPlayerEnter(Player *m_player)
     {
         if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
         {
@@ -84,7 +66,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         }
     }
 
-    bool IsRaidWiped()
+    bool instance_trial_of_the_crusader::IsRaidWiped()
     {
         Map::PlayerList const &players = instance->GetPlayers();
 
@@ -99,21 +81,56 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         return true;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void instance_trial_of_the_crusader::OnCreatureCreate(Creature* pCreature)
     {
         if (!pCreature)
             return;
         m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
     }
 
-    void OnObjectCreate(GameObject *pGo)
+    void instance_trial_of_the_crusader::OnObjectCreate(GameObject *pGo)
     {
         if (!pGo)
             return;
         m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    bool instance_trial_of_the_crusader::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+    {
+        switch (uiCriteriaId)
+        {
+            case CRITERIA_ACHIEV_GORMOK_10:
+            case CRITERIA_ACHIEV_GORMOK_25:
+                 return m_bAchievCriteria[TYPE_ACHIEV_GORMOK];
+            case CRITERIA_ACHIEV_JORMUNGAR_10:
+            case CRITERIA_ACHIEV_JORMUNGAR_25:
+                 return m_bAchievCriteria[TYPE_ACHIEV_JORMUNGAR];
+            case CRITERIA_ACHIEV_JARAXXUS_10:
+            case CRITERIA_ACHIEV_JARAXXUS_25:
+                 return m_bAchievCriteria[TYPE_ACHIEV_JARAXXUS];
+            case CRITERIA_ACHIEV_CHAMPIONS_10:
+            case CRITERIA_ACHIEV_CHAMPIONS_25:
+                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS];
+            case CRITERIA_ACHIEV_CHAMPIONS_KILL_10:
+            case CRITERIA_ACHIEV_CHAMPIONS_KILL_25:
+            case CRITERIA_ACHIEV_CHAMPIONS_KILL_10H:
+            case CRITERIA_ACHIEV_CHAMPIONS_KILL_25H:
+                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS_KILL];
+            case CRITERIA_ACHIEV_VALKYRS_10:
+            case CRITERIA_ACHIEV_VALKYRS_25:
+                 return m_bAchievCriteria[TYPE_ACHIEV_VALKYRS];
+            default:
+                 return false;
+        }
+    }
+
+    void instance_trial_of_the_crusader::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
+    {
+        if (uiType < MAX_SPECIAL_ACHIEV_CRITS)
+            m_bAchievCriteria[uiType] = bIsMet;
+    }
+
+    void instance_trial_of_the_crusader::SetData(uint32 uiType, uint32 uiData)
     {
         switch(uiType)
         {
@@ -122,15 +139,27 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
             break;
         case TYPE_BEASTS:
             m_auiEncounter[1] = uiData;
+            if (uiData == IN_PROGRESS)
+            {
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, true);
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
+            }
             break;
         case TYPE_JARAXXUS:
             m_auiEncounter[2] = uiData;
+            if (uiData == IN_PROGRESS)
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, true);
             break;
         case TYPE_CRUSADERS:
             if (uiData == FAIL && (m_auiEncounter[3] == FAIL || m_auiEncounter[3] == NOT_STARTED))
                 m_auiEncounter[3] = NOT_STARTED;
             else
                 m_auiEncounter[3] = uiData;
+            if (uiData == IN_PROGRESS)
+            {
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS, true);
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS_KILL, true);
+            }
             if (uiData == DONE)
             {
                 uint32 uiCacheEntry = GO_CRUSADERS_CACHE_10;
@@ -150,7 +179,6 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
                 if (GameObject* pChest = GetSingleGameObjectFromStorage(uiCacheEntry))
                     if (!pChest->isSpawned())
                         pChest->SetRespawnTime(7*DAY);
-                //pChest->ForcedDespawn(10000);
             };
             break;
         case TYPE_CRUSADERS_COUNT:
@@ -163,12 +191,22 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
             if (m_auiEncounter[4] == SPECIAL && uiData == SPECIAL)
                 uiData = DONE;
             m_auiEncounter[4] = uiData;
+            if (uiData == IN_PROGRESS)
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_VALKYRS, true);
             break;
         case TYPE_LICH_KING:
             m_auiEncounter[5] = uiData;
             break;
         case TYPE_ANUBARAK:
             m_auiEncounter[6] = uiData;
+
+            if (uiData == IN_PROGRESS)
+            {
+                DoCloseDoor(GO_WEB_DOOR);
+            }
+            else
+                DoOpenDoor(GO_WEB_DOOR);
+
             if (uiData == DONE)
             {
                 if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
@@ -244,13 +282,19 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         {
             DoCloseDoor(GO_WEST_PORTCULLIS);
             DoCloseDoor(GO_NORTH_PORTCULLIS);
-//            DoCloseDoor(GO_SOUTH_PORTCULLIS);
+            DoCloseDoor(GO_SOUTH_PORTCULLIS);
+
+            if (Creature* pBarrent = GetSingleCreatureFromStorage(NPC_BARRENT)) 
+                pBarrent->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
         else
         {
             DoOpenDoor(GO_WEST_PORTCULLIS);
-            DoOpenDoor(GO_NORTH_PORTCULLIS);
-//            DoOpenDoor(GO_SOUTH_PORTCULLIS);
+            DoCloseDoor(GO_NORTH_PORTCULLIS);
+            DoCloseDoor(GO_SOUTH_PORTCULLIS);
+
+            if (Creature* pBarrent = GetSingleCreatureFromStorage(NPC_BARRENT)) 
+                pBarrent->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         };
 
         if (uiData == FAIL && uiType != TYPE_STAGE && uiType != TYPE_EVENT && uiType != TYPE_COUNTER && uiType != TYPE_EVENT_TIMER)
@@ -280,7 +324,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         }
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 instance_trial_of_the_crusader::GetData(uint32 uiType)
     {
         switch(uiType)
         {
@@ -300,7 +344,6 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
             case TYPE_EVENT_NPC: switch (m_auiEncounter[8]) 
                                  {
                                  case 110:
-                                 case 111:
                                  case 115:
                                  case 116:
                                  case 140:
@@ -315,6 +358,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
                                  case 666:
                                  case 1010:
                                  case 1180:
+                                 case 1999:
                                  case 2000:
                                  case 2030:
                                  case 3000:
@@ -350,12 +394,6 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
                                  break;
 
                                  case 130:
-                                 case 132:
-                                 case 133:
-                                 case 134:
-                                 case 135:
-                                 case 136:
-                                 case 137:
                                  case 2020:
                                  case 3080:
                                  case 3051:
@@ -365,20 +403,6 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
                                  break;
 
                                  case 120:
-                                 case 121:
-                                 case 122:
-                                 case 123:
-                                 case 124:
-                                 case 125:
-                                 case 126:
-                                 case 127:
-                                 case 128:
-                                 case 129:
-                                 case 1333:
-                                 case 1334:
-                                 case 1335:
-                                 case 1336:
-                                 case 1337:
                                  case 2010:
                                  case 3050:
                                  case 3070:
@@ -399,6 +423,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
                                  case 1145:
                                  case 1150:
                                  case 1160:
+                                 case 1170:
                                  m_auiEventNPCId = NPC_FIZZLEBANG;
                                  break;
 
@@ -416,12 +441,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         return 0;
     }
 
-    const char* Save()
-    {
-        return m_strInstData.c_str();
-    }
-
-    void Load(const char* strIn)
+    void instance_trial_of_the_crusader::Load(const char* strIn)
     {
         if (!strIn)
         {
@@ -446,7 +466,7 @@ struct MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstan
         OUT_LOAD_INST_DATA_COMPLETE;
 
     }
-};
+
 
 InstanceData* GetInstanceData_instance_trial_of_the_crusader(Map* pMap)
 {
@@ -455,9 +475,9 @@ InstanceData* GetInstanceData_instance_trial_of_the_crusader(Map* pMap)
 
 void AddSC_instance_trial_of_the_crusader()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "instance_trial_of_the_crusader";
-    newscript->GetInstanceData = &GetInstanceData_instance_trial_of_the_crusader;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "instance_trial_of_the_crusader";
+    pNewScript->GetInstanceData = &GetInstanceData_instance_trial_of_the_crusader;
+    pNewScript->RegisterSelf();
 }
