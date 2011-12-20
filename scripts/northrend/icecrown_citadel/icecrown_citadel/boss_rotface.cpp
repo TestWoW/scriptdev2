@@ -144,21 +144,19 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public ScriptedAI
 
     uint32 m_uiBerserkTimer;
     uint32 m_uiSlimeSprayTimer;
-    uint32 m_uiMutatedInfectionTimer;
-    uint32 m_uiMutatedInfectionBeforeTimer;
-    uint32 m_uiInfectionsRate;
+    //uint32 m_uiMutatedInfectionTimer;
+    //uint32 m_uiMutatedInfectionBeforeTimer;
+    //uint32 m_uiInfectionsRate;
     uint32 m_uiVileGasTimer;
     uint32 m_uiSlimeFlowTimer;
-    uint8 i;
 
     void Reset()
     {
         m_uiBerserkTimer = 5 * MINUTE * IN_MILLISECONDS;
         m_uiSlimeSprayTimer = urand(17000, 23000);
         m_uiVileGasTimer = 20000;
-        m_uiMutatedInfectionTimer = m_uiMutatedInfectionBeforeTimer = 60000;
-        m_uiInfectionsRate = 1;
-        i = urand(4,7);
+        //m_uiMutatedInfectionTimer = m_uiMutatedInfectionBeforeTimer = 60000;
+        //m_uiInfectionsRate = 1;
         m_uiSlimeFlowTimer = 20000;
     }
 
@@ -280,7 +278,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public ScriptedAI
 
         // Mutated Infection - faster with time
         // implemented this instead of phases
-        if (m_uiInfectionsRate < 5)
+        /*if (m_uiInfectionsRate < 5)
         {
             if (m_uiMutatedInfectionTimer <= uiDiff)
             {
@@ -294,7 +292,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public ScriptedAI
             }
             else
                 m_uiMutatedInfectionTimer -= uiDiff;
-        }
+        }*/
 
         // Vile Gas
         if (m_bIsHeroic)

@@ -583,7 +583,7 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
         base_blood_prince_council_bossAI::Reset();
 
         m_bHasCastShadowPrison = false;
-        m_uiShadowLanceTimer = urand(2000, 5000);
+        m_uiShadowLanceTimer = 8000;
     }
 
     void KilledUnit(Unit *pVictim)
@@ -640,7 +640,7 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
                     m_bIsSaidSpecial = true;
                 }
 
-                m_uiShadowLanceTimer = urand(2000, 5000);
+                m_uiShadowLanceTimer = 8000;
             }
         }
         else
@@ -717,7 +717,7 @@ struct MANGOS_DLL_DECL boss_taldaram_iccAI : public base_blood_prince_council_bo
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_GLITTERING_SPARKS, SELECT_FLAG_PLAYER))
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_GLITTERING_SPARKS) == CAST_OK)
-                    m_uiSparksTimer = urand(5000, 10000);
+                    m_uiSparksTimer = 30000;
             }
         }
         else

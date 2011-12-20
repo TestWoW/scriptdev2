@@ -387,6 +387,8 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
     uint32 m_uiSummonAddTimer;
     uint32 m_uiSummonSuppresserTimer;
 
+    std::list<ObjectGuid> mobsGUIDList;
+
     void Reset()
     {
         m_bCombatStarted        = false;
@@ -408,6 +410,8 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
 
         m_creature->SetHealth(m_creature->GetMaxHealth() / 2.0f);
         DoCastSpellIfCan(m_creature, SPELL_CORRUPTION, CAST_TRIGGERED);
+
+        DespawnMobs();
     }
 
     void JustReachedHome()
@@ -452,12 +456,6 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
 
-    void KilledUnit(Unit* pVictim)
-    {
-        if (pVictim->GetTypeId() == TYPEID_PLAYER)
-            DoScriptText(SAY_SLAY_1 + urand(0, 450), m_creature, pVictim);
-    }
-
     void JustDied(Unit *pKiller)
     {
         DoScriptText(SAY_0_HEALTH, m_creature);
@@ -499,6 +497,9 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
 
     void JustSummoned(Creature *pCreature)
     {
+        if (!m_pInstance || !pCreature)
+            return;
+
         ++m_uiSummonCounter;
         pCreature->SetInCombatWithZone();
 
@@ -507,6 +508,28 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
             pCreature->AddThreat(m_creature, 100000);
             pCreature->GetMotionMaster()->MoveChase(m_creature);
         }
+
+        mobsGUIDList.push_back(pCreature->GetObjectGuid());
+    }
+
+    void DespawnMobs()
+    {
+        if (mobsGUIDList.empty())
+            return;
+
+        for(std::list<ObjectGuid>::iterator itr = mobsGUIDList.begin(); itr != mobsGUIDList.end(); ++itr)
+        {
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+            {
+                if (pTemp->isAlive())
+                {
+                    pTemp->DeleteThreatList();
+                    pTemp->CombatStop(true);
+                    pTemp->DealDamage(pTemp, pTemp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                }
+            }
+        }
+        mobsGUIDList.clear();
     }
 
     uint32 GetNextSummonTimer()
@@ -803,26 +826,14 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
     {
         Reset();
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
     }
 
     uint32 m_uiGutSprayTimer;
     ScriptedInstance *m_pInstance;
 
-    bool m_bIs25Man;
-    Difficulty m_uiMapDifficulty;
-
     void Reset()
     {
         m_uiGutSprayTimer = urand(3000, 5000);
-    }
-
-    void JustSummoned(Creature *pCreature)
-    {
-        pCreature->SetInCombatWithZone();
-        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
-            pCreature->DealDamage(pCreature, pCreature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
     }
 
     void KilledUnit(Unit *pVictim)
@@ -838,7 +849,7 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
         }
     }
 
-    void JustDied (Unit *pVictim)
+    void JustDied(Unit *pVictim)
     {
         m_creature->CastSpell(m_creature, SPELL_ROT_WORM_SPAWNER, false);
     }
@@ -847,9 +858,6 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
-            m_creature->ForcedDespawn();
 
         // Gut Spray
         if (m_uiGutSprayTimer <= uiDiff)
@@ -875,12 +883,8 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
     mob_blistering_zombieAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
     }
 
-    bool m_bIs25Man;
-    Difficulty m_uiMapDifficulty;
     ScriptedInstance *m_pInstance;
 
     void Reset(){}
@@ -934,7 +938,6 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
@@ -942,7 +945,6 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     uint32 m_uiColumnOfFrostTimer;
     uint32 m_uiManaVoidTimer;
 
-    bool m_bIs25Man;
     Difficulty m_uiMapDifficulty;
     ScriptedInstance *m_pInstance;
 
@@ -1019,16 +1021,12 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
     mob_blazing_skeletonAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     uint32 m_uiFireballTimer;
     uint32 m_uiLayWasteTimer;
 
-    bool m_bIs25Man;
-    Difficulty m_uiMapDifficulty;
     ScriptedInstance *m_pInstance;
 
     void Reset()
@@ -1094,11 +1092,9 @@ struct MANGOS_DLL_DECL mob_suppresserAI : public ScriptedAI
         m_bIsCasting = false;
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
     }
 
     bool m_bIsCasting;
-    bool m_bIs25Man;
 
     ScriptedInstance *m_pInstance;
     Difficulty m_uiMapDifficulty;
@@ -1124,8 +1120,6 @@ struct MANGOS_DLL_DECL mob_suppresserAI : public ScriptedAI
                     m_bIsCasting = true;
             }
         }
-        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
-            m_creature->ForcedDespawn();
     }
 };
 
