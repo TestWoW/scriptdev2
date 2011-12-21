@@ -1072,6 +1072,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
                     {
                         pFocus->GetPosition(fPosX, fPosY, fPosZ);
                         m_creature->SetFacingToObject(pFocus);
+                        m_uiWaitTimer = 10000; // For count only once
                     }
                 }
                 else
