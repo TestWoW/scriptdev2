@@ -214,9 +214,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
 
     Powers m_powerBloodPower;
 
-    virtual void ResetFight() 
-    {
-    }
+    virtual void ResetFight() {}
 
     void Reset()
     {
@@ -265,6 +263,8 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
         m_bIsIntroStarted = false;
         m_bIsIntroFinished = false;
         m_bIsOutroStarted = false;
+
+        ResetFight()
     }
 
     void MoveInLineOfSight(Unit *pWho)
