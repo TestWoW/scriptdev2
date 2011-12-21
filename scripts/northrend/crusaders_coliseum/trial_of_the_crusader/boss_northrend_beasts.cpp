@@ -88,9 +88,22 @@ enum BossSpells
     SPELL_STAGGERED_DAZE        = 66758,
 };
 
-struct MANGOS_DLL_DECL boss_gormokAI : public BSWScriptedAI
+enum Phases
 {
-    boss_gormokAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    PHASE_NORMAL                = 0,
+    PHASE_MOVING                = 1,
+    PHASE_TRAMPLE               = 2,
+};
+
+enum Points
+{
+    POINT_CENTER                = 0,
+    POINT_TARGET                = 1,
+};
+
+struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
+{
+    boss_gormokAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
@@ -192,9 +205,9 @@ CreatureAI* GetAI_boss_gormok(Creature* pCreature)
     return new boss_gormokAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_snobold_vassalAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_snobold_vassalAI : public ScriptedAI
 {
-    mob_snobold_vassalAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    mob_snobold_vassalAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
@@ -299,9 +312,9 @@ CreatureAI* GetAI_mob_snobold_vassal(Creature* pCreature)
     return new mob_snobold_vassalAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_fire_bombAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_fire_bombAI : public ScriptedAI
 {
-    mob_fire_bombAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    mob_fire_bombAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
@@ -330,9 +343,9 @@ CreatureAI* GetAI_mob_fire_bomb(Creature* pCreature)
     return new mob_fire_bombAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL boss_acidmawAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
 {
-    boss_acidmawAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    boss_acidmawAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_trial_of_the_crusader*)pCreature->GetInstanceData();
         Reset();
@@ -576,9 +589,9 @@ CreatureAI* GetAI_boss_acidmaw(Creature* pCreature)
     return new boss_acidmawAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL boss_dreadscaleAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
 {
-    boss_dreadscaleAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    boss_dreadscaleAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_trial_of_the_crusader*)pCreature->GetInstanceData();
         Reset();
@@ -638,10 +651,12 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public BSWScriptedAI
             return;
             
         if (Creature *pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_ACIDMAW))
+        {
             if (!pSister->isAlive())
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_DONE);
             else 
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_SPECIAL);
+        }
     }
 
     void JustReachedHome()
@@ -817,9 +832,9 @@ CreatureAI* GetAI_boss_dreadscale(Creature* pCreature)
     return new boss_dreadscaleAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_slime_poolAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_slime_poolAI : public ScriptedAI
 {
-    mob_slime_poolAI(Creature *pCreature) : BSWScriptedAI(pCreature)
+    mob_slime_poolAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
         Reset();
@@ -886,9 +901,9 @@ CreatureAI* GetAI_mob_slime_pool(Creature* pCreature)
     return new mob_slime_poolAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL boss_icehowlAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
 {
-    boss_icehowlAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    boss_icehowlAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = ((instance_trial_of_the_crusader*)pCreature->GetInstanceData());
         Reset();
@@ -896,52 +911,82 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public BSWScriptedAI
 
     instance_trial_of_the_crusader* m_pInstance;
 
-    uint8 SnoboldsCount;
-
-    uint32 m_uiEventStep;
-    uint32 m_uiNextEventTimer;
-
     uint32 m_uiFerociousButtTimer;
     uint32 m_uiArcticBreathTimer;
     uint32 m_uiWhirlTimer;
     uint32 m_uiMassiveCrashTimer;
-    uint32 m_uiTrampleTimer;
-
-    uint32 m_uiCheckAchiev;
-
-    bool m_bMovementStarted;
-    bool m_bIsTrampleCasted;
+    uint32 m_uiWaitTimer;
+    uint32 m_uiPhaseTimer;
+    uint32 m_uiPhase;
 
     float fPosX, fPosY, fPosZ;
-    Unit* pTarget;
+    Unit* pFocus;
 
     void Reset() 
     {
         if (!m_pInstance) 
             return;
 
-        SnoboldsCount                  = 2;
-
-        m_uiEventStep                  = 0;
-        m_uiNextEventTimer             = 0;
-
         m_uiFerociousButtTimer         = 15000;
         m_uiArcticBreathTimer          = 25000;
         m_uiWhirlTimer                 = 20000;
         m_uiMassiveCrashTimer          = 30000;
-        m_uiTrampleTimer               = 4000;
-
-        m_uiCheckAchiev                = 0;
+        m_uiPhase                      = PHASE_NORMAL;
 
         m_creature->SetRespawnDelay(7*DAY);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetSpeedRate(MOVE_WALK, 3.0f);
         m_creature->SetSpeedRate(MOVE_RUN, 3.0f);
-        m_bMovementStarted = false;
+
+        pFocus = NULL;
     }
 
-    void NextStep(uint32 uiTime = 1000)
+    void MovementInform(uint32 uiMovementType, uint32 uiData)
     {
-        ++m_uiEventStep;
-        m_uiNextEventTimer = uiTime;
+        if (uiMovementType != POINT_MOTION_TYPE)
+            return;
+
+        if (uiData == POINT_CENTER)
+        {
+            if (m_uiPhase == PHASE_MOVING)
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_MASSIVE_CRASH) == CAST_OK)
+                {
+                    pFocus = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+                    DoScriptText(EMOTE_TRAMPLE, m_creature, pFocus);
+                    m_creature->SetSpeedRate(MOVE_WALK, 6.0f);
+                    m_creature->SetSpeedRate(MOVE_RUN, 6.0f);
+                    m_uiWaitTimer = 5000;
+                    m_uiPhaseTimer = 8000;
+                    m_uiPhase = PHASE_TRAMPLE;
+                }
+            }
+        }
+        else if (uiData == POINT_TARGET)
+        {
+            if (m_uiPhase == PHASE_MOVING)
+            {
+                if (pFocus && pFocus->isAlive() && m_creature->IsWithinDistInMap(pFocus, 10.0f))  // I think that it should be any player not only focused.
+                {
+                    DoCastSpellIfCan(m_creature, SPELL_TRAMPLE, CAST_TRIGGERED);
+                    DoCastSpellIfCan(m_creature, SPELL_FROTHING_RAGE, CAST_TRIGGERED);
+                }
+                else
+                {
+                    DoCastSpellIfCan(m_creature, SPELL_STAGGERED_DAZE, CAST_TRIGGERED);
+                    DoScriptText(EMOTE_STAGGERED, m_creature);
+                }
+
+                if (m_creature->getVictim())
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->SetSpeedRate(MOVE_WALK, 3.0f);
+                m_creature->SetSpeedRate(MOVE_RUN, 3.0f);
+                SetCombatMovement(true);
+                m_uiPhase = PHASE_NORMAL;
+                pFocus = NULL;
+            }
+        }
     }
 
     void JustDied(Unit* pKiller)
@@ -950,13 +995,6 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public BSWScriptedAI
             return;
 
         m_pInstance->SetData(TYPE_NORTHREND_BEASTS, ICEHOWL_DONE);
-    }
-
-    void JumpTo(uint32 id)
-    {
-        m_creature->GetMotionMaster()->Clear();
-        m_creature->GetMotionMaster()->MoveJump(SpawnLoc[id].x, SpawnLoc[id].y, SpawnLoc[id].z, 20.0f, 8.0f);
-        m_bMovementStarted = true;
     }
 
     void JustReachedHome()
@@ -980,158 +1018,81 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public BSWScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-            if (m_uiCheckAchiev <= uiDiff)
-            {
-                if (Creature* pSnobold = m_pInstance->GetSingleCreatureFromStorage(NPC_SNOBOLD_VASSAL))
-                {
-                    if (!pSnobold->isAlive())
-                        --SnoboldsCount;
-                }
-                m_uiCheckAchiev = 1000;
+        switch (m_uiPhase)
+        {
+            case PHASE_NORMAL:
+                 if (m_uiFerociousButtTimer <= uiDiff)
+                 {
+                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEROCIOUS_BUTT) == CAST_OK)
+                         m_uiFerociousButtTimer = urand(15000, 30000);
+                 }
+                 else
+                     m_uiFerociousButtTimer -= uiDiff;
 
-                if (SnoboldsCount < 2)
-                    m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, false);
-            }
-            else
-                m_uiCheckAchiev -= uiDiff;
-
-            if (m_uiNextEventTimer <= uiDiff)
-            {
-                switch (m_uiEventStep) 
-                {
-                    case 0: 
-                    {
-                         m_creature->SetSpeedRate(MOVE_RUN, 3.0f);
-
-                         if (m_uiFerociousButtTimer <= uiDiff)
-                         {
-                             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEROCIOUS_BUTT) == CAST_OK)
-                                 m_uiFerociousButtTimer = urand(15000, 30000);
-                         }
-                         else
-                             m_uiFerociousButtTimer -= uiDiff;
-
-                         if (m_uiArcticBreathTimer <= uiDiff)
-                         {
-                             if (pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1)) 
-                                 m_creature->CastSpell(pTarget, SPELL_ARCTIC_BREATH, false);
-
+                 if (m_uiArcticBreathTimer <= uiDiff)
+                 {
+                     if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                         if (DoCastSpellIfCan(pTarget, SPELL_ARCTIC_BREATH) == CAST_OK)
                              m_uiArcticBreathTimer = urand(25000, 40000);
-                         }
-                         else
-                             m_uiArcticBreathTimer -= uiDiff;
+                 }
+                 else
+                     m_uiArcticBreathTimer -= uiDiff;
 
-                         if (m_uiWhirlTimer <= uiDiff)
-                         {
-                             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WHIRL) == CAST_OK)
-                                 m_uiWhirlTimer = urand(20000, 30000);
-                         }
-                         else
-                             m_uiWhirlTimer -= uiDiff;
-        
-                         if (m_uiMassiveCrashTimer <= uiDiff)
-                         {
-                             m_uiEventStep = 1;
-                             m_uiMassiveCrashTimer = 40000;
-                         }
-                         else
-                             m_uiMassiveCrashTimer -= uiDiff;
-        
-                        DoMeleeAttackIfReady();
-        
-                        break;
-                    }
-                    case 1: 
-                    {
-                        m_creature->AttackStop();
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
-                        SetCombatMovement(false);
-                        JumpTo(1);
-                        NextStep(2500);
-                        break;
-                    }
-                    case 2: 
-                    {
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        m_creature->CastSpell(m_creature, SPELL_MASSIVE_CRASH, false);
-                        SetCombatMovement(true);        
+                 if (m_uiWhirlTimer <= uiDiff)
+                 {
+                     if (DoCastSpellIfCan(m_creature, SPELL_WHIRL) == CAST_OK)
+                         m_uiWhirlTimer = urand(20000, 30000);
+                 }
+                 else
+                     m_uiWhirlTimer -= uiDiff;
 
-                        if (pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0)) 
-                        {
-                            m_bIsTrampleCasted = false;      
-                            resetTimer(SPELL_TRAMPLE);
-                            DoScriptText(EMOTE_TRAMPLE, m_creature, pTarget);
-                            SetCombatMovement(false);
-                            m_creature->GetMotionMaster()->MoveIdle();
-                        }
-                        NextStep(3000);
-                        break;
-                    }
-                    case 3:
-                        pTarget->GetPosition(fPosX, fPosY, fPosZ);
-                        m_creature->SetFacingToObject(pTarget);
-                        NextStep(2000);
-                    case 4: 
-                    {                
-                        m_creature->SetSpeedRate(MOVE_RUN, 6.0f);
-        
-                        if (m_uiTrampleTimer <= uiDiff)
-                        {
-                            if (pTarget && pTarget->isAlive() && (pTarget->IsWithinDistInMap(m_creature, 250.0f))) 
-                            {
-                                m_creature->GetMotionMaster()->MovePoint(1, fPosX, fPosY, fPosZ);
-                                DoScriptText(EMOTE_CRASH, m_creature);
-                                NextStep(1200);
-                            }
-                            else        
-                            {
-                                m_uiEventStep = 6;
-                            }
-                            m_uiTrampleTimer = 4000;
-                        }
-                        else
-                            m_uiTrampleTimer -= uiDiff;
-        
-                        break;        
-                    }
-                    case 5: 
-                    {
-                        Map* pMap = m_creature->GetMap();
-                        Map::PlayerList const &lPlayers = pMap->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                        {
-                            Unit* pPlayer = itr->getSource();
-                            if (!pPlayer) 
-                                continue;
+                 if (m_uiMassiveCrashTimer <= uiDiff)
+                 {
+                     m_creature->AttackStop();
+                     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                     SetCombatMovement(false);
+                     m_creature->GetMotionMaster()->Clear();
+                     m_creature->GetMotionMaster()->MovePoint(POINT_CENTER, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z);
+                     m_uiPhase = PHASE_MOVING;
+                     m_uiMassiveCrashTimer = 40000;
+                 }
+                 else
+                     m_uiMassiveCrashTimer -= uiDiff;
 
-                            if (pTarget->isAlive() && m_creature->IsWithinDistInMap(pTarget, 15.0f)) 
-                            {
-                                m_creature->CastSpell(pTarget, SPELL_TRAMPLE, true);
-                                m_creature->CastSpell(m_creature, SPELL_FROTHING_RAGE, false);
-                            }
-                            else 
-                            {
-                                m_creature->CastSpell(pTarget, SPELL_TRAMPLE, true);
-                                m_creature->CastSpell(m_creature, SPELL_STAGGERED_DAZE, false);
-                                DoScriptText(EMOTE_STAGGERED, m_creature);
-                            }
-                        }
-                        NextStep();                     
-                        break;
-                    }
-                    case 6: 
+                DoMeleeAttackIfReady();
+
+                break;
+            case PHASE_TRAMPLE:
+                if (m_creature->IsNonMeleeSpellCasted(true))
+                    return;
+
+                if (m_uiWaitTimer < uiDiff)
+                {
+                    if (pFocus && pFocus->isAlive())
                     {
-                        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        SetCombatMovement(true);
-                        m_uiEventStep = 0;
-                        break;
+                        pFocus->GetPosition(fPosX, fPosY, fPosZ);
+                        m_creature->SetFacingToObject(pFocus);
                     }
                 }
-            }
-            else
-                m_uiNextEventTimer -= uiDiff;
+                else
+                    m_uiWaitTimer -= uiDiff;
+
+                if (m_uiPhaseTimer <= uiDiff)
+                {
+                    if (pFocus && pFocus->isAlive())
+                    {
+                        m_creature->GetMotionMaster()->Clear();
+                        m_creature->GetMotionMaster()->MovePoint(POINT_TARGET, fPosX, fPosY, fPosZ);
+                        DoScriptText(EMOTE_CRASH, m_creature);
+                        m_uiPhase = PHASE_MOVING;
+                    }
+                }
+                else
+                    m_uiPhaseTimer -= uiDiff;
+                break;
+            case PHASE_MOVING:
+                break;
+        }
     }
 };
 
