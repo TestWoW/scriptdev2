@@ -152,7 +152,7 @@ struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
         m_uiImpaleTimer           = urand(15000, 30000);
         m_uiStaggeringStompTimer  = urand(20000, 25000);
         m_uiSummonSnoboldTimer    = urand(20000, 30000);
-       
+
         mobsGUIDList.clear();
     }
 
@@ -241,6 +241,7 @@ struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
 
         if (m_uiSummonSnoboldTimer <= uiDiff)
         {
+            DoScriptText(EMOTE_SUMMON_SNOBOLD, m_creature);
             ThrowAdd(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0));
             //DoCastSpellIfCan(m_creature, SPELL_RISING_ANGER, CAST_TRIGGERED);   //target bugged, need core support
             m_creature->_AddAura(SPELL_RISING_ANGER);
@@ -289,13 +290,6 @@ struct MANGOS_DLL_DECL mob_snobold_vassalAI : public ScriptedAI
     {
         if (!m_pInstance) 
             return;
-
-        //pFocus = pWho;
-
-        //m_creature->AddThreat(pFocus, 10000.0f);
-
-        //DoCastSpellIfCan(pFocus, SPELL_SNOBOLLED, CAST_TRIGGERED); // Need core support, returns invalid target.
-        //pFocus->_AddAura(SPELL_SNOBOLLED);
     }
 
     void JustReachedHome()
@@ -308,7 +302,7 @@ struct MANGOS_DLL_DECL mob_snobold_vassalAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        if (pFocus && pFocus->isAlive())
+        if (pFocus && pFocus->isAlive()) 
             pFocus->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
 
         m_creature->ForcedDespawn(5000);
@@ -336,7 +330,8 @@ struct MANGOS_DLL_DECL mob_snobold_vassalAI : public ScriptedAI
             {
                 float x, y, z;
                 m_creature->GetPosition(x, y, z);
-                if (Unit *pBomb = m_creature->SummonCreature(NPC_FIRE_BOMB, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 60000))
+
+                if (Creature *pBomb = m_creature->SummonCreature(NPC_FIRE_BOMB, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 60000))
                     pBomb->CastSpell(pBomb, SPELL_FIRE_BOMB_DOT, true);
             }
             m_uiFireBombTimer = urand(10000, 20000);

@@ -63,3 +63,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask` = '769605631' WHERE `entry
 
 UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 34496;
 UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 34497;
+
+UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 34566;
+UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 34615;
+UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 34616;
+
+UPDATE `creature_template` SET `modelid_2` = '0', `minlevel` = '83', `maxlevel` = '83', `faction_A` = '14', `faction_H` = '14', `dmg_multiplier` = '4' WHERE `entry` = 34660;
+UPDATE `creature_template` SET `modelid_2` = '0', `minlevel` = '83', `maxlevel` = '83', `faction_A` = '14', `faction_H` = '14', `dmg_multiplier` = '6'  WHERE `entry` = 35652;
+UPDATE `creature_template` SET `modelid_2` = '0', `minlevel` = '83', `maxlevel` = '83', `faction_A` = '14', `faction_H` = '14', `dmg_multiplier` = '6'  WHERE `entry` = 35653;
+UPDATE `creature_template` SET `modelid_2` = '0', `minlevel` = '83', `maxlevel` = '83', `faction_A` = '14', `faction_H` = '14', `dmg_multiplier` = '8' WHERE `entry` = 35654;

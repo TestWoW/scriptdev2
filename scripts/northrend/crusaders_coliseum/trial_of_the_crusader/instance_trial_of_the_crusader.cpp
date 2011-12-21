@@ -72,13 +72,31 @@ EndScriptData */
 
         for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
         {
-            if(Player* pPlayer = i->getSource())
+            if (Player* pPlayer = i->getSource())
             {
                 if (pPlayer->isAlive())
                     return false;
+
             }
         }
         return true;
+    }
+
+    void instance_trial_of_the_crusader::UpdateWorldState()
+    {
+        Map::PlayerList const &players = instance->GetPlayers();
+
+        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+        {
+            if (Player* pPlayer = i->getSource())
+            {
+                if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
+                {
+                    pPlayer->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
+                    pPlayer->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, GetData(TYPE_COUNTER));
+                }
+            }
+        }
     }
 
     void instance_trial_of_the_crusader::OnCreatureCreate(Creature* pCreature)
@@ -104,18 +122,18 @@ EndScriptData */
                  return m_bAchievCriteria[TYPE_ACHIEV_GORMOK];
             case CRITERIA_ACHIEV_JORMUNGAR_10:
             case CRITERIA_ACHIEV_JORMUNGAR_25:
-                 return m_bAchievCriteria[TYPE_ONE_BUT_TWO];
+                 return m_bAchievCriteria[TYPE_ACHIEV_JORMUNGAR];
             case CRITERIA_ACHIEV_JARAXXUS_10:
             case CRITERIA_ACHIEV_JARAXXUS_25:
                  return m_bAchievCriteria[TYPE_ACHIEV_JARAXXUS];
-            /*case CRITERIA_ACHIEV_CHAMPIONS_10:
+            case CRITERIA_ACHIEV_CHAMPIONS_10:
             case CRITERIA_ACHIEV_CHAMPIONS_25:
                  return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS];
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_10:
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_25:
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_10H:
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_25H:
-                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS_KILL];*/
+                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS_KILL];
             case CRITERIA_ACHIEV_VALKYRS_10:
             case CRITERIA_ACHIEV_VALKYRS_25:
                  return m_bAchievCriteria[TYPE_ACHIEV_VALKYRS];
@@ -140,22 +158,26 @@ EndScriptData */
         case TYPE_BEASTS:
             m_auiEncounter[1] = uiData;
             if (uiData == IN_PROGRESS)
-            {
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, false);
-                //SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
-            }
+            /*{
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, true);
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
+            }*/
             break;
         case TYPE_JARAXXUS:
             m_auiEncounter[2] = uiData;
-            if (uiData == IN_PROGRESS)
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, false);
+            /*if (uiData == IN_PROGRESS)
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, true);*/
             break;
         case TYPE_CRUSADERS:
             if (uiData == FAIL && (m_auiEncounter[3] == FAIL || m_auiEncounter[3] == NOT_STARTED))
                 m_auiEncounter[3] = NOT_STARTED;
             else
                 m_auiEncounter[3] = uiData;
-
+            if (uiData == IN_PROGRESS)
+            /*{
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS, true);
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS_KILL, true);
+            }*/
             if (uiData == DONE)
             {
                 uint32 uiCacheEntry = GO_CRUSADERS_CACHE_10;
@@ -211,7 +233,7 @@ EndScriptData */
                         m_uiTributeChest1 = GO_TRIBUTE_CHEST_10H_25;
                     if (m_auiEncounter[7] >= 45)
                         m_uiTributeChest2 = GO_TRIBUTE_CHEST_10H_45;
-                    if (m_auiEncounter[7] >= 49)
+                    if (m_auiEncounter[7] > 49)
                         m_uiTributeChest3 = GO_TRIBUTE_CHEST_10H_50;
                     m_uiTributeChest4 = GO_TRIBUTE_CHEST_10H_99;
                 }
@@ -221,7 +243,7 @@ EndScriptData */
                         m_uiTributeChest1 = GO_TRIBUTE_CHEST_25H_25;
                     if (m_auiEncounter[7] >= 45)
                         m_uiTributeChest2 = GO_TRIBUTE_CHEST_25H_45;
-                    if (m_auiEncounter[7] >= 49)
+                    if (m_auiEncounter[7] > 49)
                         m_uiTributeChest3 = GO_TRIBUTE_CHEST_25H_50;
                     m_uiTributeChest4 = GO_TRIBUTE_CHEST_25H_99;
                 }
@@ -263,7 +285,7 @@ EndScriptData */
         case TYPE_NORTHREND_BEASTS:
             m_auiNorthrendBeasts = uiData;
             if (uiData == SNAKES_SPECIAL)
-                SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, false);
             break;
         case DATA_HEALTH_FJOLA:
             m_uiDataDamageFjola = uiData; uiData = NOT_STARTED;
@@ -301,6 +323,7 @@ EndScriptData */
             {
                 --m_auiEncounter[7];
                 needsave = true;
+                UpdateWorldState();
             }
             uiData = NOT_STARTED;
         }

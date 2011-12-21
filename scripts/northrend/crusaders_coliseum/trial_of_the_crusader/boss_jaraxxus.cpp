@@ -67,6 +67,7 @@ enum BossSpells
     SPELL_LEGION_FLAME_AURA            = 66201,
     SPELL_SHIVAN_SLASH                 = 67098,
     SPELL_SPINNING_STRIKE              = 66283, // Need core support
+    SPELL_MISTRESS_KISS                = 67906,
     SPELL_FEL_INFERNO                  = 67047,
     SPELL_FEL_STREAK                   = 66494,
     SPELL_WILFRED_PORTAL               = 68424,
@@ -91,6 +92,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
 
     uint32 m_uiEventStep;
 
+    uint32 m_uiNetherPowerTimer;
     uint32 m_uiFelFireballTimer;
     uint32 m_uiFelLightingTimer;
     uint32 m_uiIncinerateFleshTimer;
@@ -111,6 +113,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
 
         m_uiEventStep               = 0;
 
+        m_uiNetherPowerTimer        = 0;
         m_uiFelFireballTimer        = 15000;
         m_uiFelLightingTimer        = 12000;
         m_uiIncinerateFleshTimer    = 15000;
@@ -149,7 +152,6 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetInCombatWithZone();
-        m_creature->CastSpell(m_creature, SPELL_NETHER_POWER, false);
         m_pInstance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
     }
 
@@ -172,6 +174,14 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_uiNetherPowerTimer <= uiDiff)
+        {
+            m_creature->CastSpell(m_creature, SPELL_NETHER_POWER, false);
+            m_uiNetherPowerTimer = 30000;
+        }
+        else
+            m_uiNetherPowerTimer -= uiDiff;
 
         if (m_uiCheckAchiev <= uiDiff)
         {
@@ -315,10 +325,16 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public BSWScriptedAI
     mob_infernal_volcanoAI(Creature* pCreature) : BSWScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
 
     uint32 m_InfernalCount;
     uint32 m_uiSummonInfernalTimer;
@@ -331,7 +347,8 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public BSWScriptedAI
         m_creature->SetInCombatWithZone();
         m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
 
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        if (!m_bIsHeroic)
+             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void JustDied(Unit* Killer)
@@ -504,13 +521,20 @@ struct MANGOS_DLL_DECL mob_mistress_of_painAI : public BSWScriptedAI
     mob_mistress_of_painAI(Creature* pCreature) : BSWScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
 
     uint32 m_uiShivanSlashTimer;
     uint32 m_uiSpinningStrikeTimer;
+    uint32 m_uiMistressKissTimer;
 
     void Reset()
     {
@@ -519,6 +543,7 @@ struct MANGOS_DLL_DECL mob_mistress_of_painAI : public BSWScriptedAI
 
         m_uiShivanSlashTimer       = 10000;
         m_uiSpinningStrikeTimer    = 5000;
+        m_uiMistressKissTimer      = 15000;
     }
 
     void KilledUnit(Unit* pVictim)
@@ -565,6 +590,17 @@ struct MANGOS_DLL_DECL mob_mistress_of_painAI : public BSWScriptedAI
         }
         else
             m_uiSpinningStrikeTimer -= uiDiff;
+
+        if (m_bIsHeroic)
+        {
+            if (m_uiMistressKissTimer <= uiDiff)
+            {
+                m_creature->CastSpell(m_creature->getVictim(), SPELL_MISTRESS_KISS, false);
+                m_uiMistressKissTimer = 10000;
+            }
+            else
+                m_uiMistressKissTimer -= uiDiff;
+        }
 
         DoMeleeAttackIfReady();
     }

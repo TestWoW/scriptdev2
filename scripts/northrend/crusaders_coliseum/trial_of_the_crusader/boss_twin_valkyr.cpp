@@ -15,10 +15,9 @@
  */
 
 /* ScriptData
-SDName: trial_of_the_crusader
-SD%Complete: 80%
-SDComment: by /dev/rsa
-SDCategory: Crusader Coliseum
+SDName: boss_twin_valkyr
+SDComment:
+SDAuthor: rsa, improved by Walkum
 EndScriptData */
 
 #include "precompiled.h"
@@ -67,6 +66,7 @@ enum BossSpells
     SPELL_LIGHT_SHIELD            = 65858,
     SPELL_TWIN_PACT_L             = 65876,
     SPELL_LIGHT_VORTEX            = 66046,
+    SPELL_LIGHT_TOUCH             = 67296,
 
     // Eydis
     SPELL_TWIN_SPIKE_D            = 66069,
@@ -74,6 +74,7 @@ enum BossSpells
     SPELL_DARK_SHIELD             = 65874,
     SPELL_TWIN_PACT_D             = 65875, // Need core spell support
     SPELL_DARK_VORTEX             = 66058,
+    SPELL_DARK_TOUCH              = 67281,
 
     SPELL_TWIN_POWER              = 65916,
 
@@ -114,6 +115,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
 
     uint32 m_uiTwinSpikeLTimer;
     uint32 m_uiVortexOrPactTimer;
+    uint32 m_uiLightTouchTimer;
     uint32 m_uiOrbsTimer;
 
     void Reset() 
@@ -128,6 +130,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
 
         m_uiTwinSpikeLTimer        = 10000;
         m_uiVortexOrPactTimer      = 45000;
+        m_uiLightTouchTimer        = 15000;
         m_uiOrbsTimer              = 2500;
 
         SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_OFFHAND_1, EQUIP_RANGED_1);
@@ -271,6 +274,17 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
                     }
                     else
                         m_uiTwinSpikeLTimer -= uiDiff;
+        
+                    if (m_bIsHeroic)
+                    {
+                        if (m_uiLightTouchTimer <= uiDiff)
+                        {
+                            m_creature->CastSpell(m_creature->getVictim(), SPELL_LIGHT_TOUCH, false);
+                            m_uiLightTouchTimer = 20000;
+                        }
+                        else
+                            m_uiLightTouchTimer -= uiDiff;
+                    }
 
                     if (m_uiVortexOrPactTimer <= uiDiff)
                     {
@@ -371,6 +385,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
 
     uint32 m_uiTwinSpikeDTimer;
     uint32 m_uiVortexOrPactTimer;
+    uint32 m_uiDarkTouchTimer;
     uint32 m_uiOrbsTimer;
 
     void Reset() 
@@ -385,6 +400,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
 
         m_uiTwinSpikeDTimer        = 10000;
         m_uiVortexOrPactTimer      = 90000;
+        m_uiDarkTouchTimer         = 5000;
         m_uiOrbsTimer              = 2500;
 
         SetEquipmentSlots(false, EQUIP_MAIN_2, EQUIP_OFFHAND_2, EQUIP_RANGED_2);
@@ -525,6 +541,17 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
                     }
                     else
                         m_uiTwinSpikeDTimer -= uiDiff;
+
+                    if (m_bIsHeroic)
+                    {
+                        if (m_uiDarkTouchTimer <= uiDiff)
+                        {
+                            m_creature->CastSpell(m_creature->getVictim(), SPELL_DARK_TOUCH, false);
+                            m_uiDarkTouchTimer = 20000;
+                        }
+                        else
+                            m_uiDarkTouchTimer -= uiDiff;
+                    }
 
                     if (m_uiVortexOrPactTimer <= uiDiff)
                     {

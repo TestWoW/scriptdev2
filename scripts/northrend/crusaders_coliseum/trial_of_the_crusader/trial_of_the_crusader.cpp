@@ -52,17 +52,31 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
     npc_toc_announcerAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
+
     uint32 DelayTimer;
     uint32 substage;
+
+    uint32 WormsTimer;
+    uint32 IcehowlTimer;
 
     void Reset()
     {
         if (!m_pInstance)
             return;
+
+        WormsTimer     = 150000;
+        IcehowlTimer   = 150000;
 
         m_pInstance->SetData(TYPE_STAGE, 0);
         DelayTimer = 0;
@@ -94,6 +108,21 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                  case 0:
                       break;
                  case 1:
+                      if (m_bIsHeroic)
+                      {
+		          if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_IN_PROGRESS)
+			  {		 
+			      if (WormsTimer <= diff)
+			      {
+                                  m_pInstance->SetData(TYPE_STAGE,2);
+                                  m_pInstance->SetData(TYPE_EVENT,200);
+                                  m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
+                                  m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+			      }
+                              else
+                                  WormsTimer -= diff;
+                          }
+	              }
                       if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_DONE)
                       {
                           m_pInstance->SetData(TYPE_STAGE,2);
@@ -109,6 +138,21 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                       }
                       break;
                  case 2:
+                      if (m_bIsHeroic)
+                      {
+		          if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) != ICEHOWL_IN_PROGRESS)
+			  {		 
+			      if (IcehowlTimer <= diff)
+			      {
+                                  m_pInstance->SetData(TYPE_STAGE,3);
+                                  m_pInstance->SetData(TYPE_EVENT,300);
+                                  m_pInstance->SetData(TYPE_NORTHREND_BEASTS,ICEHOWL_IN_PROGRESS);
+                                  m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+			      }
+                              else
+                                  IcehowlTimer -= diff;
+                          }
+                      }
                       if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_DONE)
                       {
                           m_pInstance->SetData(TYPE_STAGE,3);
@@ -301,7 +345,7 @@ switch(uiAction) {
                  continue;
              float x, y, z;
              pPlayer->GetPosition(x, y, z);
-             pPlayer->MonsterMoveJump(x, y, z + 15.0f, 3.14f, 20.0f, 8.0f, true);
+             pPlayer->MonsterMoveJump(x, y, z + 10.0f, 3.14f, 10.0f, 0.0f, true);
         }
         if (GameObject* pGoFloor = pInstance->GetSingleGameObjectFromStorage(GO_ARGENT_COLISEUM_FLOOR))
         {
@@ -467,17 +511,17 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
             case 5070:
             {
                 m_creature->CastSpell(m_creature,68198,false);
-                        Map* pMap = m_creature->GetMap();
-                        Map::PlayerList const &lPlayers = pMap->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                        {
-                            Unit* pPlayer = itr->getSource();
-                            if (!pPlayer) 
-                                continue;
-                        float x, y, z;
-                        pPlayer->GetPosition(x, y, z);
-                        pPlayer->MonsterMoveJump(x, y, z + 15.0f, 3.14f, 20.0f, 8.0f, true);
-                        }
+                Map* pMap = m_creature->GetMap();
+                Map::PlayerList const &lPlayers = pMap->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                     Unit* pPlayer = itr->getSource();
+                     if (!pPlayer) 
+                         continue;
+                     float x, y, z;
+                     pPlayer->GetPosition(x, y, z);
+                     pPlayer->MonsterMoveJump(x, y, z + 10.0f, 3.14f, 10.0f, 0.0f, true);
+                }
                 UpdateTimer = 1500;
                 m_pInstance->SetData(TYPE_EVENT,5080);
                 break;
