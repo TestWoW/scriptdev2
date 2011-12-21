@@ -593,9 +593,9 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
         {
             ++m_uiAchievTimer;
             if (m_uiAchievTimer < 10000)
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, true);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
             else
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, false);
         }
 
         DoMeleeAttackIfReady();
@@ -809,9 +809,9 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
         {
             ++m_uiAchievTimer;
             if (m_uiAchievTimer < 10000)
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, true);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
             else
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, false);
         }
 
         DoMeleeAttackIfReady();
