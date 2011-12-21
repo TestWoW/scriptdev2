@@ -156,7 +156,9 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
         m_bIntro = false;
         m_bEnrage = false;
         SetCombatMovement(true);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
 
         if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
                pGoPortal->Delete();
@@ -570,6 +572,9 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
         m_bIntro = false;
         m_bEnrage = false;
         m_creature->SetInCombatWithZone();
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
         if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
         {
             m_creature->SetInCombatWith(pControl);
