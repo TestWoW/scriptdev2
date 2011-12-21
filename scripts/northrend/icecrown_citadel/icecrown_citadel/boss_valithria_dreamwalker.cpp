@@ -534,33 +534,33 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
 
     uint32 GetNextSummonTimer()
     {
-        uint32 min = 4000;
-        uint32 max = 9000;
+        uint32 min = 6000;
+        uint32 max = 11000;
 
         if (m_uiSummonCounter > 10)
         {
-            min = 3500;
-            max = 8500;
+            min = 5500;
+            max = 10500;
         }
         if (m_uiSummonCounter > 20)
         {
-            min = 3000;
-            max = 8000;
+            min = 5000;
+            max = 10000;
         }
         if (m_uiSummonCounter > 30)
         {
-            min = 2500;
-            max = 7000;
+            min = 4500;
+            max = 9000;
         }
         if (m_uiSummonCounter > 40)
         {
-            min = 2000;
-            max = 6000;
+            min = 4000;
+            max = 8500;
         }
         if (m_uiSummonCounter > 50) // almost 7 minutes - considered as enrage
         {
-            min = 1500;
-            max = 5000;
+            min = 3500;
+            max = 8000;
         }
 
         return m_bIsEnrage ? 3000 : 8000 + urand(min, max);
