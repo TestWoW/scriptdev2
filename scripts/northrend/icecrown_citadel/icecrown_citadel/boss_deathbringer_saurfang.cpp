@@ -264,7 +264,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
         m_bIsIntroFinished = false;
         m_bIsOutroStarted = false;
 
-        ResetFight()
+        ResetFight();
     }
 
     void MoveInLineOfSight(Unit *pWho)
