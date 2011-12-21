@@ -104,18 +104,18 @@ EndScriptData */
                  return m_bAchievCriteria[TYPE_ACHIEV_GORMOK];
             case CRITERIA_ACHIEV_JORMUNGAR_10:
             case CRITERIA_ACHIEV_JORMUNGAR_25:
-                 return m_bAchievCriteria[TYPE_ACHIEV_JORMUNGAR];
+                 return m_bAchievCriteria[TYPE_ONE_BUT_TWO];
             case CRITERIA_ACHIEV_JARAXXUS_10:
             case CRITERIA_ACHIEV_JARAXXUS_25:
                  return m_bAchievCriteria[TYPE_ACHIEV_JARAXXUS];
-            case CRITERIA_ACHIEV_CHAMPIONS_10:
+            /*case CRITERIA_ACHIEV_CHAMPIONS_10:
             case CRITERIA_ACHIEV_CHAMPIONS_25:
                  return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS];
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_10:
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_25:
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_10H:
             case CRITERIA_ACHIEV_CHAMPIONS_KILL_25H:
-                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS_KILL];
+                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS_KILL];*/
             case CRITERIA_ACHIEV_VALKYRS_10:
             case CRITERIA_ACHIEV_VALKYRS_25:
                  return m_bAchievCriteria[TYPE_ACHIEV_VALKYRS];
@@ -141,25 +141,21 @@ EndScriptData */
             m_auiEncounter[1] = uiData;
             if (uiData == IN_PROGRESS)
             {
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, true);
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, false);
+                //SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
             }
             break;
         case TYPE_JARAXXUS:
             m_auiEncounter[2] = uiData;
             if (uiData == IN_PROGRESS)
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, true);
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, false);
             break;
         case TYPE_CRUSADERS:
             if (uiData == FAIL && (m_auiEncounter[3] == FAIL || m_auiEncounter[3] == NOT_STARTED))
                 m_auiEncounter[3] = NOT_STARTED;
             else
                 m_auiEncounter[3] = uiData;
-            if (uiData == IN_PROGRESS)
-            {
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS, true);
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS_KILL, true);
-            }
+
             if (uiData == DONE)
             {
                 uint32 uiCacheEntry = GO_CRUSADERS_CACHE_10;
@@ -266,6 +262,8 @@ EndScriptData */
             break;
         case TYPE_NORTHREND_BEASTS:
             m_auiNorthrendBeasts = uiData;
+            if (uiData == SNAKES_SPECIAL)
+                SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
             break;
         case DATA_HEALTH_FJOLA:
             m_uiDataDamageFjola = uiData; uiData = NOT_STARTED;

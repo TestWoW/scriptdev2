@@ -21,12 +21,10 @@ enum
     MAX_ENCOUNTERS              = 9,
 
     TYPE_ACHIEV_GORMOK          = 0,
-    TYPE_ACHIEV_JORMUNGAR       = 1,
+    TYPE_ONE_BUT_TWO            = 1,
     TYPE_ACHIEV_JARAXXUS        = 2,
-    TYPE_ACHIEV_CHAMPIONS       = 3,
-    TYPE_ACHIEV_CHAMPIONS_KILL  = 4,
-    TYPE_ACHIEV_VALKYRS         = 5,
-    MAX_SPECIAL_ACHIEV_CRITS    = 6,
+    TYPE_ACHIEV_VALKYRS         = 3,
+    MAX_SPECIAL_ACHIEV_CRITS    = 4,
 
     NPC_BARRENT                 = 34816,
     NPC_TIRION                  = 34996,
