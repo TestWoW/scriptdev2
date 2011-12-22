@@ -126,6 +126,8 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         m_uiCheckTimer              = 1000;
 
         m_creature->SetRespawnDelay(DAY);
+
+        mistressEntryList.clear();
     }
 
     void JustReachedHome()
@@ -343,18 +345,16 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
-    uint32 m_uiSummonInfernalTimer;
-
     void Reset()
     {
         m_creature->SetInCombatWithZone();
         m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
         SetCombatMovement(false);
 
-        m_uiSummonInfernalTimer = 3000;
-
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_INFERNAL_PERIODIC_10N, CAST_TRIGGERED);
     }
 
     void JustDied(Unit* Killer)
@@ -374,14 +374,6 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
-
-        if (m_uiSummonInfernalTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_INFERNAL_PERIODIC, CAST_TRIGGERED))
-                m_uiSummonInfernalTimer = 12000;
-        }
-        else
-            m_uiSummonInfernalTimer -= uiDiff;
     }
 };
 
@@ -482,8 +474,6 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
-    uint32 m_uiSummonMistressTimer;
-
     void Reset()
     {
         m_creature->SetInCombatWithZone();
@@ -491,10 +481,10 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
         m_creature->SetRespawnDelay(DAY);
         SetCombatMovement(false);
 
-        m_uiSummonMistressTimer = 9000;
-
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_MISTRESS_PERIODIC, CAST_TRIGGERED);
     }
 
     void AttackStart(Unit *pWho)
@@ -509,14 +499,6 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
-
-        if (m_uiSummonMistressTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_MISTRESS_PERIODIC, CAST_TRIGGERED))
-                m_uiSummonMistressTimer = 9000;
-        }
-        else
-            m_uiSummonMistressTimer -= uiDiff;
     }
 };
 
