@@ -459,25 +459,6 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
 
-    /*void SpellHitTarget(Unit *target, const SpellEntry *spell)
-    {
-        if (spell->Id == SPELL_PARALYTIC_SPRAY)
-        {
-            if (target->GetTypeId() == TYPEID_PLAYER)
-            {
-                m_creature->CastSpell(target, SPELL_PARALYTIC_TOXIN, false);
-            }
-        }
-
-        if (spell->Id == SPELL_PARALYTIC_TOXIN)
-        {
-            if (target->GetTypeId() == TYPEID_PLAYER && target->HasAura(SPELL_BURNING_BILE))
-            {
-                target->RemoveAurasDueToSpell(SPELL_PARALYTIC_TOXIN);
-            }
-        }
-    }*/
-
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -593,9 +574,9 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
         {
             ++m_uiAchievTimer;
             if (m_uiAchievTimer < 10000)
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, true);
             else
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, false);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
         }
 
         DoMeleeAttackIfReady();
@@ -809,9 +790,9 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
         {
             ++m_uiAchievTimer;
             if (m_uiAchievTimer < 10000)
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, true);
             else
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, false);
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
         }
 
         DoMeleeAttackIfReady();

@@ -245,7 +245,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
                 m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_EYDIS));
 
         if (m_uiAchievTimer < uiDiff)
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_VALKYRS, false);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, false);
         else 
             m_uiAchievTimer -= uiDiff;
 
@@ -556,7 +556,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
                 m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_FJOLA));
 
         if (m_uiAchievTimer < uiDiff)
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_VALKYRS, false);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, false);
         else 
             m_uiAchievTimer -= uiDiff;
 

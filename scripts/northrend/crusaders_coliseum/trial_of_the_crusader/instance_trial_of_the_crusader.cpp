@@ -117,26 +117,18 @@ EndScriptData */
     {
         switch (uiCriteriaId)
         {
-            case CRITERIA_ACHIEV_GORMOK_10:
-            case CRITERIA_ACHIEV_GORMOK_25:
-                 return m_bAchievCriteria[TYPE_ACHIEV_GORMOK];
-            case CRITERIA_ACHIEV_JORMUNGAR_10:
-            case CRITERIA_ACHIEV_JORMUNGAR_25:
-                 return m_bAchievCriteria[TYPE_ACHIEV_JORMUNGAR];
-            case CRITERIA_ACHIEV_JARAXXUS_10:
-            case CRITERIA_ACHIEV_JARAXXUS_25:
-                 return m_bAchievCriteria[TYPE_ACHIEV_JARAXXUS];
-            case CRITERIA_ACHIEV_CHAMPIONS_10:
-            case CRITERIA_ACHIEV_CHAMPIONS_25:
-                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS];
-            case CRITERIA_ACHIEV_CHAMPIONS_KILL_10:
-            case CRITERIA_ACHIEV_CHAMPIONS_KILL_25:
-            case CRITERIA_ACHIEV_CHAMPIONS_KILL_10H:
-            case CRITERIA_ACHIEV_CHAMPIONS_KILL_25H:
-                 return m_bAchievCriteria[TYPE_ACHIEV_CHAMPIONS_KILL];
-            case CRITERIA_ACHIEV_VALKYRS_10:
-            case CRITERIA_ACHIEV_VALKYRS_25:
-                 return m_bAchievCriteria[TYPE_ACHIEV_VALKYRS];
+            case CRITERIA_ACHIEV_UPPER_BACK_PAIN_10N:
+            case CRITERIA_ACHIEV_UPPER_BACK_PAIN_25N:
+                 return m_bAchievCriteria[TYPE_UPPER_BACK_PAIN];
+            case CRITERIA_ACHIEV_ONE_BUT_TWO_10N:
+            case CRITERIA_ACHIEV_ONE_BUT_TWO_25N:
+                 return m_bAchievCriteria[TYPE_ONE_BUT_TWO];
+            case CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_10N:
+            case CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_25N:
+                 return m_bAchievCriteria[TYPE_SIXTY_PAIN_SPIKE];
+            case CRITERIA_ACHIEV_SALT_AND_PEPPER_10N:
+            case CRITERIA_ACHIEV_SALT_AND_PEPPER_25N:
+                 return m_bAchievCriteria[TYPE_SALT_AND_PEPPER];
             default:
                  return false;
         }
@@ -165,19 +157,14 @@ EndScriptData */
             break;
         case TYPE_JARAXXUS:
             m_auiEncounter[2] = uiData;
-            /*if (uiData == IN_PROGRESS)
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, true);*/
+            if (uiData == IN_PROGRESS)
+                SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, false);
             break;
         case TYPE_CRUSADERS:
             if (uiData == FAIL && (m_auiEncounter[3] == FAIL || m_auiEncounter[3] == NOT_STARTED))
                 m_auiEncounter[3] = NOT_STARTED;
             else
                 m_auiEncounter[3] = uiData;
-            if (uiData == IN_PROGRESS)
-            /*{
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS, true);
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAMPIONS_KILL, true);
-            }*/
             if (uiData == DONE)
             {
                 uint32 uiCacheEntry = GO_CRUSADERS_CACHE_10;
@@ -210,7 +197,7 @@ EndScriptData */
                 uiData = DONE;
             m_auiEncounter[4] = uiData;
             if (uiData == IN_PROGRESS)
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_VALKYRS, true);
+                SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, true);
             break;
         case TYPE_LICH_KING:
             m_auiEncounter[5] = uiData;
@@ -284,8 +271,6 @@ EndScriptData */
             break;
         case TYPE_NORTHREND_BEASTS:
             m_auiNorthrendBeasts = uiData;
-            if (uiData == SNAKES_SPECIAL)
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, false);
             break;
         case DATA_HEALTH_FJOLA:
             m_uiDataDamageFjola = uiData; uiData = NOT_STARTED;

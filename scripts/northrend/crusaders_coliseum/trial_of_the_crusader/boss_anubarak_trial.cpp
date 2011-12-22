@@ -160,9 +160,11 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        DoScriptText(urand(0, 1) ? SAY_SLAY_1 : SAY_SLAY_2, m_creature);
-    }
+        if (pVictim->GetTypeId() != TYPEID_PLAYER)
+            return;
 
+        DoScriptText(SAY_SLAY_1 - urand(0, 1),m_creature,pVictim);
+    }
     void MoveInLineOfSight(Unit* pWho) 
     {
         if (!intro) 
