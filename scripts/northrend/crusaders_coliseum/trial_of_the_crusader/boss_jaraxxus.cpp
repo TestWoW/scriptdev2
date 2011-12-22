@@ -57,13 +57,15 @@ enum Summons
 enum BossSpells
 {
     SPELL_NETHER_POWER                 = 67108,
-    SPELL_SUMMON_VOLCAN                = 66258,
+    SPELL_SUMMON_VOLCAN_N              = 66258,
+    SPELL_SUMMON_VOLCAN_H              = 67902,
     SPELL_SUMMON_INFERNAL_PERIODIC     = 66252,
     SPELL_FEL_FIREBALL                 = 66532,
     SPELL_FEL_LIGHTING                 = 66528,
     SPELL_INCINERATE_FLESH             = 66237,
     SPELL_BURNING_INFERNO              = 66242,
-    SPELL_SUMMON_NETHER_PORTAL         = 66269,
+    SPELL_SUMMON_NETHER_PORTAL_N       = 66269,
+    SPELL_SUMMON_NETHER_PORTAL_H       = 67899,
     SPELL_SUMMON_MISTRESS_PERIODIC     = 67103,
     SPELL_LEGION_FLAME                 = 66197,
     SPELL_LEGION_FLAME_AURA            = 66201,
@@ -163,17 +165,10 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        if (pVictim->GetTypeId() == TYPEID_PLAYER)
+        if (pVictim->GetTypeId() != TYPEID_PLAYER)
+            return;
 
-        switch (urand(0,1))
-        {
-            case 0:
-                DoScriptText(SAY_SLAY_1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_SLAY_2, m_creature);
-                break;
-        };
+        DoScriptText(SAY_SLAY_1 - urand(0, 1),m_creature,pVictim);
     }
 
     void CheckAchiev()
@@ -182,12 +177,15 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(mistressEntryList, m_creature, NPC_MISTRESS, 250.0f);
 
         if (mistressEntryList.empty())
+        {
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, false);
             return;
+        }
 
         if (mistressEntryList.size()-1 >= 2)
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, true);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, true);
         else
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, false);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, false);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -198,16 +196,18 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         if (m_uiCheckTimer < uiDiff)
         {
             CheckAchiev();
-            m_uiCheckTimer = 1000;
+            m_uiCheckTimer = 500;
         }
         else
             m_uiCheckTimer -= uiDiff;
 
         if (m_uiEnrageTimer <= uiDiff)
         {
-            DoScriptText(SAY_ENRAGE, m_creature);
-            DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK;
-            m_uiEnrageTimer = 600000;
+            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
+            {
+                m_uiEnrageTimer = 600000;
+                DoScriptText(SAY_ENRAGE, m_creature);
+            }
         }
         else
             m_uiEnrageTimer -= uiDiff;
@@ -264,7 +264,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
 
         if (m_uiInfernalEruptionTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_VOLCAN) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, m_bIsHeroic ? SPELL_SUMMON_VOLCAN_H : SPELL_SUMMON_VOLCAN_N) == CAST_OK)
             {
                 m_uiInfernalEruptionTimer = 120000;
                 DoScriptText(SAY_INFERNAL_VOLCANO, m_creature);
@@ -276,7 +276,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
 
         if (m_uiNetherPortalTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_NETHER_PORTAL) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, m_bIsHeroic ? SPELL_SUMMON_NETHER_PORTAL_H : SPELL_SUMMON_NETHER_PORTAL_N) == CAST_OK)
             {
                 DoScriptText(SAY_NETHER_PORTAL, m_creature);
                 m_uiNetherPortalTimer = 120000;
@@ -348,13 +348,13 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
     void Reset()
     {
         m_creature->SetInCombatWithZone();
-        m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
         SetCombatMovement(false);
+
 
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_INFERNAL_PERIODIC_10N, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_INFERNAL_PERIODIC);
     }
 
     void JustDied(Unit* Killer)
@@ -369,9 +369,6 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
     }
@@ -477,9 +474,9 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
     void Reset()
     {
         m_creature->SetInCombatWithZone();
-        m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
         m_creature->SetRespawnDelay(DAY);
         SetCombatMovement(false);
+
 
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -494,9 +491,6 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
     }
