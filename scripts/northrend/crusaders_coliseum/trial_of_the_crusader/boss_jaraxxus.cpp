@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: boss_jaraxxus
-SDComment: Timers
+SDComment:
 SDAuthor: Walkum
 EndScriptData */
 
@@ -34,6 +34,7 @@ enum Yells
     SAY_SUMMON_MISTRESS                = -1713521,
     SAY_SUMMON_INFERNAL                = -1713524,
     SAY_INCINERATE_FLESH               = -1713523,
+    SAY_ENRAGE                         = -1713750,
 
     EMOTE_INCINERATE_FLESH             = -1713522,
 };
@@ -72,6 +73,7 @@ enum BossSpells
     SPELL_FEL_INFERNO                  = 67047,
     SPELL_FEL_STREAK                   = 66494,
     SPELL_WILFRED_PORTAL               = 68424,
+    SPELL_ENRAGE                       = 26662,
 };
 
 /*######
@@ -106,7 +108,6 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
 
     std::list<Creature*> mistressEntryList;
 
-
     void Reset() 
     {
         if (!m_pInstance) 
@@ -125,7 +126,6 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         m_uiCheckTimer              = 1000;
 
         m_creature->SetRespawnDelay(DAY);
-        mistressEntryList.clear();
     }
 
     void JustReachedHome()
@@ -183,9 +183,9 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
             return;
 
         if (mistressEntryList.size()-1 >= 2)
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, true);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, true);
         else
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, false);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_ACHIEV_JARAXXUS, false);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -200,6 +200,15 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         }
         else
             m_uiCheckTimer -= uiDiff;
+
+        if (m_uiEnrageTimer <= uiDiff)
+        {
+            DoScriptText(SAY_ENRAGE, m_creature);
+            DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK;
+            m_uiEnrageTimer = 600000;
+        }
+        else
+            m_uiEnrageTimer -= uiDiff;
 
         if (m_uiNetherPowerTimer <= uiDiff)
         {
@@ -334,7 +343,6 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
-    uint32 m_InfernalCount;
     uint32 m_uiSummonInfernalTimer;
 
     void Reset()
@@ -343,10 +351,10 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
         m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
         SetCombatMovement(false);
 
+        m_uiSummonInfernalTimer = 3000;
+
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_INFERNAL_PERIODIC, CAST_TRIGGERED);
     }
 
     void JustDied(Unit* Killer)
@@ -366,6 +374,14 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
+
+        if (m_uiSummonInfernalTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_INFERNAL_PERIODIC, CAST_TRIGGERED))
+                m_uiSummonInfernalTimer = 12000;
+        }
+        else
+            m_uiSummonInfernalTimer -= uiDiff;
     }
 };
 
@@ -466,18 +482,19 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
+    uint32 m_uiSummonMistressTimer;
+
     void Reset()
     {
         m_creature->SetInCombatWithZone();
         m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
         m_creature->SetRespawnDelay(DAY);
-
         SetCombatMovement(false);
+
+        m_uiSummonMistressTimer = 9000;
 
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_MISTRESS_PERIODIC, CAST_TRIGGERED);
     }
 
     void AttackStart(Unit *pWho)
@@ -492,6 +509,14 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
+
+        if (m_uiSummonMistressTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_MISTRESS_PERIODIC, CAST_TRIGGERED))
+                m_uiSummonMistressTimer = 9000;
+        }
+        else
+            m_uiSummonMistressTimer -= uiDiff;
     }
 };
 
