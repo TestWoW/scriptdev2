@@ -157,8 +157,8 @@ EndScriptData */
             break;
         case TYPE_BEASTS:
             m_auiEncounter[1] = uiData;
-            if (uiData == IN_PROGRESS)
-            /*{
+            /*if (uiData == IN_PROGRESS)
+            {
                 SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, true);
                 SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
             }*/
