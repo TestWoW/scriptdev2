@@ -102,9 +102,9 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
     uint32 m_uiInfernalEruptionTimer;
     uint32 m_uiNetherPortalTimer;
     uint32 m_uiEnrageTimer;
-    //uint32 m_uiCheckTimer;
+    uint32 m_uiCheckTimer;
 
-    //std::list<Creature*> mistressEntryList;
+    std::list<Creature*> mistressEntryList;
 
 
     void Reset() 
@@ -125,6 +125,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         m_uiCheckTimer              = 1000;
 
         m_creature->SetRespawnDelay(DAY);
+        mistressEntryList.clear();
     }
 
     void JustReachedHome()
@@ -173,24 +174,32 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         };
     }
 
-    /*void CheckAchiev()
+    void CheckAchiev()
     {
+        mistressEntryList.clear();
         GetCreatureListWithEntryInGrid(mistressEntryList, m_creature, NPC_MISTRESS, 250.0f);
-        return;
-    }*/
+
+        if (mistressEntryList.empty())
+            return;
+
+        if (mistressEntryList.size()-1 >= 2)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, true);
+        else
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, false);
+    }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        /*if (m_uiCheckTimer < uiDiff)
+        if (m_uiCheckTimer < uiDiff)
         {
             CheckAchiev();
             m_uiCheckTimer = 1000;
         }
         else
-            m_uiCheckTimer -= uiDiff;*/
+            m_uiCheckTimer -= uiDiff;
 
         if (m_uiNetherPowerTimer <= uiDiff)
         {
