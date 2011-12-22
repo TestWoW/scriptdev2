@@ -82,10 +82,16 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
     boss_jaraxxusAI(Creature* pCreature) : BSWScriptedAI(pCreature)
     {
         m_pInstance = (instance_trial_of_the_crusader*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     instance_trial_of_the_crusader* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
 
     uint8 MistressCount;
     uint32 m_uiCheckAchiev;
@@ -99,6 +105,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
     uint32 m_uiLegionFlameTimer;
     uint32 m_uiInfernalEruptionTimer;
     uint32 m_uiNetherPortalTimer;
+    uint32 m_uiEnrageTimer;
 
 
     void Reset() 
@@ -119,7 +126,8 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
         m_uiIncinerateFleshTimer    = 15000;
         m_uiLegionFlameTimer        = 20000;
         m_uiInfernalEruptionTimer   = 80000;
-        m_uiNetherPortalTimer       = 20000;
+        m_uiNetherPortalTimer       = 45000;
+        m_uiEnrageTimer             = 600000;
 
         m_creature->SetRespawnDelay(DAY);
     }
@@ -246,7 +254,11 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
         if (m_uiInfernalEruptionTimer <= uiDiff)
         {
             DoScriptText(SAY_INFERNAL_VOLCANO, m_creature);
-            m_creature->CastSpell(m_creature, SPELL_INFERNAL, false);
+            DoScriptText(SAY_SUMMON_INFERNAL, m_creature);
+
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                m_creature->CastSpell(pTarget, SPELL_INFERNAL, false);
+
             m_uiInfernalEruptionTimer = 80000;
         }
         else
@@ -258,14 +270,14 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public BSWScriptedAI
                 
             float x, y, z;
             m_creature->GetPosition(x, y, z);
-            m_creature->SummonCreature(NPC_NETHER_PORTAL, x + urand(5.0f, 10.0f), y + urand(5.0f, 10.0f), z, 5, TEMPSUMMON_TIMED_DESPAWN, 10000);
+            m_creature->SummonCreature(NPC_NETHER_PORTAL, x + urand(5.0f, 10.0f), y + urand(5.0f, 10.0f), z, 5, m_bIs25Man ? TEMPSUMMON_MANUAL_DESPAWN : TEMPSUMMON_TIMED_DESPAWN, 10000);
             if (Creature* pMistress = m_pInstance->GetSingleCreatureFromStorage(NPC_NETHER_PORTAL)) 
             {
                 pMistress->SetDisplayId(17612);
                 pMistress->CastSpell(pMistress, SPELL_WILFRED_PORTAL, false);
                 ++MistressCount;
             }
-            m_uiNetherPortalTimer = 100000;
+            m_uiNetherPortalTimer = 120000;
         }
         else
             m_uiNetherPortalTimer -= uiDiff;
@@ -341,14 +353,15 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public BSWScriptedAI
 
     void Reset()
     {
-        m_InfernalCount               = 3;
-        m_uiSummonInfernalTimer       = 4000;
+        m_InfernalCount               = m_bIs25Man ? 5 : 3;
+        m_uiSummonInfernalTimer       = m_bIs25Man ? 3000 : 4000;
 
         m_creature->SetInCombatWithZone();
         m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
+        SetCombatMovement(false);
 
         if (!m_bIsHeroic)
-             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void JustDied(Unit* Killer)
@@ -366,17 +379,22 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public BSWScriptedAI
 
         if (m_uiSummonInfernalTimer <= uiDiff)
         {
-            if (m_InfernalCount > 0)
+            if (m_bIsHeroic)
             {
-                --m_InfernalCount;
-
-                if (Creature* pBoss = m_pInstance->GetSingleCreatureFromStorage(NPC_JARAXXUS)) 
-                    DoScriptText(SAY_SUMMON_INFERNAL, pBoss);
-
                 if (Unit* pTarget= m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                     m_creature->CastSpell(pTarget, SPELL_INFERNAL_ERUPTION, false);
             }
-            m_uiSummonInfernalTimer = 5000;
+            else
+            {
+                if (m_InfernalCount > 0)
+                {
+                    --m_InfernalCount;
+
+                    if (Unit* pTarget= m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                        m_creature->CastSpell(pTarget, SPELL_INFERNAL_ERUPTION, false);
+                }
+            }
+            m_uiSummonInfernalTimer = m_bIs25Man ? 3000 : 5000;
         }
         else
             m_uiSummonInfernalTimer -= uiDiff;
@@ -469,10 +487,16 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public BSWScriptedAI
     mob_nether_portalAI(Creature* pCreature) : BSWScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
 
     uint32 m_uiSummonMistressTimer;
 
@@ -484,8 +508,13 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public BSWScriptedAI
         m_creature->SetSpeedRate(MOVE_RUN, 0.0f);
         m_creature->SetRespawnDelay(DAY);
 
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        SetCombatMovement(false);
+
+        if (!m_bIsHeroic)
+        {
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -504,7 +533,7 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public BSWScriptedAI
             if (Creature* pBoss = m_pInstance->GetSingleCreatureFromStorage(NPC_JARAXXUS)) 
                 DoScriptText(SAY_SUMMON_MISTRESS, pBoss);
 
-            m_uiSummonMistressTimer = 5000;
+            m_uiSummonMistressTimer = 8000;
         }
         else
             m_uiSummonMistressTimer -= uiDiff;
@@ -543,7 +572,7 @@ struct MANGOS_DLL_DECL mob_mistress_of_painAI : public BSWScriptedAI
 
         m_uiShivanSlashTimer       = 10000;
         m_uiSpinningStrikeTimer    = 5000;
-        m_uiMistressKissTimer      = 15000;
+        m_uiMistressKissTimer      = 8000;
     }
 
     void KilledUnit(Unit* pVictim)
@@ -595,7 +624,9 @@ struct MANGOS_DLL_DECL mob_mistress_of_painAI : public BSWScriptedAI
         {
             if (m_uiMistressKissTimer <= uiDiff)
             {
-                m_creature->CastSpell(m_creature->getVictim(), SPELL_MISTRESS_KISS, false);
+                if (Unit* pTarget= m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    m_creature->CastSpell(pTarget, SPELL_MISTRESS_KISS, false);
+
                 m_uiMistressKissTimer = 10000;
             }
             else
