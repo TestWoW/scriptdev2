@@ -108,6 +108,8 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
+    bool m_bCheckSisterDead;
+
     uint32 m_uiAchievTimer;
 
     uint32 m_uiEventStep;
@@ -116,12 +118,15 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
     uint32 m_uiTwinSpikeLTimer;
     uint32 m_uiVortexOrPactTimer;
     uint32 m_uiLightTouchTimer;
+    uint32 m_uiCheckTouchBuff;
     uint32 m_uiOrbsTimer;
 
     void Reset() 
     {
         if (!m_pInstance) 
             return;
+
+        m_bCheckSisterDead         = false;
 
         m_uiAchievTimer            = 180000;
 
@@ -131,6 +136,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
         m_uiTwinSpikeLTimer        = 10000;
         m_uiVortexOrPactTimer      = 45000;
         m_uiLightTouchTimer        = 15000;
+        m_uiCheckTouchBuff         = 1000;
         m_uiOrbsTimer              = 2500;
 
         SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_OFFHAND_1, EQUIP_RANGED_1);
@@ -243,6 +249,27 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
         else 
             m_uiAchievTimer -= uiDiff;
 
+        if (m_bIsHeroic)
+        {
+            if (m_uiCheckTouchBuff <= uiDiff)
+            {
+                Map* pMap = m_creature->GetMap();
+                Map::PlayerList const &lPlayers = pMap->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                     Unit* pPlayer = itr->getSource();
+                     if (!pPlayer) 
+                         continue;
+                   
+                     if (pPlayer->HasAura(SPELL_LIGHT_ESSENCE))
+                         pPlayer->RemoveAurasDueToSpell(SPELL_LIGHT_TOUCH);
+                }
+                m_uiCheckTouchBuff = 1000;
+            }
+            else 
+                m_uiCheckTouchBuff -= uiDiff;
+        }
+
         if (m_uiNextEventTimer <= uiDiff)
         {   
             switch (m_uiEventStep)
@@ -301,7 +328,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
                                  m_creature->InterruptNonMeleeSpells(true);
 
                                  if (Creature* pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_DARKBANE))
-                                     m_creature->CastSpell(pSister, SPELL_TWIN_POWER, false);
+                                     pSister->_AddAura(SPELL_TWIN_POWER, 15000);
 
                                  DoScriptText(EMOTE_PACT, m_creature);
                                  DoScriptText(SAY_PACT, m_creature);
@@ -353,6 +380,23 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public BSWScriptedAI
         else
             m_uiNextEventTimer -= uiDiff;
 
+        if (m_pInstance->GetData(TYPE_VALKIRIES) == SPECIAL && !m_bCheckSisterDead)
+        {
+            if (Creature* pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_DARKBANE))
+            {
+                if (!pSister->isAlive())
+                {
+                    m_creature->InterruptNonMeleeSpells(true);
+                    m_creature->RemoveAllAuras();
+                    m_creature->SetLevitate(false);
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    m_uiEventStep = 0;
+
+                    m_bCheckSisterDead = true;
+                }
+            }
+        }
+
         DoMeleeAttackIfReady();
     }
 };
@@ -378,6 +422,8 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
+    bool m_bCheckSisterDead;
+
     uint32 m_uiAchievTimer;
 
     uint32 m_uiEventStep;
@@ -386,6 +432,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
     uint32 m_uiTwinSpikeDTimer;
     uint32 m_uiVortexOrPactTimer;
     uint32 m_uiDarkTouchTimer;
+    uint32 m_uiCheckTouchBuff;
     uint32 m_uiOrbsTimer;
 
     void Reset() 
@@ -393,6 +440,8 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
         if (!m_pInstance) 
             return;
    
+        m_bCheckSisterDead         = false;
+
         m_uiAchievTimer            = 180000;
 
         m_uiEventStep              = 0;
@@ -401,6 +450,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
         m_uiTwinSpikeDTimer        = 10000;
         m_uiVortexOrPactTimer      = 90000;
         m_uiDarkTouchTimer         = 5000;
+        m_uiCheckTouchBuff         = 1000;
         m_uiOrbsTimer              = 2500;
 
         SetEquipmentSlots(false, EQUIP_MAIN_2, EQUIP_OFFHAND_2, EQUIP_RANGED_2);
@@ -510,6 +560,27 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
         else 
             m_uiAchievTimer -= uiDiff;
 
+        if (m_bIsHeroic)
+        {
+            if (m_uiCheckTouchBuff <= uiDiff)
+            {
+                Map* pMap = m_creature->GetMap();
+                Map::PlayerList const &lPlayers = pMap->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                     Unit* pPlayer = itr->getSource();
+                     if (!pPlayer) 
+                         continue;
+                   
+                     if (pPlayer->HasAura(SPELL_DARK_ESSENCE))
+                         pPlayer->RemoveAurasDueToSpell(SPELL_DARK_TOUCH);
+                }
+                m_uiCheckTouchBuff = 1000;
+            }
+            else 
+                m_uiCheckTouchBuff -= uiDiff;
+        }
+
         if (m_uiNextEventTimer <= uiDiff)
         {   
             switch (m_uiEventStep)
@@ -568,7 +639,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
                                  m_creature->InterruptNonMeleeSpells(true);
 
                                  if (Creature* pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_LIGHTBANE))
-                                     m_creature->CastSpell(pSister, SPELL_TWIN_POWER, false);
+                                     pSister->_AddAura(SPELL_TWIN_POWER, 15000);
 
                                  DoScriptText(EMOTE_PACT, m_creature);
                                  DoScriptText(SAY_PACT, m_creature);
@@ -619,6 +690,23 @@ struct MANGOS_DLL_DECL boss_eydisAI : public BSWScriptedAI
         }
         else
             m_uiNextEventTimer -= uiDiff;
+
+        if (m_pInstance->GetData(TYPE_VALKIRIES) == SPECIAL && !m_bCheckSisterDead)
+        {
+            if (Creature* pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_LIGHTBANE))
+            {
+                if (!pSister->isAlive())
+                {
+                    m_creature->InterruptNonMeleeSpells(true);
+                    m_creature->RemoveAllAuras();
+                    m_creature->SetLevitate(false);
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    m_uiEventStep = 0;
+
+                    m_bCheckSisterDead = true;
+                }
+            }
+        }
 
         DoMeleeAttackIfReady();
     }
@@ -683,9 +771,8 @@ bool GossipHello_mob_light_essence(Player *player, Creature* pCreature)
 
     player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
     player->RemoveAurasDueToSpell(SPELL_DARK_ESSENCE);
-//  player->CastSpell(player,SPELL_REMOVE_TOUCH, false); // Not worked now
+    player->RemoveAurasDueToSpell(SPELL_LIGHT_TOUCH);
     player->CastSpell(player,SPELL_LIGHT_ESSENCE, false);
-//  player->RemoveAurasDueToSpell(SPELL_LIGHT_TOUCH); // Override for REMOVE_TOUCH
     player->CLOSE_GOSSIP_MENU();
     return true;
 };
@@ -743,7 +830,7 @@ bool GossipHello_mob_dark_essence(Player *player, Creature* pCreature)
 
     player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
     player->RemoveAurasDueToSpell(SPELL_LIGHT_ESSENCE);
-//  player->CastSpell(player,SPELL_REMOVE_TOUCH, false); // Not worked now
+    player->RemoveAurasDueToSpell(SPELL_DARK_TOUCH);
     player->CastSpell(player,SPELL_DARK_ESSENCE, false);
     player->CLOSE_GOSSIP_MENU();
     return true;
