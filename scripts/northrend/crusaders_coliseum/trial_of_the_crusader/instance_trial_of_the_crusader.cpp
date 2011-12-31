@@ -35,12 +35,14 @@ EndScriptData */
         for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
             m_auiEncounter[i] = NOT_STARTED;
 
-        for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS; ++i)
+        for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS - 1; ++i)
             m_bAchievCriteria[i] = false;
 
-        m_auiEncounter[0] = 0;
-        m_auiEncounter[7] = 50;
-        m_auiEncounter[8] = 0;
+        SetSpecialAchievementCriteria(TYPE_IMMORTALITY, true);
+
+        m_auiEncounter[TYPE_STAGE] = 0;
+        m_auiEncounter[TYPE_COUNTER] = 50;
+        m_auiEncounter[TYPE_EVENT] = 0;
 
         m_auiNorthrendBeasts = NOT_STARTED;
         m_auiEventTimer = 1000;
@@ -54,6 +56,9 @@ EndScriptData */
             if (m_auiEncounter[i] == IN_PROGRESS)
                 return true;
 
+        if (m_auiEncounter[TYPE_NORTHREND_BEASTS] == SNAKES_SPECIAL)
+            return true;
+
         return false;
     }
 
@@ -64,6 +69,12 @@ EndScriptData */
             m_player->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
             m_player->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, GetData(TYPE_COUNTER));
         }
+    }
+
+    void instance_trial_of_the_crusader::OnPlayerDeath(Player* pPlayer)
+    {
+        if (IsEncounterInProgress())
+            SetSpecialAchievementCriteria(TYPE_IMMORTALITY, false);
     }
 
     bool instance_trial_of_the_crusader::IsRaidWiped()
@@ -120,15 +131,26 @@ EndScriptData */
             case CRITERIA_ACHIEV_UPPER_BACK_PAIN_10N:
             case CRITERIA_ACHIEV_UPPER_BACK_PAIN_25N:
                  return m_bAchievCriteria[TYPE_UPPER_BACK_PAIN];
-            case CRITERIA_ACHIEV_ONE_BUT_TWO_10N:
-            case CRITERIA_ACHIEV_ONE_BUT_TWO_25N:
-                 return m_bAchievCriteria[TYPE_ONE_BUT_TWO];
             case CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_10N:
             case CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_25N:
                  return m_bAchievCriteria[TYPE_SIXTY_PAIN_SPIKE];
             case CRITERIA_ACHIEV_SALT_AND_PEPPER_10N:
+            case CRITERIA_ACHIEV_SALT_AND_PEPPER_10H:
             case CRITERIA_ACHIEV_SALT_AND_PEPPER_25N:
+            case CRITERIA_ACHIEV_SALT_AND_PEPPER_25H:
                  return m_bAchievCriteria[TYPE_SALT_AND_PEPPER];
+            case CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_10:
+            case CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_25:
+                 return m_bAchievCriteria[TYPE_SKILL];
+            case CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_10:
+            case CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_25:
+                 return m_bAchievCriteria[TYPE_MAD_SKILL];
+            case CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_10:
+            case CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_25:
+                 return m_bAchievCriteria[TYPE_INSANITY];
+            case CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_HORDE:
+            case CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_ALLY:
+                 return m_bAchievCriteria[TYPE_IMMORTALITY];
             default:
                  return false;
         }
@@ -145,28 +167,40 @@ EndScriptData */
         switch(uiType)
         {
         case TYPE_STAGE:
-            m_auiEncounter[0] = uiData;
+            m_auiEncounter[TYPE_STAGE] = uiData;
             break;
         case TYPE_BEASTS:
-            m_auiEncounter[1] = uiData;
-            /*if (uiData == IN_PROGRESS)
-            {
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_GORMOK, true);
-                SetSpecialAchievementCriteria(TYPE_ACHIEV_JORMUNGAR, true);
-            }*/
+            m_auiEncounter[TYPE_BEASTS] = uiData;
+            if (uiData == IN_PROGRESS)
+                SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, false);
             break;
         case TYPE_JARAXXUS:
-            m_auiEncounter[2] = uiData;
+            m_auiEncounter[TYPE_JARAXXUS] = uiData;
             if (uiData == IN_PROGRESS)
                 SetSpecialAchievementCriteria(TYPE_SIXTY_PAIN_SPIKE, false);
             break;
         case TYPE_CRUSADERS:
-            if (uiData == FAIL && (m_auiEncounter[3] == FAIL || m_auiEncounter[3] == NOT_STARTED))
-                m_auiEncounter[3] = NOT_STARTED;
+            if (uiData == FAIL && (m_auiEncounter[TYPE_CRUSADERS] == FAIL || m_auiEncounter[TYPE_CRUSADERS] == NOT_STARTED))
+                m_auiEncounter[TYPE_CRUSADERS] = NOT_STARTED;
             else
-                m_auiEncounter[3] = uiData;
+                m_auiEncounter[TYPE_CRUSADERS] = uiData;
             if (uiData == DONE)
             {
+                if (Creature* pTirion = GetSingleCreatureFromStorage(NPC_TIRION))
+                {
+                    Map* pMap = pTirion->GetMap();
+                    Map::PlayerList const& pPlayers = pMap->GetPlayers();
+                    if (!pPlayers.isEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+                        {
+                            Unit *pTarget = itr->getSource();
+                            if (pTarget)
+                                pTirion->CastSpell(pTarget, 68184, true);
+                        }
+                    }
+                }
+
                 uint32 uiCacheEntry = GO_CRUSADERS_CACHE_10;
 
                 switch (instance->GetDifficulty())
@@ -193,17 +227,17 @@ EndScriptData */
                 m_auiCrusadersCount = uiData;
             break;
         case TYPE_VALKIRIES:
-            if (m_auiEncounter[4] == SPECIAL && uiData == SPECIAL)
-                uiData = DONE;
-            m_auiEncounter[4] = uiData;
+            /*if (m_auiEncounter[4] == SPECIAL && uiData == SPECIAL)
+                uiData = DONE;*/
+            m_auiEncounter[TYPE_VALKIRIES] = uiData;
             if (uiData == IN_PROGRESS)
                 SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, true);
             break;
         case TYPE_LICH_KING:
-            m_auiEncounter[5] = uiData;
+            m_auiEncounter[TYPE_LICH_KING] = uiData;
             break;
         case TYPE_ANUBARAK:
-            m_auiEncounter[6] = uiData;
+            m_auiEncounter[TYPE_ANUBARAK] = uiData;
 
             if (uiData == IN_PROGRESS)
             {
@@ -216,21 +250,21 @@ EndScriptData */
             {
                 if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
                 {
-                    if (m_auiEncounter[7] >= 25)
+                    if (m_auiEncounter[TYPE_COUNTER] >= 25)
                         m_uiTributeChest1 = GO_TRIBUTE_CHEST_10H_25;
-                    if (m_auiEncounter[7] >= 45)
+                    if (m_auiEncounter[TYPE_COUNTER] >= 45)
                         m_uiTributeChest2 = GO_TRIBUTE_CHEST_10H_45;
-                    if (m_auiEncounter[7] > 49)
+                    if (m_auiEncounter[TYPE_COUNTER] > 49)
                         m_uiTributeChest3 = GO_TRIBUTE_CHEST_10H_50;
                     m_uiTributeChest4 = GO_TRIBUTE_CHEST_10H_99;
                 }
                 if (Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
                 {
-                    if (m_auiEncounter[7] >= 25)
+                    if (m_auiEncounter[TYPE_COUNTER] >= 25)
                         m_uiTributeChest1 = GO_TRIBUTE_CHEST_25H_25;
-                    if (m_auiEncounter[7] >= 45)
+                    if (m_auiEncounter[TYPE_COUNTER] >= 45)
                         m_uiTributeChest2 = GO_TRIBUTE_CHEST_25H_45;
-                    if (m_auiEncounter[7] > 49)
+                    if (m_auiEncounter[TYPE_COUNTER] > 49)
                         m_uiTributeChest3 = GO_TRIBUTE_CHEST_25H_50;
                     m_uiTributeChest4 = GO_TRIBUTE_CHEST_25H_99;
                 }
@@ -258,11 +292,18 @@ EndScriptData */
             };
             break;
         case TYPE_COUNTER:
-            m_auiEncounter[7] = uiData;
-            uiData = DONE;
+            m_auiEncounter[TYPE_COUNTER] = uiData;
+            if (uiData < 25)
+                SetSpecialAchievementCriteria(TYPE_SKILL, false);
+            if (uiData < 45)
+                SetSpecialAchievementCriteria(TYPE_MAD_SKILL, false);
+            if (uiData < 50)
+                SetSpecialAchievementCriteria(TYPE_INSANITY, false);
+
+            //uiData = DONE;
             break;
         case TYPE_EVENT:
-            m_auiEncounter[8] = uiData;
+            m_auiEncounter[TYPE_EVENT] = uiData;
             uiData = NOT_STARTED;
             break;
         case TYPE_EVENT_TIMER:
@@ -277,9 +318,6 @@ EndScriptData */
             break;
         case DATA_HEALTH_EYDIS:
             m_uiDataDamageEydis = uiData; uiData = NOT_STARTED;
-            break;
-        case DATA_CASTING_VALKYRS:
-            m_uiValkyrsCasting = uiData; uiData = NOT_STARTED;
             break;
         }
 
@@ -306,7 +344,7 @@ EndScriptData */
         {
             if (IsRaidWiped())
             {
-                --m_auiEncounter[7];
+                --m_auiEncounter[TYPE_COUNTER];
                 needsave = true;
                 UpdateWorldState();
             }
@@ -442,7 +480,6 @@ EndScriptData */
 
         case DATA_HEALTH_FJOLA: return m_uiDataDamageFjola;
         case DATA_HEALTH_EYDIS: return m_uiDataDamageEydis;
-        case DATA_CASTING_VALKYRS: return m_uiValkyrsCasting;
         }
         return 0;
     }

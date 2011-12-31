@@ -17,10 +17,11 @@
 /* ScriptData
 SDName: boss_northrend_beasts
 SDComment: Timers
-SDAuthor: Walkum
+SDAuthor: Walkum, mechanic rewritten by carlos93 && trinitycore
 EndScriptData */
 
-// Worms: Paralytic Toxin requires core support.
+// Snobols have to jump into players. Need core support
+// Some spells have wrong target, invalid.
 
 #include "precompiled.h"
 #include "trial_of_the_crusader.h"
@@ -73,9 +74,11 @@ enum BossSpells
     SPELL_BURNING_BITE          = 66879,
     SPELL_BURNING_SPRAY         = 66902,
     SPELL_BURNING_BILE          = 66869,
+    SPELL_AUTO_GROW             = 62559,
     SPELL_SLIME_POOL            = 66883,
     SPELL_SLIME_POOL_AURA       = 66882,
     SPELL_SLIME_POOL_VISUAL     = 63084,
+    SPELL_CHECK_ACHIEV          = 68523,
 
     // Icehowl
     SPELL_FEROCIOUS_BUTT        = 66770,
@@ -268,7 +271,7 @@ struct MANGOS_DLL_DECL mob_snobold_vassalAI : public ScriptedAI
     }
 
     ScriptedInstance* m_pInstance;
-    Unit* pFocus;
+    Unit *pFocus;
 
     uint32 m_uiBatterTimer;
     uint32 m_uiFireBombTimer;
@@ -302,8 +305,8 @@ struct MANGOS_DLL_DECL mob_snobold_vassalAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        if (pFocus && pFocus->isAlive()) 
-            pFocus->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
+        /*if (pFocus && pFocus->isAlive())
+            pFocus->RemoveAurasDueToSpell(SPELL_SNOBOLLED);*/
 
         m_creature->ForcedDespawn(5000);
     }
@@ -407,8 +410,8 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
     uint32 m_uiSlimePoolTimer;
     uint32 m_uiAchievTimer;
 
-    bool m_bIsParalyticToxin;
     bool m_bIsEnraged;
+    bool m_bAchievFailed;
 
     void Reset()
     {
@@ -422,10 +425,10 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
 
         m_uiPhase                       = PHASE_SUBMERGED;
 
-        m_uiAchievTimer                 = 0;
+        m_uiAchievTimer                 = 10000;
 
-        m_bIsParalyticToxin             = false;
         m_bIsEnraged                    = false;
+        m_bAchievFailed                 = false;
 
         m_creature->SetInCombatWithZone();
         m_creature->SetRespawnDelay(7*DAY);
@@ -445,6 +448,24 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_DONE);
             else
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_SPECIAL);
+        }
+
+        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
+            CheckAchiev();
+    }
+
+    void CheckAchiev()
+    {
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                    m_creature->CastSpell(pTarget, SPELL_CHECK_ACHIEV, true);
+            }
         }
     }
 
@@ -573,10 +594,8 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL)
         {
             ++m_uiAchievTimer;
-            if (m_uiAchievTimer < 10000)
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, true);
-            else
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
+            if (m_uiAchievTimer < uiDiff)
+                m_bAchievFailed = true;
         }
 
         DoMeleeAttackIfReady();
@@ -609,6 +628,7 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
     uint32 m_uiAchievTimer;
 
     bool m_bIsEnraged;
+    bool m_bAchievFailed;
 
     void Reset()
     {
@@ -619,11 +639,12 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
         m_uiBurningSprayTimer           = 15000;
         m_uiSweepTimer                  = 20000;
         m_uiSlimePoolTimer              = 10000;
-        m_uiAchievTimer                 = 0;
+        m_uiAchievTimer                 = 10000;
 
         m_uiPhase                       = PHASE_EMERGED;
 
         m_bIsEnraged                    = false;
+        m_bAchievFailed                 = false;
 
         m_creature->SetInCombatWithZone();
         m_creature->SetRespawnDelay(7*DAY);
@@ -644,6 +665,24 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
             else 
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_SPECIAL);
         }
+
+        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
+            CheckAchiev();
+    }
+
+    void CheckAchiev()
+    {
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                    m_creature->CastSpell(pTarget, SPELL_CHECK_ACHIEV, true);
+            }
+        }
     }
 
     void JustReachedHome()
@@ -656,25 +695,6 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
 
         m_creature->ForcedDespawn();
     }
-
-    /*void SpellHitTarget(Unit *target, const SpellEntry *spell)
-    {
-        if (spell->Id == SPELL_BURNING_SPRAY)
-        {
-            if (target->GetTypeId() == TYPEID_PLAYER)
-            {
-                m_creature->CastSpell(target, SPELL_BURNING_BILE, false);
-            }
-        }
-
-        if (spell->Id == SPELL_BURNING_BILE)
-        {
-            if (target->GetTypeId() == TYPEID_PLAYER)
-            {
-                target->RemoveAurasDueToSpell(SPELL_PARALYTIC_TOXIN);
-            }
-        }
-    }*/
 
     void UpdateAI(const uint32 uiDiff)
     {
@@ -789,10 +809,8 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL)
         {
             ++m_uiAchievTimer;
-            if (m_uiAchievTimer < 10000)
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, true);
-            else
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ONE_BUT_TWO, false);
+            if (m_uiAchievTimer < uiDiff)
+                m_bAchievFailed = true;
         }
 
         DoMeleeAttackIfReady();
@@ -827,9 +845,10 @@ struct MANGOS_DLL_DECL mob_slime_poolAI : public ScriptedAI
         m_uiIncreaseSizeTimer = 0;
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->SetInCombatWithZone();
-        m_creature->CastSpell(m_creature, SPELL_SLIME_POOL_AURA, false);
+        DoCastSpellIfCan(m_creature, SPELL_SLIME_POOL_AURA, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_AUTO_GROW, CAST_TRIGGERED);
 
         SetCombatMovement(false);
 
@@ -852,15 +871,6 @@ struct MANGOS_DLL_DECL mob_slime_poolAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_SLIME_POOL_VISUAL, false);
             m_bIsCloudCasted = true;
         }
-
-        if (m_uiIncreaseSizeTimer <= uiDiff)
-        {
-            m_fSize = m_fSize*1.035;
-            m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, m_fSize);
-            m_uiIncreaseSizeTimer = 500;
-        }
-        else
-            m_uiIncreaseSizeTimer -= uiDiff;
 
         if (m_fSize >= 6.0f) 
             m_creature->ForcedDespawn();
@@ -890,9 +900,13 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     uint32 m_uiWaitTimer;
     uint32 m_uiPhaseTimer;
     uint32 m_uiPhase;
+    uint32 m_uiCheckTimer;
 
     float fPosX, fPosY, fPosZ;
-    Unit* pFocus;
+    Unit *pFocus;
+    bool m_bAchievFailed;
+
+    std::list<Creature*> vassalsEntryList;
 
     void Reset() 
     {
@@ -904,13 +918,18 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
         m_uiWhirlTimer                 = 20000;
         m_uiMassiveCrashTimer          = 30000;
         m_uiPhase                      = PHASE_NORMAL;
+        m_uiCheckTimer                 = 0; // if not vassals at encounter start only check once.
 
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetSpeedRate(MOVE_WALK, 3.0f);
         m_creature->SetSpeedRate(MOVE_RUN, 3.0f);
 
+        m_bAchievFailed                = false;
+
         pFocus = NULL;
+
+        vassalsEntryList.clear();
     }
 
     void MovementInform(uint32 uiMovementType, uint32 uiData)
@@ -961,6 +980,27 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
         }
     }
 
+    void CheckAchiev()
+    {
+        vassalsEntryList.clear();
+        GetCreatureListWithEntryInGrid(vassalsEntryList, m_creature, NPC_SNOBOLD_VASSAL, 250.0f);
+
+        if (vassalsEntryList.empty())
+        {
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, false);
+            m_bAchievFailed = true;
+            return;
+        }
+
+        if (vassalsEntryList.size()-1 >= 2)
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, true);
+        else
+        {
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, false);
+            m_bAchievFailed = true;
+        }
+    }
+
     void JustDied(Unit* pKiller)
     {
         if (!m_pInstance) 
@@ -989,6 +1029,17 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (!m_bAchievFailed)
+        {
+            if (m_uiCheckTimer < uiDiff)
+            {
+                CheckAchiev();
+                m_uiCheckTimer = 500;
+            }
+            else
+                m_uiCheckTimer -= uiDiff;
+        }
 
         switch (m_uiPhase)
         {

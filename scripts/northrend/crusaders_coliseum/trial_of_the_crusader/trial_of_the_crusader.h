@@ -21,10 +21,14 @@ enum
     MAX_ENCOUNTERS              = 9,
 
     TYPE_UPPER_BACK_PAIN        = 0,
-    TYPE_ONE_BUT_TWO            = 1,
-    TYPE_SIXTY_PAIN_SPIKE       = 2,
-    TYPE_SALT_AND_PEPPER        = 3,
-    MAX_SPECIAL_ACHIEV_CRITS    = 4,
+    TYPE_SIXTY_PAIN_SPIKE       = 1,
+    TYPE_SALT_AND_PEPPER        = 2,
+    TYPE_SKILL                  = 3,
+    TYPE_MAD_SKILL              = 4,
+    TYPE_INSANITY               = 5,
+    TYPE_DEDICATED_INSANITY     = 6,
+    TYPE_IMMORTALITY            = 7,
+    MAX_SPECIAL_ACHIEV_CRITS    = 8,
 
     NPC_BARRENT                 = 34816,
     NPC_TIRION                  = 34996,
@@ -115,18 +119,29 @@ enum
 
     DATA_HEALTH_EYDIS           = 201,
     DATA_HEALTH_FJOLA           = 202,
-    DATA_CASTING_VALKYRS        = 203,
 
     DESPAWN_TIME                = 300000,
 
-    CRITERIA_ACHIEV_UPPER_BACK_PAIN_10N         = 11779,
-    CRITERIA_ACHIEV_UPPER_BACK_PAIN_25N         = 11780,
-    CRITERIA_ACHIEV_ONE_BUT_TWO_10N             = 12280,
-    CRITERIA_ACHIEV_ONE_BUT_TWO_25N             = 12278,
-    CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_10N        = 11838,
-    CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_25N        = 11839,
-    CRITERIA_ACHIEV_SALT_AND_PEPPER_10N         = 11778,
-    CRITERIA_ACHIEV_SALT_AND_PEPPER_25N         = 11818,
+    CRITERIA_ACHIEV_UPPER_BACK_PAIN_10N             = 11779,
+    CRITERIA_ACHIEV_UPPER_BACK_PAIN_25N             = 11780,
+
+    CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_10N            = 11838,
+    CRITERIA_ACHIEV_SIXTY_PAIN_SPIKE_25N            = 11839,
+
+    CRITERIA_ACHIEV_SALT_AND_PEPPER_10N             = 11778,
+    CRITERIA_ACHIEV_SALT_AND_PEPPER_10H             = 12258,
+    CRITERIA_ACHIEV_SALT_AND_PEPPER_25N             = 11818,
+    CRITERIA_ACHIEV_SALT_AND_PEPPER_25H             = 11860,
+
+    CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_10             = 12344,
+    CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_25             = 12338,
+    CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_10         = 12347,
+    CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_25         = 12341,
+    CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_10          = 12349,
+    CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_25          = 12343,
+    CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_HORDE    = 12247,
+    CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_ALLY     = 12359,
+    CRITERIA_ACHIEV_TRIBUTE_TO_DEDICATED_INSANITY   = 12360,
 };
 
 static Locations SpawnLoc[]=
@@ -225,6 +240,7 @@ public:
 
     bool IsEncounterInProgress() const;
     void OnPlayerEnter(Player *m_player);
+    void OnPlayerDeath(Player *m_player);
 
     bool IsRaidWiped();
     void UpdateWorldState();
@@ -256,7 +272,6 @@ private:
 
     uint32 m_uiDataDamageFjola;
     uint32 m_uiDataDamageEydis;
-    uint32 m_uiValkyrsCasting;
 
     uint32 m_uiTributeChest1;
     uint32 m_uiTributeChest2;

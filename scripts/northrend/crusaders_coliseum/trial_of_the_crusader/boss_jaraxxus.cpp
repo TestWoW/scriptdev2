@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: boss_jaraxxus
 SDComment:
-SDAuthor: Walkum
+SDAuthor: by Walkum, achievs and improves by carlos93.
 EndScriptData */
 
 #include "precompiled.h"
