@@ -1014,8 +1014,13 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     {
                         DoScriptText(SAY_SHATTER_ARENA, m_creature);
                         m_creature->CastSpell(m_creature, SPELL_QUAKE, false);
+
                         if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
                             pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
+
+                        if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
+                            pGoFrostyWind->SetGoState(GO_STATE_ACTIVE);
+
                         NextStep(8000);
                     }
                     break;
@@ -1040,11 +1045,11 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
 
                     m_pInstance->DoUseDoorOrButton(GO_ARTHAS_PRECIPICE);
 
-                    if (GameObject* pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, 202188, 100.0f))
-                         pGoFrostyWind->Delete();
-
                     if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
+                        pGoSnowEdge->SetGoState(GO_STATE_READY);
+
+                    if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
+                        pGoFrostyWind->SetGoState(GO_STATE_READY);
 
                     m_creature->GetMotionMaster()->Clear();
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
@@ -1131,6 +1136,7 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                         pGoFloor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
                         pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,oldflag);
                     }
+
                     if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
                         pGoSnowEdge->SetGoState(GO_STATE_READY);
 
@@ -1173,10 +1179,13 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
                     {
                         DoScriptText(SAY_SHATTER_ARENA, m_creature);
                         m_creature->CastSpell(m_creature, SPELL_QUAKE, false);
+
                         if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
                             pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
 
-                        m_creature->SummonGameobject(GO_FROSTY_WIND, 503.62f, -2124.66f, 1036.61f, 0, 0);
+                        if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
+                            pGoFrostyWind->SetGoState(GO_STATE_ACTIVE);
+
                         NextStep(0);
                     }
                     break;
@@ -1200,11 +1209,11 @@ struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_
 
                     m_pInstance->DoUseDoorOrButton(GO_ARTHAS_PRECIPICE);
 
-                    if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
-                        pGoFrostyWind->Delete();
-
                     if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
+                        pGoSnowEdge->SetGoState(GO_STATE_READY);
+
+                    if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
+                        pGoFrostyWind->SetGoState(GO_STATE_READY);
 
                     m_creature->GetMotionMaster()->Clear();
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
