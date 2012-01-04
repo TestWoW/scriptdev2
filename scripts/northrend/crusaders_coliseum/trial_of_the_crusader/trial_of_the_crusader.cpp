@@ -88,7 +88,6 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
         if (Creature *pAlly = GetClosestCreatureWithEntry(m_creature, NPC_PROUDMOORE, 300.0f))
             pAlly->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-        m_creature->SetRespawnDelay(DAY);
     }
 
     void AttackStart(Unit *who)
@@ -135,6 +134,8 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                           m_pInstance->SetData(TYPE_STAGE,0);
                           m_pInstance->SetData(TYPE_EVENT,666);
                           m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
                       }
                       break;
                  case 2:
@@ -165,6 +166,8 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                           m_pInstance->SetData(TYPE_STAGE,0);
                           m_pInstance->SetData(TYPE_EVENT,666);
                           m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
                       }
                       break;
                  case 3:
@@ -180,6 +183,8 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                           m_pInstance->SetData(TYPE_STAGE,0);
                           m_pInstance->SetData(TYPE_EVENT,666);
                           m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
                       };
                       break;
                  case 4:

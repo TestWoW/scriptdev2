@@ -256,8 +256,9 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         if (m_uiLegionFlameTimer <= uiDiff)
         {
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                if (DoCastSpellIfCan(pTarget, SPELL_LEGION_FLAME) == CAST_OK)
-                    m_uiLegionFlameTimer = 30000;
+                m_creature->CastSpell(pTarget, SPELL_LEGION_FLAME, false);
+            
+            m_uiLegionFlameTimer = 30000;
         }
         else
             m_uiLegionFlameTimer -= uiDiff;
@@ -309,7 +310,7 @@ struct MANGOS_DLL_DECL mob_legion_flameAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-        DoCastSpellIfCan(m_creature, SPELL_LEGION_FLAME_AURA, CAST_TRIGGERED);
+        m_creature->_AddAura(SPELL_LEGION_FLAME_AURA);
         m_creature->ForcedDespawn(60000);
         m_creature->SetRespawnDelay(DAY);
     }
@@ -320,7 +321,10 @@ struct MANGOS_DLL_DECL mob_legion_flameAI : public ScriptedAI
             return;
 
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
+        {
+            m_creature->RemoveAllAuras();
             m_creature->ForcedDespawn();
+        }
     }
 };
 
@@ -345,11 +349,14 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
+    uint32 m_uiSummonInfernalTimer;
+
     void Reset()
     {
         m_creature->SetInCombatWithZone();
         SetCombatMovement(false);
 
+        m_uiSummonInfernalTimer = 12000;
 
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -371,6 +378,14 @@ struct MANGOS_DLL_DECL mob_infernal_volcanoAI : public ScriptedAI
     {
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
+
+        if (m_uiSummonInfernalTimer <= uiDiff)
+        {
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_INFERNAL_PERIODIC);
+            m_uiSummonInfernalTimer = 9000;
+        }
+        else
+            m_uiSummonInfernalTimer -= uiDiff;
     }
 };
 
@@ -471,12 +486,15 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
+    uint32 m_uiSummonMistressTimer;
+
     void Reset()
     {
         m_creature->SetInCombatWithZone();
         m_creature->SetRespawnDelay(DAY);
         SetCombatMovement(false);
 
+        m_uiSummonMistressTimer = 18000;
 
         if (!m_bIsHeroic)
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -493,6 +511,14 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
     {
         if (m_pInstance->GetData(TYPE_JARAXXUS) != IN_PROGRESS) 
             m_creature->ForcedDespawn();
+
+        if (m_uiSummonMistressTimer <= uiDiff)
+        {
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_MISTRESS_PERIODIC, CAST_TRIGGERED);
+            m_uiSummonMistressTimer = 9000;
+        }
+        else
+            m_uiSummonMistressTimer -= uiDiff;
     }
 };
 
