@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -28,7 +28,7 @@ EndContentData */
 #include "precompiled.h"
 #include "trial_of_the_champion.h"
 
-#define GOSSIP_START_EVENT     "Estoy preparado para el siguiente reto."
+#define GOSSIP_START_EVENT     "Im ready for the next challenge."
 
 /*######
 ## npc_toc5_announcer
@@ -43,10 +43,10 @@ struct _Messages
 
 static _Messages _GossipMessage[]=
 {
-{GOSSIP_START_EVENT,GOSSIP_ACTION_INFO_DEF+1,false,TYPE_GRAND_CHAMPIONS}, //
-{GOSSIP_START_EVENT,GOSSIP_ACTION_INFO_DEF+2,false,TYPE_ARGENT_CHALLENGE},  //
-{GOSSIP_START_EVENT,GOSSIP_ACTION_INFO_DEF+3,false,TYPE_BLACK_KNIGHT}, //
-{GOSSIP_START_EVENT,GOSSIP_ACTION_INFO_DEF+4,true,TYPE_BLACK_KNIGHT}, //
+{"Вы готовы драться с чемпионами противоположной фракции?",GOSSIP_ACTION_INFO_DEF+1,false,TYPE_GRAND_CHAMPIONS}, //
+{"Вы готовы драться с чемпионом Серебряного Рассвета?",GOSSIP_ACTION_INFO_DEF+2,false,TYPE_ARGENT_CHALLENGE},  //
+{"Вы готовы драться с Черным рыцарем?",GOSSIP_ACTION_INFO_DEF+3,false,TYPE_BLACK_KNIGHT}, //
+{"Не надо сюда тыкать. На сегодня арена закрыта.",GOSSIP_ACTION_INFO_DEF+4,true,TYPE_BLACK_KNIGHT}, //
 };
 
 struct MANGOS_DLL_DECL npc_toc5_announcerAI : public ScriptedAI
@@ -110,7 +110,7 @@ pPlayer->CLOSE_GOSSIP_MENU();
 switch(uiAction) {
     case GOSSIP_ACTION_INFO_DEF+1: {
     if (m_pInstance->GetData(DATA_TOC5_ANNOUNCER) == 0) {
-               m_pInstance->SetData(DATA_TOC5_ANNOUNCER, pCreature->GetObjectGuid());
+               m_pInstance->SetData(DATA_TOC5_ANNOUNCER, pCreature->GetEntry());
 
            if (m_pInstance->GetData(DATA_TOC5_ANNOUNCER) == m_pInstance->GetData(DATA_ARELAS))
                {
@@ -187,8 +187,8 @@ switch(uiAction) {
             };
         };
 
-    if (m_pInstance->GetData(TYPE_GRAND_CHAMPIONS) == NOT_STARTED || m_pInstance->GetData(TYPE_GRAND_CHAMPIONS) == IN_PROGRESS)
-                {
+        if (m_pInstance->GetData(TYPE_GRAND_CHAMPIONS) == NOT_STARTED || m_pInstance->GetData(TYPE_GRAND_CHAMPIONS) == IN_PROGRESS)
+        {
                 m_pInstance->SetData(DATA_CHAMPIONS_COUNT, 3);
                 if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(DATA_CHAMPION_1))
                         pTemp->Respawn();
@@ -203,7 +203,7 @@ switch(uiAction) {
                     else
                         pCreature->SummonCreature(m_pInstance->GetData(DATA_CHAMPIONID_3), 754.360779f, 660.816162f, 412.395996f, 4.698700f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME);
                 m_pInstance->SetData(TYPE_GRAND_CHAMPIONS, IN_PROGRESS);
-                };
+        };
     };
 
     case GOSSIP_ACTION_INFO_DEF+2: {

@@ -17,8 +17,8 @@
 
 
 /* ScriptData
-SDName: boss_infinite_corruptor
-SD%Complete:
+SDName: instance_culling_of_stratholme
+SD%Complete: %
 SDComment:
 EndScriptData */
 

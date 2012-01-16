@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- * Copyright (C) 2011 MangosR2
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -14,6 +14,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+
+/* ScriptData
+SDName: instance_culling_of_stratholme
+SD%Complete: %
+SDComment:
+EndScriptData */
 
 #ifndef DEF_CULLING_OF_STRATHOLME_H
 #define DEF_CULLING_OF_STRATHOLME_H

@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- * Copyright (C) 2011 MangosR2
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,8 +17,8 @@
 
 
 /* ScriptData
-SDName: culling_of_stratholme
-SD%Complete:
+SDName: instance_culling_of_stratholme
+SD%Complete: %
 SDComment:
 EndScriptData */
 
@@ -472,7 +472,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
             case 2:
                 m_creature->SetWalk(true);
                 DoScriptText(SAY_INTRO03, m_creature);
-                m_creature->SetGuidValue(UNIT_FIELD_TARGET, 0);
+                m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
                 m_creature->GetMotionMaster()->MovePoint(0, 1908.334f, 1315.354f, 149.551f);
                 if (Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                     pUther->GetMotionMaster()->MovePoint(0, 1903.600f, 1296.678f, 143.383f);
@@ -562,7 +562,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 JumpNextStep(3000);
                 break;
             case 20:
-                m_creature->SetGuidValue(UNIT_FIELD_TARGET, 0);
+                m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
                 ((npc_arthasAI*)m_creature->AI())->Start(false);
                 JumpNextStep(3000);
                 break;
@@ -611,7 +611,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 JumpNextStep(1000);
                 break;
             case 6:
-                m_creature->SetGuidValue(UNIT_FIELD_TARGET, 0);
+                m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
                 m_creature->GetMotionMaster()->MovePoint(0, 2091.179f,1278.065f,140.476f);
                 DoScriptText(SAY_ENTER06, m_creature);
                 JumpNextStep(3000);
@@ -643,7 +643,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 JumpNextStep(7000);
                 break;
             case 11:
-                m_creature->SetGuidValue(UNIT_FIELD_TARGET, 0);
+                m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
                 DoScriptText(SAY_ENTER10, m_creature);
                 JumpNextStep(12000);
                 break;
@@ -782,10 +782,10 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 JumpNextStep(6000);
                 break;
             case 5:
-                m_creature->SetGuidValue(UNIT_FIELD_TARGET, 0);
+                m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
                 if (Creature* pHuman = m_pInstance->instance->GetCreature(m_uiHuman01GUID))
                 {
-                    pHuman->SetGuidValue(UNIT_FIELD_TARGET, 0);
+                    pHuman->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
                     pHuman->UpdateEntry(NPC_INFINITE_ADVERSARY);
                 }
                 if (Creature* pHuman2 = m_pInstance->instance->GetCreature(m_uiHuman02GUID))
@@ -886,7 +886,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                    Malganis->SetVisibility(VISIBILITY_OFF);
                    m_creature->GetMotionMaster()->MovePoint(0, pMalganis->GetPositionX(), pMalganis->GetPositionY(), pMalganis->GetPositionZ());
                 }
-                m_creature->SetGuidValue(UNIT_FIELD_TARGET, 0);
+                m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
                 m_creature->SetWalk(false);
                 JumpNextStep(3000);
                 break;
@@ -1129,6 +1129,10 @@ struct MANGOS_DLL_DECL npc_utherAI : public npc_escortAI
 ## npc_chromi_middle
 ###*/
 
+#define GOSSIP_ITEM_CHROMI1 "What do you think they're up to?"
+#define GOSSIP_ITEM_CHROMI2 "What want me to do what?"
+#define GOSSIP_ITEM_CHROMI3 "Very well, Chromie."
+
 enum
 {
   QUEST_ROYAL_ESCORT               = 13151,
@@ -1140,28 +1144,6 @@ enum
 
 bool GossipHello_npc_chromi_middle(Player* pPlayer, Creature* pCreature)
 {
-    char const* GOSSIP_ITEM_CHROMI1;
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-     case LOCALE_enUS:
-     case LOCALE_koKR:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-                      GOSSIP_ITEM_CHROMI1 = "¿Qué te hace pensar que ellos quieran ayudarnos?";
-                      break;
-     case LOCALE_esMX:
-                      GOSSIP_ITEM_CHROMI1 = "¿Qué te hace pensar que ellos quieran ayudarnos?";
-                      break;
-     case LOCALE_ruRU:
-     default:
-                      GOSSIP_ITEM_CHROMI1 = "What do you think they're up to?";
-                      break;
-    }
-
     if (pCreature->isQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
@@ -1179,32 +1161,6 @@ bool GossipHello_npc_chromi_middle(Player* pPlayer, Creature* pCreature)
 
 bool GossipSelect_npc_chromi_middle(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
 {
-    char const* GOSSIP_ITEM_CHROMI2;
-    char const* GOSSIP_ITEM_CHROMI3;
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-     case LOCALE_enUS:
-     case LOCALE_koKR:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-                      GOSSIP_ITEM_CHROMI2 = "Sigue contando.";
-                      GOSSIP_ITEM_CHROMI3 = "Muy bien, Chromi.";
-                      break;
-     case LOCALE_esMX:
-                      GOSSIP_ITEM_CHROMI2 = "Sigue contando.";
-                      GOSSIP_ITEM_CHROMI3 = "Muy bien, Chromi.";
-                      break;
-     case LOCALE_ruRU:
-     default:
-                      GOSSIP_ITEM_CHROMI2 = "What want me to do what?";
-                      GOSSIP_ITEM_CHROMI3 = "Very well, Chromie.";
-                      break;
-    }
-
     if (ScriptedInstance* m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData()))
       if (m_pInstance->GetData(TYPE_INTRO) != NOT_STARTED) return true;
 
@@ -1233,7 +1189,6 @@ bool GossipSelect_npc_chromi_middle(Player* pPlayer, Creature* pCreature, uint32
         }
 
        pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_CHROMI4, pCreature->GetObjectGuid());
-       pPlayer->CLOSE_GOSSIP_MENU();
     }
 
     return true;
@@ -1277,49 +1232,23 @@ struct MANGOS_DLL_DECL npc_chromi_middleAI : public ScriptedAI
 
 enum
 {
-   GOSSIP_MENU_ARTHAS_1                        = 13076,
-   GOSSIP_MENU_ARTHAS_2                        = 13125,
-   GOSSIP_MENU_ARTHAS_3                        = 13177,
-   GOSSIP_MENU_ARTHAS_4                        = 13287,
+   GOSSIP_MENU_ARTHAS_1                        = 100001,
+   GOSSIP_MENU_ARTHAS_2                        = 100002,
+   GOSSIP_MENU_ARTHAS_3                        = 100003,
+   GOSSIP_MENU_ARTHAS_4                        = 100004,
+   GOSSIP_MENU_ARTHAS_5                        = 100005
 };
+
+#define GOSSIP_ITEM_ARTHAS_0 "I'm ready to start Culling of Stratholme."
+#define GOSSIP_ITEM_ARTHAS_1 "Yes, my Prince. We're ready."
+#define GOSSIP_ITEM_ARTHAS_2 "We're only doing what is best for Loarderon your Highness."
+#define GOSSIP_ITEM_ARTHAS_3 "I'm ready."
+#define GOSSIP_ITEM_ARTHAS_4 "For Lordaeron!"
+#define GOSSIP_ITEM_ARTHAS_5 "I'm ready to battle the dreadlord, sire."
 
 bool GossipHello_npc_arthas(Player* pPlayer, Creature* pCreature)
 {
     ScriptedInstance* pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
-
-    char const* GOSSIP_ITEM_ARTHAS_1;
-    char const* GOSSIP_ITEM_ARTHAS_2;
-    char const* GOSSIP_ITEM_ARTHAS_3;
-    char const* GOSSIP_ITEM_ARTHAS_4;
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-     case LOCALE_enUS:
-     case LOCALE_koKR:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-                      GOSSIP_ITEM_ARTHAS_1 = "Sí, mi príncipe. Estamos listos.";
-                      GOSSIP_ITEM_ARTHAS_2 = "Sólo lo haremos si es lo mejor para Lordaeron, mi majestad.";
-                      GOSSIP_ITEM_ARTHAS_3 = "Estamos listos.";
-                      GOSSIP_ITEM_ARTHAS_4 = "¡Por Lordaeron!";
-                      break;
-     case LOCALE_esMX:
-                      GOSSIP_ITEM_ARTHAS_1 = "Sí, mi príncipe. Estamos listos.";
-                      GOSSIP_ITEM_ARTHAS_2 = "Sólo lo haremos si es lo mejor para Lordaeron, mi majestad.";
-                      GOSSIP_ITEM_ARTHAS_3 = "Estamos listos.";
-                      GOSSIP_ITEM_ARTHAS_4 = "¡Por Lordaeron!";
-                      break;
-     case LOCALE_ruRU:
-     default:
-                      GOSSIP_ITEM_ARTHAS_1 = "Yes, my Prince. We're ready.";
-                      GOSSIP_ITEM_ARTHAS_2 = "We're only doing what is best for Loarderon your Highness.";
-                      GOSSIP_ITEM_ARTHAS_3 = "I'm ready.";
-                      GOSSIP_ITEM_ARTHAS_4 = "For Lordaeron!";
-                      break;
-    }
 
     if (pInstance && pInstance->GetData(TYPE_PHASE) == 0)
     {

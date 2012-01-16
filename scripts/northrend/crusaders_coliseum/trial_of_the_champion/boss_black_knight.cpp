@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: boss_black_knight
-SD%Complete: 80%
-SDComment: not sure about timers. modified by /dev/rsa
+SD%Complete: 70%
+SDComment: missing yells. not sure about timers. modified by /dev/rsa
 SDCategory: Trial Of the Champion
 EndScriptData */
 
@@ -26,43 +26,33 @@ EndScriptData */
 
 enum
 {
-    SPELL_BERSERK                  = 47008,
+        SPELL_BERSERK                           = 47008,
     //yells
-    SAY_BLACKNIGHT_AGGRO           = -1601036,
-    SAY_BLACKNIGHT_SKELETON        = -1601037,
-    SAY_BLACKNIGHT_GHOST           = -1601038,
-    SAY_BLACKNIGHT_SLAY1           = -1601039,
-    SAY_BLACKNIGHT_SLAY2           = -1601040,
-    SAY_BLACKNIGHT_DEATH           = -1601041,
-
 
     //undead
     SPELL_PLAGUE_STRIKE            = 67724,
-    SPELL_PLAGUE_STRIKE_H          = 67884,
+    SPELL_PLAGUE_STRIKE_H        = 67884,
     SPELL_ICY_TOUCH                = 67718,
-    SPELL_ICY_TOUCH_H              = 67881,
-    SPELL_OBLITERATE               = 67725,
-    SPELL_OBLITERATE_H             = 67883,
-    SPELL_CHOKE                    = 68306,
+    SPELL_ICY_TOUCH_H            = 67881,
+    SPELL_OBLITERATE            = 67725,
+    SPELL_OBLITERATE_H            = 67883,
+    SPELL_CHOKE                = 68306,
     //skeleton
-    SPELL_ARMY                     = 42650, //replacing original one, since that one spawns millions of ghouls!!
+    SPELL_ARMY                = 42650, //replacing original one, since that one spawns millions of ghouls!!
     //ghost
-    SPELL_DEATH                    = 67808,
-    SPELL_DEATH_H                  = 67875,
-    SPELL_MARK                     = 67823,
+    SPELL_DEATH                 = 67808,
+    SPELL_DEATH_H                = 67875,
+    SPELL_MARK                = 67823,
 
     //risen ghoul
-    SPELL_CLAW                     = 67879,
-    SPELL_EXPLODE                  = 67729,
+    SPELL_CLAW                    = 67879,
+    SPELL_EXPLODE                = 67729,
     SPELL_EXPLODE_H                = 67886,
-    SPELL_LEAP                     = 67749,
-    SPELL_LEAP_H                   = 67880,
+    SPELL_LEAP                    = 67749,
+    SPELL_LEAP_H                = 67880,
 
     //sword ID
-    EQUIP_SWORD                    = 40343,
-
-    //NPC daily dungeon
-    NPC_DAILY_DUNGEON              = 22852,
+    EQUIP_SWORD                    = 40343
 };
 
 // Risen Ghoul
@@ -130,12 +120,10 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
         Reset();
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
-        m_bIsAlliance = true;
     }
 
     ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
-    bool m_bIsAlliance;
 
     uint32 Plague_Strike_Timer;
     uint32 Icy_Touch_Timer;
@@ -170,22 +158,13 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
                 m_creature->SetWalk(true);
     }
 
+
     void Aggro(Unit* pWho)
     {
         if (!m_pInstance)
             return;
         if (m_pInstance->GetData(TYPE_BLACK_KNIGHT) != DONE)
             m_pInstance->SetData(TYPE_BLACK_KNIGHT, IN_PROGRESS);
-
-        DoScriptText(SAY_BLACKNIGHT_AGGRO, m_creature);
-
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster())
-        {
-            if (((Player*)pWho)->GetTeam() == ALLIANCE)
-                m_bIsAlliance = true;
-            else
-                m_bIsAlliance = false;
-        }
     }
 
     void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
@@ -200,30 +179,15 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* pVictim)
-    {
-        DoScriptText(urand(SAY_BLACKNIGHT_SLAY1, SAY_BLACKNIGHT_SLAY2), m_creature);
-    }
 
     void JustDied(Unit* pKiller)
     {
         if (!m_pInstance)
             return;
-
         if (phase3 && !phase1 && !phase2)
         {
             m_pInstance->SetData(TYPE_BLACK_KNIGHT, DONE);
         }
-
-        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 746.70f, 654.52f, 411.60f, 4.7f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
-
-        DoScriptText(SAY_BLACKNIGHT_DEATH, m_creature);
-
-        if (m_bIsAlliance)
-            m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 4296 : 4298);
-        else
-            m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? 3778 : 4297);
-
 /*        if (phase2 && !phase1 && !phase3)
             if (!m_creature->isAlive())
             {
@@ -240,7 +204,6 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
 
     void StartPhase2()
     {
-        DoScriptText(SAY_BLACKNIGHT_SKELETON, m_creature);
         m_creature->SetHealth(m_creature->GetMaxHealth());
         m_creature->SetDisplayId(27550);
         phase1 = false;
@@ -254,7 +217,6 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
 
     void StartPhase3()
     {
-        DoScriptText(SAY_BLACKNIGHT_GHOST, m_creature);
         m_creature->SetHealth(m_creature->GetMaxHealth());
         m_creature->SetDisplayId(14560);
         SetEquipmentSlots(false, EQUIP_UNEQUIP, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);

@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- * Copyright (C) 2011 MangosR2
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +18,7 @@
 
 /* ScriptData
 SDName: instance_culling_of_stratholme
-SD%Complete:
+SD%Complete: %
 SDComment:
 EndScriptData */
 
@@ -162,7 +162,7 @@ struct MANGOS_DLL_DECL instance_culling_of_stratholme : public ScriptedInstance
        {
            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
            {
-                pChromi->MonsterWhisper("Has hecho un buen trabajo con las cajas. Ven a verme a la entrada de Stratholme, te estaré esperando.", i->getSource(), false);
+                pChromi->MonsterWhisper("Good work with crates! Come to me in front of Stratholme for your next assignment!", i->getSource(), false);
                 i->getSource()->KilledMonsterCredit(NPC_CRATE_KC_BUNNY, pChromi->GetObjectGuid());
                 i->getSource()->DestroyItemCount(ITEM_ARCANE_DISRUPTOR, 1, true);
             }

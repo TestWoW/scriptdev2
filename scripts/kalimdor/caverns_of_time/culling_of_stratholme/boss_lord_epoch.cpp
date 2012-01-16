@@ -17,8 +17,8 @@
 
 
 /* ScriptData
-SDName: boss_lord_epoch
-SD%Complete:
+SDName: instance_culling_of_stratholme
+SD%Complete: %
 SDComment:
 EndScriptData */
 
