@@ -4037,7 +4037,7 @@ bool GossipHello_teleport_acherus_up(Player* pPlayer, Creature* pCreature)
 
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_UP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetObjectGuid());
 
     return true;
 }
@@ -4079,7 +4079,7 @@ bool GossipHello_teleport_acherus_down(Player* pPlayer, Creature* pCreature)
 
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_UP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetObjectGuid());
 
     return true;
 }

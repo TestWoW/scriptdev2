@@ -126,7 +126,7 @@ struct MANGOS_DLL_DECL boss_IckAI : public ScriptedAI
                 if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                     pKrick->AddThreat(pTarget, 0.0f);
                 DoScriptText(SAY_AGGRO, pKrick);
-                m_uiKrickGUID = pKrick->GetGUID();
+                m_uiKrickGUID = pKrick->GetObjectGuid();
             }
         }
         else
@@ -136,7 +136,7 @@ struct MANGOS_DLL_DECL boss_IckAI : public ScriptedAI
                 if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                     pKrick->AddThreat(pTarget, 0.0f);
                 DoScriptText(SAY_AGGRO, pKrick);
-                m_uiKrickGUID = pKrick->GetGUID();
+                m_uiKrickGUID = pKrick->GetObjectGuid();
             }
         }
     }
@@ -374,7 +374,7 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                     if(Creature* pJaina = m_creature->SummonCreature(NPC_JAINA_PART1, 783.565f, 112.559f, 509.461f, 0, TEMPSUMMON_TIMED_DESPAWN, 80000))
                     {
                         pJaina->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX() - 15, m_creature->GetPositionY(), m_creature->GetPositionZ());
-                        m_uiJainaGuid = pJaina->GetGUID();
+                        m_uiJainaGuid = pJaina->GetObjectGuid();
                     }
                 }
 
@@ -383,7 +383,7 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                     if(Creature* pSylvanas = m_creature->SummonCreature(NPC_SYLVANAS_PART1, 783.565f, 112.559f, 509.461f, 0, TEMPSUMMON_TIMED_DESPAWN, 80000))
                     {
                         pSylvanas->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX() - 15, m_creature->GetPositionY(), m_creature->GetPositionZ());
-                        m_uiSylvanasGuid = pSylvanas->GetGUID();
+                        m_uiSylvanasGuid = pSylvanas->GetObjectGuid();
                     }
                 }
                 ++Step;
@@ -395,7 +395,7 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                     if(Creature* pJaina = m_pInstance->instance->GetCreature(m_uiJainaGuid))
                     {
                         DoScriptText(SAY_OUTRO2_ALY, pJaina);
-                        pJaina->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                        pJaina->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 if(TeamInInstance == HORDE)
@@ -403,7 +403,7 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                     if(Creature* pSylvanas = m_pInstance->instance->GetCreature(m_uiSylvanasGuid))
                     {
                         DoScriptText(SAY_OUTRO2_HORDE, pSylvanas);
-                        pSylvanas->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                        pSylvanas->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 ++Step;
@@ -429,14 +429,14 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                 if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 860.649f, 124.863f, 536.019f, 3.43f, TEMPSUMMON_TIMED_DESPAWN, 20000))
                 {
                     pTyrannus->GetMotionMaster()->MoveIdle();
-                    pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                    pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     pTyrannus->SetUInt32Value(UNIT_FIELD_BYTES_0, 50331648);
                     pTyrannus->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
                     pTyrannus->GetMotionMaster()->MoveIdle();
                     pTyrannus->GetMap()->CreatureRelocation(pTyrannus, 860.649f, 124.863f, 536.019f, 3.43f);
                     pTyrannus->GetMotionMaster()->MovePoint(860.649f, 124.863f, 536.019f, 1);
-                    m_uiTyrannusGuid = pTyrannus->GetGUID();
+                    m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
                 }
                 ++Step;
                 OutroTimer = 4000;
@@ -573,7 +573,7 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                     {
                         pJaina->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                         pJaina->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX() - 15, m_creature->GetPositionY(), m_creature->GetPositionZ());
-                        m_uiJainaGuid = pJaina->GetGUID();
+                        m_uiJainaGuid = pJaina->GetObjectGuid();
                     }
                 }
 
@@ -583,7 +583,7 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                     {
                         pSylvanas->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                         pSylvanas->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX() - 15, m_creature->GetPositionY(), m_creature->GetPositionZ());
-                        m_uiSylvanasGuid = pSylvanas->GetGUID();
+                        m_uiSylvanasGuid = pSylvanas->GetObjectGuid();
                     }
                 }
                 ++Step;
@@ -595,7 +595,7 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                     if(Creature* pJaina = m_pInstance->instance->GetCreature(m_uiJainaGuid))
                     {
                         DoScriptText(SAY_OUTRO2_ALY, pJaina);
-                        pJaina->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                        pJaina->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 if(TeamInInstance == HORDE)
@@ -603,7 +603,7 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                     if(Creature* pSylvanas = m_pInstance->instance->GetCreature(m_uiSylvanasGuid))
                     {
                         DoScriptText(SAY_OUTRO2_HORDE, pSylvanas);
-                        pSylvanas->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                        pSylvanas->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 ++Step;
@@ -628,9 +628,9 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                 DoScriptText(SAY_OUTRO5, m_creature);
                 if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 860.649f, 124.863f, 536.019f, 3.43f, TEMPSUMMON_TIMED_DESPAWN, 20000))
                 {
-                    pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                    pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    m_uiTyrannusGuid = pTyrannus->GetGUID();
+                    m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
                 }
                 ++Step;
                 OutroTimer = 4000;

@@ -48,14 +48,14 @@ void instance_pit_of_saron::OnCreatureCreate(Creature* pCreature)
 {
     switch(pCreature->GetEntry())
     {
-        case NPC_TYRANNUS_INTRO: m_uiTyrannusIntroGUID = pCreature->GetGUID(); break;
-        case NPC_SLAVE_1:        m_uiSlaveOneGUID      = pCreature->GetGUID(); break;
-        case NPC_GARFROST:       m_uiGarfrostGUID      = pCreature->GetGUID(); break;
-        case NPC_KRICK:          m_uiKrickGUID         = pCreature->GetGUID(); break;
-        case NPC_KRICK_EVENT:    m_uiKrickEventGUID    = pCreature->GetGUID(); break; 
-        case NPC_ICK:            m_uiIckGUID           = pCreature->GetGUID(); break;
-        case NPC_TYRANNUS:       m_uiTyrannusGUID      = pCreature->GetGUID(); break;
-        case NPC_RIMEFANG:       m_uiRimefangGUID      = pCreature->GetGUID(); break;
+        case NPC_TYRANNUS_INTRO: m_uiTyrannusIntroGUID = pCreature->GetObjectGuid(); break;
+        case NPC_SLAVE_1:        m_uiSlaveOneGUID      = pCreature->GetObjectGuid(); break;
+        case NPC_GARFROST:       m_uiGarfrostGUID      = pCreature->GetObjectGuid(); break;
+        case NPC_KRICK:          m_uiKrickGUID         = pCreature->GetObjectGuid(); break;
+        case NPC_KRICK_EVENT:    m_uiKrickEventGUID    = pCreature->GetObjectGuid(); break; 
+        case NPC_ICK:            m_uiIckGUID           = pCreature->GetObjectGuid(); break;
+        case NPC_TYRANNUS:       m_uiTyrannusGUID      = pCreature->GetObjectGuid(); break;
+        case NPC_RIMEFANG:       m_uiRimefangGUID      = pCreature->GetObjectGuid(); break;
     }
 }
 
@@ -64,12 +64,12 @@ void instance_pit_of_saron::OnObjectCreate(GameObject* pGo)
     switch(pGo->GetEntry())
     {
         case GO_ICEWALL:
-            m_uiIcewallGUID = pGo->GetGUID();
+            m_uiIcewallGUID = pGo->GetObjectGuid();
             if (m_auiEncounter[TYPE_GARFROST] == DONE && m_auiEncounter[TYPE_KRICK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_HALLS_OF_REFLECT_PORT:
-            m_uiHallsPortGUID = pGo->GetGUID();
+            m_uiHallsPortGUID = pGo->GetObjectGuid();
             break;
     }
 }

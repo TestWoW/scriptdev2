@@ -84,7 +84,7 @@ struct MANGOS_DLL_DECL boss_eadricAI : public ScriptedAI
     uint32 Hammer_Timer;
     uint32 Hammer_Dmg_Timer;
         uint32 m_uiBerserk_Timer;
-    uint64 HammerTarget;
+    ObjectGuid HammerTarget;
 
     void Reset()
     {
@@ -94,7 +94,7 @@ struct MANGOS_DLL_DECL boss_eadricAI : public ScriptedAI
         Hammer_Timer = m_bIsRegularMode ? 40000 : 10000;
         Hammer_Dmg_Timer = m_bIsRegularMode ? 45000 : 20000;
         m_uiBerserk_Timer = m_bIsRegularMode ? 300000 : 180000;
-        HammerTarget = 0;
+        HammerTarget.Clear();
         m_creature->GetMotionMaster()->MovePoint(0, 746, 614, m_creature->GetPositionZ());
                 m_creature->SetWalk(true);
     }
@@ -146,7 +146,7 @@ struct MANGOS_DLL_DECL boss_eadricAI : public ScriptedAI
             {
                 DoCast(target, SPELL_HAMMER_OF_JUSTICE);
                 DoScriptText(SAY_EADRIC_HAMMER, m_creature);
-                HammerTarget = target->GetGUID();
+                HammerTarget = target->GetObjectGuid();
             }
             Hammer_Timer = m_bIsRegularMode ? 40000 : 15000;
         }else Hammer_Timer -= diff;
@@ -193,7 +193,7 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
     uint32 Renew_Timer;
     uint32 Shield_Delay;
     uint32 Shield_Check;
-        uint32 m_uiBerserk_Timer;
+    uint32 m_uiBerserk_Timer;
     bool summoned;
     bool shielded;
 
@@ -272,7 +272,7 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
             switch(urand(0, 1))
                 {
                 case 0:
-                    if (Creature* pTemp = (m_creature->GetMap()->GetCreature( m_pInstance->GetData64(DATA_MEMORY))))
+                    if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(DATA_MEMORY))
                         if (pTemp->isAlive())
                             DoCast(pTemp, m_bIsRegularMode ? SPELL_RENEW : SPELL_RENEW_H);
                         else
@@ -358,7 +358,7 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
 
         if (Shield_Check < diff && shielded)
         {
-        if (Creature* pTemp = (m_creature->GetMap()->GetCreature( m_pInstance->GetData64(DATA_MEMORY))))
+        if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(DATA_MEMORY))
                 if (!pTemp->isAlive())
                 {
                     DoScriptText(SAY_PALETRESS_SUMMON_DEFEAT, m_creature);

@@ -2427,7 +2427,7 @@ bool GossipHello_pilgrim_table(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WAR_FOOD, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SHARE_FOOD, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 
-    pPlayer->SEND_GOSSIP_MENU(50001, pCreature->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(50001, pCreature->GetObjectGuid());
     return true;
 }
 

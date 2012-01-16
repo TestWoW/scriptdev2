@@ -599,7 +599,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
                     {
                         pTyrannus->ForcedDespawn();
                         pTyrannus->DealDamage(pTyrannus, pTyrannus->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                        m_uiTyrannusGuid = pTyrannus->GetGUID();
+                        m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
                     }
                     switch (creatureEntry)
                     {
@@ -610,7 +610,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
                             SummonAlySlaves();
                             pMartin->GetMotionMaster()->MovePoint(0, 1014.670f, 158.714f, 628.156f);
                             pMartin->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            m_uiMartinGuid = pMartin->GetGUID();
+                            m_uiMartinGuid = pMartin->GetObjectGuid();
                         }
                         break;
                     case NPC_SYLVANAS_PART2:
@@ -620,7 +620,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
                             SummonHordeSlaves();
                             pGorkun->GetMotionMaster()->MovePoint(0, 1014.670f, 158.714f, 628.156f);
                             pGorkun->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                            m_uiGorkunGuid = pGorkun->GetGUID();
+                            m_uiGorkunGuid = pGorkun->GetObjectGuid();
                         }
                         break;
                     }
@@ -630,7 +630,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_endAI: public ScriptedAI
                 case 2:
                     if(Creature* pSindragosa = m_creature->SummonCreature(NPC_SINDRAGOSA, 977.224f, 164.056f, 653.216f,  0.3f, TEMPSUMMON_TIMED_DESPAWN, 18000))
                     {
-                        m_uiSindragosaGuid = pSindragosa->GetGUID();
+                        m_uiSindragosaGuid = pSindragosa->GetObjectGuid();
                     }
                     switch (creatureEntry)
                     {

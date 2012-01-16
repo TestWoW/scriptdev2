@@ -172,7 +172,7 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
 
     bool m_bBrannBattle;
 
-    std::list<uint64> m_lDwarfGUIDList;
+    std::list<ObjectGuid> m_lDwarfGUIDList;
     uint32 m_uiChainLightning_Timer;
     uint32 m_uiLightningShield_Timer;
     uint32 m_uiStaticCharge_Timer;
@@ -248,7 +248,7 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
         if (m_lDwarfGUIDList.empty())
             return;
 
-        for(std::list<uint64>::iterator itr = m_lDwarfGUIDList.begin(); itr != m_lDwarfGUIDList.end(); ++itr)
+        for(std::list<ObjectGuid>::iterator itr = m_lDwarfGUIDList.begin(); itr != m_lDwarfGUIDList.end(); ++itr)
         {
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
             {
@@ -262,7 +262,7 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
 
     void JustSummoned(Creature* pSummoned)
     {
-        m_lDwarfGUIDList.push_back(pSummoned->GetGUID());
+        m_lDwarfGUIDList.push_back(pSummoned->GetObjectGuid());
 
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
         {
