@@ -60,13 +60,23 @@ UPDATE `creature_template` SET `name` = 'Permafrost', `unit_flags` = '0', `facti
 UPDATE `creature_template` SET `flags_extra` = '256' WHERE `entry` = 34800;
 
 UPDATE `creature_template` SET `mechanic_immune_mask` = '769605631' WHERE `entry` = 34780;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '769605631' WHERE `entry` = 35216;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '769605631' WHERE `entry` = 35268;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '769605631' WHERE `entry` = 35269;
 
 UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 34496;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 35347;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 35348;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 35349;
+
 UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 34497;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 35350;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 35351;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '635387903' WHERE `entry` = 35352;
 
 UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 34566;
-UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 34615;
-UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 34616;
+UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 35615;
+UPDATE `creature_template` SET `unit_flags` = '0' WHERE `entry` = 35616;
 
 UPDATE `creature_template` SET `modelid_2` = '0', `minlevel` = '83', `maxlevel` = '83', `faction_A` = '14', `faction_H` = '14', `dmg_multiplier` = '4' WHERE `entry` = 34660;
 UPDATE `creature_template` SET `modelid_2` = '0', `minlevel` = '83', `maxlevel` = '83', `faction_A` = '14', `faction_H` = '14', `dmg_multiplier` = '6'  WHERE `entry` = 35652;
