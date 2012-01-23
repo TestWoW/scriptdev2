@@ -15,10 +15,9 @@
  */
 
 /* ScriptData
-SDName: Trial Of the crusader
-SD%Complete: 60%
-SDComment: event script by /dev/rsa
-SDCategory: trial_of_the_crusader
+SDName: trial_of_the_crusader
+SDComment:
+SDAuthor: rsa
 EndScriptData */
 
 #include "precompiled.h"
@@ -34,52 +33,65 @@ struct _Messages
 
 static _Messages _GossipMessage[]=
 {
-    {MSG_BEASTS,GOSSIP_ACTION_INFO_DEF+1,false,TYPE_BEASTS}, //
-    {MSG_JARAXXUS,GOSSIP_ACTION_INFO_DEF+2,false,TYPE_JARAXXUS},  //
-    {MSG_CRUSADERS,GOSSIP_ACTION_INFO_DEF+3,false,TYPE_CRUSADERS}, //
-    {MSG_VALKIRIES,GOSSIP_ACTION_INFO_DEF+4,false,TYPE_VALKIRIES}, //
-    {MSG_LICH_KING,GOSSIP_ACTION_INFO_DEF+5,false,TYPE_ANUBARAK}, //
-    {MSG_ANUBARAK,GOSSIP_ACTION_INFO_DEF+6,true,TYPE_ANUBARAK}, //
+    {MSG_BEASTS,GOSSIP_ACTION_INFO_DEF+1,false,TYPE_BEASTS},
+    {MSG_JARAXXUS,GOSSIP_ACTION_INFO_DEF+2,false,TYPE_JARAXXUS},
+    {MSG_CRUSADERS,GOSSIP_ACTION_INFO_DEF+3,false,TYPE_CRUSADERS},
+    {MSG_VALKIRIES,GOSSIP_ACTION_INFO_DEF+4,false,TYPE_VALKIRIES},
+    {MSG_LICH_KING,GOSSIP_ACTION_INFO_DEF+5,false,TYPE_ANUBARAK},
 };
 
 enum
 {
-    NUM_MESSAGES = 6,
+    NUM_MESSAGES = 5,
     SPELL_WILFRED_PORTAL        = 68424,
     SPELL_JARAXXUS_CHAINS       = 67924,
 };
-
 
 struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
 {
     npc_toc_announcerAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
+        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
+    Difficulty m_uiMapDifficulty;
+
+    bool m_bIsHeroic;
+    bool m_bIs25Man;
+
     uint32 DelayTimer;
     uint32 substage;
+
+    uint32 WormsTimer;
+    uint32 IcehowlTimer;
 
     void Reset()
     {
         if (!m_pInstance)
             return;
 
-        m_pInstance->SetData(TYPE_STAGE,0);
+        WormsTimer     = 150000;
+        IcehowlTimer   = 150000;
+
+        m_pInstance->SetData(TYPE_STAGE, 0);
         DelayTimer = 0;
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        if(Creature *pAlly = GetClosestCreatureWithEntry(m_creature, NPC_THRALL, 300.0f))
-                          pAlly->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        if(Creature *pAlly = GetClosestCreatureWithEntry(m_creature, NPC_PROUDMOORE, 300.0f))
-                          pAlly->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetRespawnDelay(DAY);
+
+        if (Creature *pHorde = GetClosestCreatureWithEntry(m_creature, NPC_THRALL, 300.0f))
+            pHorde->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+        if (Creature *pAlly = GetClosestCreatureWithEntry(m_creature, NPC_PROUDMOORE, 300.0f))
+            pAlly->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
     }
 
     void AttackStart(Unit *who)
     {
-        //ignore all attackstart commands
         return;
     }
 
@@ -88,99 +100,135 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        if(DelayTimer < diff)
+        if (DelayTimer < diff)
         {
             switch (m_pInstance->GetData(TYPE_STAGE))
             {
-            case 0:
-                break;
-            case 1:
-                if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_DONE)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,2);
-                    m_pInstance->SetData(TYPE_EVENT,200);
-                    m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
-                    m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
-                }
-                if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,0);
-                    m_pInstance->SetData(TYPE_EVENT,666);
-                    m_pInstance->SetData(TYPE_BEASTS,NOT_STARTED);
-                }
-                break;
-            case 2:
-                if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_DONE)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,3);
-                    m_pInstance->SetData(TYPE_EVENT,300);
-                    m_pInstance->SetData(TYPE_NORTHREND_BEASTS,ICEHOWL_IN_PROGRESS);
-                    m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
-                }
-                if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,0);
-                    m_pInstance->SetData(TYPE_EVENT,666);
-                    m_pInstance->SetData(TYPE_BEASTS,NOT_STARTED);
-                }
-                break;
-            case 3:
-                if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == ICEHOWL_DONE)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,0);
-                    m_pInstance->SetData(TYPE_BEASTS,DONE);
-                    m_pInstance->SetData(TYPE_EVENT,400);
-                    m_pInstance->SetData(TYPE_NORTHREND_BEASTS,DONE);
-                }
-                if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,0);
-                    m_pInstance->SetData(TYPE_EVENT,666);
-                    m_pInstance->SetData(TYPE_BEASTS,NOT_STARTED);
-                };
-                break;
-            case 4:
-                break;
-            case 5:
-                break;
-            case 6:
-                if (m_pInstance->GetData(TYPE_CRUSADERS_COUNT) == 0 && m_pInstance->GetData(TYPE_CRUSADERS) == IN_PROGRESS)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,0);
-                    m_pInstance->SetData(TYPE_CRUSADERS,DONE);
-                    m_pInstance->SetData(TYPE_EVENT,3100);
-                }
-                break;
-            case 7:
-                if (m_pInstance->GetData(TYPE_VALKIRIES) == DONE)
-                {
-                     m_pInstance->SetData(TYPE_STAGE,0);
-                     m_pInstance->SetData(TYPE_EVENT,4020);
-                     m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                }
-                if (m_pInstance->GetData(TYPE_VALKIRIES) == FAIL)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,0);
-                    m_pInstance->SetData(TYPE_EVENT,0);
-                }
-                break;
-            case 8:
-                break;
-            case 9:
-                if (m_pInstance->GetData(TYPE_ANUBARAK) == DONE)
-                {
-                    m_pInstance->SetData(TYPE_STAGE,10);
-                    m_pInstance->SetData(TYPE_EVENT,6000);
-                }
-                if (m_pInstance->GetData(TYPE_ANUBARAK) == FAIL)
-                {
-                     m_pInstance->SetData(TYPE_STAGE,0);
-                     m_pInstance->SetData(TYPE_EVENT,0);
-                }
-                break;
-            case 10:
-                //m_creature->ForcedDespawn();
-                break;
+                 case 0:
+                      break;
+                 case 1:
+                      if (m_bIsHeroic)
+                      {
+		          if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_IN_PROGRESS)
+			  {		 
+			      if (WormsTimer <= diff)
+			      {
+                                  m_pInstance->SetData(TYPE_STAGE,2);
+                                  m_pInstance->SetData(TYPE_EVENT,200);
+                                  m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
+                                  m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+			      }
+                              else
+                                  WormsTimer -= diff;
+                          }
+	              }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,2);
+                          m_pInstance->SetData(TYPE_EVENT,200);
+                          m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
+                          m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_EVENT,666);
+                          m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
+                      }
+                      break;
+                 case 2:
+                      if (m_bIsHeroic)
+                      {
+		          if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) != ICEHOWL_IN_PROGRESS)
+			  {		 
+			      if (IcehowlTimer <= diff)
+			      {
+                                  m_pInstance->SetData(TYPE_STAGE,3);
+                                  m_pInstance->SetData(TYPE_EVENT,300);
+                                  m_pInstance->SetData(TYPE_NORTHREND_BEASTS,ICEHOWL_IN_PROGRESS);
+                                  m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+			      }
+                              else
+                                  IcehowlTimer -= diff;
+                          }
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,3);
+                          m_pInstance->SetData(TYPE_EVENT,300);
+                          m_pInstance->SetData(TYPE_NORTHREND_BEASTS, ICEHOWL_IN_PROGRESS);
+                          m_pInstance->SetData(TYPE_BEASTS, IN_PROGRESS);
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_EVENT,666);
+                          m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
+                      }
+                      break;
+                 case 3:
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == ICEHOWL_DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_BEASTS, DONE);
+                          m_pInstance->SetData(TYPE_EVENT,400);
+                          m_pInstance->SetData(TYPE_NORTHREND_BEASTS, DONE);
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_EVENT,666);
+                          m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
+                      };
+                      break;
+                 case 4:
+                      break;
+                 case 5:
+                      break;
+                 case 6:
+                      if (m_pInstance->GetData(TYPE_CRUSADERS_COUNT) == 0 && m_pInstance->GetData(TYPE_CRUSADERS) == IN_PROGRESS)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE, 0);
+                          m_pInstance->SetData(TYPE_CRUSADERS, DONE);
+                          m_pInstance->SetData(TYPE_EVENT, 3100);
+                      }
+                      break;
+                 case 7:
+                      if (m_pInstance->GetData(TYPE_VALKIRIES) == DONE)
+                      {
+                           m_pInstance->SetData(TYPE_STAGE, 0);
+                           m_pInstance->SetData(TYPE_EVENT, 4020);
+                           m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                      }
+                      if (m_pInstance->GetData(TYPE_VALKIRIES) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE, 0);
+                          m_pInstance->SetData(TYPE_EVENT, 0);
+                      }
+                      break;
+                 case 8:
+                      break;
+                 case 9:
+                      if (m_pInstance->GetData(TYPE_ANUBARAK) == DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE, 10);
+                          m_pInstance->SetData(TYPE_EVENT, 6000);
+                      }
+                      if (m_pInstance->GetData(TYPE_ANUBARAK) == FAIL)
+                      {
+                           m_pInstance->SetData(TYPE_STAGE, 0);
+                           m_pInstance->SetData(TYPE_EVENT, 0);
+                      }
+                      break;
+                 case 10:
+                      //m_creature->ForcedDespawn();
+                      break;
             }
         }
         else DelayTimer -= diff;
@@ -203,32 +251,32 @@ bool GossipHello_npc_toc_announcer(Player* pPlayer, Creature* pCreature)
     if (!m_pInstance)
         return false;
 
-    if(pPlayer->IsInCombat() || m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(TYPE_EVENT))
+    if (pPlayer->IsInCombat() || m_pInstance->IsEncounterInProgress() || m_pInstance->GetData(TYPE_EVENT))
         return true;
 
     switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
     {
-     case LOCALE_enUS:
-     case LOCALE_koKR:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-                      _message = "¡Estamos listos!";
-                      break;
-     case LOCALE_esMX:
-                      _message = "¡Estamos listos!";
-                      break;
-     case LOCALE_ruRU:
-                      _message = "Всегда готовы!";
-                      break;
-     default:
-                      _message = "We are ready!";
-                      break;
+        case LOCALE_enUS:
+        case LOCALE_koKR:
+        case LOCALE_frFR:
+        case LOCALE_deDE:
+        case LOCALE_zhCN:
+        case LOCALE_zhTW:
+        case LOCALE_esES:
+             _message = "¡Estamos listos!";
+             break;
+        case LOCALE_esMX:
+             _message = "¡Estamos listos!";
+             break;
+        case LOCALE_ruRU:
+             _message = "Всегда готовы!";
+             break;
+        default:
+             _message = "We are ready!";
+             break;
     };
 
-    for(i = 0; i < NUM_MESSAGES; i++)
+    for (i = 0; i < NUM_MESSAGES; i++)
     {
         if (!_GossipMessage[i].state && (m_pInstance->GetData(_GossipMessage[i].encounter) != DONE ))
         {
@@ -256,67 +304,72 @@ bool GossipSelect_npc_toc_announcer(Player* pPlayer, Creature* pCreature, uint32
 pPlayer->CLOSE_GOSSIP_MENU();
 
 switch(uiAction) {
-    case GOSSIP_ACTION_INFO_DEF+1: {
-    if (pInstance->GetData(TYPE_BEASTS) != DONE) {
-           if (pPlayer->GetTeam() == ALLIANCE) pInstance->SetData(TYPE_EVENT,115);
-           else pInstance->SetData(TYPE_EVENT,110);
-           pInstance->SetData(TYPE_NORTHREND_BEASTS,NOT_STARTED);
-           pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
-           };
+    case GOSSIP_ACTION_INFO_DEF+1: 
+    {
+        if (pInstance->GetData(TYPE_BEASTS) != DONE) 
+        {
+            pInstance->SetData(TYPE_EVENT,110);
+            pInstance->SetData(TYPE_NORTHREND_BEASTS,NOT_STARTED);
+            pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+        };
     break;
     };
 
-    case GOSSIP_ACTION_INFO_DEF+2: {
-    if (pInstance->GetData(TYPE_JARAXXUS) != DONE)
-           pInstance->SetData(TYPE_EVENT,1010);
+    case GOSSIP_ACTION_INFO_DEF+2: 
+    {
+        if (pInstance->GetData(TYPE_JARAXXUS) != DONE)
+            pInstance->SetData(TYPE_EVENT,1010);
     break;
     };
 
-    case GOSSIP_ACTION_INFO_DEF+3: {
-    if (pInstance->GetData(TYPE_CRUSADERS) != DONE) {
-                  if (pPlayer->GetTeam() == ALLIANCE) pInstance->SetData(TYPE_EVENT,3000);
-                  else pInstance->SetData(TYPE_EVENT,3001);
-                  };
+    case GOSSIP_ACTION_INFO_DEF+3: 
+    {
+        if (pInstance->GetData(TYPE_CRUSADERS) != DONE) 
+        {
+            if (pPlayer->GetTeam() == ALLIANCE) pInstance->SetData(TYPE_EVENT,3000);
+            else pInstance->SetData(TYPE_EVENT,3001);
+        };
     break;
     };
 
-    case GOSSIP_ACTION_INFO_DEF+4: {
-    if (pInstance->GetData(TYPE_VALKIRIES) != DONE)
-           pInstance->SetData(TYPE_EVENT,4000);
+    case GOSSIP_ACTION_INFO_DEF+4: 
+    {
+        if (pInstance->GetData(TYPE_VALKIRIES) != DONE)
+            pInstance->SetData(TYPE_EVENT,4000);
     break;
     };
 
-    case GOSSIP_ACTION_INFO_DEF+5: {
-       if (pInstance->GetData(TYPE_LICH_KING) != DONE) return false;
-       if (GameObject* pGoFloor = pInstance->GetSingleGameObjectFromStorage(GO_ARGENT_COLISEUM_FLOOR))
-          {
-           pGoFloor->SetUInt32Value(GAMEOBJECT_DISPLAYID,9060);
-           pGoFloor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
-           pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,8449);
-           }
-           pCreature->CastSpell(pCreature,69016,false);
+    case GOSSIP_ACTION_INFO_DEF+5: 
+    {
+        Map* pMap = pCreature->GetMap();
+        Map::PlayerList const &lPlayers = pMap->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+        {
+             Unit* pPlayer = itr->getSource();
+             if (!pPlayer) 
+                 continue;
+             float x, y, z;
+             pPlayer->GetPosition(x, y, z);
+             pPlayer->MonsterMoveJump(x, y, z + 10.0f, 3.14f, 10.0f, 0.0f, true);
+        }
+        if (GameObject* pGoFloor = pInstance->GetSingleGameObjectFromStorage(GO_ARGENT_COLISEUM_FLOOR))
+        {
+             pGoFloor->SetUInt32Value(GAMEOBJECT_DISPLAYID,9060);
+             pGoFloor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
+             pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,8449);
+        }
+        pCreature->CastSpell(pCreature,69016,false);
 
-           Creature* pTemp = pInstance->GetSingleCreatureFromStorage(NPC_ANUBARAK);
-           if (!pTemp || !pTemp->isAlive())
-                         pCreature->SummonCreature(NPC_ANUBARAK, SpawnLoc[19].x, SpawnLoc[19].y, SpawnLoc[19].z, 5, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME);
-           if (pTemp) {
-                        pTemp->GetMotionMaster()->MovePoint(0, SpawnLoc[20].x, SpawnLoc[20].y, SpawnLoc[20].z);
-                        pTemp->SetWalk(true);
-                        pTemp->SetInCombatWithZone();
-                        }
-           pInstance->SetData(TYPE_STAGE,9);
-           pInstance->SetData(TYPE_ANUBARAK,IN_PROGRESS);
-           if (pCreature->GetVisibility() == VISIBILITY_ON)
-                   pCreature->SetVisibility(VISIBILITY_OFF);
+        Creature* pTemp = pInstance->GetSingleCreatureFromStorage(NPC_ANUBARAK);
+        if (!pTemp || !pTemp->isAlive())
+            pCreature->SummonCreature(NPC_ANUBARAK, SpawnLoc[19].x, SpawnLoc[19].y, SpawnLoc[19].z, 5, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME);
+     
+        if (pCreature->GetVisibility() == VISIBILITY_ON)
+            pCreature->SetVisibility(VISIBILITY_OFF);
+
     break;
     };
-
-    case GOSSIP_ACTION_INFO_DEF+6: {
-    pInstance->SetData(TYPE_STAGE,10);
-    break;
-    };
-
-  };
+};
 
 return true;
 }
@@ -355,7 +408,7 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
             pPortal->SetDisplayId(17612);
             m_uiPortalGuid = pPortal->GetObjectGuid();
         }
-        if(m_pInstance)
+        if (m_pInstance)
             m_pInstance->SetData(TYPE_LICH_KING,IN_PROGRESS);
     }
 
@@ -368,7 +421,6 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
 
     void AttackStart(Unit *who)
     {
-        //ignore all attackstart commands
         return;
     }
 
@@ -377,17 +429,13 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
         Reset();
     }
 
-    void MoveInLineOfSight(Unit *who)
-    {
-    }
-
     void StartMovement()
     {
         if(!WayPointList.empty() || MovementStarted)
             return;
 
         AddWaypoint(0, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z);
-        AddWaypoint(1, SpawnLoc[17].x, SpawnLoc[17].y, SpawnLoc[17].z);
+        AddWaypoint(1, SpawnLoc[18].x, SpawnLoc[18].y, SpawnLoc[18].z);
         AddWaypoint(2, SpawnLoc[18].x, SpawnLoc[18].y, SpawnLoc[18].z);
         m_creature->SetWalk(true);
         WayPoint = WayPointList.begin();
@@ -466,10 +514,23 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
                 }
                 break;
             case 5070:
+            {
                 m_creature->CastSpell(m_creature,68198,false);
+                Map* pMap = m_creature->GetMap();
+                Map::PlayerList const &lPlayers = pMap->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                     Unit* pPlayer = itr->getSource();
+                     if (!pPlayer) 
+                         continue;
+                     float x, y, z;
+                     pPlayer->GetPosition(x, y, z);
+                     pPlayer->MonsterMoveJump(x, y, z + 10.0f, 3.14f, 10.0f, 0.0f, true);
+                }
                 UpdateTimer = 1500;
                 m_pInstance->SetData(TYPE_EVENT,5080);
                 break;
+            }
             case 5080:
                 if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARGENT_COLISEUM_FLOOR))
                 {
@@ -483,15 +544,8 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
                 if(m_pInstance)
                     m_pInstance->SetData(TYPE_LICH_KING,DONE);
 
-                m_pInstance->SetData(TYPE_ANUBARAK,IN_PROGRESS);
-                m_creature->SummonCreature(NPC_ANUBARAK, SpawnLoc[19].x, SpawnLoc[19].y, SpawnLoc[19].z, 5, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME);
-
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUBARAK))
-                {
-                    pTemp->GetMotionMaster()->MovePoint(0, SpawnLoc[20].x, SpawnLoc[20].y, SpawnLoc[20].z);
-                    pTemp->SetWalk(true);
-                    pTemp->SetInCombatWithZone();
-                }
+                if (Creature *pAnubarak = m_creature->SummonCreature(NPC_ANUBARAK, SpawnLoc[19].x, SpawnLoc[19].y, SpawnLoc[19].z, 3.14f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME))
+                    pAnubarak->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
                 m_pInstance->SetData(TYPE_STAGE,9);
                 Event=false;
@@ -557,17 +611,19 @@ struct MANGOS_DLL_DECL npc_fizzlebang_tocAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        DoScriptText(-1713515, m_creature, pKiller);
         m_pInstance->SetData(TYPE_EVENT, 1179);
+
         if (Creature* pPortal = GetCreatureFromGuid(m_uiPortalGuid))
             pPortal->ForcedDespawn();
+
+        m_creature->ForcedDespawn(5000);
     }
 
     void Reset()
     {
         m_creature->SetRespawnDelay(DAY);
         m_creature->GetMotionMaster()->MovePoint(1, SpawnLoc[27].x, SpawnLoc[27].y, SpawnLoc[27].z);
-        m_uiPortalGuid.Clear();
+        m_uiPortalGuid = 0;
     }
 
     void UpdateAI(const uint32 diff)
@@ -601,6 +657,7 @@ struct MANGOS_DLL_DECL npc_fizzlebang_tocAI : public ScriptedAI
                     {
                         pPortal->SetRespawnDelay(DAY);
                         pPortal->SetDisplayId(22862);
+                        pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X, 2.5f);
                         m_uiPortalGuid = pPortal->GetObjectGuid();
                     }
 
@@ -610,25 +667,19 @@ struct MANGOS_DLL_DECL npc_fizzlebang_tocAI : public ScriptedAI
                     break;
                case 1132:
                     m_creature->GetMotionMaster()->MovementExpired();
-
-                    if (Creature* pPortal = GetCreatureFromGuid(m_uiPortalGuid))
-                        pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.5f);
-
                     m_pInstance->SetData(TYPE_EVENT, 1134);
-                    UpdateTimer = 4000;
+                    UpdateTimer = 1000;
                     break;
                case 1134:
                     if (Creature* pPortal = GetCreatureFromGuid(m_uiPortalGuid))
-                        pPortal->SetDisplayId(15900);
-
-                    if (Creature* pPortal = GetCreatureFromGuid(m_uiPortalGuid))
-                        pPortal->ForcedDespawn(30000);
+                        pPortal->ForcedDespawn(16000);
 
                     if (Creature* pTrigger =  m_creature->SummonCreature(NPC_TRIGGER, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 5.0f, TEMPSUMMON_MANUAL_DESPAWN, 5000))
                     {
                         pTrigger->SetDisplayId(17612);
                         pTrigger->CastSpell(pTrigger, SPELL_WILFRED_PORTAL, false);
                         pTrigger->SetRespawnDelay(DAY);
+                        pTrigger->SetFloatValue(OBJECT_FIELD_SCALE_X, 2.0f);
                         m_uiTriggerGuid = pTrigger->GetObjectGuid();
                     }
 
@@ -637,9 +688,6 @@ struct MANGOS_DLL_DECL npc_fizzlebang_tocAI : public ScriptedAI
                     m_pInstance->SetData(TYPE_EVENT, 1135);
                     break;
                case 1135:
-                    if (Creature* pTrigger = GetCreatureFromGuid(m_uiTriggerGuid))
-                        pTrigger->SetFloatValue(OBJECT_FIELD_SCALE_X, 2.0f);
-
                     m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SPELLCAST_OMNI);
                     UpdateTimer = 3000;
                     m_pInstance->SetData(TYPE_EVENT, 1140);
@@ -650,39 +698,53 @@ struct MANGOS_DLL_DECL npc_fizzlebang_tocAI : public ScriptedAI
                     if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JARAXXUS))
                     {
                         pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        pTemp->CastSpell(pTemp, SPELL_JARAXXUS_CHAINS, false);
-                        DoScriptText(-1713517, pTemp);
+                        pTemp->SetWalk(true);
+                        pTemp->GetMotionMaster()->MovePoint(1, SpawnLoc[28].x, SpawnLoc[28].y, SpawnLoc[28].z);
                     }
                     m_pInstance->SetData(TYPE_EVENT, 1142);
-                    UpdateTimer = 5000;
+                    UpdateTimer = 3000;
                     break;
                case 1142:
-                    UpdateTimer = 5000;
-                    m_pInstance->SetData(TYPE_EVENT, 1144);
+                    if (Creature* pTrigger = GetCreatureFromGuid(m_uiTriggerGuid))
+                        pTrigger->RemoveAurasDueToSpell(SPELL_WILFRED_PORTAL);
+
+                    if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JARAXXUS))
+                        pTemp->SetFacingToObject(m_creature);
+
                     DoScriptText(-1713513, m_creature);
+                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
+                    m_pInstance->SetData(TYPE_EVENT, 1144);
+                    UpdateTimer = 3000;
                     break;
                case 1144:
                     if (Creature* pTrigger = GetCreatureFromGuid(m_uiTriggerGuid))
                         pTrigger->ForcedDespawn();
 
-                    m_pInstance->SetData(TYPE_EVENT, 1150);
-                    UpdateTimer = 7000;
+                    m_pInstance->SetData(TYPE_EVENT, 1145);
+                    UpdateTimer = 9000;
                     break;
-               case 1150:
+               case 1145:
                     if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JARAXXUS))
                     {
-                        pTemp->RemoveAurasDueToSpell(SPELL_JARAXXUS_CHAINS);
-                        pTemp->SetInCombatWithZone();
-                        m_creature->SetInCombatWith(pTemp);
-                        pTemp->AddThreat(m_creature, 1000.0f);
-                        pTemp->AI()->AttackStart(m_creature);
-                        pTemp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        DoScriptText(-1713514, pTemp);
+                        pTemp->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                     }
+
+                    m_pInstance->SetData(TYPE_EVENT, 1150);
+                    UpdateTimer = 5000;
+                    break;
+               case 1150:
+                    DoScriptText(-1713515, m_creature);
+                    if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JARAXXUS))
+                        pTemp->CastSpell(m_creature, 66532, false);
+
                     m_pInstance->SetData(TYPE_EVENT, 1160);
-                    UpdateTimer = 8000;
+                    UpdateTimer = 4000;
                     break;
                case 1160:
-                    m_pInstance->SetData(TYPE_EVENT, 1170);
+                    if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JARAXXUS))
+                        pTemp->SetInCombatWithZone();
+
                     UpdateTimer = 1000;
                     break;
               }
@@ -720,7 +782,6 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
 
     void AttackStart(Unit *who)
     {
-        //ignore all attackstart commands
         return;
     }
 
@@ -737,30 +798,10 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
         {
             switch (m_pInstance->GetData(TYPE_EVENT))
             {
-            // Horda
             case 110:
                 m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
                 DoScriptText(-1713500, m_creature);
                 UpdateTimer = 22000;
-                m_pInstance->SetData(TYPE_EVENT,111);
-                break;
-            case 111:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713569, m_creature);
-                UpdateTimer = 4500;
-                m_pInstance->SetData(TYPE_EVENT,120);
-                break;
-            // Ali
-            case 115:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713500, m_creature);
-                UpdateTimer = 22000;
-                m_pInstance->SetData(TYPE_EVENT,116);
-                break;
-            case 116:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713582, m_creature);
-                UpdateTimer = 7000;
                 m_pInstance->SetData(TYPE_EVENT,130);
                 break;
             case 140:
@@ -790,7 +831,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                 break;
             case 200:
                 DoScriptText(-1713503, m_creature);
-                UpdateTimer = 10000;
+                UpdateTimer = 4000;
                 m_pInstance->SetData(TYPE_EVENT,205);
                 break;
             case 205:
@@ -822,7 +863,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                 break;
             case 300:
                 DoScriptText(-1713505, m_creature);
-                UpdateTimer = 15000;
+                UpdateTimer = 5000;
                 m_pInstance->SetData(TYPE_EVENT,305);
                 break;
             case 305:
@@ -863,7 +904,7 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_EVENT,1110);
                 break;
             case 1179:
-                UpdateTimer = 2000;
+                UpdateTimer = 5000;
                 m_pInstance->SetData(TYPE_EVENT, 1180);
                 break;
             case 1180:
@@ -1272,16 +1313,28 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                 UpdateTimer = 3000;
                 m_pInstance->SetData(TYPE_EVENT,0);
                 m_pInstance->DoUseDoorOrButton(GO_MAIN_GATE_DOOR);
-                m_pInstance->SetData(TYPE_CRUSADERS,IN_PROGRESS);
+                m_pInstance->SetData(TYPE_CRUSADERS, IN_PROGRESS);
                 break;
             //Crusaders battle end
             case 3100:
                 DoScriptText(-1713535, m_creature);
                 UpdateTimer = 5000;
-                m_creature->CastSpell(m_creature, 68184,true);
-                m_pInstance->SetData(TYPE_EVENT,0);
+                m_creature->CastSpell(m_creature, 68184, true);
+                m_pInstance->SetData(TYPE_EVENT, 0);
                 break;
             case 4000:
+                if (GameObject* pGO10N = m_pInstance->GetSingleGameObjectFromStorage(GO_CRUSADERS_CACHE_10))
+                    pGO10N->Delete();
+
+                if (GameObject* pGO10H = m_pInstance->GetSingleGameObjectFromStorage(GO_CRUSADERS_CACHE_25))
+                    pGO10H->Delete();
+
+                if (GameObject* pGO25N = m_pInstance->GetSingleGameObjectFromStorage(GO_CRUSADERS_CACHE_10_H))
+                    pGO25N->Delete();
+
+                if (GameObject* pGO25H = m_pInstance->GetSingleGameObjectFromStorage(GO_CRUSADERS_CACHE_25_H))
+                    pGO25H->Delete();
+
                 DoScriptText(-1713536, m_creature);
                 UpdateTimer = 3000;
                 m_pInstance->SetData(TYPE_EVENT,4010);
@@ -1333,16 +1386,19 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_EVENT,5030);
                 break;
             case 6000:
-                m_creature->NearTeleportTo(SpawnLoc[19].x, SpawnLoc[19].y, SpawnLoc[19].z, 4.0f);
+                m_creature->NearTeleportTo(SpawnLoc[19].x, SpawnLoc[19].y, SpawnLoc[19].z, 3.15f);
                 UpdateTimer = 20000;
                 m_pInstance->SetData(TYPE_EVENT,6005);
                 break;
             case 6005:
                 DoScriptText(-1713565, m_creature);
+                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
+                m_creature->SummonGameobject(195682, 783.57f, 124.45f, 142.21f, 0, 0);
                 UpdateTimer = 20000;
                 m_pInstance->SetData(TYPE_EVENT,6010);
                 break;
             case 6010:
+                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                 if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_10MAN_HEROIC || m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_25MAN_HEROIC)
                     DoScriptText(-1713566, m_creature);
                 UpdateTimer = 60000;
@@ -1407,99 +1463,6 @@ struct MANGOS_DLL_DECL npc_garrosh_tocAI : public ScriptedAI
                 DoScriptText(-1713702, m_creature);
                 m_pInstance->SetData(TYPE_EVENT,121);
                 UpdateTimer = 5000;
-                break;
-            case 121:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                m_pInstance->SetData(TYPE_EVENT,122);
-                UpdateTimer = 3000;
-                break;
-            // Horda
-            case 122:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_THRALL))
-                    DoScriptText(-1713570, pTemp);
-                m_pInstance->SetData(TYPE_EVENT,123);
-                UpdateTimer = 9000;
-                break;
-            case 123:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713571, m_creature);
-                m_pInstance->SetData(TYPE_EVENT,124);
-                UpdateTimer = 10000;
-                break;
-            case 124:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_THRALL))
-                    DoScriptText(-1713572, pTemp);
-                UpdateTimer = 5000;
-                m_pInstance->SetData(TYPE_EVENT,125);
-                break;
-            case 125:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713573, m_creature);
-                UpdateTimer = 7000;
-                m_pInstance->SetData(TYPE_EVENT,126);
-                break;
-            case 126:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_THRALL))
-                    DoScriptText(-1713574, pTemp);
-                UpdateTimer = 7000;
-                m_pInstance->SetData(TYPE_EVENT,127);
-                break;
-            case 127:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713575, m_creature);
-                UpdateTimer = 2000;
-                m_pInstance->SetData(TYPE_EVENT,128);
-                break;
-            case 128:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
-                    DoScriptText(-1713576, pTemp);
-                UpdateTimer = 8000;
-                m_pInstance->SetData(TYPE_EVENT,129);
-                break;
-            case 129:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_THRALL))
-                    DoScriptText(-1713577, pTemp);
-                UpdateTimer = 2000;
-                m_pInstance->SetData(TYPE_EVENT,1333);
-                break;
-            case 1333:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713578, m_creature);
-                UpdateTimer = 9500;
-                m_pInstance->SetData(TYPE_EVENT,1334);
-                break;
-            case 1334:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_THRALL))
-                    DoScriptText(-1713579, pTemp);
-                UpdateTimer = 2000;
-                m_pInstance->SetData(TYPE_EVENT,1335);
-                break;
-            case 1335:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
-                    DoScriptText(-1713580, pTemp);
-                UpdateTimer = 4000;
-                m_pInstance->SetData(TYPE_EVENT,1336);
-                break;
-            case 1336:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_THRALL))
-                    DoScriptText(-1713581, pTemp);
-                UpdateTimer = 7000;
-                m_pInstance->SetData(TYPE_EVENT,1337);
-                break;
-            case 1337:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
-                    DoScriptText(-1713537, pTemp);
-                UpdateTimer = 3000;
-                m_pInstance->SetData(TYPE_EVENT,140);
                 break;
             case 2010:
                 DoScriptText(-1713527, m_creature);
@@ -1574,45 +1537,6 @@ struct MANGOS_DLL_DECL npc_rinn_tocAI : public ScriptedAI
             switch (m_pInstance->GetData(TYPE_EVENT))
             {
             case 130:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_PROUDMOORE))
-                    DoScriptText(-1713583, pTemp);
-                UpdateTimer = 3000;
-                m_pInstance->SetData(TYPE_EVENT,132);
-                break;
-            case 132:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                UpdateTimer = 3000;
-                m_pInstance->SetData(TYPE_EVENT,133);
-                break;
-            case 133:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
-                   DoScriptText(-1713584, pTemp);
-                UpdateTimer = 7000;
-                m_pInstance->SetData(TYPE_EVENT,134);
-                break;
-            case 134:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713585, m_creature);
-                UpdateTimer = 7000;
-                m_pInstance->SetData(TYPE_EVENT,135);
-                break;
-            case 135:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_PROUDMOORE))
-                    DoScriptText(-1713586, pTemp);
-                UpdateTimer = 3000;
-                m_pInstance->SetData(TYPE_EVENT,136);
-                break;
-            case 136:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
-                DoScriptText(-1713587, m_creature);
-                UpdateTimer = 16000;
-                m_pInstance->SetData(TYPE_EVENT,137);
-                break;
-            case 137:
-                m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_TALK);
                 if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
                    DoScriptText(-1713537, pTemp);
                 UpdateTimer = 3000;
@@ -1642,6 +1566,8 @@ struct MANGOS_DLL_DECL npc_rinn_tocAI : public ScriptedAI
             case 4020:
                 DoScriptText(-1713548, m_creature);
                 UpdateTimer = 7000;
+                if (Creature* pBarrent = m_pInstance->GetSingleCreatureFromStorage(NPC_BARRENT))
+                    pBarrent->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 m_pInstance->SetData(TYPE_EVENT,4030);
                 break;
             }
@@ -1660,37 +1586,37 @@ CreatureAI* GetAI_npc_rinn_toc(Creature* pCreature)
 
 void AddSC_trial_of_the_crusader()
 {
-    Script* NewScript;
+    Script* pNewScript;
 
-    NewScript = new Script;
-    NewScript->Name = "npc_toc_announcer";
-    NewScript->GetAI = &GetAI_npc_toc_announcer;
-    NewScript->pGossipHello = &GossipHello_npc_toc_announcer;
-    NewScript->pGossipSelect = &GossipSelect_npc_toc_announcer;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_toc_announcer";
+    pNewScript->GetAI = &GetAI_npc_toc_announcer;
+    pNewScript->pGossipHello = &GossipHello_npc_toc_announcer;
+    pNewScript->pGossipSelect = &GossipSelect_npc_toc_announcer;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "boss_lich_king_toc";
-    NewScript->GetAI = &GetAI_boss_lich_king_toc;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_lich_king_toc";
+    pNewScript->GetAI = &GetAI_boss_lich_king_toc;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "npc_fizzlebang_toc";
-    NewScript->GetAI = &GetAI_npc_fizzlebang_toc;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_fizzlebang_toc";
+    pNewScript->GetAI = &GetAI_npc_fizzlebang_toc;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "npc_tirion_toc";
-    NewScript->GetAI = &GetAI_npc_tirion_toc;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_tirion_toc";
+    pNewScript->GetAI = &GetAI_npc_tirion_toc;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "npc_garrosh_toc";
-    NewScript->GetAI = &GetAI_npc_garrosh_toc;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_garrosh_toc";
+    pNewScript->GetAI = &GetAI_npc_garrosh_toc;
+    pNewScript->RegisterSelf();
 
-    NewScript = new Script;
-    NewScript->Name = "npc_rinn_toc";
-    NewScript->GetAI = &GetAI_npc_rinn_toc;
-    NewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_rinn_toc";
+    pNewScript->GetAI = &GetAI_npc_rinn_toc;
+    pNewScript->RegisterSelf();
 }
