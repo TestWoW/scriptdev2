@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -61,10 +61,10 @@ enum saysSD2
     PHASE_MACE_ENCHANTMENT              = 3,
     PHASE_MOVEMENT                      = 4,
 
-    EQUIP_ID_SWORD  = 49345,
-    EQUIP_ID_MACE   = 49344,
+    EQUIP_ID_SWORD                      = 49345,
+    EQUIP_ID_MACE                       = 49344,
 
-    ACHIEV_DOESNT_GO_TO_ELEVEN         = 4524,
+    ACHIEV_DOESNT_GO_TO_ELEVEN          = 4524,
 };
 
 static const float aGarfrostMoveLocs[2][3] =
@@ -208,9 +208,9 @@ struct MANGOS_DLL_DECL npc_martin_gorkunAI: public ScriptedAI
                 case 2:
                     if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 695.46f, -156.31f, 546.061f, 4.7f, TEMPSUMMON_TIMED_DESPAWN, 10000))
                     {
-                        //pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetGUID());
+                        //pTyrannus->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                         pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        m_uiTyrannusGuid = pTyrannus->GetGUID();
+                        m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
                     }
                     ++m_uiOutro_Phase;
                     m_uiSpeech_Timer = 3000;
