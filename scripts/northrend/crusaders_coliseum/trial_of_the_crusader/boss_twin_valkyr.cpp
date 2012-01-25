@@ -162,6 +162,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
 
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetHealth(m_creature->GetMaxHealth());
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
     }
 
     void JustReachedHome()
@@ -439,6 +440,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
 
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetHealth(m_creature->GetMaxHealth());
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
     }
 
     void JustReachedHome()
