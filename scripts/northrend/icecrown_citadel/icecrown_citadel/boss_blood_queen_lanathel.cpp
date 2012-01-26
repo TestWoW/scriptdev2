@@ -73,6 +73,14 @@ enum
     POINT_CENTER_AIR            = 1,
 };
 
+enum Equipment
+{
+    EQUIP_MAIN           = 29996, // TODO: Need true id weapon.
+    EQUIP_OFFHAND        = EQUIP_NO_CHANGE,
+    EQUIP_RANGED         = EQUIP_NO_CHANGE,
+    EQUIP_DONE           = EQUIP_NO_CHANGE,
+};
+
 static Locations QueenLocs[]=
 {
     {4595.640137f, 2769.195557f, 400.137054f},  // 0 Phased
@@ -80,19 +88,12 @@ static Locations QueenLocs[]=
 };
 
 
-struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
+struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 {
-    boss_blood_queen_lanathelAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_blood_queen_lanathelAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
-
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
 
     uint32 m_uiShadows;
     uint32 m_uiPhase;
@@ -107,8 +108,6 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
     uint32 m_uiEnrageTimer;
     uint32 m_uiBloodMirrorCheckTimer;
 
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
     bool m_bBite;
     bool m_bCastShadows;
 
@@ -157,7 +156,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
     void MovementInform(uint32 uiMovementType, uint32 uiData)
     {
         if (uiMovementType != POINT_MOTION_TYPE)
-        return;
+            return;
 
         if (uiData == POINT_CENTER_GROUND)
         {
@@ -202,14 +201,6 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
         }
     }
 
-    enum Equipment
-    {
-        EQUIP_MAIN           = 29996, // TODO: Need true id weapon.
-        EQUIP_OFFHAND        = EQUIP_NO_CHANGE,
-        EQUIP_RANGED         = EQUIP_NO_CHANGE,
-        EQUIP_DONE           = EQUIP_NO_CHANGE,
-    };
-
     void Aggro(Unit* pWho)
     {
         if (m_pInstance)
@@ -219,39 +210,6 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
         SetEquipmentSlots(false, EQUIP_MAIN, EQUIP_OFFHAND, EQUIP_RANGED);
 
         DoScriptText(SAY_AGGRO,m_creature,pWho);
-    }
-
-    Unit* SelectRandomRangedTarget(Unit *pSource, uint32 targets)
-    {
-        Unit *pResult = NULL;
-        std::list<Unit*> lTargets;
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-
-        for (ThreatList::const_iterator i = tList.begin();i != tList.end(); ++i)
-        {
-            if (!(*i)->getUnitGuid().IsPlayer())
-                continue;
-
-            if (Unit* pTmp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
-                lTargets.push_back(pTmp);
-        }
-
-        if (!lTargets.empty())
-        {
-            uint8 max = targets;
-            std::list<Unit*>::iterator iter;
-
-            lTargets.sort(ObjectDistanceOrderReversed(pSource));
-            iter = lTargets.begin();
-
-            if (max >= lTargets.size())
-                max = lTargets.size() - 1;
-
-            std::advance(iter, urand(0, max));
-            pResult = (*iter);
-        }
-
-        return pResult;
     }
 
     Unit* SelectClosestFriendlyTarget(Unit *pVictim)
@@ -284,22 +242,22 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
 
     Unit* SelectVampiricBiteTarget()
     {
-    const ThreatList &threatList = m_creature->getThreatManager().getThreatList();
-    ThreatList::const_iterator itr = threatList.begin();
-    std::advance(itr, 1); // don't target the main tank
-    for (;itr != threatList.end(); ++itr)
-    {
-        if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+        const ThreatList &threatList = m_creature->getThreatManager().getThreatList();
+        ThreatList::const_iterator itr = threatList.begin();
+        std::advance(itr, 1); // don't target the main tank
+        for (;itr != threatList.end(); ++itr)
         {
-            if (!pVictim->HasAuraOfDifficulty(70867) && // Essence of the Blood Queen
-            !pVictim->HasAuraOfDifficulty(70877) &&     // Frenzied Bloodthirst
-            !pVictim->HasAuraOfDifficulty(70445) &&     // Blood Mirror
-            !pVictim->HasAuraOfDifficulty(70923))       // Uncontrollable Frenzy
-                {
-                    return pVictim;
+            if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            {
+                if (!pVictim->HasAuraOfDifficulty(70867) && // Essence of the Blood Queen
+                !pVictim->HasAuraOfDifficulty(70877) &&     // Frenzied Bloodthirst
+                !pVictim->HasAuraOfDifficulty(70445) &&     // Blood Mirror
+                !pVictim->HasAuraOfDifficulty(70923))       // Uncontrollable Frenzy
+                    {
+                        return pVictim;
+                    }
                 }
             }
-        }
 
         return NULL;
     }
@@ -318,7 +276,6 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
@@ -371,7 +328,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
         case PHASE_GROUND:
             if (m_uiTwilightTimer < uiDiff)
             {
-                if (Unit *pTarget = SelectRandomRangedTarget(m_creature, m_bIs25Man ? 2 : 1))
+                if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_TWILIGHT_BLOODBOLT) == CAST_OK)
                         m_uiTwilightTimer = urand(12000, 17000);
@@ -391,7 +348,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
 
             if (m_uiPactTimer < uiDiff)
             {
-                if (Unit *pTarget = SelectRandomRangedTarget(m_creature , m_bIs25Man ? 3 : 2))
+                if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_PACT_OF_DARKFALLEN) == CAST_OK)
                     {
@@ -404,7 +361,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
 
             if (m_uiShadowsTimer < uiDiff)
             {
-                if (Unit *pTarget = SelectRandomRangedTarget(m_creature , m_bIs25Man ? 2 : 1))
+                if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_SWARMING_SHADOWS) == CAST_OK)
                     {
@@ -461,7 +418,6 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public ScriptedAI
     }
 };
 
-
 CreatureAI* GetAI_boss_blood_queen_lanathel(Creature* pCreature)
 {
     return new boss_blood_queen_lanathelAI(pCreature);
@@ -497,7 +453,6 @@ CreatureAI* GetAI_mob_swarming_shadows(Creature* pCreature)
 {
      return new mob_swarming_shadowsAI (pCreature);
 }
-
 
 void AddSC_boss_blood_queen_lanathel()
 {

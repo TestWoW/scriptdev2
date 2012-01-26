@@ -125,22 +125,12 @@ static Locations SpawnLoc[]=
 
 };
 // Rotface
-struct MANGOS_DLL_DECL boss_rotfaceAI : public ScriptedAI
+struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
 {
-    boss_rotfaceAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_rotfaceAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-
         Reset();
     }
-
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
 
     uint32 m_uiBerserkTimer;
     uint32 m_uiSlimeSprayTimer;
@@ -416,11 +406,11 @@ struct MANGOS_DLL_DECL mob_big_oozeAI : public ScriptedAI
 {
     mob_big_oozeAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_citadel*)pCreature->GetInstanceData();
         Reset();
     }
 
-    instance_icecrown_spire *m_pInstance;
+    instance_icecrown_citadel *m_pInstance;
     uint32 m_uiStickyOozeTimer;
     uint32 m_uiCheckTimer;
     bool exploded;

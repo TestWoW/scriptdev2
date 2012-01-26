@@ -14,120 +14,148 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: boss_the_lich_king
-SD%Complete: 85%
-SDComment: by carlos93 tnx Walkum
-SDCategory: Icecrown Citadel
-EndScriptData */
-
-// TODO:
-// Implement Frostmourne phase
-// Implement the Necrotic plague buff
+/**
+ * ScriptData
+ * SDName: boss_the_lich_king
+ * SD%Complete:
+ * SDComment: 
+ * SDCategory: Icecrown Citadel
+ */
 
 #include "precompiled.h"
 #include "icecrown_citadel.h"
-#include "Vehicle.h"
 
 enum BossSpells
 {
-    //////////////// LICH KING ////////////////
-    // Phase 1
-    SPELL_INFEST                        = 70541,
-    SPELL_NECROTIC_PLAGUE               = 70337,
-    SPELL_SUMMON_SHAMBLING_HORROR       = 70372,
-    SPELL_SUMMON_DRUDGE_GHOULS          = 70358,
-    SPELL_SUMMON_SHADOW_TRAP            = 73539, // Heroic only
+    SPELL_BERSERK               = 47008,
+    SPELL_SIT_EMOTE_NO_SHEATH   = 73220,
+    SPELL_PLAGUE_AVOIDANCE      = 72846,
 
-    // Phase 2
-    SPELL_SOUL_REAPER                   = 69409,
-    SPELL_SUMMON_DEFILE                 = 72762,
-    SPELL_SUMMON_VALKYR_10              = 69037,
-    SPELL_SUMMON_VALKYR_25              = 74361,
+    // Intro
+    SPELL_ICE_LOCK              = 71614,
 
-    // Phase 3
-    SPELL_HARVEST_SOUL                  = 68980,
-    SPELL_HARVEST_SOULS                 = 74296,
-    SPELL_SUMMON_VILE_SPIRITS           = 70498,
+    // Outro
+    SPELL_FURY_OF_FROSTMOURNE   = 72350,
+    SPELL_FURY_OF_FROSTMOURNE2  = 72351, // cannot resurect aura
+    SPELL_RAISE_DEAD            = 71769,
+    SPELL_THROW_FROSTMOURNE     = 73017, // 1
+    SPELL_BROKEN_FROSTMOURNE    = 72398, // 2
+    SPELL_SUMMON_FROSTMOURNE    = 72407, // 3 summon npc which casts 4 and 5 and LK enters this npc as vehicle
+    SPELL_FROSTMOURNE_DESPAWN   = 72726, // 4
+    SPELL_FROSTMOURNE_SPIRITS   = 72405, // 5
+    SPELL_SOUL_BARRAGE          = 72305, // strangulation and sounds
+    SPELL_LK_CINEMATIC          = 73159,
 
-    // Intro / Outro visuals
-    SPELL_STAND_UP                      = 73220,
-    SPELL_ICE_LOCK                      = 71614,
-    SPELL_RAISE_DEAD                    = 71769,
-    SPELL_BROKEN_FROSTMOURNE            = 72398,
-    SPELL_BOOM_VISUAL                   = 72726,  
-    SPELL_LIGHTS_BLESSING               = 71797,
-    SPELL_FROSTMOURNE_TRIGGER           = 72405,
-    SPELL_SUMMON_BROKEN_FROSTMOURNE     = 72406,
-    SPELL_SUMMON_BROKEN_FROSTMOURNE_2   = 73017,
-    SPELL_FURY_OF_FROSTMOURNE           = 72350,
-    SPELL_BERSERK                       = 47008,
-    SPELL_SUMMON_TERENAS                = 72420,
-    SPELL_SOUL_BARRAGE                  = 72305,
+    // Tirion
+    SPELL_LIGHTS_BLESSING       = 71797, // after 5secs smashes Ice Lock
 
-    // Transition phase
-    SPELL_REMORSELESS_WINTER            = 68981,
-    SPELL_PAIN_AND_SUFFERING            = 72133,
-    SPELL_SUMMON_ICE_SPHERE             = 69104,
-    SPELL_SUMMON_RAGING_SPIRIT          = 69200,
-    SPELL_QUAKE                         = 72262,
+    // Terenas Menethil
+    SPELL_MASS_RESURRECTION     = 72429, // dummy
 
-    // Defile
-    SPELL_DEFILE                        = 72743,
-    SPELL_DEFILE_GROW                   = 72756,
+    // Phase One
+    SPELL_NECROTIC_PLAGUE       = 70337,
+    SPELL_NECROTIC_PLAGUE_STACK = 70338,
+    SPELL_INFEST                = 70541,
+    SPELL_SUMMON_GHOULS         = 70358,
+    SPELL_SUMMON_HORROR         = 70372,
+    SPELL_SHADOW_TRAP           = 73539,
 
-    // Raging spirit
-    SPELL_SOUL_SHRIEK                   = 69242,
-    SPELL_CLONE                         = 69198,
+    // Phase transition
+    SPELL_REMORSELESS_WINTER_1  = 68981,
+    SPELL_REMORSELESS_WINTER_2  = 72259,
+    SPELL_QUAKE                 = 72262,
+    SPELL_PAIN_AND_SUFFERING    = 72133,
+    SPELL_RAGING_SPIRIT         = 69200,
+    SPELL_SUMMON_RAGING_SPIRIT  = 69201,
+    SPELL_SUMMON_ICE_SPHERE     = 69103,
+    SPELL_ICE_SPHERE            = 69104, // missile and summon effect
 
-    // Ice sphere
-    SPELL_ICE_PULSE                     = 69091,
-    SPELL_ICE_BURST                     = 69108,
-    SPELL_ICE_SPHERE_VISUAL             = 69090,
+    // Phase Two
+    SPELL_SUMMON_VALKYR         = 69037,
+    SPELL_SUMMON_VALKYRS        = 74361, // 25man
+    SPELL_SOUL_REAPER           = 69409,
+    SPELL_DEFILE                = 72762,
+
+    // Phase Three
+    SPELL_VILE_SPIRITS          = 70498,
+    SPELL_HARVEST_SOUL          = 68980, // stun aura and periodic damage, triggers summoning of vehicle
+    SPELL_HARVEST_SOUL_TP_FM_N  = 72546, // teleports to Frostmourne Room and applies 60sec dummy aura (normal)
+    SPELL_HARVEST_SOUL_TP_FM_H  = 73655, // teleports to Frostmourne Room and applies 60sec DoT aura (heroic)
+    SPELL_HARVEST_SOUL_CLONE    = 71372,
+    SPELL_HARVEST_SOULS         = 74296,
+    SPELL_HARVESTED_SOUL_1      = 73028,
+    SPELL_HARVESTED_SOUL_2      = 74321,
+    SPELL_HARVESTED_SOUL_3      = 74322,
+    SPELL_HARVESTED_SOUL_4      = 74323,
+
+    SPELL_FROSTMOURNE_TP_VISUAL = 73078,
+
+    // Shambling Horror
+    SPELL_FRENZY                = 28747,
+    SPELL_ENRAGE                = 72143,
+    SPELL_SHOCKWAVE             = 72149,
 
     // Shadow Trap
-    SPELL_SHADOW_TRAP                   = 73529,
-    SPELL_SHADOW_TRAP_VISUAL            = 73525,
+    SPELL_SHADOW_TRAP_VISUAL    = 73530,
+    SPELL_SHADOW_TRAP_AURA      = 73525,
 
-    // Shambling horror
-    SPELL_SHOCKWAVE                     = 72149,
-    SPELL_HORROR_ENRAGE                 = 72143,
-    SPELL_HORROR_FRENZY                 = 28747,
+    // Raging Spirit
+    SPELL_SOUL_SHRIEK           = 69242,
+    SPELL_RAGING_SPIRIT_VISUAL  = 69198,
 
-    // Vile spirits
-    SPELL_VILE_SPIRITS                  = 70497,
-    SPELL_SPIRITS_BURST                 = 70503,
+    // Ice Sphere
+    SPELL_ICE_SPHERE_VISUAL     = 69090,
+    SPELL_ICE_BURST_AURA        = 69109,
+    SPELL_ICE_BURST             = 69108,
+    SPELL_ICE_PULSE             = 69091,
 
-    // Valkyr
-    SPELL_WINGS_OF_THE_DAMNED           = 74352,
-    SPELL_VALKYR_CHARGE                 = 74399,
-    SPELL_VALKYR_CARRY                  = 74445,
-    SPELL_VALKYR_EJECT                  = 68576,
-    SPELL_LIFE_SIPHON                   = 73783,
+    // Val'kyr Shadowguard
+    SPELL_LIFE_SIPHON           = 73783,
+    SPELL_VALKYR_CHARGE         = 74399,
+    SPELL_VALKYR_CARRY          = 74445,
+    SPELL_HARVEST_SOUL_VEHICLE  = 68985,
+    SPELL_EJECT_PASSENGERS      = 68576,
+    SPELL_WINGS_OF_THE_DAMNED   = 74352,
 
-    // Terenas Menethil Final
-    SPELL_MASS_RESURRECT                = 72429,
+    // Defile
+    SPELL_DEFILE_AURA           = 72743,
+    SPELL_DEFILE_GROW           = 72756,
+
+    // Vile Spirit and Wicked Spirit
+    SPELL_SPIRIT_BURST_AURA     = 70502,
+    SPELL_SPIRIT_BURST_1        = 70503, // used for achiev check -->
+    SPELL_SPIRIT_BURST_2        = 73806,
+    SPELL_SPIRIT_BURST_3        = 73807,
+    SPELL_SPIRIT_BURST_4        = 73808,
 
     // Spirit Warden
-    SPELL_SOULRIP                       = 69397,
-    SPELL_DESTROY_SOUL                  = 74086,
-    SPELL_DARK_HUNGER                   = 69383,
+    SPELL_DARK_HUNGER           = 69383,
+    SPELL_DESTROY_SOUL          = 74086,
+    SPELL_SOUL_RIP              = 69397, // 3500, each next one x2 (maybe based on HP of target?)
 
-    // Terenas Menethil Inside Frostmourne
-    SPELL_LIGHTS_FAVOR                  = 69382,
-    SPELL_RESTORE_SOUL                  = 72592,
-    SPELL_RESTORE_SOUL_HERO             = 73650,
+    // Terenas in Frostmourne
+    SPELL_RESTORE_SOUL          = 72595,
+    SPELL_RESTORE_SOUL_HEROIC   = 73650,
+    SPELL_LIGHTS_FAVOR          = 69382,
+    SPELL_SUMMON_SPIRIT_BOMBS_1 = 73581, // heroic only, summons Spirit Bomb every 1 sec
+    SPELL_SUMMON_SPIRIT_BOMBS_2 = 74299, // 2 secs interval
+    SPELL_SUMMON_SPIRIT_BOMB    = 74300, // aura doesnt work somehow, so we will use manual summoning
 
-    // Npcs
-    NPC_VALKYR                          = 36609,
-    NPC_ICE_SPHERE                      = 36633,
-    NPC_SHADOW_TRAP                     = 39137,
-    NPC_DEFILER                         = 38757,
-    NPC_RAGING_SPIRIT                   = 36701,
-    NPC_VILE_SPIRIT                     = 37799,
-    NPC_STRANGULATE_VEHICLE             = 36598,
-    NPC_WICKED_SPIRIT                   = 39190,
+    // Spirit Bomb
+    SPELL_SPIRIT_BOMB_VISUAL    = 73572,
+    SPELL_EXPLOSION             = 73804,
 
+    // NPCs
+    NPC_SHADOW_TRAP             = 39137,
+    NPC_FROSTMOURNE             = 38584,
+    NPC_ICE_SPHERE              = 36633,
+    NPC_RAGING_SPIRIT           = 36701,
+    NPC_DEFILE                  = 38757,
+    NPC_VALKYR_SHADOWGUARD      = 36609,
+    NPC_TERENAS_FM_NORMAL       = 36823,
+    NPC_TERENAS_FM_HEROIC       = 39217,
+    NPC_WICKED_SPIRIT           = 39190,
+    NPC_SPIRIT_BOMB             = 39189,
 };
 
 // talks
@@ -142,7 +170,6 @@ enum
     SAY_REMORSELESS_WINTER      = -1631164,
     SAY_SHATTER_ARENA           = -1631165,
     SAY_SUMMON_VALKYR           = -1631166,
-    SAY_DEFILE                  = -1631596,
     SAY_HARVEST_SOUL            = -1631167,
     SAY_FM_TERENAS_AID_1        = -1631168,
     SAY_FM_TERENAS_AID_2        = -1631169,
@@ -176,1343 +203,1542 @@ enum Common
      FINAL_ARTHAS_MOVIE         = 16,
 };
 
-enum Points
+enum Phase
 {
-    POINT_CENTER                = 10,
-    POINT_WEST                  = 11,
-    POINT_EAST                  = 12,
+    PHASE_INTRO                 = 0,    // intro
+    PHASE_ONE                   = 1,    // phase one
+    PHASE_RUNNING_WINTER_ONE    = 2,    // running to center of platform to cast Remorseless Winter
+    PHASE_TRANSITION_ONE        = 3,    // Remorseless Winter aura and casting spells, summoning orbs and spirits
+    PHASE_QUAKE_ONE             = 4,    // casting Quake
+    PHASE_TWO                   = 5,    // phase two with val'kyrs and some more spells
+    PHASE_RUNNING_WINTER_TWO    = 6,    // running to center of platform to cast Remorseless Winter again
+    PHASE_TRANSITION_TWO        = 7,    // second Remorseless Winter phase
+    PHASE_QUAKE_TWO             = 8,    // second Quake casting
+    PHASE_THREE                 = 9,    // phase three, casting Soul Harvest (Frostmourne phase)
+    PHASE_IN_FROSTMOURNE        = 10,   // phase three, waiting untill whole raid leaves Frostmourne
+    PHASE_CUTSCENE              = 11,   // phase when LK kills raid, Terenas comes etc.
+    PHASE_DEATH_AWAITS          = 12,   // strangulating Lich King, raid group finishing him
 };
 
-enum Equipment
+enum Point
 {
-    EQUIP_MAIN_LK           = 36942,
-    EQUIP_MAIN_TIRION       = 13262,
-    EQUIP_OFFHAND        = EQUIP_NO_CHANGE,
-    EQUIP_RANGED         = EQUIP_NO_CHANGE,
-    EQUIP_DONE           = EQUIP_NO_CHANGE,
+    POINT_CENTER_LAND           = 1,
+    POINT_CENTER_LAND_TIRION    = 2,
+    POINT_TELEPORTER_TIRION     = 3,
+    POINT_VALKYR_THROW          = 4,
+    POINT_VALKYR_CENTER         = 5,
+    POINT_TP_TO_FM              = 6, // point where strangulate vehicle moves, after reaching player is teleported into frostmourne
+    POINT_SPIRIT_BOMB           = 7, // Spirit Bomb moving down
 };
 
-static Locations SpawnLoc[]=
+static Locations SpawnLoc[] =
 {
-    {459.93689f, -2124.638184f, 1040.860107f},    // 0 Lich King Intro
-    {503.15652f, -2124.516602f, 1040.860107f},    // 1 Lich king move end
-    {491.27118f, -2124.638184f, 1040.860107f},    // 2 Tirion 1
+    {458.58889f, -2124.516602f, 1040.860107f},    // 0 Lich King Intro
+    {503.15652f, -2124.516602f, 1040.860107f},    // 1 Center of the platform
+    {492.15652f, -2124.516602f, 1040.860107f},    // 2 Tirion strikes Lich King
     {481.69797f, -2124.638184f, 1040.860107f},    // 3 Tirion 2
     {498.00448f, -2201.573486f, 1046.093872f},    // 4 Valkyrs?
     {517.48291f, -2124.905762f, 1040.861328f},    // 5 Tirion?
-    {502.66f, -2124.43f, 1040.859985f},           // 6 Lich king final (blizzlike), o=3.1146
-    {520.311f, -2124.709961f, 1040.859985f},      // 7 Frostmourne
-    {517.378f, -2124.905762f, 1040.861328f},      // 8 Tirion see Lich
-    {502.66f, -2124.43f, 1040.859985f},           // 9 Tirion jumps
-    {503.97330f, -2123.921800f, 1057.4666000f},   // 10 Valkyr Center (heroic)
-    {503.37330f, -2213.671800f, 1043.6766000f},   // 11 Valkyr West
-    {502.66666f, -2041.245483f, 1043.7098000f},   // 12 Valkyr East
+    {529.85302f, -2124.709961f, 1040.859985f},    // 6 Lich king final, o=3.1146
+    {520.311f,   -2124.709961f, 1040.859985f},    // 7 Frostmourne
+    {453.80f,    -2088.20f,     1040.859985f},    // 8 Val'kyr drop point right to Frozen Throne
+    {457.03f,    -2155.08f,     1040.859985f},    // 9 Val'kyr drop point left to Frozen Throne
 };
 
-struct MANGOS_DLL_DECL boss_the_lich_king_icc_eventAI : public ScriptedAI
+#define GOSSIP_TIRION_START_EVENT "We are prepared, Highlord. Let us battle for the fate of Azeroth! For the light of dawn!"
+
+/**
+ * Tirion
+ */
+struct MANGOS_DLL_DECL boss_tirion_iccAI : public base_icc_bossAI
 {
-    boss_the_lich_king_icc_eventAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_tirion_iccAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-
-        m_uiEventStep = 0;
-        m_uiNextEventTimer = 0;
-
-        m_bMovementStarted = false;
-        m_bIsIntroStarted = false;
-        m_bIsIntroFinished = false;
-        m_bIsOutroStarted = false;
-
-        m_guidTirion.Clear();
-        m_guidMenethil.Clear();
+        m_bIsEventStarted   = false;
+        m_guidTerenas.Clear();
+        m_guidFrostmourne.Clear();
     }
 
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-
-    ObjectGuid m_guidTirion;
-    ObjectGuid m_guidMenethil;
-
-    bool m_bIs25Man;
-    bool m_bIsHeroic;
-    bool m_bMovementStarted;
-    bool m_bIsIntroStarted;
-    bool m_bIsIntroFinished;
-    bool m_bIsOutroStarted;
-
-    uint32 m_uiNextEventTimer;
+    bool m_bIsEventStarted;
     uint32 m_uiEventStep;
+    uint32 m_uiEventTimer;
+    ObjectGuid m_guidTerenas;
+    ObjectGuid m_guidFrostmourne;
 
-    void Reset()
+    void Reset(){}
+
+    void EnterEvadeMode()
     {
-        if (!m_pInstance)
-            return;
-
-        m_uiEventStep = 0;
-        m_uiNextEventTimer = 0;
-
-        m_bMovementStarted = false;
-        m_bIsIntroStarted = false;
-        m_bIsIntroFinished = false;
-        m_bIsOutroStarted = false;
-
-        m_guidTirion.Clear();
-        m_guidMenethil.Clear();
-    }
-
-    void NextStep(uint32 uiTime = 1000)
-    {
-        ++m_uiEventStep;
-        m_uiNextEventTimer = uiTime;
-    }
-
-    void MovementInform(uint32 type, uint32 id)
-    {
-        if (type != POINT_MOTION_TYPE || !m_bMovementStarted)
-            return;
-
-        if (id)
+        if (m_pInstance)
         {
-            m_bMovementStarted = false;
-            m_creature->GetMotionMaster()->MovementExpired();
+            if (m_pInstance->GetData(TYPE_LICH_KING) == DONE || m_pInstance->GetData(TYPE_LICH_KING) == FAIL)
+            {
+                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                base_icc_bossAI::EnterEvadeMode();
+            }
         }
     }
 
-    void StartMovement(uint32 id, Unit *pTarget)
+    void DoStartEvent()
     {
-        pTarget->GetMotionMaster()->Clear();
-        pTarget->GetMotionMaster()->MovePoint(id, SpawnLoc[id].x, SpawnLoc[id].y, SpawnLoc[id].z);
-        m_bMovementStarted = true;
+        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+            pLichKing->SetStandState(UNIT_STAND_STATE_STAND);
+
+        m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        m_bIsEventStarted = true;
+        m_uiEventStep = 0;
+        m_uiEventTimer = 2000;
     }
 
-    virtual void UpdateFightAI(const uint32 uiDiff) {}
+    void DoContinueEvent()
+    {
+        m_uiEventTimer = 17000;
+        m_uiEventStep = 10;
+        m_bIsEventStarted = true;
+    }
+
+    void DoFinishEvent()
+    {
+        m_uiEventTimer = 0;
+        m_uiEventStep = 27;
+        m_bIsEventStarted = true;
+    }
+
+    void NextStep(uint32 uiTimer)
+    {
+        ++m_uiEventStep;
+        m_uiEventTimer = uiTimer;
+    }
+
+    void DoLichKingText(int32 iText)
+    {
+        if (m_pInstance)
+        {
+            if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                DoScriptText(iText, pLichKing);
+        }
+    }
+
+    void DoLichKingEmote(uint32 uiEmote)
+    {
+        if (m_pInstance)
+        {
+            if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                pLichKing->HandleEmote(uiEmote);
+        }
+    }
+
+    void MovementInform(uint32 uiMovementType, uint32 uiData)
+    {
+        if (uiMovementType != POINT_MOTION_TYPE)
+            return;
+
+        if (uiData == POINT_CENTER_LAND_TIRION)
+        {
+            NextStep(1000);
+        }
+        else if (POINT_TELEPORTER_TIRION)
+        {
+            if (m_pInstance)
+            {
+                if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                    m_creature->SetFacingToObject(pLichKing);
+            }
+        }
+    }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_pInstance->GetData(TYPE_LICH_KING) == IN_PROGRESS && !m_bIsIntroStarted)
-        {
-            m_bIsIntroStarted = true;
-            m_bIsIntroFinished = false;
-            NextStep();
-        }
+        if (!m_bIsEventStarted)
+            return;
 
-        if (m_creature->GetHealthPercent() <= 10.0f && !m_bIsOutroStarted)
+        if (m_uiEventStep >= 23)
         {
-            m_bIsOutroStarted = true;
-            NextStep();
-        }
-
-        if (m_bIsIntroStarted && !m_bIsIntroFinished)
-        {
-            if (m_uiNextEventTimer <= uiDiff)
+            if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
             {
-                switch (m_uiEventStep)
-                {
+                if (pLichKing->GetHealthPercent() > 1.0f) // prevents tirion kills LK
+                    DoMeleeAttackIfReady();
+            }
+        }
+
+        // events
+        if (m_uiEventTimer < uiDiff)
+        {
+            switch(m_uiEventStep)
+            {
                 case 0:
-                    break;
-                case 1:
-                    m_creature->CastSpell(m_creature, SPELL_STAND_UP, true);
-                    NextStep(2000);
-                    break;
-                case 2:
-                    if (Creature* pTemp = m_creature->GetClosestCreatureWithEntry(m_creature, NPC_TIRION, 200.0f))
+                {
+                    if (m_pInstance)
                     {
-                        m_guidTirion = pTemp->GetObjectGuid();
-                        pTemp->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        pTemp->SetWalk(true);
-                        StartMovement(2, pTemp);
-                        NextStep(3000);
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        {
+                            pLichKing->GetMotionMaster()->MovePoint(0, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z);
+                        }
                     }
-                    m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-                    break;
-                case 3:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        m_creature->HandleEmote(EMOTE_STATE_TALK);
-                        pTemp->HandleEmote(EMOTE_STATE_READY2H);
-                        DoScriptText(SAY_INTRO_1, m_creature);
-                        StartMovement(0, m_creature);
-                        NextStep(13500);
-                    }
-                    break;
-                case 4:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        m_creature->HandleEmote(EMOTE_STATE_NONE);
-                        DoScriptText(SAY_INTRO_2, pTemp);
-                        NextStep(9000);
-                    }
-                    break;
-                case 5:
-                    DoScriptText(SAY_INTRO_3, m_creature);
-                    NextStep(8000);
-                    break;
-                case 6:
-                    m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-                    NextStep(3000);
-                    break;
-                case 7:
-                    m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
-                    NextStep(12000);
-                    break;
-                case 8:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        pTemp->HandleEmote(EMOTE_ONESHOT_POINT);
-                        DoScriptText(SAY_INTRO_4, pTemp);
-                        NextStep(4000);
-                        break;
-                    }
-                case 9:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        pTemp->SetWalk(false);
-                        StartMovement(3, pTemp);
-                        NextStep(500);
-                        break;
-                    }
-                case 10:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        m_creature->CastSpell(pTemp, SPELL_ICE_LOCK, true);
-                        NextStep(1500);
-                    }
-                    break;
-                case 11:
-                    m_creature->HandleEmote(EMOTE_STATE_TALK);
-                    DoScriptText(SAY_INTRO_5, m_creature);
-                    NextStep(18000);
-                    break;
-                case 12:
-                    m_creature->GetMotionMaster()->Clear();
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    SetCombatMovement(true);
-                    m_bIsIntroFinished = true;
-                    m_creature->SetInCombatWithZone();
-                    m_creature->SetSpeedRate(MOVE_RUN, 2.0f);
-                    m_creature->SetSpeedRate(MOVE_WALK, 1.17f);
-                    NextStep();
-                    break;
-                case 13:
-                    break;
-                default:
+                    DoCastSpellIfCan(m_creature, SPELL_PLAGUE_AVOIDANCE, CAST_TRIGGERED);
+                    m_creature->GetMotionMaster()->MovePoint(0, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z);
+                    DoLichKingText(SAY_INTRO_1);
+                    NextStep(14000);
                     break;
                 }
-            }
-            else
-                m_uiNextEventTimer -= uiDiff;
-        }
-
-        if (m_bIsOutroStarted)
-        {
-            if (m_uiNextEventTimer <= uiDiff)
-            {
-                switch (m_uiEventStep)
+                case 1:
                 {
-                case 14:
-                    if (m_creature->IsNonMeleeSpellCasted(true))
-                        return;
-
-                    m_creature->CastSpell(m_creature, SPELL_FURY_OF_FROSTMOURNE, false);
-                    m_creature->AttackStop();
-                    SetCombatMovement(false);
-                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    m_creature->SetOrientation(0.0f);
-                    DoScriptText(SAY_OUTRO_1, m_creature);
-                    NextStep(28000);
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
+                    DoScriptText(SAY_INTRO_2, m_creature);
+                    NextStep(7000);
+                    break;
+                }
+                case 2:
+                {
+                    DoLichKingText(SAY_INTRO_3);
+                    NextStep(4000);
+                    break;
+                }
+                case 3:
+                {
+                    DoLichKingEmote(EMOTE_ONESHOT_SHOUT);
+                    NextStep(4000);
+                    break;
+                }
+                case 4:
+                {
+                    DoLichKingEmote(EMOTE_ONESHOT_POINT);
+                    NextStep(4000);
+                    break;
+                }
+                case 5:
+                {
+                    DoLichKingEmote(EMOTE_ONESHOT_SHOUT);
+                    NextStep(10000);
+                    break;
+                }
+                case 6:
+                {
+                    DoScriptText(SAY_INTRO_4, m_creature);
+                    m_creature->HandleEmote(EMOTE_ONESHOT_POINT);
+                    NextStep(4000);
+                    break;
+                }
+                case 7:
+                {
+                    if (m_pInstance)
                     {
-                        m_creature->SetInCombatWith(pTemp);
-                        pTemp->AddThreat(m_creature, 1000.0f);
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        {
+                            m_creature->GetMotionMaster()->MoveChase(pLichKing);
+                            pLichKing->CastSpell(m_creature, SPELL_ICE_LOCK, false);
+                            DoScriptText(SAY_INTRO_5, pLichKing);
+                        }
                     }
-                    m_creature->SetInCombatWithZone();
+                    NextStep(1000);
                     break;
-                case 15:
-                    DoScriptText(SAY_OUTRO_2, m_creature);
-                    NextStep(9000);
+                }
+                case 8:
+                {
+                    if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                    {
+                        pLichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                        pLichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                        pLichKing->SetInCombatWithZone();
+                        m_creature->SetFacingToObject(pLichKing);
+                    }
+
+                    m_bIsEventStarted = false;
+                    NextStep(0);
                     break;
-                case 16:
-                    DoScriptText(SAY_OUTRO_3, m_creature);
+                }
+                case 9:
+                {
+                    // battle with Lich King
+                    break;
+                }
+                // *** ENDING EVENT ***
+                case 10:
+                {
+                    DoLichKingText(SAY_OUTRO_1);
+                    NextStep(27000);
+                    break;
+                }
+                case 11:
+                {
+                    DoLichKingText(SAY_OUTRO_2);
+                    NextStep(10000);
+                    break;
+                }
+                case 12:
+                {
+                    DoLichKingText(SAY_OUTRO_3);
+                    if (m_pInstance)
+                    {
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                            pLichKing->SetFacingToObject(m_creature);
+                    }
                     NextStep(23000);
                     break;
-                case 17:
-                    StartMovement(6, m_creature);
+                }
+                case 13:
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        {
+                            DoScriptText(SAY_OUTRO_4, pLichKing);
+                            pLichKing->GetMotionMaster()->MovePoint(POINT_CENTER_LAND, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z);
+                        }
+                    }
+                    NextStep(27000);
+                    break;
+                }
+                case 14:
+                {
+                    DoLichKingText(SAY_OUTRO_5);
+                    NextStep(12000);
+                    break;
+                }
+                case 15:
+                {
+                    DoScriptText(SAY_OUTRO_6, m_creature);
+                    NextStep(8000);
+                    break;
+                }
+                case 16:
+                {
+                    DoCastSpellIfCan(m_creature, SPELL_LIGHTS_BLESSING, CAST_TRIGGERED);
                     NextStep(5000);
                     break;
+                }
+                case 17:
+                {
+                    m_creature->RemoveAurasDueToSpell(SPELL_ICE_LOCK);
+
+                    // run to Lich King
+                    if (m_pInstance)
+                    {
+                        if (m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        {
+                            m_creature->SetWalk(false);
+                            m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_LAND_TIRION, SpawnLoc[5].x, SpawnLoc[5].y, SpawnLoc[5].z);
+                        }
+                    }
+
+                    NextStep(2000);
+                    break;
+                }
                 case 18:
-                    DoScriptText(SAY_OUTRO_4, m_creature);
-                    m_creature->CastSpell(m_creature, SPELL_RAISE_DEAD, false);
-                    NextStep(28000);
+                {
+                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SPECIALATTACK1H);
+
+                    // wait for arriving at Lich King and attack him
                     break;
+                }
                 case 19:
-                    DoScriptText(SAY_OUTRO_5, m_creature);
-                    NextStep(8000);
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        {
+                            float x, y, z;
+                            pLichKing->GetClosePoint(x, y, z, pLichKing->GetObjectBoundingRadius(), 3.0f, pLichKing->GetOrientation());
+                            pLichKing->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
+                            pLichKing->InterruptNonMeleeSpells(true);
+                            pLichKing->CastSpell(pLichKing, SPELL_FROSTMOURNE_DESPAWN, true);
+                            pLichKing->CastSpell(pLichKing, SPELL_THROW_FROSTMOURNE, false);
+                            //pLichKing->SetStandState(UNIT_STAND_STATE_KNEEL);
+                            pLichKing->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
+                            DoScriptText(SAY_OUTRO_7, pLichKing);
+
+                            if (Creature *pFrostmourne = m_creature->SummonCreature(NPC_FROSTMOURNE, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 7 * DAY * IN_MILLISECONDS))
+                            {
+                                pFrostmourne->CastSpell(pFrostmourne, SPELL_BROKEN_FROSTMOURNE, true);
+                                m_guidFrostmourne = pFrostmourne->GetObjectGuid();
+                            }
+                        }
+                    }
+
+                    NextStep(5000);
                     break;
+                }
                 case 20:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
+                {
+                    DoScriptText(SAY_OUTRO_8, m_creature);
+                    m_creature->GetMotionMaster()->MovePoint(POINT_TELEPORTER_TIRION, SpawnLoc[6].x, SpawnLoc[6].y, SpawnLoc[6].z);
+                    
+                    if (m_pInstance)
                     {
-                        DoScriptText(SAY_OUTRO_6, pTemp);
-                        NextStep(9000);
-                    }
-                    break;
-                case 21:
-                    NextStep(3000);
-                    break;
-                case 22:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        pTemp->CastSpell(pTemp, SPELL_LIGHTS_BLESSING, true);
-                        NextStep(7000);
-                    }
-                    break;
-                case 23:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        pTemp->SetWalk(false);
-                        pTemp->RemoveAurasDueToSpell(SPELL_ICE_LOCK);
-                        pTemp->SetFacingToObject(m_creature);
-                        NextStep(1000);
-                    }
-                    break;
-                case 24:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        StartMovement(2, pTemp);
-                        pTemp->HandleEmote(EMOTE_STATE_READY2H);
-                        NextStep(500);
-                    }
-                    break;
-                case 25:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                      pTemp->GetMotionMaster()->MoveJump(SpawnLoc[5].x, SpawnLoc[5].y, SpawnLoc[5].z, 20.0f, 8.0f);
-                      NextStep(500);
-                    }
-                    break;
-                case 26:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        m_creature->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED);
-                        pTemp->CastSpell(m_creature, SPELL_BOOM_VISUAL, true);
-                        m_creature->CastSpell(m_creature, SPELL_SUMMON_BROKEN_FROSTMOURNE_2, true);
-                        m_creature->CastSpell(m_creature, SPELL_SUMMON_BROKEN_FROSTMOURNE, false);
-                        DoScriptText(SAY_OUTRO_7, m_creature);
-                        pTemp->HandleEmote(EMOTE_ONESHOT_SPECIALATTACK1H);
-                        pTemp->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
-                        NextStep(3000);
-                    }
-                    break;
-                case 27:
-                    NextStep();
-                    break;
-                case 28:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        pTemp->SetFacingToObject(m_creature);
-                        DoScriptText(SAY_OUTRO_8, pTemp);
-                        NextStep(0);
-                    }
-                    break;
-                case 29:
-                    float x, y, z;
-                    if (Unit *pFrostmourne = m_creature->SummonCreature(NPC_FROSTMOURNE_HOLDER, SpawnLoc[6].x - 1, SpawnLoc[6].y, SpawnLoc[6].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 5000))
-                    {
-                        if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
                         {
-                            pFrostmourne->CastSpell(pFrostmourne, SPELL_BROKEN_FROSTMOURNE, true);
-                            pFrostmourne->CastSpell(pFrostmourne, SPELL_FROSTMOURNE_TRIGGER, true);
-                            m_creature->RemoveAurasDueToSpell(SPELL_SUMMON_BROKEN_FROSTMOURNE);
-                            m_creature->RemoveAllAuras();
-                            m_creature->GetPosition(x, y, z);
-                            m_creature->GetMotionMaster()->MovePoint(0, x, y, z + 2.0f);
-                            m_creature->CastSpell(m_creature, SPELL_SOUL_BARRAGE, true);
-                            pTemp->CastSpell(pFrostmourne, SPELL_SUMMON_TERENAS, false);
+                            if (Creature *pFrostmourne = m_pInstance->instance->GetCreature(m_guidFrostmourne))
+                            {
+                                float x, y, z;
+                                pFrostmourne->GetPosition(x, y, z);
+                                pFrostmourne->CastSpell(pFrostmourne, SPELL_FROSTMOURNE_SPIRITS, true);
+                                pLichKing->CastSpell(pLichKing, SPELL_SOUL_BARRAGE, true);
+                                pLichKing->SetWalk(true);
+                                pLichKing->GetMotionMaster()->MovePoint(0, x, y, z + 1.0f);
+                            }
                         }
+                    }
+
+                    NextStep(7000);
+                    break;
+                }
+                case 21:
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        {
+                            float x, y, z;
+                            pLichKing->GetClosePoint(x, y, z, pLichKing->GetObjectBoundingRadius(), 6.0f, pLichKing->GetAngle(m_creature) + 1.0f);
+
+                            if (Creature *pTerenas = m_creature->SummonCreature(NPC_MENETHIL, x, y, z, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                            {
+                                m_guidTerenas = pTerenas->GetObjectGuid();
+                                pTerenas->SetFacingToObject(pLichKing);
+                                DoScriptText(SAY_OUTRO_9, pTerenas);
+                            }
+                        }
+                    }
+
+                    NextStep(10000);
+                    break;
+                }
+                case 22:
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature *pTerenas = m_pInstance->instance->GetCreature(m_guidTerenas))
+                        {
+                            DoScriptText(SAY_OUTRO_10, pTerenas);
+                            pTerenas->CastSpell(pTerenas, SPELL_MASS_RESURRECTION, false);
+                        }
+                    }
+
+                    NextStep(6000);
+                    break;
+                }
+                case 23:
+                {
+                    DoScriptText(SAY_OUTRO_11, m_creature);
+                    if (m_pInstance)
+                    {
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        {
+                            if (Creature *pTerenas = m_pInstance->instance->GetCreature(m_guidTerenas))
+                                pTerenas->AI()->AttackStart(pLichKing);
+
+                            AttackStart(pLichKing);
+                        }
+                    }
+                    NextStep(6000);
+                    break;
+                }
+                case 24:
+                {
+                    DoLichKingText(SAY_OUTRO_12);
+                    NextStep(9000);
+                    break;
+                }
+                case 25:
+                {
+                    DoLichKingText(SAY_OUTRO_13);
+                    NextStep(0);
+                    break;
+                }
+                case 26:
+                {
+                    // wait until Lich King is dead
+                    break;
+                }
+                case 27:
+                {
+                    if (m_pInstance)
+                    {
+                        if (Creature *pFrostmourne = m_pInstance->instance->GetCreature(m_guidFrostmourne))
+                            pFrostmourne->ForcedDespawn(10000);
+
+                        if (Creature *pTerenas = m_pInstance->instance->GetCreature(m_guidTerenas))
+                            pTerenas->ForcedDespawn(10000);
                     }
                     NextStep(8000);
                     break;
-                case 30:
-                    if (Creature* pMenethil = m_creature->GetClosestCreatureWithEntry(m_creature, NPC_MENETHIL, 200.0f))
-                    {
-                        m_guidMenethil = pMenethil->GetObjectGuid();
-                        DoScriptText(SAY_OUTRO_9, pMenethil);
-                    }
-                    NextStep(12000);
-                    break;
-                case 31:
-                    if (Creature *pMenethil = m_creature->GetMap()->GetCreature(m_guidMenethil))
-                    {
-                        DoScriptText(SAY_OUTRO_10, pMenethil);
-                        pMenethil->CastSpell(pMenethil, SPELL_MASS_RESURRECT, false);
-                    }
-                    NextStep(6000);
-                    break;
-                case 32:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        if (Creature *pMenethil = m_creature->GetMap()->GetCreature(m_guidMenethil))
-                        {
-                            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            pTemp->SetInCombatWith(m_creature);
-                            m_creature->SetInCombatWith(m_creature);
-                            pTemp->AI()->AttackStart(m_creature);
-                            pMenethil->AI()->AttackStart(m_creature);
-                            pTemp->GetMotionMaster()->MoveChase(m_creature);
-                        }
-                    }
-                    NextStep(6000);
-                    break;
-                case 33:
-                    DoScriptText(SAY_OUTRO_12, m_creature);
-                    SetCombatMovement(false);
-                    NextStep(12000);
-                    break;
-                case 34:
-                    DoScriptText(SAY_OUTRO_13, m_creature);
-                    NextStep(12000);
-                    break;
-                case 35:
-                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidTirion))
-                    {
-                        if (m_creature->GetHealthPercent() <= 5.0f)
-                        {
-                            DoScriptText(SAY_OUTRO_11, pTemp);
-                            NextStep();
-                        }
-                    }
-                    break;
-                case 36:
-                    break;
-                default:
-                    break;
                 }
-            }
-            else
-                m_uiNextEventTimer -= uiDiff;
-        }
-
-        UpdateFightAI(uiDiff);
-    }
-};
-
-struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public boss_the_lich_king_icc_eventAI
-{
-    boss_the_lich_king_iccAI(Creature* pCreature) : boss_the_lich_king_icc_eventAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-        oldflag = 0;
-        m_bIsFinalPhase = false;
-        m_bIsEnrage = false;
-        m_bInFrostmourne = false;
-        mobsGUIDList.clear();
-        m_uiEventStep = 0;
-        m_uiNextEventTimer = 0;
-        m_uiNecroticPlagueTimer = 30000;
-        m_uiInfestTimer = 20000;
-        m_uiShadowTrapTimer = urand(30000, 35000);
-        m_uiDrudgeGhoulsTimer = 10000;
-        m_uiShamblingHorrorTimer = 20000;
-        m_uiRagingSpiritTimer = 17000;
-        m_uiIceSphereTimer = 2000;
-        m_uiPainAndSufferingTimer = 2000;
-        m_uiDefileTimer = 30000;
-        m_uiValkyrTimer = 45000;
-        m_uiSoulReaperTimer = 30000;
-        m_uiVileSpiritsTimer = 30000;
-        m_uiHarvestSoulTimer = 10000;
-        m_uiEnrageTimer = 15 * MINUTE * IN_MILLISECONDS;
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    Creature* pTirion;
-    Creature* pFrostmourne;
-    std::list<ObjectGuid> mobsGUIDList;
-
-    bool m_bIsFinalPhase;
-    bool m_bIsEnrage;
-    bool m_bInFrostmourne;
-    bool m_bIs25Man;
-    bool m_bIsHeroic;
-
-    Difficulty m_uiMapDifficulty;
-
-    uint32 oldflag;
-
-    uint32 m_uiEventStep;
-    uint32 m_uiNextEventTimer;
-    uint32 m_uiVileSpiritsTimer;
-    uint32 m_uiInfestTimer;
-    uint32 m_uiDrudgeGhoulsTimer;
-    uint32 m_uiShamblingHorrorTimer;
-    uint32 m_uiNecroticPlagueTimer;
-    uint32 m_uiShadowTrapTimer;
-    uint32 m_uiRagingSpiritTimer;
-    uint32 m_uiIceSphereTimer;
-    uint32 m_uiPainAndSufferingTimer;
-    uint32 m_uiDefileTimer;
-    uint32 m_uiValkyrTimer;
-    uint32 m_uiSoulReaperTimer;
-    uint32 m_uiHarvestSoulTimer;
-    uint32 m_uiEnrageTimer;
-
-    void ResetFight()
-    {
-        if(!m_pInstance)
-            return;
-
-        mobsGUIDList.clear();
-        m_uiEventStep = 0;
-        m_uiNextEventTimer = 0;
-        m_uiNecroticPlagueTimer = 30000;
-        m_uiInfestTimer = 20000;
-        m_uiShadowTrapTimer = urand(30000, 35000);
-        m_uiDrudgeGhoulsTimer = 10000;
-        m_uiShamblingHorrorTimer = 20000;
-        m_uiRagingSpiritTimer = 17000;
-        m_uiIceSphereTimer = 2000;
-        m_uiPainAndSufferingTimer = 1500;
-        m_uiDefileTimer = 30000;
-        m_uiValkyrTimer = 45000;
-        m_uiSoulReaperTimer = 30000;
-        m_uiVileSpiritsTimer = 30000;
-        m_uiHarvestSoulTimer = 10000;
-        m_uiEnrageTimer = 15 * MINUTE * IN_MILLISECONDS;
-
-        m_creature->SetOrientation(0.0f);
-        m_pInstance->SetData(TYPE_LICH_KING, NOT_STARTED);
-
-        if (GameObject* pGoBolvarChained = GetClosestGameObjectWithEntry(m_creature, 202437, 100.0f))
-               pGoBolvarChained->Delete();
-
-        m_creature->SummonGameobject(202437, 425.089f, -2123.31f, 1058.68f, 0, 0);
-
-        if (GameObject* pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, 202188, 100.0f))
-               pGoFrostyWind->Delete();
-
-        m_creature->SummonGameobject(202188, 503.62f, -2124.66f, 1036.61f, 0, 0);
-
-        if (oldflag)
-            if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PLATFORM))
-            {
-               pGoFloor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
-               pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,oldflag);
-            }
-
-        if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_1, 100.0f))
-            pGoSnowEdge->SetGoState(GO_STATE_READY);
-
-        if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_2, 100.0f))
-            pGoSnowEdge->SetGoState(GO_STATE_READY);
-
-        if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_3, 100.0f))
-            pGoSnowEdge->SetGoState(GO_STATE_READY);
-
-        if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_4, 100.0f))
-            pGoSnowEdge->SetGoState(GO_STATE_READY);
-
-        if (Creature *pTirion = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
-            pTirion->AI()->EnterEvadeMode();
-    }
-
-    void NextStep(uint32 uiTime = 1000)
-    {
-        ++m_uiEventStep;
-        m_uiNextEventTimer = uiTime;
-    }
-
-    void MovementInform(uint32 type, uint32 id)
-    {
-        if (type != POINT_MOTION_TYPE || !m_bMovementStarted)
-            return;
-
-        if (id)
-        {
-            m_bMovementStarted = false;
-            m_creature->GetMotionMaster()->MovementExpired();
-        }
-    }
-
-    void StartMovement(uint32 id)
-    {
-        m_creature->GetMotionMaster()->Clear();
-        m_creature->GetMotionMaster()->MovePoint(id, SpawnLoc[id].x, SpawnLoc[id].y, SpawnLoc[id].z);
-        m_bMovementStarted = true;
-    }
-
-    void EnterEvadeMode()
-    {
-        if (!m_pInstance)
-            return;
-
-        if (m_pInstance->GetData(TYPE_LICH_KING) == IN_PROGRESS && (m_bIsFinalPhase || m_bInFrostmourne))
-            return;
-
-        DespawnMobs();
-        m_creature->RemoveAllAuras();
-        m_creature->DeleteThreatList();
-        m_creature->CombatStop(true);
-        m_creature->LoadCreatureAddon();
-        m_bIsFinalPhase = false;
-        m_bInFrostmourne = false;
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_pInstance->SetData(TYPE_LICH_KING, FAIL);
-        if (m_creature->isAlive())
-            m_creature->GetMotionMaster()->MoveTargetedHome();
-
-        m_creature->SetLootRecipient(NULL);
-
-        ResetFight();
-    }
-
-    void KilledUnit(Unit* pVictim)
-    {
-        if (m_bIsFinalPhase)
-            return;
-
-        DoScriptText(SAY_SLAY_1 - urand(0, 1), m_creature, pVictim);
-    }
-
-    void JustReachedHome()
-    {
-        if (!m_pInstance)
-            return;
-
-        m_pInstance->SetData(TYPE_LICH_KING, FAIL);
-        m_bIsFinalPhase = false;
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-        if (Creature *pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
-            pTemp->AI()->EnterEvadeMode();
-    }
-
-    void JustSummoned(Creature* pSummoned)
-    {
-        if(!m_pInstance || !pSummoned)
-            return;
-
-        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))  // Should be 1, 0 its for debug
-        {
-           pSummoned->SetInCombatWith(pTarget);
-           pSummoned->AddThreat(pTarget, 100.0f);
-        }
-
-        mobsGUIDList.push_back(pSummoned->GetObjectGuid());
-    }
-
-    void DespawnMobs()
-    {
-        if (mobsGUIDList.empty())
-            return;
-
-        for(std::list<ObjectGuid>::iterator itr = mobsGUIDList.begin(); itr != mobsGUIDList.end(); ++itr)
-        {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
-            {
-                if (pTemp->isAlive())
+                case 28:
                 {
-                    pTemp->DeleteThreatList();
-                    pTemp->CombatStop(true);
-                    pTemp->DealDamage(pTemp, pTemp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    // play cinematic
+                    if (m_pInstance)
+                    {
+                        Map::PlayerList const &list = m_pInstance->instance->GetPlayers();
+                        for(Map::PlayerList::const_iterator itr = list.begin(); itr != list.end(); ++itr)
+                        {
+                            itr->getSource()->SendMovieStart(FINAL_ARTHAS_MOVIE);
+                        }
+                    }
+                    NextStep(0);
+                    break;
                 }
-            }
-        }
-        mobsGUIDList.clear();
-    }
-
-
-    void Aggro(Unit* pWho)
-    {
-        if (!m_pInstance)
-            return;
-
-        DoScriptText(SAY_AGGRO, m_creature);
-        m_pInstance->SetData(TYPE_LICH_KING, IN_PROGRESS);
-        DoPlaySoundToSet(m_creature, 17458);
-    }
-
-    void JustDied(Unit *killer)
-    {
-        if(!m_pInstance)
-            return;
-
-        float x, y, z;
-        m_creature->GetPosition(x, y, z);
-        m_creature->GetMotionMaster()->MovePoint(0, x, y, z - 2.0f);
-
-        DoScriptText(SAY_OUTRO_14, m_creature);
-        m_pInstance->SetData(TYPE_LICH_KING, DONE);
-
-        DespawnMobs();
-
-    }
-
-    void UpdateFightAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (!m_pInstance)
-            return;
-
-        if (!m_creature->SelectHostileTarget() && !m_bIsFinalPhase && !m_bInFrostmourne)
-        {
-            m_pInstance->SetData(TYPE_LICH_KING, FAIL);
-            EnterEvadeMode();
-            return;
-        }
-
-        if (m_uiEnrageTimer < uiDiff && !m_bIsEnrage && !m_bIsFinalPhase)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-            {
-                m_uiEnrageTimer = 15*MINUTE*IN_MILLISECONDS;
-                m_bIsEnrage = true;
-            }
-        }
-        else m_uiEnrageTimer -= uiDiff;
-
-        if (m_uiNextEventTimer <= uiDiff)
-        {
-            switch (m_uiEventStep)
-            {
-            case 0: // Phase 1
-
-                    // Infest
-                    if (m_uiInfestTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature, SPELL_INFEST) == CAST_OK)
-                            m_uiInfestTimer = 30000;
-                    }
-                    else m_uiInfestTimer -= uiDiff;
-
-                    // Drudge Ghouls
-                    if (m_uiDrudgeGhoulsTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_DRUDGE_GHOULS) == CAST_OK)
-                            m_uiDrudgeGhoulsTimer = urand (20000, 22000);
-                    }
-                    else m_uiDrudgeGhoulsTimer -= uiDiff;
-
-                    // Shambling Horror
-                    if (m_uiShamblingHorrorTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_SHAMBLING_HORROR) == CAST_OK)
-                            m_uiShamblingHorrorTimer = 60000;
-                    }
-                    else m_uiShamblingHorrorTimer -= uiDiff;
-
-                    // Necrotic Plague                 
-                    if (m_uiNecroticPlagueTimer < uiDiff)
-                    {
-                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                        {
-                            if (DoCastSpellIfCan(pTarget,SPELL_NECROTIC_PLAGUE) == CAST_OK)
-                                m_uiNecroticPlagueTimer = urand(30000, 35000);
-                        }
-                    }
-                    else m_uiNecroticPlagueTimer -= uiDiff;
-
-                    // Shadow Trap (only hero)
-                    if (m_bIsHeroic)
-                    {
-                        if (m_uiShadowTrapTimer < uiDiff)
-                        {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget,SPELL_SUMMON_SHADOW_TRAP) == CAST_OK)
-                                    m_uiShadowTrapTimer = urand(30000, 35000);
-                            }
-                        }
-                        else m_uiShadowTrapTimer -= uiDiff;
-                    }
-
-                    if (m_creature->GetHealthPercent() < 70.0f)
-                    {
-                        NextStep();
-                    }
-
-                    DoMeleeAttackIfReady();
-                    break;
-
-            case 1: // Go in transition phase
-                    if (m_creature->IsNonMeleeSpellCasted(true))
-                        return;
-
-                    DoPlaySoundToSet(m_creature, 17459);
-                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    SetCombatMovement(false);
-                    StartMovement(1);
-                    NextStep();
-                    break;
-            case 2:
-                    if (m_bMovementStarted)
-                        return;
-
-                    m_creature->CastSpell(m_creature, SPELL_REMORSELESS_WINTER, false);
-
-                    DoScriptText(SAY_REMORSELESS_WINTER, m_creature);
-                    NextStep(3000);
-                    break;
-            case 3:
-                    if (m_creature->IsNonMeleeSpellCasted(true))
-                        return;
-
-                    if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_1, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
-
-                    if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_2, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
-
-                    if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_3, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
-
-                    if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_ICESHARD_4, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
-
-                    NextStep();
-                    break;
-            case 4:
-                    // Raging Spirit
-                    if (m_uiRagingSpiritTimer < uiDiff)
-                    {
-                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                        {
-                            if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_RAGING_SPIRIT) == CAST_OK)
-                                m_uiRagingSpiritTimer = 17000;
-                        }
-                    }
-                    else m_uiRagingSpiritTimer -= uiDiff;
-
-                    // Ice Sphere
-                    if (m_uiIceSphereTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_ICE_SPHERE) == CAST_OK)
-                            m_uiIceSphereTimer = 6000;
-                    }
-                    else m_uiIceSphereTimer -= uiDiff;
-
-                    // Pain And Suffering
-                    if (m_uiPainAndSufferingTimer < uiDiff)
-                    {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                        {
-                            if (DoCastSpellIfCan(pTarget, SPELL_PAIN_AND_SUFFERING) == CAST_OK)
-                                m_uiPainAndSufferingTimer = 1500;
-                        }
-                    }
-                    else m_uiPainAndSufferingTimer -= uiDiff;
-
-                    if (!m_creature->HasAuraOfDifficulty(SPELL_REMORSELESS_WINTER))
-                    {
-                        DoScriptText(SAY_SHATTER_ARENA, m_creature);
-                        m_creature->CastSpell(m_creature, SPELL_QUAKE, false);
-
-                        if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
-                            pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
-
-                        if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
-                            pGoFrostyWind->SetGoState(GO_STATE_ACTIVE);
-
-                        NextStep(8000);
-                    }
-                    break;
-
-            case 5: // Platform destruct
-                    if (m_creature->IsNonMeleeSpellCasted(true))
-                        return;
-
-                    if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PLATFORM))
-                    {
-                         pGoFloor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
-                         oldflag = pGoFloor->GetUInt32Value(GAMEOBJECT_BYTES_1);
-                         pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,8449);
-                    }
-
-                    if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PRECIPICE))
-                    {
-                         pGoFloor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
-                         oldflag = pGoFloor->GetUInt32Value(GAMEOBJECT_BYTES_1);
-                         pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,8449);
-                    }
-
-                    m_pInstance->DoUseDoorOrButton(GO_ARTHAS_PRECIPICE);
-
-                    if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_READY);
-
-                    if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
-                        pGoFrostyWind->SetGoState(GO_STATE_READY);
-
-                    m_creature->GetMotionMaster()->Clear();
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    SetCombatMovement(true);
-                    NextStep();
-                    break;
-
-            case 6: // Phase 2
-
-                    // Defile
-                    if (m_uiDefileTimer < uiDiff)
-                    {
-                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                        {
-                            if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_DEFILE) == CAST_OK)
-                            {
-                                DoScriptText(SAY_DEFILE, m_creature);
-                                m_uiDefileTimer = 30000;
-                            }
-                        }
-                    }
-                    else m_uiDefileTimer -= uiDiff;
-
-                    // Soul Reaper
-                    if (m_uiSoulReaperTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_REAPER) == CAST_OK)
-                            m_uiSoulReaperTimer = 30000;
-                    }
-                    else m_uiSoulReaperTimer -= uiDiff;
-
-                    // Valkyr
-                    if (m_uiValkyrTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_SUMMON_VALKYR_25 : SPELL_SUMMON_VALKYR_10) == CAST_OK)
-                        {
-                            m_uiValkyrTimer = 45000;
-                            DoScriptText(SAY_SUMMON_VALKYR,m_creature);
-                        }
-                    }
-                    else m_uiValkyrTimer -= uiDiff;
-
-                    // Infest          
-                    if (m_uiInfestTimer < uiDiff)
-                    {
-                            if (DoCastSpellIfCan(m_creature, SPELL_INFEST) == CAST_OK)
-                                m_uiInfestTimer = 30000;
-                    }
-                    else m_uiInfestTimer -= uiDiff;
-
-                    if (m_creature->GetHealthPercent() < 40.0f)
-                    {
-                        NextStep();
-                    }
-
-                    DoMeleeAttackIfReady();
-                    break;
-            case 7:           // Go in transition phase
-                    if (m_creature->IsNonMeleeSpellCasted(true))
-                        return;
-
-                    DoPlaySoundToSet(m_creature, 17459);
-                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    SetCombatMovement(false);
-                    StartMovement(1);
-                    NextStep();
-                    break;
-            case 8:
-                    if (m_bMovementStarted)
-                        return;
-
-                    m_creature->CastSpell(m_creature, SPELL_REMORSELESS_WINTER, false);
-
-                    DoScriptText(SAY_REMORSELESS_WINTER, m_creature);
-                    NextStep(2500);
-                    break;
-            case 9:         // Platform restore
-                    if (m_creature->IsNonMeleeSpellCasted(true))
-                        return;
-
-                    if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PLATFORM))
-                    {
-                        pGoFloor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
-                        pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,oldflag);
-                    }
-
-                    if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_READY);
-
-                    m_pInstance->DoUseDoorOrButton(GO_ARTHAS_PRECIPICE);
-
-                    NextStep();
-                    break;
-            case 10:
-                    // Raging Spirit
-                    if (m_uiRagingSpiritTimer < uiDiff)
-                    {
-                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                        {
-                            if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_RAGING_SPIRIT) == CAST_OK)
-                                m_uiRagingSpiritTimer = 17000;
-                        }
-                    }
-                    else m_uiRagingSpiritTimer -= uiDiff;
-
-                    // Ice Sphere
-                    if (m_uiIceSphereTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_ICE_SPHERE) == CAST_OK)
-                            m_uiIceSphereTimer = 6000;
-                    }
-                    else m_uiIceSphereTimer -= uiDiff;
-
-                    // Pain And Suffering
-                    if (m_uiPainAndSufferingTimer < uiDiff)
-                    {
-                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                        {
-                            if (DoCastSpellIfCan(pTarget, SPELL_PAIN_AND_SUFFERING) == CAST_OK)
-                                m_uiPainAndSufferingTimer = 1500;
-                        }
-                    }
-                    else m_uiPainAndSufferingTimer -= uiDiff;
-
-                    if (!m_creature->HasAuraOfDifficulty(SPELL_REMORSELESS_WINTER))
-                    {
-                        DoScriptText(SAY_SHATTER_ARENA, m_creature);
-                        m_creature->CastSpell(m_creature, SPELL_QUAKE, false);
-
-                        if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
-                            pGoSnowEdge->SetGoState(GO_STATE_ACTIVE);
-
-                        if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
-                            pGoFrostyWind->SetGoState(GO_STATE_ACTIVE);
-
-                        NextStep(0);
-                    }
-                    break;
-            case 11:           // Platform destruct
-                    if (m_creature->IsNonMeleeSpellCasted(true))
-                        return;
-
-                    if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PLATFORM))
-                    {
-                         pGoFloor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
-                         oldflag = pGoFloor->GetUInt32Value(GAMEOBJECT_BYTES_1);
-                         pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,8449);
-                    }
-
-                    if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PRECIPICE))
-                    {
-                         pGoFloor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
-                         oldflag = pGoFloor->GetUInt32Value(GAMEOBJECT_BYTES_1);
-                         pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1,8449);
-                    }
-
-                    m_pInstance->DoUseDoorOrButton(GO_ARTHAS_PRECIPICE);
-
-                    if (GameObject *pGoSnowEdge = GetClosestGameObjectWithEntry(m_creature, GO_SNOW_EDGE, 100.0f))
-                        pGoSnowEdge->SetGoState(GO_STATE_READY);
-
-                    if (GameObject *pGoFrostyWind = GetClosestGameObjectWithEntry(m_creature, GO_FROSTY_WIND, 100.0f))
-                        pGoFrostyWind->SetGoState(GO_STATE_READY);
-
-                    m_creature->GetMotionMaster()->Clear();
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    SetCombatMovement(true);
-                    NextStep();
-                    break;
-            case 12:           // Phase 3
-
-                    // Defile
-                    if (m_uiDefileTimer < uiDiff)
-                    {
-                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                        {
-                            if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_DEFILE) == CAST_OK)
-                            {
-                                DoScriptText(SAY_DEFILE, m_creature);
-                                m_uiDefileTimer = 30000;
-                            }
-                        }
-                    }
-                    else m_uiDefileTimer -= uiDiff;
-
-                    // Soul Reaper
-                    if (m_uiSoulReaperTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_REAPER) == CAST_OK)
-                            m_uiSoulReaperTimer = 30000;
-                    }
-                    else m_uiSoulReaperTimer -= uiDiff;
-
-                    // Harvest Soul
-                    if (m_uiHarvestSoulTimer < uiDiff)
-                    {
-                        if (m_bIsHeroic)
-                        {
-                            if (DoCastSpellIfCan(m_creature, SPELL_HARVEST_SOULS) == CAST_OK)
-                            {
-                                m_bInFrostmourne = true;
-                                m_uiHarvestSoulTimer = 70000;
-                                DoScriptText(SAY_HARVEST_SOUL,m_creature);
-                            }
-                        }
-                        if (!m_bIsHeroic)
-                        {
-                            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                            {
-                                if (DoCastSpellIfCan(pTarget, SPELL_HARVEST_SOUL) == CAST_OK)
-                                {
-                                    m_bInFrostmourne = true;
-                                    m_uiHarvestSoulTimer = 70000;
-                                    DoScriptText(SAY_HARVEST_SOUL,m_creature);
-                                }
-                            }
-                        }
-                    }
-                    else m_uiHarvestSoulTimer -= uiDiff;         
-
-                    /*// Vile Spirits
-                    if (m_uiVileSpiritsTimer < uiDiff)
-                    {
-                        if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_VILE_SPIRITS) == CAST_OK)
-                            m_uiVileSpiritsTimer = 30000;
-                    }
-                    else
-                        m_uiVileSpiritsTimer -= uiDiff;*/
-
-                    if (m_creature->SelectHostileTarget() || m_creature->getVictim())
-                        m_bInFrostmourne = false;
-
-                    DoMeleeAttackIfReady();
-
-                    if (m_creature->GetHealthPercent() < 10.0f)
-                    {
-                        m_bIsFinalPhase = true;
-                        m_bInFrostmourne = false;
-                        NextStep();
-                    }
-                    break;
-            case 13:           // Ending Phase start
-                    break;
             }
         }
         else
-            m_uiNextEventTimer -= uiDiff;
+            m_uiEventTimer -= uiDiff;
     }
-};
-
-
-CreatureAI* GetAI_boss_the_lich_king_icc(Creature* pCreature)
-{
-    return new boss_the_lich_king_iccAI(pCreature);
-};
-
-struct MANGOS_DLL_DECL boss_tirion_iccAI : public ScriptedAI
-{
-    boss_tirion_iccAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    uint32 nextEvent;
-    uint32 nextPoint;
-    uint32 m_uiEventStep;
-    uint32 m_uiNextEventTimer;
-    bool m_bMovementStarted;
-    bool m_bTirionStarted;
-    ObjectGuid m_guidLichKing;
-
-    void EnterEvadeMode()
-    {
-        if (!m_pInstance)
-            return;
-        if (m_pInstance->GetData(TYPE_LICH_KING) == IN_PROGRESS)
-            return;
-    }
-
-    void Reset()
-    {
-        if(!m_pInstance)
-            return;
-        m_bMovementStarted = false;
-        m_bTirionStarted = false;
-        m_uiEventStep = 0;
-        m_uiNextEventTimer = 0;
-        m_creature->RemoveAurasDueToSpell(SPELL_ICE_LOCK);
-        m_creature->SetOrientation(M_PI_F);
-        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE,EMOTE_STATE_NONE);
-        SetCombatMovement(false);
-    }
-
-    void NextStep(uint32 uiTime = 1000)
-    {
-        ++m_uiEventStep;
-        m_uiNextEventTimer = uiTime;
-    }
-
-    void MovementInform(uint32 type, uint32 id)
-    {
-        if (type != POINT_MOTION_TYPE || !m_bMovementStarted)
-            return;
-
-        if (id)
-        {
-            m_bMovementStarted = false;
-            m_creature->GetMotionMaster()->MovementExpired();
-        }
-    }
-
-    void StartMovement(uint32 id)
-    {
-        m_creature->GetMotionMaster()->Clear();
-        m_creature->GetMotionMaster()->MovePoint(id, SpawnLoc[id].x, SpawnLoc[id].y, SpawnLoc[id].z);
-        m_bMovementStarted = true;
-    }
-
-    void doSendCinematic()
-    {
-        Map::PlayerList const &pList = m_creature->GetMap()->GetPlayers();
-        if (pList.isEmpty()) return;
-        for (Map::PlayerList::const_iterator i = pList.begin(); i != pList.end(); ++i)
-             if (Player* pPlayer = i->getSource())
-                 if (pPlayer && pPlayer->isAlive() && pPlayer->IsInMap(m_creature))
-                     pPlayer->SendMovieStart(FINAL_ARTHAS_MOVIE);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_pInstance->GetData(TYPE_LICH_KING) == FAIL && m_creature->HasAura(SPELL_ICE_LOCK))
-        {
-            m_creature->RemoveAurasDueToSpell(SPELL_ICE_LOCK);
-            m_creature->GetMotionMaster()->MoveTargetedHome();
-            Reset();
-        }
-
-        if (m_pInstance->GetData(TYPE_LICH_KING) == DONE && !m_bTirionStarted)
-        {
-            m_bTirionStarted = true;
-            NextStep();
-        }
-
-        if (m_uiNextEventTimer <= uiDiff && m_bTirionStarted)
-        {
-            switch (m_uiEventStep)
-            {
-            case 0:
-                break;
-            case 1:
-                if (Unit* pTemp = m_creature->GetClosestCreatureWithEntry(m_creature, NPC_LICH_KING, 200.0f))
-                {
-                    m_guidLichKing = pTemp->GetObjectGuid();
-                    m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                    pTemp->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                }
-                NextStep(5000);
-                break;
-            case 2:
-                if (GameObject* pGoBolvarUnchained = GetClosestGameObjectWithEntry(m_creature, 202437, 100.0f))
-                    pGoBolvarUnchained->Delete();
-
-                m_creature->SummonGameobject(202438, 425.089f, -2123.31f, 1058.68f, 0, 0);
-                m_creature->SummonGameobject(202436, 426.56f, -2123.86f, 1064.89f, -3.12412f, 0);
-                doSendCinematic();
-                NextStep(230000);
-                break;
-            case 3:
-                if (Creature* pMenethil = m_creature->GetClosestCreatureWithEntry(m_creature, NPC_MENETHIL, 200.0f))
-                {
-                    if (pMenethil->isAlive())
-                        pMenethil->ForcedDespawn();
-                }
-
-                if (Creature *pTemp = m_creature->GetMap()->GetCreature(m_guidLichKing))
-                {
-                    pTemp->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-                }
-                NextStep(20000);
-                EnterEvadeMode();
-                break;
-            case 4:
-                break;
-            default:
-                break;
-            }
-        }
-        else
-            m_uiNextEventTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-bool GossipHello_boss_tirion_icc(Player* pPlayer, Creature* pCreature)
-{
-    ScriptedInstance* m_pInstance;
-    m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
-    if (m_pInstance->GetData(TYPE_LICH_KING) != NOT_STARTED &&
-        m_pInstance->GetData(TYPE_LICH_KING) != FAIL )
-    {
-        pPlayer->PlayerTalkClass->SendGossipMenu(721002, pCreature->GetObjectGuid());
-        return true;
-    };
-
-    pPlayer->ADD_GOSSIP_ITEM_ID(GOSSIP_ICON_CHAT, -3631608, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-    pPlayer->PlayerTalkClass->SendGossipMenu(721001, pCreature->GetObjectGuid());
-    return true;
-};
-
-bool GossipSelect_boss_tirion_icc(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    ScriptedInstance* m_pInstance;
-    m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-    if (!m_pInstance) return false;
-
-    if (uiAction == GOSSIP_ACTION_INFO_DEF)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        m_pInstance->SetData(TYPE_LICH_KING, IN_PROGRESS);
-        return true;
-    } else return false;
 };
 
 CreatureAI* GetAI_boss_tirion_icc(Creature* pCreature)
 {
     return new boss_tirion_iccAI(pCreature);
-};
+}
 
-struct MANGOS_DLL_DECL  mob_ice_sphere_iccAI : public ScriptedAI
+bool GossipHello_boss_tirion_icc(Player* pPlayer, Creature* pCreature)
 {
-    mob_ice_sphere_iccAI(Creature *pCreature) : ScriptedAI(pCreature)
+    ScriptedInstance* pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+
+    if (!pInstance)
+        return true;
+
+    if (pInstance->GetData(TYPE_LICH_KING) != NOT_STARTED &&
+        pInstance->GetData(TYPE_LICH_KING) != FAIL )
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-        Reset();
+        return false;
     }
 
-    ScriptedInstance *m_pInstance;
-    uint32 m_uiVisualTimer;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIs25Man;
-    bool m_bIsHeroic;
-    bool m_bSkin;
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_TIRION_START_EVENT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
+    return true;
+}
+
+bool GossipSelect_boss_tirion_icc(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    if (uiAction == GOSSIP_ACTION_INFO_DEF)
+    {
+        pPlayer->CLOSE_GOSSIP_MENU();
+
+        if (boss_tirion_iccAI *pTirionAI = dynamic_cast<boss_tirion_iccAI*>(pCreature->AI()))
+            pTirionAI->DoStartEvent();
+
+        return true;
+    }
+    else
+        return false;
+}
+
+
+/**
+ * The Lich King
+ */
+struct MANGOS_DLL_DECL boss_the_lich_king_iccAI : public base_icc_bossAI
+{
+    boss_the_lich_king_iccAI(Creature* pCreature) : base_icc_bossAI(pCreature)
+    {
+        Reset();
+        m_uiPlatformOriginalFlag = 0;
+        m_bPillarsDestroyed = false;
+        m_bIsFirstAttempt = true;
+    }
+
+    uint32 m_uiPhase;
+    uint32 m_uiPhaseTimer;
+    uint32 m_uiBerserkTimer;
+    uint32 m_uiGhoulsTimer;
+    uint32 m_uiHorrorTimer;
+    uint32 m_uiNecroticPlagueTimer;
+    uint32 m_uiInfestTimer;
+    uint32 m_uiShadowTrapTimer;
+    uint32 m_uiPainSufferingTimer;
+    uint32 m_uiRagingSpiritTimer;
+    uint32 m_uiIceSphereTimer;
+    uint32 m_uiValkyrTimer;
+    uint32 m_uiDefileTimer;
+    uint32 m_uiSoulReaperTimer;
+    uint32 m_uiHarvestSoulTimer;
+    uint32 m_uiFrostmournePhaseTimer;
+    uint32 m_uiVileSpiritsTimer;
+
+    uint32 m_uiPlatformOriginalFlag;
+    uint32 m_uiRespawnPlatformTimer;
+    uint32 m_uiDestroyPillarsTimer;
+    bool m_bPillarsDestroyed;
+    bool m_bPlatformDestroyed;
+    bool m_bIsFirstAttempt;
 
     void Reset()
     {
+        m_uiPhase               = PHASE_INTRO;
+        m_uiBerserkTimer        = 15 * MINUTE * IN_MILLISECONDS;
+        m_uiGhoulsTimer         = 13000;
+        m_uiHorrorTimer         = 21000;
+        m_uiInfestTimer         = 20000;
+        m_uiNecroticPlagueTimer = 26000;
+        m_uiShadowTrapTimer     = 15000;
+        m_uiPainSufferingTimer  = 6000;
+        m_uiRagingSpiritTimer   = 20000;
+        m_uiIceSphereTimer      = 6000;
+        m_uiValkyrTimer         = 10000;
+        m_uiDefileTimer         = 30000;
+        m_uiSoulReaperTimer     = 25000;
+        m_uiHarvestSoulTimer    = 5000;
+        m_uiVileSpiritsTimer    = 20000;
+        m_uiDestroyPillarsTimer = 3000;
+        m_uiRespawnPlatformTimer= 3000;
+
+        DoRespawnPlatform();
+        SetCombatMovement(true);
+    }
+
+    void Aggro(Unit *pWho)
+    {
+        if (!m_bIsFirstAttempt)
+            DoScriptText(SAY_AGGRO, m_creature); // say aggro if this is another attempt
+
+        m_uiPhase = PHASE_ONE;
+
+        m_creature->SetWalk(false);
+        m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+        m_creature->SetStandState(UNIT_STAND_STATE_STAND);
+        DoCastSpellIfCan(m_creature, SPELL_PLAGUE_AVOIDANCE, CAST_TRIGGERED);
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_LICH_KING, IN_PROGRESS);
+    }
+
+    void KilledUnit(Unit *pWho)
+    {
+        if (pWho->GetTypeId() == TYPEID_PLAYER && m_uiPhase != PHASE_DEATH_AWAITS)
+            DoScriptText(SAY_SLAY_1 - urand(0, 1), m_creature);
+    }
+
+    void JustDied(Unit *pKiller)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_LICH_KING, DONE);
+
+        DoScriptText(SAY_OUTRO_14, m_creature);
+
+        // finish event, after around 8 seconds play cinematic
+        if (m_pInstance)
+        {
+            if (Creature *pTirion = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
+            {
+                if (boss_tirion_iccAI *pTirionAI = dynamic_cast<boss_tirion_iccAI*>(pTirion->AI()))
+                    pTirionAI->DoFinishEvent();
+            }
+        }
+    }
+
+    void JustReachedHome()
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_LICH_KING, FAIL);
+
+        if (Creature *pTirion = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
+        {
+            if (boss_tirion_iccAI *pTirionAI = dynamic_cast<boss_tirion_iccAI*>(pTirion->AI()))
+                pTirionAI->EnterEvadeMode();
+        }
+
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SIT);
+        m_creature->SetStandState(UNIT_STAND_STATE_SIT);
+
+        m_bIsFirstAttempt = false;
+    }
+
+    void JustSummoned(Creature *pSummoned)
+    {
+        if (pSummoned->GetEntry() == NPC_ICE_SPHERE)
+        {
+            pSummoned->SetInCombatWithZone();
+
+            if (Unit *pTarget = SelectTargetForIceSphere())
+            {
+                pSummoned->AddThreat(pTarget, 100000.0f);
+                pSummoned->AI()->AttackStart(pTarget);
+                pSummoned->CastSpell(pSummoned, SPELL_ICE_BURST_AURA, true);
+                pSummoned->CastSpell(pTarget, SPELL_ICE_PULSE, true);
+            }
+        }
+    }
+
+    void MovementInform(uint32 uiMovementType, uint32 uiData)
+    {
+        if (uiMovementType != POINT_MOTION_TYPE)
+            return;
+
+        switch(uiData)
+        {
+            case POINT_CENTER_LAND:
+            {
+                if (m_uiPhase == PHASE_RUNNING_WINTER_ONE)
+                {
+                    DoScriptText(SAY_REMORSELESS_WINTER, m_creature);
+                    DoCastSpellIfCan(m_creature, SPELL_REMORSELESS_WINTER_1);
+                    m_uiPhase = PHASE_TRANSITION_ONE;
+                    m_uiPhaseTimer          = 62000;
+                    // set phase initial timers
+                    m_uiPainSufferingTimer  = 6000;
+                    m_uiRagingSpiritTimer   = 20000;
+                    m_uiIceSphereTimer      = 6000;
+
+                    // on heroic despawn Shadow Traps
+                    if (m_bIsHeroic)
+                        DoDespawnShadowTraps();
+                }
+                else if (m_uiPhase == PHASE_RUNNING_WINTER_TWO)
+                {
+                    DoScriptText(SAY_REMORSELESS_WINTER, m_creature);
+                    DoCastSpellIfCan(m_creature, SPELL_REMORSELESS_WINTER_2);
+                    m_uiRespawnPlatformTimer = 3000; // respawn platform after spell is cast
+                    m_uiPhase = PHASE_TRANSITION_TWO;
+                    m_uiPhaseTimer          = 62000;
+                    // set phase initial timers
+                    m_uiPainSufferingTimer  = 6000;
+                    m_uiRagingSpiritTimer   = 15000;
+                    m_uiIceSphereTimer      = 6000;
+                }
+                else if (m_uiPhase == PHASE_DEATH_AWAITS)
+                {
+                    DoCastSpellIfCan(m_creature, SPELL_RAISE_DEAD);
+                }
+
+                break;
+            }
+        }
+    }
+
+    void DoDestroyPillars()
+    {
+        if (m_pInstance)
+        {
+            if (GameObject *pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_ICESHARD_1))
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            if (GameObject *pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_ICESHARD_2))
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            if (GameObject *pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_ICESHARD_3))
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            if (GameObject *pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_ICESHARD_4))
+                pGo->SetGoState(GO_STATE_ACTIVE);
+        }
+    }
+
+    void DoDestroyPlatform()
+    {
+        if (!m_pInstance)
+            return;
+
+        if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PLATFORM))
+        {
+             pGoFloor->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
+             m_uiPlatformOriginalFlag = pGoFloor->GetUInt32Value(GAMEOBJECT_BYTES_1);
+             pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1, 8449);
+        }
+
+        if (GameObject *pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_FROSTY_WIND))
+            pGo->SetGoState(GO_STATE_READY);
+        if (GameObject *pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_SNOW_EDGE))
+            pGo->SetGoState(GO_STATE_READY);
+
+        m_bPlatformDestroyed = true;
+    }
+
+    void DoRespawnPlatform()
+    {
+        if (!m_pInstance)
+            return;
+
+        if (GameObject* pGoFloor = m_pInstance->GetSingleGameObjectFromStorage(GO_ARTHAS_PLATFORM))
+        {
+            pGoFloor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DAMAGED | GO_FLAG_NODESPAWN);
+            pGoFloor->SetUInt32Value(GAMEOBJECT_BYTES_1, m_uiPlatformOriginalFlag);
+        }
+
+        if (GameObject* pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_FROSTY_WIND))
+            pGo->SetGoState(GO_STATE_ACTIVE);
+
+        m_bPlatformDestroyed = false;
+    }
+
+    void DoDespawnShadowTraps()
+    {
+        std::list<Creature*> lTraps;
+        GetCreatureListWithEntryInGrid(lTraps, m_creature, NPC_SHADOW_TRAP, 120.0f);
+        if (!lTraps.empty())
+        {
+            for(std::list<Creature*>::iterator i = lTraps.begin(); i != lTraps.end();)
+            {
+                std::list<Creature*>::iterator next = i;
+                ++next;
+                if (*i)
+                    (*i)->ForcedDespawn();
+
+                i = next;
+            }
+        }
+    }
+
+    void DoDespawnValkyrs()
+    {
+        std::list<Creature*> lValkyrs;
+        GetCreatureListWithEntryInGrid(lValkyrs, m_creature, NPC_VALKYR_SHADOWGUARD, 120.0f);
+        if (!lValkyrs.empty())
+        {
+            for(std::list<Creature*>::iterator i = lValkyrs.begin(); i != lValkyrs.end();)
+            {
+                std::list<Creature*>::iterator next = i;
+                ++next;
+                if (*i)
+                    (*i)->ForcedDespawn();
+
+                i = next;
+            }
+        }
+    }
+
+    Unit* SelectTargetForIceSphere()
+    {
+        std::list<ObjectGuid> lPotentialTargets;
+        const ThreatList &threatList = m_creature->getThreatManager().getThreatList();
+        for (ThreatList::const_iterator itr = threatList.begin();itr != threatList.end(); ++itr)
+        {
+            if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            {
+                if (!pVictim->HasAuraOfDifficulty(SPELL_ICE_PULSE))
+                    lPotentialTargets.push_back((*itr)->getUnitGuid());
+            }
+        }
+
+        if (!lPotentialTargets.empty())
+        {
+            std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
+            std::advance(i, urand(0, lPotentialTargets.size() - 1));
+            return m_creature->GetMap()->GetUnit(*i);
+        }
+        else
+            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_ICE_PULSE, SELECT_FLAG_PLAYER);
+    }
+
+    Unit* SelectTargetForNecroticPlague()
+    {
+        std::list<ObjectGuid> lPotentialTargets;
+        const ThreatList &threatList = m_creature->getThreatManager().getThreatList();
+        for (ThreatList::const_iterator itr = threatList.begin();itr != threatList.end(); ++itr)
+        {
+            if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            {
+                if (pVictim != m_creature->getVictim() &&
+                    !pVictim->HasAuraOfDifficulty(SPELL_NECROTIC_PLAGUE) &&
+                    !pVictim->HasAuraOfDifficulty(SPELL_NECROTIC_PLAGUE_STACK))
+                {
+                    lPotentialTargets.push_back((*itr)->getUnitGuid());
+                }
+            }
+        }
+
+        if (!lPotentialTargets.empty())
+        {
+            std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
+            std::advance(i, urand(0, lPotentialTargets.size() - 1));
+            return m_creature->GetMap()->GetUnit(*i);
+        }
+        else
+            return NULL;
+    }
+
+    Unit* SelectTargetForDefile()
+    {
+        std::list<ObjectGuid> lPotentialTargets;
+        const ThreatList &threatList = m_creature->getThreatManager().getThreatList();
+        for (ThreatList::const_iterator itr = threatList.begin();itr != threatList.end(); ++itr)
+        {
+            if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            {
+                if (pVictim->GetTypeId() == TYPEID_PLAYER && !pVictim->GetVehicle())
+                    lPotentialTargets.push_back((*itr)->getUnitGuid());
+            }
+        }
+
+        if (!lPotentialTargets.empty())
+        {
+            std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
+            std::advance(i, urand(0, lPotentialTargets.size() - 1));
+            return m_creature->GetMap()->GetUnit(*i);
+        }
+        else
+            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_DEFILE, SELECT_FLAG_PLAYER);
+    }
+
+    void DoPrepareFrostmourneRoom()
+    {
+        // Terenas + Spirit Warden
+        if (!m_bIsHeroic)
+        {
+            m_creature->SummonCreature(NPC_TERENAS_FM_NORMAL, SpawnLoc[10].x - 5.0f, SpawnLoc[10].y, SpawnLoc[10].z, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
+            m_creature->SummonCreature(NPC_SPIRIT_WARDEN, SpawnLoc[10].x + 5.0f, SpawnLoc[10].y, SpawnLoc[10].z, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        }
+        // Terenas + Spirit Bombs and Spirits
+        else
+        {
+            m_creature->SummonCreature(NPC_TERENAS_FM_HEROIC, SpawnLoc[10].x, SpawnLoc[10].y, SpawnLoc[10].z, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        }
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_FROSTMOURNE_ROOM, IN_PROGRESS);
+    }
+
+    void SpellHit(Unit *pCaster, const SpellEntry *pSpell)
+    {
+        if (pSpell->Id == SPELL_HARVESTED_SOUL_1 ||
+            pSpell->Id == SPELL_HARVESTED_SOUL_2 ||
+            pSpell->Id == SPELL_HARVESTED_SOUL_3 ||
+            pSpell->Id == SPELL_HARVESTED_SOUL_4)
+        {
+            DoScriptText(SAY_FM_PLAYER_DEATH, m_creature);
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiPhase != PHASE_INTRO && m_uiPhase != PHASE_DEATH_AWAITS)
+        {
+            // check evade
+            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+                return;
+
+            // Berserk
+            if (m_uiBerserkTimer < uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                {
+                    DoScriptText(SAY_ENRAGE, m_creature);
+                    m_uiBerserkTimer = 30 * MINUTE * IN_MILLISECONDS;
+                }
+            }
+            else
+                m_uiBerserkTimer -= uiDiff;
+        }
+
+        switch(m_uiPhase)
+        {
+            case PHASE_INTRO:
+            {
+                // wait until set in combat
+                return;
+            }
+            case PHASE_ONE:
+            {
+                // check HP
+                if (m_creature->GetHealthPercent() <= 70.0f)
+                {
+                    if (m_creature->IsNonMeleeSpellCasted(true))
+                        return;
+
+                    // phase transition
+                    SetCombatMovement(false);
+                    m_creature->GetMotionMaster()->Clear();
+                    m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_LAND, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z);
+                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_uiPhase = PHASE_RUNNING_WINTER_ONE;
+                    return;
+                }
+
+                // Necrotic Plague
+                if (m_uiNecroticPlagueTimer < uiDiff)
+                {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                        if (DoCastSpellIfCan(pTarget, SPELL_NECROTIC_PLAGUE) == CAST_OK)
+                            m_uiNecroticPlagueTimer = 26000;
+                }
+                else
+                    m_uiNecroticPlagueTimer -= uiDiff;
+
+                // Infest
+                if (m_uiInfestTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_INFEST) == CAST_OK)
+                        m_uiInfestTimer = 30000;
+                }
+                else
+                    m_uiInfestTimer -= uiDiff;
+
+                // Summon Ghouls
+                if (m_uiGhoulsTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_GHOULS) == CAST_OK)
+                        m_uiGhoulsTimer = urand (20000, 22000);
+                }
+                else
+                    m_uiGhoulsTimer -= uiDiff;
+
+                // Summon Shambling Horror
+                if (m_uiHorrorTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_HORROR) == CAST_OK)
+                        m_uiHorrorTimer = 60000;
+                }
+                else
+                    m_uiHorrorTimer -= uiDiff;
+
+                // Shadow Trap (heroic)
+                if (m_bIsHeroic)
+                {
+                    if (m_uiShadowTrapTimer < uiDiff)
+                    {
+                        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_SHADOW_TRAP, SELECT_FLAG_PLAYER))
+                            if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_TRAP) == CAST_OK)
+                                m_uiShadowTrapTimer = urand(30000, 35000);
+                    }
+                    else
+                        m_uiShadowTrapTimer -= uiDiff;
+                }
+
+                DoMeleeAttackIfReady();
+                break;
+            }
+            case PHASE_RUNNING_WINTER_ONE:
+            case PHASE_RUNNING_WINTER_TWO:
+            {
+                // wait for waypoint arrival
+                break;
+            }
+            case PHASE_TRANSITION_ONE:
+            case PHASE_TRANSITION_TWO:
+            {
+                if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+                    return;
+
+                // phase end timer
+                if (m_uiPhaseTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_QUAKE) == CAST_OK)
+                    {
+                        DoScriptText(SAY_SHATTER_ARENA, m_creature);
+                        m_uiPhase = (m_uiPhase == PHASE_TRANSITION_ONE ? PHASE_QUAKE_ONE : PHASE_QUAKE_TWO);
+                        m_uiPhaseTimer = 6500;
+                    }
+                }
+                else
+                    m_uiPhaseTimer -= uiDiff;
+
+                // destroy pillars
+                if (!m_bPillarsDestroyed)
+                {
+                    if (m_uiDestroyPillarsTimer < uiDiff)
+                    {
+                        DoDestroyPillars();
+                        m_bPillarsDestroyed = true;
+                    }
+                    else
+                        m_uiDestroyPillarsTimer -= uiDiff;
+                }
+
+                // respawning platform
+                if (m_bPlatformDestroyed)
+                {
+                    if (m_uiRespawnPlatformTimer < uiDiff)
+                    {
+                        DoRespawnPlatform();
+                    }
+                    else
+                        m_uiRespawnPlatformTimer -= uiDiff;
+                }
+
+                // Pain and Suffering
+                if (m_uiPainSufferingTimer < uiDiff)
+                {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_PAIN_AND_SUFFERING, SELECT_FLAG_PLAYER))
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_PAIN_AND_SUFFERING, CAST_TRIGGERED) == CAST_OK)
+                            m_uiPainSufferingTimer = urand(1500, 3000);
+                    }
+                }
+                else
+                    m_uiPainSufferingTimer -= uiDiff;
+
+                // Summon Ice Sphere
+                if (m_uiIceSphereTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_ICE_SPHERE) == CAST_OK)
+                        m_uiIceSphereTimer = 6000;
+                }
+                else
+                    m_uiIceSphereTimer -= uiDiff;
+
+                // Summon Raging Spirit
+                if (m_uiRagingSpiritTimer < uiDiff)
+                {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_RAGING_SPIRIT, SELECT_FLAG_PLAYER))
+                    {
+                        pTarget->CastSpell(pTarget, SPELL_SUMMON_RAGING_SPIRIT, true);
+                        m_uiRagingSpiritTimer = 17000;
+                    }
+                }
+                else
+                    m_uiRagingSpiritTimer -= uiDiff;
+
+                break;
+            }
+            case PHASE_QUAKE_ONE:
+            case PHASE_QUAKE_TWO:
+            {
+                // Casting Quake spell - phase end timer
+                if (m_uiPhaseTimer < uiDiff)
+                {
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    DoDestroyPlatform();
+                    m_uiPhase = (m_uiPhase == PHASE_QUAKE_ONE ? PHASE_TWO : PHASE_THREE);
+                    SetCombatMovement(true);
+                    m_creature->GetMotionMaster()->Clear();
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    return;
+                }
+                else
+                    m_uiPhaseTimer -= uiDiff;
+
+                break;
+            }
+            case PHASE_TWO:
+            {
+                // check HP
+                if (m_creature->GetHealthPercent() <= 40.0f)
+                {
+                    if (m_creature->IsNonMeleeSpellCasted(true))
+                        return;
+
+                    // phase transition
+                    DoDespawnValkyrs();
+                    SetCombatMovement(false);
+                    m_creature->GetMotionMaster()->Clear();
+                    m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_LAND, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z);
+                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_uiPhaseTimer = 60000;
+                    m_uiPhase = PHASE_RUNNING_WINTER_TWO;
+                }
+
+                // Soul Reaper
+                if (m_uiSoulReaperTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_REAPER) == CAST_OK)
+                        m_uiSoulReaperTimer = 30000;
+                }
+                else
+                    m_uiSoulReaperTimer -= uiDiff;
+
+                // Infest
+                if (m_uiInfestTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_INFEST) == CAST_OK)
+                        m_uiInfestTimer = 30000;
+                }
+                else
+                    m_uiInfestTimer -= uiDiff;
+
+                // Defile
+                if (m_uiDefileTimer < uiDiff)
+                {
+                    if (Unit *pTarget = SelectTargetForDefile())
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_DEFILE) == CAST_OK)
+                            m_uiDefileTimer = 30000;
+                    }
+                }
+                else
+                    m_uiDefileTimer -= uiDiff;
+
+                // Summon Val'kyr
+                if (m_uiValkyrTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_VALKYR) == CAST_OK)
+                    {
+                        DoScriptText(SAY_SUMMON_VALKYR, m_creature);
+                        m_uiValkyrTimer = 45000;
+                    }
+                }
+                else
+                    m_uiValkyrTimer -= uiDiff;
+
+                DoMeleeAttackIfReady();
+                break;
+            }
+            case PHASE_THREE:
+            {
+                // check HP
+                if (m_creature->GetHealthPercent() <= 10.0f)
+                {
+                    m_creature->GetMotionMaster()->Clear();
+                    m_creature->StopMoving();
+                    SetCombatMovement(false);
+                    DoCastSpellIfCan(m_creature, SPELL_FURY_OF_FROSTMOURNE, CAST_INTERRUPT_PREVIOUS);
+                    DoScriptText(SAY_LAST_PHASE, m_creature);
+                    m_uiPhase = PHASE_DEATH_AWAITS;
+
+                    // tell Tirion to continue the event
+                    if (m_pInstance)
+                    {
+                        if (Creature *pTirion = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
+                        {
+                            if (boss_tirion_iccAI *pTirionAI = dynamic_cast<boss_tirion_iccAI*>(pTirion->AI()))
+                                pTirionAI->DoContinueEvent();
+                        }
+                    }
+
+                    return;
+                }
+
+                // Soul Reaper
+                if (m_uiSoulReaperTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_REAPER) == CAST_OK)
+                        m_uiSoulReaperTimer = 30000;
+                }
+                else
+                    m_uiSoulReaperTimer -= uiDiff;
+
+                // Defile
+                if (m_uiDefileTimer < uiDiff)
+                {
+                    if (Unit *pTarget = SelectTargetForDefile())
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_DEFILE) == CAST_OK)
+                            m_uiDefileTimer = 30000;
+                    }
+                }
+                else
+                    m_uiDefileTimer -= uiDiff;
+
+                // Harvest Soul
+                if (m_uiHarvestSoulTimer < uiDiff)
+                {
+                    Unit *pTarget = NULL;
+                    if (m_bIsHeroic)
+                        pTarget = m_creature;
+                    else
+                        pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_HARVEST_SOUL, SELECT_FLAG_PLAYER);
+
+                    if (pTarget)
+                    {
+                        if (DoCastSpellIfCan(pTarget, m_bIsHeroic ? SPELL_HARVEST_SOULS : SPELL_HARVEST_SOUL) == CAST_OK)
+                        {
+                            DoScriptText(SAY_HARVEST_SOUL, m_creature);
+                            m_uiHarvestSoulTimer = m_bIsHeroic ? 120000 : 70000;
+                            DoPrepareFrostmourneRoom();
+
+                            if (m_bIsHeroic)
+                            {
+                                m_uiPhase = PHASE_IN_FROSTMOURNE;
+                                SetCombatMovement(false);
+                                m_creature->StopMoving();
+                                m_creature->GetMotionMaster()->Clear();
+                                m_uiFrostmournePhaseTimer = 47000;
+                                m_uiDefileTimer = 1000;
+                            }
+                        }
+                    }
+                }
+                else
+                    m_uiHarvestSoulTimer -= uiDiff;
+
+                // Vile Spirits (start moving after 15seconds)
+                if (m_uiVileSpiritsTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_VILE_SPIRITS) == CAST_OK)
+                        m_uiVileSpiritsTimer = 30000;
+                }
+                else
+                    m_uiVileSpiritsTimer -= uiDiff;
+
+                DoMeleeAttackIfReady();
+                break;
+            }
+            case PHASE_IN_FROSTMOURNE:
+            {
+                // check if players are alive before entering evade mode?
+                // wait until they leave Frostmourne
+                if (m_uiFrostmournePhaseTimer < uiDiff)
+                {
+                    m_uiPhase = PHASE_THREE;
+                    if (m_creature->getVictim())
+                        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    return;
+                }
+                else
+                    m_uiFrostmournePhaseTimer -= uiDiff;
+
+                break;
+            }
+            case PHASE_DEATH_AWAITS:
+            {
+                // wait for swift death
+                break;
+            }
+        }
+    }
+};
+
+CreatureAI* GetAI_boss_the_lich_king_icc(Creature* pCreature)
+{
+    return new boss_the_lich_king_iccAI(pCreature);
+}
+
+/**
+ * Drudge Ghoul
+ */
+struct MANGOS_DLL_DECL mob_drudge_ghoulAI : public base_icc_bossAI
+{
+    mob_drudge_ghoulAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        Reset();
+    }
+
+    uint32 m_uiReadyTimer;
+    bool m_bIsReady;
+    bool m_bIsSpawned;
+
+    void Reset()
+    {
+        m_bIsReady          = false;
+        m_bIsSpawned        = false;
+        m_uiReadyTimer      = 5000;
+    }
+
+    void JustDied()
+    {
+        m_creature->ForcedDespawn(1000);
+    }
+
+    void JustReachedHome()
+    {
+        m_creature->ForcedDespawn();
+    }
+
+    void AttackStart(Unit *pWho)
+    {
+        if (!m_bIsReady)
+            return;
+        else
+            base_icc_bossAI::AttackStart(pWho);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_bIsReady)
+        {
+            if (!m_bIsSpawned)
+            {
+                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                m_bIsSpawned = true;
+            }
+
+            if (m_uiReadyTimer <= uiDiff)
+            {
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_bIsReady = true;
+                if (m_creature->getVictim())
+                    AttackStart(m_creature->getVictim());
+                else
+                    m_creature->SetInCombatWithZone();
+            }
+            else
+                m_uiReadyTimer -= uiDiff;
+
+            return;
+        }
+
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_mob_drudge_ghoul(Creature* pCreature)
+{
+    return new mob_drudge_ghoulAI(pCreature);
+}
+
+/**
+ * Shambling Horror
+ */
+struct MANGOS_DLL_DECL mob_shambling_horrorAI : public base_icc_bossAI
+{
+    mob_shambling_horrorAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        Reset();
+    }
+
+    uint32 m_uiShockwaveTimer;
+    uint32 m_uiEnrageTimer;
+    uint32 m_uiReadyTimer;
+    bool m_bHasCastFrenzy;
+    bool m_bIsReady;
+    bool m_bIsSpawned;
+
+    void Reset()
+    {
+        m_bIsReady          = false;
+        m_bIsSpawned        = false;
+        m_uiReadyTimer      = 5000;
+
+        m_uiShockwaveTimer  = 12000;
+        m_uiEnrageTimer     = 6000;
+        m_bHasCastFrenzy    = false;
+    }
+
+    void JustDied()
+    {
+        m_creature->ForcedDespawn(1000);
+    }
+
+    void JustReachedHome()
+    {
+        m_creature->ForcedDespawn();
+    }
+
+    void AttackStart(Unit *pWho)
+    {
+        if (!m_bIsReady)
+            return;
+        else
+            base_icc_bossAI::AttackStart(pWho);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_bIsReady)
+        {
+            if (!m_bIsSpawned)
+            {
+                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                m_bIsSpawned = true;
+            }
+
+            if (m_uiReadyTimer <= uiDiff)
+            {
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_bIsReady = true;
+                if (m_creature->getVictim())
+                    AttackStart(m_creature->getVictim());
+                else
+                    m_creature->SetInCombatWithZone();
+            }
+            else
+                m_uiReadyTimer -= uiDiff;
+
+            return;
+        }
+
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        // Frenzy on heroic
+        if (m_bIsHeroic)
+        {
+            if (!m_bHasCastFrenzy)
+            {
+                if (m_creature->GetHealthPercent() <= 20.0f)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+                        m_bHasCastFrenzy = true;
+                }
+            }
+        }
+
+        // Enrage
+        if (m_uiEnrageTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
+            {
+                m_uiEnrageTimer = 20000;
+                m_uiShockwaveTimer = urand(5000, 7000);
+            }
+        }
+        else
+            m_uiEnrageTimer -= uiDiff;
+
+        // Shockwave
+        if (m_uiShockwaveTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOCKWAVE) == CAST_OK)
+                m_uiShockwaveTimer = 20000;
+        }
+        else
+            m_uiShockwaveTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_mob_shambling_horror(Creature* pCreature)
+{
+    return new mob_shambling_horrorAI(pCreature);
+}
+
+/**
+ * Shadow Trap
+ */
+struct MANGOS_DLL_DECL mob_shadow_trapAI : public base_icc_bossAI
+{
+    mob_shadow_trapAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
+        SetCombatMovement(false);
+        DoCastSpellIfCan(m_creature, SPELL_SHADOW_TRAP_VISUAL, CAST_TRIGGERED);
+        m_uiShadowTrapTimer = 5000;
+        m_bHasCastAura = false;
+    }
+
+    uint32 m_uiShadowTrapTimer;
+    bool m_bHasCastAura;
+
+    void Reset(){}
+
+    void DamageTaken(Unit *pDealer, uint32 &uiDamage)
+    {
+        uiDamage = 0;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
+        // Shadow Trap
+        if (!m_bHasCastAura)
+        {
+            if (m_uiShadowTrapTimer < uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_SHADOW_TRAP_AURA) == CAST_OK)
+                {
+                    m_creature->RemoveAurasDueToSpell(SPELL_SHADOW_TRAP_VISUAL);
+                    m_bHasCastAura = true;
+                }
+            }
+            else
+                m_uiShadowTrapTimer -= uiDiff;
+        }
+    }
+};
+
+CreatureAI* GetAI_mob_shadow_trap(Creature* pCreature)
+{
+    return new mob_shadow_trapAI(pCreature);
+}
+
+/**
+ * Ice Sphere
+ */
+struct MANGOS_DLL_DECL mob_ice_sphere_iccAI : public base_icc_bossAI
+{
+    mob_ice_sphere_iccAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
         m_creature->SetWalk(true);
-        m_creature->SetSpeedRate(MOVE_WALK, 1.0f);
-        m_creature->SetSpeedRate(MOVE_RUN, 1.0f);
-        m_uiVisualTimer = 2400;
-        m_bSkin = false;
+        m_creature->SetSpeedRate(MOVE_WALK, 1.1f);
+        m_uiVisualTimer = 2000;
         SetCombatMovement(false);
         m_creature->SetVisibility(VISIBILITY_OFF);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -1520,254 +1746,84 @@ struct MANGOS_DLL_DECL  mob_ice_sphere_iccAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
     }
 
-    void Aggro(Unit *pWho)
+    uint32 m_uiVisualTimer;
+
+    void Reset(){}
+
+    void JustDied(Unit *pKiller)
     {
-        if (!pWho)
-            return;
-
-        m_creature->CastSpell(pWho, SPELL_ICE_PULSE, true);
+        m_creature->ForcedDespawn();
     }
-
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
-              m_creature->ForcedDespawn();
+            m_creature->ForcedDespawn();
 
-        if (m_uiVisualTimer < uiDiff && !m_bSkin)
+        if (m_uiVisualTimer < uiDiff)
         {
             m_creature->CastSpell(m_creature, SPELL_ICE_SPHERE_VISUAL, false);
             m_creature->SetVisibility(VISIBILITY_ON);
-            m_bSkin = true;
-        }
-        else m_uiVisualTimer -= uiDiff;
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-        {
-            if (Creature *pLich = GetClosestCreatureWithEntry(m_creature, NPC_LICH_KING, 100.0f))
-            {
-                if (Unit *pTarget = pLich->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-                {
-                   m_creature->SetInCombatWith(pTarget);
-                   m_creature->AddThreat(pTarget, 1000.0f);
-                }
-            }
-        }
-
-        if (m_bSkin)
-        {
             SetCombatMovement(true);
-
-            if (m_creature->IsWithinDistInMap(m_creature->getVictim(), 2.0f))
-                m_creature->CastSpell(m_creature, SPELL_ICE_BURST, false);
-
-            m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+            m_uiVisualTimer = 5 * MINUTE * IN_MILLISECONDS;
         }
+        else m_uiVisualTimer -= uiDiff;
     }
 };
 
 CreatureAI* GetAI_mob_ice_sphere_icc(Creature* pCreature)
 {
     return new mob_ice_sphere_iccAI(pCreature);
-};
-
-struct MANGOS_DLL_DECL mob_defiler_iccAI : public BSWScriptedAI
-{
-    mob_defiler_iccAI(Creature *pCreature) : BSWScriptedAI(pCreature)
-    {
-        m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIs25Man;
-    bool m_bIsHeroic;
-    uint32 m_uiLifeTimer;
-    float m_Size0;
-    float m_Size;
-
-    void Reset()
-    {
-        SetCombatMovement(false);
-        m_uiLifeTimer = 30000;
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->CastSpell(m_creature, SPELL_DEFILE, true);
-        m_Size0 = m_creature->GetObjectScale();
-        m_Size = m_Size0;
-    }
-
-    void AttackStart(Unit *pWho)
-    {
-
-    }
-
-    bool DoSearchPlayers(float range)
-    {
-        if(GetPlayerAtMinimumRange(m_Size * range))
-            return true;
-        else
-            return false;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if(m_pInstance && m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
-            m_creature->ForcedDespawn();
-
-        if (m_uiLifeTimer < uiDiff)
-        {
-            m_creature->ForcedDespawn();
-        }
-        else m_uiLifeTimer -= uiDiff;
-
-        if (DoSearchPlayers(3.0f) && m_Size <= m_Size0 * 6.0f)
-        {
-            m_Size = m_Size*1.01;
-            m_creature->SetObjectScale(m_Size);
-        }
-    }
-
-};
-
-CreatureAI* GetAI_mob_defiler_icc(Creature* pCreature)
-{
-    return new mob_defiler_iccAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_strangulate_vehicleAI : public ScriptedAI
+/**
+ * Raging Spirit
+ */
+struct MANGOS_DLL_DECL mob_raging_spiritAI : public base_icc_bossAI
 {
-    mob_strangulate_vehicleAI(Creature *pCreature) : ScriptedAI(pCreature)
+    mob_raging_spiritAI(Creature *pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
         Reset();
     }
 
-    ScriptedInstance *m_pInstance;
-
-    void Reset()
-    {
-        SetCombatMovement(false);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-    }
-
-    void AttackStart(Unit *pWho)
-    {
-        return;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-       m_creature->ForcedDespawn();
-    }
-
-};
-
-CreatureAI* GetAI_mob_strangulate_vehicle(Creature* pCreature)
-{
-    return new mob_strangulate_vehicleAI(pCreature);
-}
-
-struct MANGOS_DLL_DECL mob_vile_spiritAI : public ScriptedAI
-{
-    mob_vile_spiritAI(Creature *pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    instance_icecrown_spire *m_pInstance;
-
-    uint32 m_uiStartTimer;
-
-    void Reset()
-    {
-       SetCombatMovement(false);
-       m_creature->SetWalk(true);
-       m_uiStartTimer = 15000;
-    }
-
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
-              m_creature->ForcedDespawn();
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiStartTimer < uiDiff)
-        {
-           SetCombatMovement(true);
-           m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-           m_pInstance->SetSpecialAchievementCriteria(TYPE_NECK_DEEP_IN_VILE, false);
-        }
-        else m_uiStartTimer -= uiDiff;
-
-        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
-        {
-           m_creature->CastSpell(m_creature->getVictim(), SPELL_SPIRITS_BURST, true);
-           m_creature->ForcedDespawn(100);
-        }
-
-        if (m_creature->getVictim()->GetTypeId() != TYPEID_PLAYER)
-            return;
-    }
-};
-
-CreatureAI* GetAI_mob_vile_spirit(Creature* pCreature)
-{
-    return new mob_vile_spiritAI(pCreature);
-}
-
-struct MANGOS_DLL_DECL mob_raging_spiritAI : public ScriptedAI
-{
-    mob_raging_spiritAI(Creature *pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiSoulShriekTimer = 10000;
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
     uint32 m_uiSoulShriekTimer;
+    bool m_bHasCloned;
 
     void Reset()
     {
-        m_uiSoulShriekTimer = 10000;
-    }
-
-    void Aggro(Unit *pWho)
-    {
-        if (!pWho)
-            return;
-
-        pWho->CastSpell(m_creature, SPELL_CLONE, false);
+        m_uiSoulShriekTimer = 8000;
+        m_bHasCloned = false;
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
-              m_creature->ForcedDespawn();
+            m_creature->ForcedDespawn();
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (!m_bHasCloned)
+        {
+            if (Unit *pCreator = m_creature->GetCreator())
+            {
+                pCreator->CastSpell(m_creature, SPELL_RAGING_SPIRIT_VISUAL, true);
+                m_bHasCloned = true;
+            }
+        }
+
+        // Soul Shriek
         if (m_uiSoulShriekTimer < uiDiff)
         {
-            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_SHRIEK))
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_SHRIEK) == CAST_OK)
                 m_uiSoulShriekTimer = 10000;
         }
-        else m_uiSoulShriekTimer -= uiDiff;
+        else
+            m_uiSoulShriekTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
@@ -1778,35 +1834,139 @@ CreatureAI* GetAI_mob_raging_spirit(Creature* pCreature)
     return new mob_raging_spiritAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_valkyrAI : public ScriptedAI
+/**
+ * Val'kyr Shadowguard
+ */
+struct MANGOS_DLL_DECL mob_valkyr_shadowguardAI : public base_icc_bossAI
 {
-    mob_valkyrAI(Creature* pCreature) : ScriptedAI(pCreature)
+    mob_valkyr_shadowguardAI(Creature *pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
+        DoCastSpellIfCan(m_creature, SPELL_WINGS_OF_THE_DAMNED, CAST_TRIGGERED);
+        SetCombatMovement(false);
+        m_creature->SetLevitate(true);
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+        m_creature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 15.0f, 0.0f);
+        m_bIsHeroic = true;
     }
 
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
-    bool m_bIsCarry;
-    bool m_bIsInCenter;
-    bool m_bInMovement;
+    uint32 m_uiCatchTimer;
     uint32 m_uiLifeSiphonTimer;
+    bool m_bIsReady;
+    bool m_bIsCarrying;
+    bool m_bIsCastingLifeSiphon;
 
     void Reset()
     {
-        m_bIsCarry = false;
-        m_bIsInCenter = false;
-        m_bInMovement = false;
-        m_uiLifeSiphonTimer = 10000;
-        SetCombatMovement(true);
-        m_creature->SetLevitate(false);
-        m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
+        m_bIsReady = false;
+        m_bIsCarrying = true;
+        m_bIsCastingLifeSiphon = false;
+        m_uiCatchTimer = 2000;
+        m_uiLifeSiphonTimer = 2000;
+    }
+
+    void AttackStart(Unit *pWho)
+    {
+        if (m_bIsCastingLifeSiphon)
+            base_icc_bossAI::AttackStart(pWho);
+    }
+
+    Unit* DoCatchTarget()
+    {
+        if (m_pInstance)
+        {
+            if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+            {
+                // search for proper target
+                std::list<ObjectGuid> lPotentialTargets;
+                ThreatList const &lThreatList = pLichKing->getThreatManager().getThreatList();
+
+                if (!lThreatList.empty())
+                {
+                    for (ThreatList::const_iterator i = lThreatList.begin(); i != lThreatList.end(); ++i)
+                    {
+                        if (Unit *pTmp = m_pInstance->instance->GetUnit((*i)->getUnitGuid()))
+                        {
+                            if (pTmp != pLichKing->getVictim() &&
+                                pTmp->GetTypeId() == TYPEID_PLAYER &&
+                                !pTmp->GetVehicle())
+                            {
+                                lPotentialTargets.push_back(pTmp->GetObjectGuid());
+                            }
+                        }
+                    }
+                }
+
+                // select random target
+                if (!lPotentialTargets.empty())
+                {
+                    std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
+                    std::advance(i, urand(0, lPotentialTargets.size() - 1));
+
+                    if (Unit *pTarget = m_pInstance->instance->GetUnit(*i))
+                    {
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+                        // charge isn't properly implemented...
+                        DoCastSpellIfCan(pTarget, SPELL_VALKYR_CHARGE, CAST_TRIGGERED);
+                        m_creature->NearTeleportTo(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ() + 3.0f, 0.0f);
+                        DoCastSpellIfCan(pTarget, SPELL_VALKYR_CARRY, CAST_TRIGGERED);
+                        m_bIsCarrying = true;
+                        return pTarget;
+                    }
+                }
+            }
+        }
+
+        return NULL;
+    }
+
+    void DoFlyAway(Unit *pTarget)
+    {
+        float curX, curY, curZ;
+        float destX, destY, destZ;
+        pTarget->GetPosition(curX, curY, curZ);
+
+        // don't fly into Frozen Throne
+        if (curX < 480.0f)
+        {
+            if (curY > -2124.0f)
+                m_creature->GetMotionMaster()->MovePoint(POINT_VALKYR_THROW, SpawnLoc[8].x, SpawnLoc[8].y, SpawnLoc[8].z + 3.0f);
+            else
+                m_creature->GetMotionMaster()->MovePoint(POINT_VALKYR_THROW, SpawnLoc[9].x, SpawnLoc[9].y, SpawnLoc[9].z + 3.0f);
+
+            return;
+        }
+
+        // angle to center
+        float angle = m_creature->GetAngle(SpawnLoc[1].x, SpawnLoc[1].y);
+        // angle away from center
+        angle += M_PI_F;
+        if (angle > 2 * M_PI_F)
+            angle -= (2 * M_PI_F);
+
+        // don't fly into Frozen Throne
+        if (angle < 3.8f && angle > 2.3f)
+        {
+            if (angle > 3.05f)
+                angle = 3.8f;
+            else
+                angle = 2.3f;
+        }
+
+        float fDistToCenter = m_creature->GetDistance2d(SpawnLoc[1].x, SpawnLoc[1].y);
+        float fDist = 60.0f - fDistToCenter;
+
+        m_creature->GetNearPoint(m_creature, destX, destY, destZ, 0.0f, fDist, angle);
+        m_creature->GetMotionMaster()->MovePoint(POINT_VALKYR_THROW, destX, destY, SpawnLoc[1].z + 3.0f);
+    }
+
+    void DoThrowAndGoBack()
+    {
+        DoCastSpellIfCan(m_creature, SPELL_EJECT_PASSENGERS, CAST_TRIGGERED);
+        m_creature->GetMotionMaster()->Clear();
+        m_creature->GetMotionMaster()->MovePoint(POINT_VALKYR_CENTER, SpawnLoc[1].x + frand(-3.0f, 3.0f), SpawnLoc[1].y + frand(-3.0f, 3.0f), SpawnLoc[1].z + 12.0f);
     }
 
     void MovementInform(uint32 uiMovementType, uint32 uiData)
@@ -1814,552 +1974,701 @@ struct MANGOS_DLL_DECL mob_valkyrAI : public ScriptedAI
         if (uiMovementType != POINT_MOTION_TYPE)
             return;
 
-        if (uiData == POINT_WEST || uiData == POINT_EAST)
+        if (uiData == POINT_VALKYR_THROW)
         {
-            if (m_bIsCarry)
+            DoThrowAndGoBack();
+        }
+        else if (uiData == POINT_VALKYR_CENTER)
+        {
+            if (m_bIsHeroic)
             {
-                //DoCastSpellIfCan(m_creature, SPELL_VALKYR_EJECT);
-                if (VehicleKit *pVehKit = m_creature->GetVehicleKit())
-                    pVehKit->RemoveAllPassengers();
-                m_bIsCarry = false;
-                m_bInMovement = false;
+                // start casting Life Siphon
+                if (m_creature->GetHealthPercent() <= 50.0f)
+                    m_bIsCarrying = false;
+                else
+                    m_bIsReady = false;
+            }
+            else
+            {
+                // catch another target
+                m_bIsReady = false;
             }
         }
-        else if (uiData == POINT_CENTER)
-        {
-            m_bIsInCenter = true;
-            m_bInMovement = false;
-        }
-    }
-
-    void MoveToClosestPoint()
-    {
-        float WestDistance, EastDistance;
-        m_creature->GetMotionMaster()->Clear();
-        m_bInMovement = true;
-
-        WestDistance = m_creature->GetDistance2d(SpawnLoc[11].x, SpawnLoc[11].y);
-        EastDistance = m_creature->GetDistance2d(SpawnLoc[12].x, SpawnLoc[12].y);
-
-        if (WestDistance < EastDistance)
-            m_creature->GetMotionMaster()->MovePoint(POINT_WEST, SpawnLoc[11].x, SpawnLoc[11].y, SpawnLoc[11].z);
-        else
-            m_creature->GetMotionMaster()->MovePoint(POINT_EAST, SpawnLoc[12].x, SpawnLoc[12].y, SpawnLoc[12].z);
-    }
-
-    void Aggro(Unit *pWho)
-    {
-        if (!m_pInstance || !pWho)
-            return;
-
-        DoCastSpellIfCan(m_creature, SPELL_WINGS_OF_THE_DAMNED, CAST_TRIGGERED);
-        //m_creature->AddThreat(pWho, 100.0f);
-        m_creature->SetInCombatWithZone();
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_bIsCarry && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
-            return;
-
-        if (!m_bIsCarry && m_creature->CanReachWithMeleeAttack(m_creature->getVictim()) && !m_bInMovement && !m_bIsInCenter)
+        // on heroic start casting Life Siphon at 50% HP
+        if (m_bIsHeroic && !m_bIsCastingLifeSiphon)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VALKYR_CARRY) == CAST_OK)
+            if (m_creature->GetHealthPercent() <= 50.0f)
             {
-                m_creature->getVictim()->EnterVehicle(m_creature->GetVehicleKit(), 0);
-                m_bIsCarry = true;
+                m_bIsReady = true;
+                m_bIsCarrying = true;
+                m_bIsCastingLifeSiphon = true;
+                DoThrowAndGoBack();
             }
         }
 
-        if (m_bIsCarry && !m_bInMovement)
-            MoveToClosestPoint();
-
-        if (m_bIsHeroic && !m_bIsInCenter)
+        if (!m_bIsReady)
         {
-            if (m_creature->GetHealthPercent() <= 50)
+            if (m_uiCatchTimer < uiDiff)
             {
-                //DoCastSpellIfCan(m_creature, SPELL_VALKYR_EJECT);
-                if (VehicleKit *pVehKit = m_creature->GetVehicleKit())
-                    pVehKit->RemoveAllPassengers();
-                m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
-                SetCombatMovement(false);
-                m_creature->SetLevitate(true);
-                m_creature->GetMotionMaster()->Clear();
-                m_creature->GetMotionMaster()->MovePoint(POINT_CENTER, SpawnLoc[10].x + urand(1, 4), SpawnLoc[10].y + urand (1, 4), SpawnLoc[10].z + urand (1, 4));
+                if (Unit *pTarget = DoCatchTarget())
+                {
+                    m_bIsReady = true;
+                    DoFlyAway(pTarget);
+                }
             }
+            else
+                m_uiCatchTimer -= uiDiff;
+
+            return;
         }
-        if (m_bIsInCenter)
-        {
-            if (m_uiLifeSiphonTimer < uiDiff)
-            {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    if (DoCastSpellIfCan(pTarget, SPELL_LIFE_SIPHON) == CAST_OK)
-                        m_uiLifeSiphonTimer = 10000;
-            }
-            else m_uiLifeSiphonTimer -= uiDiff;
-        }
-    }
-};
 
-CreatureAI* GetAI_mob_valkyr(Creature *pCreature)
-{
-    return new mob_valkyrAI(pCreature);
-}
-
-// Frostmourne phase
-
-struct MANGOS_DLL_DECL mob_terenas_frostmourneAI : public ScriptedAI
-{
-    mob_terenas_frostmourneAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-        pVictim = NULL;
-        pSpiritWarden = NULL;
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
-    bool m_bEventStarted;
-    bool m_bEventFinished;
-    uint32 m_uiEventStep;
-    uint32 m_uiNextEventTimer;
-    Player *pVictim;
-    Unit *pSpiritWarden;
-
-    void Reset()
-    {
-        if(!m_pInstance)
-            return;
-
-        SetCombatMovement(false);
-        m_bEventStarted = false;
-        m_bEventFinished = false;
-        pSpiritWarden = NULL;
-        pVictim = NULL;
-        m_uiNextEventTimer = 0;
-        m_uiEventStep = 0;
-    }
-
-    void MoveInLineOfSight(Unit *pWho)
-    {
-        if (!((Player*)pWho)->isGameMaster() && m_creature->GetDistance2d(pWho) < 20.0f)
-            m_creature->SetInCombatWithZone();
-        else
-            return;
-    }
-
-    void Aggro(Unit *pWho)
-    {
-        if (!m_pInstance || !pWho)
-            return;
-
-        m_creature->CastSpell(m_creature, SPELL_LIGHTS_FAVOR, true);
-
-        if (m_bIsHeroic)
-            m_creature->CastSpell(m_creature, SPELL_RESTORE_SOUL_HERO, false);
-    }
-
-    void JustDied(Unit *pKiller)
-    {
-        if (pSpiritWarden)
-            pSpiritWarden->CastSpell(pVictim, SPELL_DESTROY_SOUL, false);
-        if (Creature *pLich = GetClosestCreatureWithEntry(m_creature, NPC_LICH_KING, 500.0f))
-        {
-            DoScriptText(SAY_FM_PLAYER_DEATH ,pLich, pKiller);
-        }
-    }
-
-    void NextStep(uint32 uiTime = 1000)
-    {
-        ++m_uiEventStep;
-        m_uiNextEventTimer = uiTime;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_pInstance)
-            return;
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (!m_bIsHeroic)
+        if (m_bIsHeroic && !m_bIsCarrying)
         {
-            if (pSpiritWarden = GetClosestCreatureWithEntry(m_creature, NPC_SPIRIT_WARDEN, 20.0f))
+            // Life Siphon
+            if (m_uiLifeSiphonTimer < uiDiff)
             {
-                m_creature->SetInCombatWith(pSpiritWarden);
-                pSpiritWarden->SetInCombatWith(m_creature);
-                m_creature->AI()->AttackStart(pSpiritWarden);
-                m_creature->AddThreat(pSpiritWarden, 100000.0f);
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_LIFE_SIPHON) == CAST_OK)
+                    m_uiLifeSiphonTimer = 5000;
+            }
+            else
+                m_uiLifeSiphonTimer -= uiDiff;
+        }
+    }
+};
+
+CreatureAI* GetAI_mob_valkyr_shadowguard(Creature* pCreature)
+{
+    return new mob_valkyr_shadowguardAI(pCreature);
+}
+
+/**
+ * Defile
+ */
+struct MANGOS_DLL_DECL mob_defiler_iccAI : public base_icc_bossAI
+{
+    mob_defiler_iccAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
+        SetCombatMovement(false);
+        DoCastSpellIfCan(m_creature, SPELL_DEFILE_AURA, CAST_TRIGGERED);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED); // don't turn around
+        // "lasts 30 seconds"
+        m_creature->ForcedDespawn(30000);
+    }
+
+    void Reset(){}
+    void AttackStart(Unit *pWho){}
+    void UpdateAI(const uint32 uiDiff){}
+};
+
+CreatureAI* GetAI_mob_defiler_icc(Creature* pCreature)
+{
+    return new mob_defiler_iccAI(pCreature);
+}
+
+/**
+ * Vile Spirit
+ */
+struct MANGOS_DLL_DECL  mob_vile_spiritAI : public base_icc_bossAI
+{
+    mob_vile_spiritAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
+        SetCombatMovement(false);
+        m_creature->SetLevitate(true);
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+        m_creature->SetInCombatWithZone();
+        m_creature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 15.0f, 0.0f);
+        m_creature->GetMotionMaster()->MovePoint(1, m_creature->GetPositionX() + frand(-3.0f, 3.0f), m_creature->GetPositionY() + frand(-3.0f, 3.0f), m_creature->GetPositionZ());
+        DoCastSpellIfCan(m_creature, SPELL_SPIRIT_BURST_AURA, CAST_TRIGGERED);
+        Reset();
+    }
+
+    bool m_bIsReady;
+    uint32 m_uiReadyTimer;
+
+    void Reset()
+    {
+        m_bIsReady = false;
+        m_uiReadyTimer = 15000;
+    }
+
+    void MovementInform(uint32 uiMovementType, uint32 uiData)
+    {
+        if (uiMovementType != POINT_MOTION_TYPE)
+            return;
+
+        if (m_bIsReady)
+            return;
+
+        if (uiData == 1)
+            m_creature->GetMotionMaster()->MovePoint(1, m_creature->GetPositionX() + frand(-3.0f, 3.0f), m_creature->GetPositionY() + frand(-3.0f, 3.0f), m_creature->GetPositionZ());
+    }
+
+    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    {
+        if (m_pInstance)
+        {
+            if (pSpell->Id == SPELL_SPIRIT_BURST_1 ||
+                pSpell->Id == SPELL_SPIRIT_BURST_2 ||
+                pSpell->Id == SPELL_SPIRIT_BURST_3 ||
+                pSpell->Id == SPELL_SPIRIT_BURST_4)
+            {
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_NECK_DEEP_IN_VILE, false);
+            }
+        }
+    }
+
+    Unit* SelectTarget()
+    {
+        if (m_pInstance)
+        {
+            if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+            {
+                // search for proper target
+                std::list<ObjectGuid> lPotentialTargets;
+                ThreatList const &lThreatList = pLichKing->getThreatManager().getThreatList();
+
+                if (!lThreatList.empty())
+                {
+                    for (ThreatList::const_iterator i = lThreatList.begin(); i != lThreatList.end(); ++i)
+                    {
+                        if (Unit *pTmp = m_pInstance->instance->GetUnit((*i)->getUnitGuid()))
+                        {
+                            if (pTmp != pLichKing->getVictim() &&
+                                pTmp->GetTypeId() == TYPEID_PLAYER &&
+                                !pTmp->GetVehicle())
+                            {
+                                lPotentialTargets.push_back(pTmp->GetObjectGuid());
+                            }
+                        }
+                    }
+                }
+
+                // select random target
+                if (!lPotentialTargets.empty())
+                {
+                    std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
+                    std::advance(i, urand(0, lPotentialTargets.size() - 1));
+
+                    if (Unit *pTarget = m_pInstance->instance->GetUnit(*i))
+                        return pTarget;
+                }
             }
         }
 
-        if (GetPlayerAtMinimumRange(20.0f) && m_bEventStarted)
-        {
-            NextStep();
-            m_bEventStarted = true;
-        }
+        return NULL;
+    }
 
-        if (m_bEventStarted && !m_bEventFinished)
+    void UpdateAI(const uint32 uiDiff)
+    {
+        // start chasing timer
+        if (!m_bIsReady)
         {
-            if (m_uiNextEventTimer <= uiDiff)
+            if (m_uiReadyTimer < uiDiff)
             {
-                switch (m_uiEventStep)
+                if (Unit *pTarget = SelectTarget())
                 {
-                    case 0:
-                        break;
-                    case 1:
-                        DoScriptText(SAY_FM_TERENAS_AID_1, m_creature);
-                        NextStep(13000);
-                        break;
-                    case 2:
-                        DoScriptText(SAY_FM_TERENAS_AID_2, m_creature);
-                        NextStep(11000);
-                        break;
-                    case 3:
-                        if (!m_bIsHeroic)
-                            DoScriptText(SAY_FM_TERENAS_AID_3, m_creature);
-                        NextStep();
-                        break;
-                    case 4:
-                        m_bEventFinished = true;
-                        NextStep();
-                        break;
-                    case 5:
-                        break;
-                    default:
-                        break;
+                    DoResetThreat();
+                    m_creature->AddThreat(pTarget, 100000.0f);
+                    m_bIsReady = true;
+                    m_creature->StopMoving();
+                    SetCombatMovement(true);
+                    m_creature->GetMotionMaster()->Clear();
+                    AttackStart(pTarget);
                 }
             }
             else
-                m_uiNextEventTimer -= uiDiff;
+                m_uiReadyTimer -= uiDiff;
         }
+        else if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+                return;
+    }
+};
+
+CreatureAI* GetAI_mob_vile_spirit(Creature* pCreature)
+{
+    return new mob_vile_spiritAI(pCreature);
+}
+
+struct MANGOS_DLL_DECL mob_strangulate_vehicleAI : public base_icc_bossAI
+{
+    mob_strangulate_vehicleAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
+        SetCombatMovement(false);
+        m_creature->SetWalk(true);
+        m_bIsSetUp = false;
+        m_bHasMoved = false;
+        m_bHasTeleported = false;
+        m_uiMoveTimer = 2000;
+        m_uiTeleportTimer = 6000;
+    }
+
+    bool m_bIsSetUp;
+    bool m_bHasMoved;
+    bool m_bHasTeleported;
+    uint32 m_uiMoveTimer;
+    uint32 m_uiTeleportTimer;
+
+    void Reset(){}
+    void AttackStart(Unit *pWho){}
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+        else
+        {
+            if (m_pInstance->GetData(TYPE_FROSTMOURNE_ROOM) == DONE)
+            {
+                if (Unit *pCreator = m_creature->GetCreator())
+                {
+                    float x, y, z;
+                    m_creature->GetPosition(x, y, z);
+                    pCreator->NearTeleportTo(x, y, z, m_creature->GetOrientation(), true);
+                    // remove Harvest Soul aura
+                    pCreator->RemoveAurasDueToSpell(72546);
+                    pCreator->RemoveAurasDueToSpell(73655);
+
+                    m_creature->ForcedDespawn();
+                    return;
+                }
+            }
+        }
+
+        if (!m_bIsSetUp)
+        {
+            if (Unit *pCreator = m_creature->GetCreator())
+            {
+                pCreator->CastSpell(m_creature, SPELL_HARVEST_SOUL_VEHICLE, true);
+                m_bIsSetUp = true;
+            }
+        }
+
+        // move timer
+        if (!m_bHasMoved)
+        {
+            if (m_uiMoveTimer < uiDiff)
+            {
+                if (m_pInstance)
+                {
+                    if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                    {
+                        float x, y, z;
+                        pLichKing->GetNearPoint(m_creature, x, y, z, m_creature->GetObjectBoundingRadius(), 8.0f, pLichKing->GetAngle(m_creature));
+                        m_creature->GetMotionMaster()->MovePoint(POINT_TP_TO_FM, x, y, z, false);
+                    }
+                }
+                m_bHasMoved = true;
+            }
+            else
+                m_uiMoveTimer -= uiDiff;
+        }
+
+        // teleport timer
+        if (!m_bHasTeleported)
+        {
+            if (m_uiTeleportTimer < uiDiff)
+            {
+                if (Unit *pCreator = m_creature->GetCreator())
+                {
+                    if (pCreator->isAlive())
+                    {
+                        pCreator->CastSpell(m_creature, SPELL_HARVEST_SOUL_CLONE, true);
+                        pCreator->CastSpell(pCreator, SPELL_FROSTMOURNE_TP_VISUAL, true);
+                        pCreator->CastSpell(pCreator, m_bIsHeroic ? SPELL_HARVEST_SOUL_TP_FM_H : SPELL_HARVEST_SOUL_TP_FM_N, true);
+                    }
+                    else
+                    {
+                        m_creature->ForcedDespawn();
+                        return;
+                    }
+                }
+                if (m_pInstance)
+                {
+                    if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                        pLichKing->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                }
+                m_bHasTeleported = true;
+            }
+            else
+                m_uiTeleportTimer -= uiDiff;
+        }
+    }
+};
+
+CreatureAI* GetAI_mob_strangulate_vehicle(Creature* pCreature)
+{
+    return new mob_strangulate_vehicleAI(pCreature);
+}
+
+/**
+ * Terenas Menethil in Frostmourne
+ */
+struct MANGOS_DLL_DECL npc_terenas_fmAI : public base_icc_bossAI
+{
+    npc_terenas_fmAI(Creature *pCreature) : base_icc_bossAI(pCreature)
+    {
+        m_uiSayPhase = 0;
+        m_uiSayTimer = 6000;
+        m_uiReleaseTimer = 46000;
+        m_uiSummonWickedSpiritsTimer = 7000;
+        m_uiSummonSpiritBombTimer = 7000;
+        m_bHasReleasedPlayer = false;
+
+        m_creature->ForcedDespawn(m_bIsHeroic ? 48000 : 68000);
+    }
+
+    uint32 m_uiSayTimer;
+    uint32 m_uiSayPhase;
+    uint32 m_uiReleaseTimer;
+    uint32 m_uiSummonWickedSpiritsTimer;
+    uint32 m_uiSummonSpiritBombTimer;
+    bool m_bHasReleasedPlayer;
+
+    void Reset(){}
+
+    void Aggro(Unit *pWho)
+    {
+        DoCastSpellIfCan(m_creature, SPELL_LIGHTS_FAVOR, CAST_TRIGGERED);
+        m_creature->SetHealthPercent(50.0f);
+    }
+
+    void EnterEvadeMode()
+    {
+        if (!m_bHasReleasedPlayer)
+        {
+            m_bHasReleasedPlayer = true;
+            DoCastSpellIfCan(m_creature, SPELL_RESTORE_SOUL);
+            m_uiSayPhase = 5;
+            m_uiSayTimer = 2000;
+        }
+    }
+
+    void JustDied(Unit *pKiller)
+    {
+        if (pKiller->GetEntry() == NPC_SPIRIT_WARDEN)
+        {
+            pKiller->CastSpell(pKiller, SPELL_DESTROY_SOUL, true);
+
+            if (m_pInstance)
+                m_pInstance->SetData(TYPE_FROSTMOURNE_ROOM, DONE);
+
+            ((Creature*)pKiller)->ForcedDespawn();
+        }
+    }
+
+    void DoSummonWickedSpirits(uint32 count)
+    {
+        for(uint32 i = 0; i < count; ++i)
+        {
+            float x, y, z;
+            m_creature->GetPosition(x, y, z);
+
+            z += 15.0f;
+            x += frand(-25.0f, 25.0f);
+            y += frand(-25.0f, 25.0f);
+
+            m_creature->SummonCreature(NPC_WICKED_SPIRIT, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 41000);
+        }
+    }
+
+    void DamageTaken(Unit *pDealer, uint32 uiDamage)
+    {
+        if (m_bIsHeroic)
+            uiDamage = 0;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiSayTimer < uiDiff)
+        {
+            switch (m_uiSayPhase)
+            {
+                case 0:
+                    if (!m_bIsHeroic)
+                    {
+                        if (Creature *pSpirit = GetClosestCreatureWithEntry(m_creature, NPC_SPIRIT_WARDEN, 20.0f))
+                        {
+                            AttackStart(pSpirit);
+                            pSpirit->AI()->AttackStart(m_creature);
+                            pSpirit->AddThreat(m_creature, 100000.0f);
+                        }
+                    }
+                    else
+                    {
+                        DoSummonWickedSpirits(15);
+                        m_uiSummonWickedSpiritsTimer = 15000;
+                        // summon Spirit Bomb every 2 seconds
+                        // aura doesnt work?;/
+                        // DoCastSpellIfCan(m_creature, SPELL_SUMMON_SPIRIT_BOMBS_2, CAST_TRIGGERED);
+                        DoCastSpellIfCan(m_creature, SPELL_RESTORE_SOUL_HEROIC);
+                    }
+                    ++m_uiSayPhase;
+                    m_uiSayTimer = 1000;
+                    break;
+                case 1:
+                    DoScriptText(SAY_FM_TERENAS_AID_1, m_creature);
+                    ++m_uiSayPhase;
+                    m_uiSayTimer = 8000;
+                    break;
+                case 2:
+                    DoScriptText(SAY_FM_TERENAS_AID_2, m_creature);
+                    ++m_uiSayPhase;
+                    m_uiSayTimer = 12000;
+                    break;
+                case 3:
+                    DoScriptText(SAY_FM_TERENAS_AID_3, m_creature);
+                    ++m_uiSayPhase;
+                    break;
+                case 4:
+                    // fight
+                    break;
+                case 5:
+                    // release soul
+                    if (m_pInstance)
+                    {
+                        m_pInstance->SetData(TYPE_FROSTMOURNE_ROOM, DONE);
+
+                        if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
+                            DoScriptText(SAY_FM_PLAYER_ESCAPE, pLichKing);
+                    }
+                    ++m_uiSayPhase;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+            m_uiSayTimer -= uiDiff;
+
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
+        if (m_bIsHeroic)
+        {
+            // Release Souls (heroic)
+            if (m_uiReleaseTimer < uiDiff)
+            {
+                if (m_pInstance)
+                    m_pInstance->SetData(TYPE_FROSTMOURNE_ROOM, DONE);
+
+                m_uiReleaseTimer = 46000;
+            }
+            else
+                m_uiReleaseTimer -= uiDiff;
+
+            // Summon Wicked Spirits
+            if (m_uiSummonWickedSpiritsTimer < uiDiff)
+            {
+                DoSummonWickedSpirits(1);
+                m_uiSummonWickedSpiritsTimer = 1000;
+            }
+            else
+                m_uiSummonWickedSpiritsTimer -= uiDiff;
+        }
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
         DoMeleeAttackIfReady();
     }
 };
 
-CreatureAI* GetAI_mob_terenas_frostmourne(Creature *pCreature)
+CreatureAI* GetAI_npc_terenas_fm(Creature* pCreature)
 {
-    return new mob_terenas_frostmourneAI(pCreature);
+    return new npc_terenas_fmAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_spirit_wardenAI : public ScriptedAI
+
+/**
+ * Spirit Warden
+ */
+struct MANGOS_DLL_DECL mob_spirit_wardenAI : public base_icc_bossAI
 {
-    mob_spirit_wardenAI(Creature* pCreature) : ScriptedAI(pCreature)
+    mob_spirit_wardenAI(Creature *pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-        pTerenasFrostmourne = NULL;
-        pVictim = NULL;
+        m_creature->ForcedDespawn(68000);
         Reset();
     }
 
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
-
-    uint32 m_uiSoulripTimer;
-    uint32 m_uiDestroysoulTimer;
-
-    Creature *pTerenasFrostmourne;
-    Player *pVictim;
+    uint32 m_uiSoulRipTimer;
+    uint32 m_uiHarvestedSoulTimer;
 
     void Reset()
     {
-        m_uiSoulripTimer = 0;
-        m_uiDestroysoulTimer = 60000;
-        m_creature->SetRespawnDelay(20000);
-        pTerenasFrostmourne = NULL;
-        pVictim = NULL;
-    }
-
-    void JustDied(Unit *pKiller)
-    {
-        if (pTerenasFrostmourne)
-            pTerenasFrostmourne->CastSpell(pVictim, SPELL_RESTORE_SOUL, false);
-        if (Creature *pLich = GetClosestCreatureWithEntry(m_creature, NPC_LICH_KING, 500.0f))
-        {
-            DoScriptText(SAY_FM_PLAYER_ESCAPE ,pLich, pKiller);
-        }
-    }
-
-    void Aggro(Unit *pWho)
-    {
-        if(!m_pInstance)
-            return;
-
-        if (pTerenasFrostmourne = GetClosestCreatureWithEntry(m_creature, NPC_TERENAS_FROSTMOURNE, 20.0f))
-        {
-            m_creature->SetInCombatWith(pTerenasFrostmourne);
-            pTerenasFrostmourne->SetInCombatWith(m_creature);
-            m_creature->AI()->AttackStart(pTerenasFrostmourne);
-            m_creature->AddThreat(pTerenasFrostmourne, 100000.0f);
-        }
-        m_creature->CastSpell(m_creature, SPELL_DARK_HUNGER, true);
+        DoCastSpellIfCan(m_creature, SPELL_DARK_HUNGER, CAST_TRIGGERED);
+        m_uiSoulRipTimer = 12000;
+        m_uiHarvestedSoulTimer = 61000;
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_pInstance)
-            return;
-
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (pVictim = GetPlayerAtMinimumRange(20.0f))
-        {
-            // Soul rip
-            if (m_uiSoulripTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(pTerenasFrostmourne, SPELL_SOULRIP) == CAST_OK)
-                    m_uiSoulripTimer = 8000;
-            }
-            else
-                m_uiSoulripTimer -= uiDiff;
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
-            DoMeleeAttackIfReady();
+        // Soul Rip
+        if (m_uiSoulRipTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SOUL_RIP) == CAST_OK)
+                m_uiSoulRipTimer = 20000;
         }
         else
-            return;
+            m_uiSoulRipTimer -= uiDiff;
+
+        // Harvest Soul 60sec aura wears off
+        if (m_uiHarvestedSoulTimer < uiDiff)
+        {
+            if (m_pInstance)
+                m_pInstance->SetData(TYPE_FROSTMOURNE_ROOM, DONE);
+
+            m_uiHarvestedSoulTimer = 60000;
+        }
+        else
+            m_uiHarvestedSoulTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
-CreatureAI* GetAI_mob_spirit_warden(Creature *pCreature)
+CreatureAI* GetAI_mob_spirit_warden(Creature* pCreature)
 {
     return new mob_spirit_wardenAI(pCreature);
 }
 
-/*struct MANGOS_DLL_DECL mob_terenas_menethilAI : public ScriptedAI
+/**
+ * Spirit Bomb
+ */
+struct MANGOS_DLL_DECL mob_spirit_bombAI : public base_icc_bossAI
 {
-    mob_terenas_menethilAI(Creature* pCreature) : ScriptedAI(pCreature)
+    mob_spirit_bombAI(Creature *pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
-
-    void Reset()
-    {
-
-    }
-
-    void AttackStart(Unit *pWho)
-    {
-        return;
-    }
-};
-
-CreatureAI* GetAI_mob_terenas_menethil(Creature *pCreature)
-{
-    return new mob_terenas_menethilAI(pCreature);
-}*/
-
-struct MANGOS_DLL_DECL mob_shambling_horrorAI : public ScriptedAI
-{
-    mob_shambling_horrorAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-
-    bool m_bIsHeroic;
-
-    uint32 m_uiEnrageTimer;
-    uint32 m_uiShockwaveTimer;
-
-    void Reset()
-    {
-        m_uiEnrageTimer = 20000;
-        m_uiShockwaveTimer = urand(13000, 20000);
-    }
-
-    void Aggro(Unit *pWho)
-    {
-        if (!pWho)
-            return;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiEnrageTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_HORROR_ENRAGE) == CAST_OK)
-                m_uiEnrageTimer = 20000;
-        }
-        else m_uiEnrageTimer -= uiDiff;
-
-        if (m_uiShockwaveTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOCKWAVE) == CAST_OK)
-                m_uiShockwaveTimer = urand(13000, 20000);
-        }
-        else m_uiShockwaveTimer -= uiDiff;
-
-        if (m_bIsHeroic)
-        {
-            if (m_creature->GetHealthPercent() <= 20.0f && !m_creature->HasAura(SPELL_HORROR_FRENZY))
-            {
-                m_creature->CastSpell(m_creature, SPELL_HORROR_FRENZY, false);
-            }
-        }
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mob_shambling_horror(Creature *pCreature)
-{
-    return new mob_shambling_horrorAI(pCreature);
-}
-
-struct MANGOS_DLL_DECL mob_shadow_trapAI : public ScriptedAI
-{
-    mob_shadow_trapAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-
-    uint32 m_uiWaitTimer;
-    uint32 m_uiDespawnTimer;
-    uint32 m_uiCheckTimer;
-
-    void Reset()
-    {
+        m_creature->ForcedDespawn(41000);
         SetCombatMovement(false);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->CastSpell(m_creature, SPELL_SHADOW_TRAP_VISUAL, true);
-        m_uiWaitTimer = 3000;
-        m_uiDespawnTimer = 30000;
-        m_uiCheckTimer = 0;
+        m_creature->SetLevitate(true);
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+        m_creature->SetInCombatWithZone();
+        m_creature->GetMotionMaster()->Clear();
+
+        float x, y, z;
+        m_creature->GetPosition(x, y, z);
+
+        m_creature->NearTeleportTo(x, y, z + 20.0f, 0.0f);
+        m_creature->GetMotionMaster()->MovePoint(POINT_SPIRIT_BOMB, x, y, z, false);
+        DoCastSpellIfCan(m_creature, SPELL_SPIRIT_BOMB_VISUAL, CAST_TRIGGERED);
     }
 
-    void AttackStart(Unit *pWho)
+    void Reset(){}
+
+    void MovementInform(uint32 uiMovementType, uint32 uiData)
     {
-        return;
+        if (uiMovementType != POINT_MOTION_TYPE)
+            return;
+
+        if (uiData == POINT_SPIRIT_BOMB)
+        {
+            DoCastSpellIfCan(m_creature, SPELL_EXPLOSION);
+            m_creature->ForcedDespawn(1000);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_uiWaitTimer < uiDiff)
-        {
-            if (m_uiCheckTimer < uiDiff)
-            {
-                if (Player *pPlayer = GetPlayerAtMinimumRange(m_creature->GetObjectScale() * 3))
-                    if (pPlayer)
-                        m_creature->CastSpell(m_creature, SPELL_SHADOW_TRAP, false);
-
-                m_uiCheckTimer = 1000;
-            }
-            else m_uiCheckTimer -= uiDiff;
-        }
-        else m_uiWaitTimer -= uiDiff;
-
-        if (m_uiDespawnTimer < uiDiff)
+        if (!m_pInstance || m_pInstance->GetData(TYPE_LICH_KING) != IN_PROGRESS)
             m_creature->ForcedDespawn();
-        else m_uiDespawnTimer -= uiDiff;
     }
 };
 
-CreatureAI* GetAI_mob_shadow_trap(Creature *pCreature)
+CreatureAI* GetAI_mob_spirit_bomb(Creature* pCreature)
 {
-    return new mob_shadow_trapAI(pCreature);
+    return new mob_spirit_bombAI(pCreature);
 }
+
 
 void AddSC_boss_lich_king_icc()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_the_lich_king_icc";
-    newscript->GetAI = &GetAI_boss_the_lich_king_icc;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_the_lich_king_icc";
+    pNewScript->GetAI = &GetAI_boss_the_lich_king_icc;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "boss_tirion_icc";
-    newscript->GetAI = &GetAI_boss_tirion_icc;
-    newscript->pGossipHello = &GossipHello_boss_tirion_icc;
-    newscript->pGossipSelect = &GossipSelect_boss_tirion_icc;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_tirion_icc";
+    pNewScript->GetAI = &GetAI_boss_tirion_icc;
+    pNewScript->pGossipHello = &GossipHello_boss_tirion_icc;
+    pNewScript->pGossipSelect = &GossipSelect_boss_tirion_icc;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_ice_sphere_icc";
-    newscript->GetAI = &GetAI_mob_ice_sphere_icc;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_ice_sphere_icc";
+    pNewScript->GetAI = &GetAI_mob_ice_sphere_icc;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_defiler_icc";
-    newscript->GetAI = &GetAI_mob_defiler_icc;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_shambling_horror";
+    pNewScript->GetAI = &GetAI_mob_shambling_horror;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_strangulate_vehicle";
-    newscript->GetAI = &GetAI_mob_strangulate_vehicle;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_drudge_ghoul";
+    pNewScript->GetAI = &GetAI_mob_drudge_ghoul;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_vile_spirit";
-    newscript->GetAI = &GetAI_mob_vile_spirit;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_shadow_trap";
+    pNewScript->GetAI = &GetAI_mob_shadow_trap;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_raging_spirit";
-    newscript->GetAI = &GetAI_mob_raging_spirit;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_raging_spirit";
+    pNewScript->GetAI = &GetAI_mob_raging_spirit;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_valkyr";
-    newscript->GetAI = &GetAI_mob_valkyr;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_valkyr_shadowguard";
+    pNewScript->GetAI = &GetAI_mob_valkyr_shadowguard;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_terenas_frostmourne";
-    newscript->GetAI = &GetAI_mob_terenas_frostmourne;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_defiler_icc";
+    pNewScript->GetAI = &GetAI_mob_defiler_icc;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_spirit_warden";
-    newscript->GetAI = &GetAI_mob_spirit_warden;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_vile_spirit";
+    pNewScript->GetAI = &GetAI_mob_vile_spirit;
+    pNewScript->RegisterSelf();
 
-    /*newscript = new Script;
-    newscript->Name = "mob_terenas_menethil";
-    newscript->GetAI = &GetAI_mob_terenas_menethil;
-    newscript->RegisterSelf();*/
+    pNewScript = new Script;
+    pNewScript->Name = "mob_strangulate_vehicle";
+    pNewScript->GetAI = &GetAI_mob_strangulate_vehicle;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_shambling_horror";
-    newscript->GetAI = &GetAI_mob_shambling_horror;
-    newscript->RegisterSelf();
-    newscript = new Script;
+    pNewScript = new Script;
+    pNewScript->Name = "npc_terenas_fm";
+    pNewScript->GetAI = &GetAI_npc_terenas_fm;
+    pNewScript->RegisterSelf();
 
-    newscript->Name = "mob_shadow_trap";
-    newscript->GetAI = &GetAI_mob_shadow_trap;
-    newscript->RegisterSelf();
-};
+    pNewScript = new Script;
+    pNewScript->Name = "mob_spirit_warden";
+    pNewScript->GetAI = &GetAI_mob_spirit_warden;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "mob_spirit_bomb";
+    pNewScript->GetAI = &GetAI_mob_spirit_bomb;
+    pNewScript->RegisterSelf();
+}

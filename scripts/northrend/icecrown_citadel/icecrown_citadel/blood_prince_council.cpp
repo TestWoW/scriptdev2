@@ -314,22 +314,13 @@ CreatureAI* GetAI_npc_blood_orb_control(Creature* pCreature)
 }
 
 // base struct for Blood Prince Council
-struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public ScriptedAI
+struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
 {
-    base_blood_prince_council_bossAI(Creature* pCreature) : ScriptedAI(pCreature)
+    base_blood_prince_council_bossAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
         DoCastSpellIfCan(m_creature, SPELL_FEIGN_DEATH, CAST_TRIGGERED);
     }
-    
-    instance_icecrown_spire* m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
 
     bool m_bIsEmpowered;
     bool m_bIsSaidSpecial; // 1st spell cast after being empowered is followed by special say
@@ -426,6 +417,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public ScriptedAI
             if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != FAIL)
                 m_pInstance->SetData(TYPE_BLOOD_COUNCIL, FAIL);
         }
+        m_creature->SetHealth(1);
     }
     
     void SpellHit(Unit *pCaster, const SpellEntry *pSpell)

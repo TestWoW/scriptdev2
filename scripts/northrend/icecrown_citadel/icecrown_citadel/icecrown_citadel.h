@@ -2,8 +2,8 @@
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
-#ifndef DEF_ICECROWN_SPIRE_H
-#define DEF_ICECROWN_SPIRE_H
+#ifndef DEF_icecrown_citadel_H
+#define DEF_icecrown_citadel_H
 #include "BSW_instance.h"
 #include "BSW_ai.h"
 
@@ -21,12 +21,12 @@ enum
     TYPE_LANATHEL                       = 9,
     TYPE_VALITHRIA                      = 10,
     TYPE_SINDRAGOSA                     = 11,
-    TYPE_KINGS_OF_ICC                   = 12,
-    TYPE_LICH_KING                      = 13,
-    TYPE_ICECROWN_QUESTS                = 14,
-    TYPE_COUNT                          = 15,
+    TYPE_LICH_KING                      = 12,
     MAX_ENCOUNTERS,
 
+    TYPE_FROSTMOURNE_ROOM,
+    TYPE_KINGS_OF_ICC,
+    TYPE_ICECROWN_QUESTS,
     TYPE_STINKY,
     TYPE_PRECIOUS,
 
@@ -179,8 +179,6 @@ enum
     DESPAWN_TIME                        = 300000,
     SPELL_SHADOWS_EDGE                  = 71168,
 
-    MAX_SPECIAL_ACHIEV_CRITS            = 14,
-
     TYPE_BONED                          = 0,
     TYPE_FULL_HOUSE                     = 1,
     TYPE_ON_THE_BOAT                    = 2,
@@ -193,8 +191,10 @@ enum
     TYPE_ONCE_BITTEN_TWICE_SHY_V        = 9,
     TYPE_PORTAL_JOCKEY                  = 10,
     TYPE_ALL_YOU_CAN_EAT                = 11,
-    TYPE_BEEN_WATING_A_LONG_TIME        = 12,
+    TYPE_BEEN_WAITING_A_LONG_TIME       = 12,
     TYPE_NECK_DEEP_IN_VILE              = 13,
+
+    MAX_SPECIAL_ACHIEV_CRITS            = 14,
 
     // Lord Marrowgar
     CRITERIA_BONED_10N                  = 12775,
@@ -252,28 +252,37 @@ enum
     CRITERIA_PORTAL_JOCKEY_10H          = 12979,
     CRITERIA_PORTAL_JOCKEY_25H          = 12980,
 
-
     // Sindragosa
     CRITERIA_ALL_YOU_CAN_EAT_10N        = 12822,
     CRITERIA_ALL_YOU_CAN_EAT_25N        = 12972,
     CRITERIA_ALL_YOU_CAN_EAT_10H        = 12996,
     CRITERIA_ALL_YOU_CAN_EAT_25H        = 12989,
+
+    // The lich king
+    CRITERIA_BEEN_WAITING_10N           = 13246,
+    CRITERIA_BEEN_WAITING_10H           = 13247,
+    CRITERIA_BEEN_WAITING_25N           = 13244,
+    CRITERIA_BEEN_WAITING_25H           = 13245,
+
+    CRITERIA_NECK_DEEP_IN_VILE_10N      = 12823,
+    CRITERIA_NECK_DEEP_IN_VILE_10H      = 13163,
+    CRITERIA_NECK_DEEP_IN_VILE_25N      = 13243,
+    CRITERIA_NECK_DEEP_IN_VILE_25H      = 13164,
 };
 
-class MANGOS_DLL_DECL instance_icecrown_spire : public BSWScriptedInstance
+class MANGOS_DLL_DECL instance_icecrown_citadel : public ScriptedInstance
 {
 public:
-    instance_icecrown_spire(Map* pMap);
-    ~instance_icecrown_spire() {}
+    instance_icecrown_citadel(Map* pMap);
+    ~instance_icecrown_citadel() {}
 
     void Initialize();
 
     void OnObjectCreate(GameObject* pGo);
     void OnCreatureCreate(Creature* pCreature);
 
-    void OpenAllDoors();
-    void OnPlayerEnter(Player* pPlayer);
     bool IsEncounterInProgress();
+    bool IsRaidWiped();
 
     void SetData(uint32 uiType, uint32 uiData);
     uint32 GetData(uint32 uiType);
@@ -311,20 +320,53 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
 {
     base_icc_bossAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_citadel*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_icecrown_citadel* m_pInstance;
     Difficulty m_uiMapDifficulty;
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
     void Reset(){}
     void UpdateAI(const uint32 uiDiff){}
+
+    Unit* SelectRandomRangedTarget(Unit *pSource)
+        {
+            Unit *pResult = NULL;
+            std::list<Unit*> lTargets;
+            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+
+            for (ThreatList::const_iterator i = tList.begin();i != tList.end(); ++i)
+            {
+                if (!(*i)->getUnitGuid().IsPlayer())
+                    continue;
+
+                if (Unit* pTmp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
+                    lTargets.push_back(pTmp);
+            }
+
+            if (!lTargets.empty())
+            {
+                uint8 max = m_bIs25Man ? 8 : 3;
+                std::list<Unit*>::iterator iter;
+
+                lTargets.sort(ObjectDistanceOrderReversed(pSource));
+                iter = lTargets.begin();
+
+                if (max >= lTargets.size())
+                    max = lTargets.size() - 1;
+
+                std::advance(iter, urand(0, max));
+                pResult = (*iter);
+            }
+
+            return pResult;
+        }
 };
 
 #endif

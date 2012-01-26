@@ -167,7 +167,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
 {
     boss_deathbringer_saurfang_eventAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_citadel*)pCreature->GetInstanceData();
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_powerBloodPower = m_creature->getPowerType(); // don't call this function multiple times in script
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
@@ -190,7 +190,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
         m_lGuards.clear();
     }
 
-    instance_icecrown_spire *m_pInstance;
+    instance_icecrown_citadel *m_pInstance;
 
     uint32 m_uiNextEventTimer;
     uint32 m_uiEventStep;
@@ -1322,7 +1322,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
 {
     boss_deathbringer_saurfangAI(Creature* pCreature) : boss_deathbringer_saurfang_eventAI(pCreature)
     {
-        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
+        m_pInstance = (instance_icecrown_citadel*)pCreature->GetInstanceData();
         m_powerBloodPower = m_creature->getPowerType(); // don't call this function multiple times in script
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
@@ -1331,7 +1331,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         ResetFight();
     }
 
-    instance_icecrown_spire *m_pInstance;
+    instance_icecrown_citadel *m_pInstance;
 
     uint32 m_uiRuneOfBloodTimer;
     uint32 m_uiBoilingBloodTimer;
@@ -1400,10 +1400,10 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
 
     void KilledUnit(Unit* pVictim)
     {
-        if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        {
-            DoScriptText(SAY_SLAY_1 - urand(0,1), m_creature, pVictim);
-        }
+        if (pVictim->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        DoScriptText(SAY_SLAY_1 - urand(0, 1),m_creature,pVictim);
     }
 
     void JustSummoned(Creature *pSummoned)
