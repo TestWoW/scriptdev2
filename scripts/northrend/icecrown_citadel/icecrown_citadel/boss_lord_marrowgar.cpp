@@ -89,25 +89,17 @@ enum
 /*####
 # Lord Marrowgar
 ####*/
-struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public ScriptedAI
+struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
 {
-    boss_lord_marrowgarAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_lord_marrowgarAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bSaidIntro = false;
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         m_uiMaxCharges = m_bIsHeroic ? MAX_CHARGES_HEROIC : MAX_CHARGES_NORMAL;
 
         Reset();
     }
 
-    ScriptedInstance *m_pInstance;
-
     bool m_bSaidIntro;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
 
     uint8 m_uiPhase;
     uint8 m_uiChargesCount;
@@ -120,8 +112,6 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public ScriptedAI
     uint32 m_uiBoneStormTimer;
     uint32 m_uiBoneStormChargeTimer;
     uint32 m_uiBoneStormColdflameTimer;
-
-    Difficulty m_uiMapDifficulty;
 
     void Reset()
     {
@@ -170,6 +160,9 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
+        if (pVictim->GetTypeId() != TYPEID_PLAYER)
+            return;
+
         DoScriptText(SAY_SLAY_1 - urand(0, 1),m_creature,pVictim);
     }
 
@@ -385,13 +378,13 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
 {
     mob_bone_spikeAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = ((instance_icecrown_spire*)pCreature->GetInstanceData());
+        m_pInstance = ((instance_icecrown_citadel*)pCreature->GetInstanceData());
         m_uiAchievTimer = 8000;
         m_bEmerged = false;
         SetCombatMovement(false);
     }
 
-    instance_icecrown_spire* m_pInstance;
+    instance_icecrown_citadel* m_pInstance;
     bool m_bEmerged;
     uint32 m_uiAchievTimer;
 

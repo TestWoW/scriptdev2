@@ -15,7 +15,7 @@
  */
 
 /* ScriptData
-SDName: icecrown_spire
+SDName: icecrown_citadel
 SD%Complete: 100%
 SDComment: by /dev/rsa
 SDCategory: Icecrown Citadel - mobs
@@ -39,54 +39,15 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public BSWScriptedAI
 {
     mob_spire_frostwyrmAI(Creature* pCreature) : BSWScriptedAI(pCreature)
     {
-        pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         Reset();
     }
-
-    ScriptedInstance *pInstance;
-    uint8 stage;
-
     void Reset()
     {
         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         m_creature->SetRespawnDelay(DAY);
 
-        stage = 0;
         resetTimers();
-    }
-
-    void MoveInLineOfSight(Unit* pWho)
-    {
-         if(Creature* pHordeOne = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_1))
-             pHordeOne->HandleEmote(EMOTE_STATE_READY1H);
-
-         if(Creature* pHordeTwo = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_2))
-             pHordeTwo->HandleEmote(EMOTE_STATE_READY1H);
-
-         if(Creature* pHordeThree = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_3))
-             pHordeThree->HandleEmote(EMOTE_STATE_READY2H);
-
-         if(Creature* pHordeFour = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_4))
-             pHordeFour->HandleEmote(EMOTE_STATE_READY2H);
-
-         if(Creature* pHordeFive = pInstance->GetSingleCreatureFromStorage(NPC_HORDE_5))
-             pHordeFive->HandleEmote(EMOTE_STATE_READY1H);
-
-         if(Creature* pAllyOne = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_1))
-             pAllyOne->HandleEmote(EMOTE_STATE_READY1H);
-
-         if(Creature* pAllyTwo = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_2))
-             pAllyTwo->HandleEmote(EMOTE_STATE_READY1H);
-
-         if(Creature* pAllyThree = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_3))
-             pAllyThree->HandleEmote(EMOTE_STATE_READY1H);
-
-         if(Creature* pAllyFour = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_4))
-             pAllyFour->HandleEmote(EMOTE_STATE_READY1H);
-
-         if(Creature* pAllyFive = pInstance->GetSingleCreatureFromStorage(NPC_ALLY_5))
-             pAllyFive->HandleEmote(EMOTE_STATE_READY2H);
     }
 
     void UpdateAI(const uint32 diff)

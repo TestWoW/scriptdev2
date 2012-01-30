@@ -21,7 +21,7 @@ DELETE FROM `locales_npc_text` WHERE `entry` = 99323;
 DELETE FROM `npc_text` WHERE `ID` = 99323;
 DELETE FROM `gameobject` WHERE `guid` IN (913334);
 
-UPDATE `instance_template` SET `ScriptName`='instance_icecrown_spire' WHERE `map`=631;
+UPDATE `instance_template` SET `ScriptName`='instance_icecrown_citadel' WHERE `map`=631;
 
 -- fix for ytdb data on frostwing door/puddle
 
@@ -63,6 +63,7 @@ DELETE FROM `spell_area` WHERE `spell` IN
 -- --------
 
 UPDATE `creature_template` SET `vehicle_id` = 639, `AIName`='', `PowerType` = 3, `ScriptName`='boss_deathbringer_saurfang' WHERE `entry`=37813;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_highlord_saurfang_icc' WHERE `entry`=37187;
 UPDATE `creature_template` SET `vehicle_id` = 639, `AIName`='', `PowerType` = 3 WHERE `entry` IN (38402,38582,38583);
 UPDATE `creature` SET `position_x` = -476.621,`position_y` = 2211.11,`position_z` = 541.197, `spawntimesecs` = 604800 WHERE `id` = 37813;
 UPDATE `creature_template` SET `ScriptName`='mob_blood_beast', `AIName`='' WHERE `entry`= 38508;
@@ -103,9 +104,13 @@ UPDATE `creature_template` SET baseattacktime = 1000 WHERE `entry` IN (37813, 38
 
 UPDATE `creature_template` SET `ScriptName`='boss_lady_deathwhisper', `AIName`='' WHERE `entry`=36855;
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 256 WHERE `entry` IN (38296, 38297); -- can't taunt on heroic mode
-UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14,`ScriptName`='mob_vengeful_shade', `AIName`='' WHERE `entry`= 38222;
+UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14,`ScriptName`='', `AIName`='' WHERE `entry`= 38222;
 UPDATE `creature_template` SET `ScriptName`='mob_cult_adherent', `AIName`='' WHERE `entry`= 37949;
 UPDATE `creature_template` SET `ScriptName`='mob_cult_fanatic', `AIName`='' WHERE `entry`= 37890;
+
+-- Vengeful Blast aura for shades
+DELETE FROM `creature_template_addon` WHERE `entry` = 38222;
+INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES (38222, "71494");
 
 -- ---------
 -- Marrowgar
@@ -132,15 +137,7 @@ DELETE FROM `creature` WHERE `guid` = 94094 AND `id` = 38490;
 -- -------------------------
 DELETE FROM `gameobject` WHERE `id` IN (201872,201873,201874,201875,202177,202178,202179,202180);
 UPDATE `gameobject_template` SET `flags` = 0 WHERE `gameobject_template`.`entry` IN (201872,201873,201874,201875,202177,202178,202179,202180);
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`) VALUES
-(972541, 201872, 631, 1, 1, -428.141, 2421.34, 191.233, 3.10389, 0, 0, 0.999822, 0.0188489, -604800, 100, 1),
-(972543, 201873, 631, 2, 1, -428.141, 2421.34, 191.233, 3.10389, 0, 0, 0.999822, 0.0188489, -604800, 100, 1),
-(972545, 201874, 631, 4, 1, -428.141, 2421.34, 191.233, 3.10389, 0, 0, 0.999822, 0.0188489, -604800, 100, 1),
-(972547, 201875, 631, 8, 1, -428.141, 2421.34, 191.233, 3.10389, 0, 0, 0.999822, 0.0188489, -604800, 100, 1),
-(972551, 202177, 631, 1, 1, -447.493, 2003.5, 191.235, 0.153939, 0, 0, 0.0768933, 0.997039, -604800, 100, 1),
-(972553, 202178, 631, 2, 1, -447.493, 2003.5, 191.235, 0.153939, 0, 0, 0.0768933, 0.997039, -604800, 100, 1),
-(972555, 202179, 631, 4, 1, -447.493, 2003.5, 191.235, 0.153939, 0, 0, 0.0768933, 0.997039, -604800, 100, 1),
-(972557, 202180, 631, 8, 1, -447.493, 2003.5, 191.235, 0.153939, 0, 0, 0.0768933, 0.997039, -604800, 100, 1);
+
 
 -- -----------
 -- Plague wing
@@ -155,9 +152,9 @@ UPDATE `gameobject_template` SET `faction` = '114' WHERE `gameobject_template`.`
 UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201370);
 UPDATE `creature_template` SET `ScriptName`='mob_little_ooze', `AIName`='' WHERE `entry`= 36897;
 UPDATE `creature_template` SET `ScriptName`='mob_big_ooze', `AIName`='' WHERE `entry`= 36899;
-UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80, `AIName` ='', `faction_A`= 14, `faction_H` = 14, `ScriptName`='mob_rotface_ooze_dummy', `AIName`='', unit_flags = 524288, flags_extra = flags_extra | 2 WHERE `entry` IN (37013, 37986, 38107, 38548);
+UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80, `AIName` ='', `faction_A`= 14, `faction_H` = 14, `ScriptName`='mob_rotface_ooze_dummy', `AIName`='', unit_flags = 524288, flags_extra = flags_extra | 2 WHERE `entry` IN (37013, 37986, 38548);
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80, `AIName` ='', `faction_A`= 2212, `faction_H` = 2212, `ScriptName`='mob_sticky_ooze', `AIName`='' WHERE `entry`= 37006;
-UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80, `AIName` ='', `faction_A`= 2212, `faction_H` = 2212, `ScriptName`='mob_ooze_explode_stalker', `AIName`='' WHERE `entry` = 38107;
+UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80, `AIName` ='', `faction_A`= 2212, `faction_H` = 2212, `ScriptName`='mob_ooze_explosion_stalker', `AIName`='' WHERE `entry` = 38107;
 
 DELETE FROM `spell_script_target` WHERE `entry` IN (69508, 70881, 69782, 69783, 70079);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES
@@ -174,6 +171,9 @@ INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`,
 DELETE FROM `creature_model_info` WHERE (`modelid`=30483);
 INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`, `gender`, `modelid_other_gender`, `modelid_alternative`) VALUES (30483, 5, 1, 2, 0, 0);
 
+-- fix flags of Puddle Stalkers
+UPDATE `creature_template` SET `unit_flags` = 524288 WHERE `entry` = 37013;
+
 -- ---------
 -- Festergut
 -- ---------
@@ -181,9 +181,9 @@ INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`,
 UPDATE `creature_template` SET `ScriptName`='boss_festergut', `AIName`=''  WHERE `entry`= 36626;
 UPDATE `gameobject_template` SET `faction` = '114' WHERE `gameobject_template`.`entry` IN (201371);
 UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201371);
-UPDATE `creature_template` SET `ScriptName`='mob_vile_gas_malleable_goo', `AIName`='', `flags_extra` = `flags_extra` | 2 | 128  WHERE `entry` IN (38548, 38556);
+UPDATE `creature_template` SET `ScriptName`='mob_vile_gas_malleable_goo', unit_flags = 0, `AIName`='', `flags_extra` = `flags_extra` | 2 | 128  WHERE `entry` IN (38548, 38556);
 -- orange gas stalker
-UPDATE `creature_template` SET `faction_A` = 2212, `faction_H` = 2212,  `ScriptName`='', `AIName`='' WHERE `entry`= 36659;
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` & ~33554432 & ~2, `faction_A` = 2212, `faction_H` = 2212,  `ScriptName`='', `AIName`='' WHERE `entry`= 36659;
 DELETE FROM `spell_script_target` WHERE `entry` IN (69157, 69162, 69164);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES
 (69157, 1, 36659),
@@ -214,11 +214,15 @@ INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`,
 DELETE FROM `creature_model_info` WHERE (`modelid`=30483);
 INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`, `gender`, `modelid_other_gender`, `modelid_alternative`) VALUES (30483, 5, 1, 2, 0, 0);
 
+-- make triggers not visible
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 33554432 | 2 WHERE entry IN (37013, 37986, 38107, 38548, 37006, 38107, 38548, 38556, 36659);
+
 -- -------------------
 -- Professor putricide
 -- -------------------
 
 UPDATE `creature_template` SET `ScriptName`='boss_professor_putricide', `AIName`='' WHERE `entry`= 36678;
+UPDATE `creature_template` SET `vehicle_id`=587 WHERE `entry` in (36678,38431,38585,38586);
 UPDATE `gameobject_template` SET `faction` = '114',`data0` = '0' WHERE `gameobject_template`.`entry` IN (201372,201614,201613, 201612);
 UPDATE `gameobject` SET `state` = '1' WHERE `id` IN (201612,201614,201613);
 UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201372);
@@ -228,14 +232,32 @@ UPDATE `creature_template` SET `ScriptName`='mob_choking_gas_bomb', `AIName`='',
 UPDATE `creature_template` SET `ScriptName`='mob_ooze_puddle',`scale` = '1.0', `AIName`='', `minlevel` = 82, `maxlevel` = 82, `modelid_1` = 11686, `modelid_2` = 11686, `modelid_3` = 11686, `modelid_4` = 11686, `faction_A` = 14, `faction_H` = 14  WHERE `entry`= 37690;
 UPDATE `gameobject_template` SET `faction` = '0', `ScriptName` = 'go_plague_sigil' WHERE `gameobject_template`.`entry` IN (202182);
 
+DELETE FROM `spell_script_target` WHERE `entry` IN (71412, 71415, 71617);
+INSERT INTO `spell_script_target` VALUES
+(71412, 1, 37824), -- Green Ooze
+(71415, 1, 37824), -- Orange Ooze
+(71617, 1, 38317); -- Tear Gas
+
+-- delete some weird Grow Stacker - grows too fast
+DELETE FROM `creature_template_addon` WHERE `entry` = 37690;
+-- delete dot aura from abomination
+DELETE FROM creature_template_addon WHERE entry IN (37672, 38605, 38786, 38787, 38285, 38788, 38789, 38790);
+
+-- remove proc from Mutated Strength - currently cooldown for creatures not handled in core
+DELETE FROM `spell_proc_event` WHERE `entry` IN (71604, 72673, 72674, 72675);
+INSERT INTO `spell_proc_event` (`entry`, `procFlags`) VALUES
+(71604, 256),
+(72673, 256),
+(72674, 256),
+(72675, 256);
+
 -- -----------
 -- Abomination
 -- -----------
 
 DELETE FROM `creature_template_addon` WHERE (`entry`=37672);
 INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES (37672, '70385 70405');
-UPDATE `creature_template` SET `vehicle_id`=587 WHERE `entry` in (36678,38431,38585,38586);
-UPDATE `creature_template` SET `vehicle_id`=591 WHERE `entry` in (37672,38605,38786,38787);
+UPDATE `creature_template` SET `PowerType` = 3, `vehicle_id`=591 WHERE `entry` in (37672,38605,38786,38787);
 DELETE FROM `spell_script_target` WHERE `entry` IN (70360);
 INSERT INTO `spell_script_target` VALUES (70360,1,37690);
 
@@ -308,15 +330,30 @@ UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201376);
 UPDATE `creature_template` SET `ScriptName`='boss_blood_queen_lanathel', `AIName`='' WHERE `entry`= 37955;
 UPDATE `creature_template` SET  `minlevel` = 80, `maxlevel` = 80, `AIName` ='', `faction_A`= 14, `faction_H` = 14,`ScriptName`='mob_swarming_shadows' WHERE `entry`= 38163;
 UPDATE `gameobject_template` SET `faction` = '0', `ScriptName` = 'go_frostwing_sigil' WHERE `gameobject_template`.`entry` IN (202181);
+UPDATE `gameobject_template` SET `faction` = '0', `ScriptName` = 'go_frostwing_sigil' WHERE `gameobject_template`.`entry` IN (202181);
+
+-- Essence of the Blood Queen
 DELETE FROM `spell_proc_event` WHERE entry IN (70871);
 INSERT INTO `spell_proc_event` VALUES
 (70871, 0x7F,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0.000000, 0.000000, 0);
 
+-- Mirror Soul proc on melee hits
+DELETE FROM `spell_proc_event` WHERE entry IN (70445);
+INSERT INTO `spell_proc_event` VALUES
+(70445, 0x7F,  0, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000008, 0x00000000, 0, 100, 0);
+
+-- Presence of the Darkfallen
+DELETE FROM spell_script_target WHERE entry IN (70995, 71952);
+INSERT INTO spell_script_target VALUES
+(71952, 1, 37955),
+(70995, 1, 37955);
+
 DELETE FROM `creature_model_info` WHERE (`modelid`=31165);
-INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`, `gender`, `modelid_other_gender`, `modelid_alternative`) VALUES (31165, 3, 2, 2, 0, 0);
+INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`, `gender`, `modelid_other_gender`, `modelid_alternative`) VALUES (31165, 3, 5, 2, 0, 0);
 
 DELETE FROM `creature_model_info` WHERE (`modelid`=31093);
 INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`, `gender`, `modelid_other_gender`, `modelid_alternative`) VALUES (31093, 1.24, 2, 1, 0, 0);
+
 -- ---------------------
 -- Valithria dreamwalker
 -- ---------------------
@@ -335,9 +372,9 @@ UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16, `ScriptName` 
 UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16, `ScriptName` = 'mob_gluttonous_abomination', `AIName` = '' WHERE `entry`= 37886;
 UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16, `ScriptName` = 'mob_blistering_zombie', `AIName` = '' WHERE `entry`= 37934;
 UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16, `ScriptName` = 'mob_risen_archmage', `AIName` = '' WHERE `entry`= 37868;
-UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16, `ScriptName` = 'mob_blazing_skeleton', `AIName` = '' WHERE `entry`= 36791;
+UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16, `ScriptName` = 'mob_blazing_skeleton', `AIName` = '', `mechanic_immune_mask` = `mechanic_immune_mask` | 2048 WHERE `entry`= 36791;
 UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16, `ScriptName` = 'mob_suppresser', `AIName` = '' WHERE `entry`= 37863;
-UPDATE `creature_template` SET `ScriptName`='mob_mana_void', `AIName`='', `flags_extra` = `flags_extra` &~128 WHERE `entry`= 38068;
+UPDATE `creature_template` SET `minlevel` = 82, `maxlevel` = 82, `ScriptName`='mob_mana_void', `AIName`='', `flags_extra` = `flags_extra` &~128 WHERE `entry`= 38068;
 UPDATE `creature_template` SET `ScriptName`='mob_column_of_frost', `AIName`='', `flags_extra` = `flags_extra` &~128 WHERE `entry`= 37918;
 
 DELETE FROM `spell_script_target` WHERE `entry` IN (71946, 72031, 72032, 72033);
@@ -346,6 +383,11 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES
 (72031, 1, 37950),
 (72032, 1, 37950),
 (72033, 1, 37950);
+
+-- spawn Valithria in dream state
+DELETE FROM `creature` WHERE `id` = 37950;
+INSERT INTO `creature` (`id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `curhealth`, `MovementType`) VALUES
+(37950, 631, 15, 16, 4203.1416, 2484.8616, 386.4849, 6.276, 604800, 0, 1, 0);
 
 DELETE FROM `creature` WHERE `guid` = 47738 AND `id` = 38589;
 DELETE FROM `pool_creature` WHERE `guid`=47738;
@@ -379,25 +421,58 @@ INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES (37186, 70022);
 -- Lich King
 -- ---------
 
-UPDATE `creature_template` SET `ScriptName`='boss_the_lich_king_icc', `AIName`='' WHERE `entry`= 36597;
+UPDATE `creature_template` SET `ScriptName`='boss_the_lich_king_icc', `AIName`='' WHERE `entry` = 36597;
+UPDATE `creature_template_addon` SET `auras` = '73878 73220 72846' WHERE `entry` IN (36597, 39166, 39167, 39168);
+UPDATE `creature_template` SET `speed_walk` = 1.0, `speed_run` = 1.1 WHERE `entry` IN (36597, 39166, 39167, 39168);
 UPDATE `creature_template` SET `ScriptName`='boss_tirion_icc', `npcflag`=1, `AIName`='' WHERE `entry`= 38995;
-INSERT IGNORE INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES ('71614', '1', '38995');
+UPDATE `creature_template` SET `ScriptName` = 'boss_terenas_menethil_icc' WHERE entry = 38579;
 
 UPDATE `creature_template` SET `ScriptName`='mob_ice_sphere_icc', `AIName`='' WHERE `entry`= 36633;
 UPDATE `creature_template` SET `ScriptName`='mob_defiler_icc', `AIName`='' WHERE `entry`= 38757;
 UPDATE `creature_template` SET `ScriptName`='mob_strangulate_vehicle', `AIName`='' WHERE `entry`= 36598;
-UPDATE `creature_template` SET `ScriptName`='mob_vile_spirit', `AIName`='' WHERE `entry`= 37799;
+UPDATE `creature_template` SET `ScriptName`='mob_vile_spirit', `AIName`='' WHERE `entry` IN (37799, 39190);
+UPDATE `creature_template` SET `speed_walk` = 1.8, `speed_run` = 1.1 WHERE `entry` IN (37799, 39284, 39285, 39286);
 UPDATE `creature_template` SET `ScriptName`='mob_raging_spirit', `AIName`='' WHERE `entry`= 36701;
+UPDATE `creature_template` SET `ScriptName`='mob_drudge_ghoul', `AIName`='' WHERE `entry`= 37695;
+UPDATE `creature_template` SET `ScriptName`='mob_shambling_horror', `AIName`='' WHERE `entry`= 37698;
+UPDATE `creature_template` SET `ScriptName`='mob_shadow_trap', `AIName`='', `faction_A` = 14, `faction_H` = 14, `unit_flags` = `unit_flags` | 2 | 33554432 WHERE `entry`= 39137;
+UPDATE `creature_template` SET `ScriptName`='mob_valkyr_shadowguard', `AIName`='' WHERE `entry`= 36609;
+UPDATE `creature_template` SET `ScriptName`='npc_terenas_fm', `AIName`='' WHERE `entry`= 36823; -- normal
+UPDATE `creature_template` SET `ScriptName`='npc_terenas_fm', `AIName`='' WHERE `entry`= 39217; -- heroic, different entry
+UPDATE `creature_template` SET `ScriptName`='mob_spirit_warden', `AIName`='' WHERE `entry`= 36824;
+UPDATE `creature_template` SET `ScriptName`='mob_spirit_bomb', `AIName`='', minlevel = 83, maxlevel = 83, `unit_flags` = `unit_flags` | 33554432, `faction_A` = 14, `faction_H` = 14 WHERE `entry`= 39189;
 
-DELETE FROM `npc_text` WHERE `ID` IN (721001,721002);
-INSERT INTO `npc_text` (`ID`, `Text0_0`) VALUES
-(721001, 'Greetings $N! Are you ready to battle with Lich King?'),
-(721002, 'Instance script designed by /dev/rsa especially for\n http://wow.teletoria.ru\n Thanks to:\n Vladimir Mangos\n Insider42\n Wowka321\n Selector\n and many other !\n');
+-- speed of Wicked Spirits
+UPDATE `creature_template` SET `speed_walk` = 0.9, `speed_run` = 0.9 WHERE `entry` IN (39190, 39287, 39288, 39289);
 
-DELETE FROM `locales_npc_text` WHERE `entry` IN (721001,721002);
-INSERT INTO `locales_npc_text` (`entry`, `Text0_0_loc1`, `Text0_0_loc2`, `Text0_0_loc3`, `Text0_0_loc4`, `Text0_0_loc5`, `Text0_0_loc6`, `Text0_0_loc7`, `Text0_0_loc8`) VALUES
-(721001, 'Greetings $N! Are you ready to battle with Lich King?', NULL, NULL, NULL, NULL, NULL, NULL, 'Приветствую, $N! Поможешь мне прихлопнуть главного засранца WOW?'),
-(721002, 'Instance script designed by /dev/rsa especially for\n http://wow.teletoria.ru\n Thanks to:\n Vladimir Mangos\n Insider42\n Wowka321\n Selector\n and many other !\n', NULL, NULL, NULL, NULL, NULL, NULL, 'Скрипт инстанса разработан специально для\n http://wow.teletoria.ru\n Благодарности:\n Vladimir Mangos\n Insider42\n Wowka321\n Selector\n и многим другим!\n (c) /dev/rsa 2010 год');
+-- damage of Terenas and Spirit Warden, they should be hitting each other for around 10-11k normal melee damage
+UPDATE `creature_template` SET `dmg_multiplier` = 46 WHERE `entry` IN (36823, 36824, 39296);
+
+-- make Ice Spheres untauntable
+UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask` | 256 WHERE `entry` IN (36633, 39305, 39306, 39307);
+
+DELETE FROM `spell_script_target` WHERE `entry` IN (71614, 74074, 73028, 74321, 74322, 74323, 72679, 74318, 74319, 74320);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES
+(71614, 1, 38995),
+(74074, 1, 36597),
+(73028, 1, 36597), -- Harvested Soul
+(74321, 1, 36597),
+(74322, 1, 36597),
+(74323, 1, 36597),
+(72679, 1, 36597),
+(74318, 1, 36597),
+(74319, 1, 36597),
+(74320, 1, 36597);
+
+-- Tirion gossip
+DELETE FROM `npc_gossip` WHERE npc_guid = 115781;
+INSERT INTO `npc_gossip` (`npc_guid`, `textid`) VALUES
+(115781, 15290);
+
+-- proc for Dark Hunger
+DELETE FROM `spell_proc_event` WHERE `entry` = 69383;
+INSERT INTO `spell_proc_event` (`entry`, `procFlags`) VALUES
+(69383, 0x04 | 0x10 | 0x10000);
 
 -- -----------------
 -- EAI YTDB CLEAN UP
@@ -442,7 +517,7 @@ DELETE FROM `creature_template_addon` WHERE (`entry`=37133);
 INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_pvp_state`, `emote`, `moveflags`) VALUES (37133, 0, 0, 0, 0, 333, 0);
 -- end of weird addon fix
 
--- fix double spawn of dream dragon
-DELETE FROM `creature` WHERE `id`=37950;
+
+-- DELETE FROM `creature` WHERE `id`=37950;
 
 -- ------
