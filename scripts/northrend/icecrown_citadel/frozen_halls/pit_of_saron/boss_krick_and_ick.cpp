@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -395,7 +395,7 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                     if(Creature* pJaina = m_pInstance->instance->GetCreature(m_uiJainaGuid))
                     {
                         DoScriptText(SAY_OUTRO2_ALY, pJaina);
-                        pJaina->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                        pJaina->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 if(TeamInInstance == HORDE)
@@ -403,7 +403,7 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                     if(Creature* pSylvanas = m_pInstance->instance->GetCreature(m_uiSylvanasGuid))
                     {
                         DoScriptText(SAY_OUTRO2_HORDE, pSylvanas);
-                        pSylvanas->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                        pSylvanas->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 ++Step;
@@ -429,7 +429,7 @@ struct MANGOS_DLL_DECL boss_KrickAI : public ScriptedAI
                 if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 860.649f, 124.863f, 536.019f, 3.43f, TEMPSUMMON_TIMED_DESPAWN, 20000))
                 {
                     pTyrannus->GetMotionMaster()->MoveIdle();
-                    pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                    pTyrannus->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     pTyrannus->SetUInt32Value(UNIT_FIELD_BYTES_0, 50331648);
                     pTyrannus->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
@@ -595,7 +595,7 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                     if(Creature* pJaina = m_pInstance->instance->GetCreature(m_uiJainaGuid))
                     {
                         DoScriptText(SAY_OUTRO2_ALY, pJaina);
-                        pJaina->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                        pJaina->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 if(TeamInInstance == HORDE)
@@ -603,7 +603,7 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                     if(Creature* pSylvanas = m_pInstance->instance->GetCreature(m_uiSylvanasGuid))
                     {
                         DoScriptText(SAY_OUTRO2_HORDE, pSylvanas);
-                        pSylvanas->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                        pSylvanas->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     }
                 }
                 ++Step;
@@ -628,7 +628,7 @@ struct MANGOS_DLL_DECL boss_krick_eventAI : public ScriptedAI
                 DoScriptText(SAY_OUTRO5, m_creature);
                 if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 860.649f, 124.863f, 536.019f, 3.43f, TEMPSUMMON_TIMED_DESPAWN, 20000))
                 {
-                    pTyrannus->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                    pTyrannus->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
                 }

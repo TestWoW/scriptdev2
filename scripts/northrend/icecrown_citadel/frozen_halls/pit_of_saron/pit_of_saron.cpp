@@ -199,7 +199,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
                     {
                         pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         DoScriptText(SAY_TYRANNUS1, pTyrannus);
-                        m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
+                        m_uiTyrannusGuid = pTyrannus->GetGUID();
                     }
 
                     switch (creatureEntry)
