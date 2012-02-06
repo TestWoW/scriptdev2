@@ -161,6 +161,10 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
         SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_OFFHAND_1, EQUIP_RANGED_1);
 
         m_creature->SetRespawnDelay(7*DAY);
+<<<<<<< HEAD
+=======
+        m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_NONE);
+>>>>>>> 3f284db41f91d7c7698131bf74fc3c75a2388dcd
         m_creature->SetHealth(m_creature->GetMaxHealth());
     }
 
@@ -170,6 +174,10 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
             return;
 
         m_pInstance->SetData(TYPE_VALKIRIES, FAIL);
+<<<<<<< HEAD
+=======
+        m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_NONE);
+>>>>>>> 3f284db41f91d7c7698131bf74fc3c75a2388dcd
         m_pInstance->SetData(DATA_HEALTH_FJOLA, m_creature->GetMaxHealth());
         m_creature->ForcedDespawn();
     }
@@ -438,6 +446,10 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
         SetEquipmentSlots(false, EQUIP_MAIN_2, EQUIP_OFFHAND_2, EQUIP_RANGED_2);
 
         m_creature->SetRespawnDelay(7*DAY);
+<<<<<<< HEAD
+=======
+        m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_NONE);
+>>>>>>> 3f284db41f91d7c7698131bf74fc3c75a2388dcd
         m_creature->SetHealth(m_creature->GetMaxHealth());
     }
 
@@ -447,6 +459,10 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
             return;
 
         m_pInstance->SetData(TYPE_VALKIRIES, FAIL);
+<<<<<<< HEAD
+=======
+        m_pInstance->SetData(DATA_CASTING_VALKYRS, SPELL_NONE);
+>>>>>>> 3f284db41f91d7c7698131bf74fc3c75a2388dcd
         m_pInstance->SetData(DATA_HEALTH_EYDIS, m_creature->GetMaxHealth());
         m_creature->ForcedDespawn();
     }
