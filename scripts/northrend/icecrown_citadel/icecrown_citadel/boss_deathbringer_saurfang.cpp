@@ -508,7 +508,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->SetWalk(true);
                                 pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                 pTmp->GetPosition(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                 pTmp->_AddAura(70572);
                             }
                             // move guards
@@ -519,7 +519,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                     pTmp->SetWalk(true);
                                     pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                     pTmp->GetPosition(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                     pTmp->_AddAura(70572);
                                 }
                             }
@@ -716,7 +716,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->SetWalk(true);
                                 pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                 pTmp->GetPosition(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                 pTmp->_AddAura(SPELL_GRIP_OF_AGONY);
                             }
                             // move guards
@@ -727,7 +727,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                     pTmp->SetWalk(true);
                                     pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                     pTmp->GetPosition(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                     pTmp->_AddAura(SPELL_GRIP_OF_AGONY);
                                 }
                             }
@@ -788,7 +788,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                 pTmp->GetPosition(x, y, z);
                                 m_creature->UpdateAllowedPositionZ(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                 pTmp->RemoveAllAuras();
                             }
                             // move guards
@@ -798,7 +798,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 {
                                     pTmp->GetPosition(x, y, z);
                                     m_creature->UpdateAllowedPositionZ(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                     pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                     pTmp->RemoveAllAuras();
                                 }
@@ -1173,7 +1173,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                 pTmp->GetPosition(x, y, z);
                                 m_creature->UpdateAllowedPositionZ(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                 pTmp->RemoveAllAuras();
                             }
                             // move guards
@@ -1183,7 +1183,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 {
                                     pTmp->GetPosition(x, y, z);
                                     m_creature->UpdateAllowedPositionZ(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                     pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                     pTmp->RemoveAllAuras();
                                 }

@@ -284,6 +284,11 @@ public:
     bool IsEncounterInProgress();
     bool IsRaidWiped();
 
+    void DoOpenDoor(ObjectGuid guid);
+    void DoCloseDoor(ObjectGuid guid);
+    void DoOpenDoor(uint32 entry);
+    void DoCloseDoor(uint32 entry);
+
     void SetData(uint32 uiType, uint32 uiData);
     uint32 GetData(uint32 uiType);
 
