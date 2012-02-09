@@ -327,7 +327,7 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
                             float x, y, z;
                             m_creature->GetPosition(x, y, z);
 
-                            m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_MANUAL_DESPAWN, 60000);
+                            m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000);
                             m_uiPursuingTimer = 90000;
                         }
                         else
@@ -870,7 +870,7 @@ struct MANGOS_DLL_DECL mob_anubarak_spikeAI : public BSWScriptedAI
 
                 float x, y, z;
                 m_creature->GetPosition(x, y, z);
-                m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
+                m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000);
             }
 
             m_uiImpaleTimer = 500;
@@ -887,7 +887,7 @@ struct MANGOS_DLL_DECL mob_anubarak_spikeAI : public BSWScriptedAI
 
                 float x, y, z;
                 m_creature->GetPosition(x, y, z);
-                m_creature->SummonCreature(NPC_SPIKE, x + urand(5.0f, 10.0f), y + urand(5.0f, 10.0f), z, 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
+                m_creature->SummonCreature(NPC_SPIKE, x + urand(5.0f, 10.0f), y + urand(5.0f, 10.0f), z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000);
             }
             m_uiPermafrostTimer = 250;
         }
