@@ -950,7 +950,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_MASSIVE_CRASH) == CAST_OK)
                 {
-                    pFocus = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+                    pFocus = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_MASSIVE_CRASH, SELECT_FLAG_PLAYER);
                     DoScriptText(EMOTE_TRAMPLE, m_creature, pFocus);
                     m_creature->SetSpeedRate(MOVE_WALK, 6.0f);
                     m_creature->SetSpeedRate(MOVE_RUN, 6.0f);
@@ -1102,8 +1102,8 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
                     {
                         pFocus->GetPosition(fPosX, fPosY, fPosZ);
                         m_creature->SetFacingToObject(pFocus);
-                        m_uiWaitTimer = 10000; // For count only once
                     }
+                    m_uiWaitTimer = 10000; // For count only once
                 }
                 else
                     m_uiWaitTimer -= uiDiff;
@@ -1115,8 +1115,8 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
                         m_creature->GetMotionMaster()->Clear();
                         m_creature->GetMotionMaster()->MovePoint(POINT_TARGET, fPosX, fPosY, fPosZ);
                         DoScriptText(EMOTE_CRASH, m_creature);
-                        m_uiPhase = PHASE_MOVING;
                     }
+                    m_uiPhase = PHASE_MOVING;
                 }
                 else
                     m_uiPhaseTimer -= uiDiff;

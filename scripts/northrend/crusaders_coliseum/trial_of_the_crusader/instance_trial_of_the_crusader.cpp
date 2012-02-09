@@ -39,6 +39,9 @@ EndScriptData */
             m_bAchievCriteria[i] = false;
 
         SetSpecialAchievementCriteria(TYPE_IMMORTALITY, true);
+        SetSpecialAchievementCriteria(TYPE_SKILL, true);
+        SetSpecialAchievementCriteria(TYPE_MAD_SKILL, true);
+        SetSpecialAchievementCriteria(TYPE_INSANITY, true);
 
         m_auiEncounter[TYPE_STAGE] = 0;
         m_auiEncounter[TYPE_COUNTER] = 50;
@@ -227,8 +230,8 @@ EndScriptData */
                 m_auiCrusadersCount = uiData;
             break;
         case TYPE_VALKIRIES:
-            /*if (m_auiEncounter[4] == SPECIAL && uiData == SPECIAL)
-                uiData = DONE;*/
+            if (m_auiEncounter[4] == SPECIAL && uiData == SPECIAL)
+                uiData = DONE;
             m_auiEncounter[TYPE_VALKIRIES] = uiData;
             if (uiData == IN_PROGRESS)
                 SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, true);
@@ -300,7 +303,7 @@ EndScriptData */
             if (uiData < 50)
                 SetSpecialAchievementCriteria(TYPE_INSANITY, false);
 
-            //uiData = DONE;
+            uiData = DONE;
             break;
         case TYPE_EVENT:
             m_auiEncounter[TYPE_EVENT] = uiData;
