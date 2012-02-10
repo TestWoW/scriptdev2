@@ -251,9 +251,8 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
         if (!pSister)
             return;
 
-        if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_EYDIS) &&
-                                      m_pInstance->GetData(DATA_HEALTH_EYDIS) != 0)
-                m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_EYDIS));
+        if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_EYDIS) && m_pInstance->GetData(DATA_HEALTH_EYDIS) != 0)
+            m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_EYDIS));
 
         if (!m_bAchievFailed)
         {
@@ -529,9 +528,8 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
             return;
 
 
-        if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_FJOLA) &&
-                                      m_pInstance->GetData(DATA_HEALTH_FJOLA) != 0)
-                m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_FJOLA));
+        if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_FJOLA) && m_pInstance->GetData(DATA_HEALTH_FJOLA) != 0)
+            m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_FJOLA));
 
         if (!m_bAchievFailed)
         {

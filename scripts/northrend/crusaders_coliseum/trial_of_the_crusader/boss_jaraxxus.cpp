@@ -108,8 +108,6 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
     uint32 m_uiEnrageTimer;
     uint32 m_uiCheckTimer;
 
-    std::list<Creature*> mistressEntryList;
-
     void Reset() 
     {
         if (!m_pInstance) 
@@ -128,8 +126,6 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         m_uiCheckTimer              = 1000;
 
         m_creature->SetRespawnDelay(DAY);
-
-        mistressEntryList.clear();
     }
 
     void JustReachedHome()
@@ -173,7 +169,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
 
     void CheckAchiev()
     {
-        mistressEntryList.clear();
+        std::list<Creature*> mistressEntryList;
         GetCreatureListWithEntryInGrid(mistressEntryList, m_creature, NPC_MISTRESS, 250.0f);
 
         if (mistressEntryList.empty())
