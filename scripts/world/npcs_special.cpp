@@ -2498,7 +2498,7 @@ bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
 
-    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
     return true;
 }
 
@@ -2572,7 +2572,7 @@ bool GossipHello_logroneitor_alliance(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
-    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
     return true;
 }
 
