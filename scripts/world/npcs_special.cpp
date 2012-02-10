@@ -2452,6 +2452,155 @@ bool GossipSelect_pilgrim_table(Player* pPlayer, Creature* pCreature, uint32 uiS
     return true;
 }
 
+bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
+{
+    char const* GOSSIP_LONELY;
+    char const* GOSSIP_NAXXRAMAS;
+    char const* GOSSIP_DISASTER;
+    char const* GOSSIP_HOLIDAY;
+    char const* GOSSIP_WINTERN;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_LONELY         = "Me siento sólo, we.";
+                      GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
+                      GOSSIP_DISASTER       = "Te voy a dar un beso, guapetón.";
+                      GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
+                      GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
+                      break;
+     case LOCALE_esMX:
+                      GOSSIP_LONELY         = "Me siento sólo, we.";
+                      GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
+                      GOSSIP_DISASTER       = "Te voy a dar un beso, guapetón.";
+                      GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
+                      GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
+                      break;
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_LONELY         = "I'm lonely, goblin.";
+                      GOSSIP_NAXXRAMAS      = "You are sad, crazy.";
+                      GOSSIP_DISASTER       = "Kiss me, baby.";
+                      GOSSIP_HOLIDAY        = "It's time to get one surprise.";
+                      GOSSIP_WINTERN        = "We wish you a merry achievement.";
+                      break;
+    };
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_LONELY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NAXXRAMAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DISASTER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+
+    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_logroneitor_horde(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    switch(uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(1291);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+2:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(1704);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+3:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(1280);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+4:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(271);
+            pPlayer->CompletedAchievement(272);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+5:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(252);
+            break;
+    }
+    return true;
+}
+
+bool GossipHello_logroneitor_alliance(Player* pPlayer, Creature* pCreature)
+{
+    char const* GOSSIP_LONELY;
+    char const* GOSSIP_NAXXRAMAS;
+    char const* GOSSIP_HOLIDAY;
+    char const* GOSSIP_WINTERN;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_LONELY         = "Me siento sólo, we.";
+                      GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
+                      GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
+                      GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
+                      break;
+     case LOCALE_esMX:
+                      GOSSIP_LONELY         = "Me siento sólo, we.";
+                      GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
+                      GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
+                      GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
+                      break;
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_LONELY         = "I'm lonely.";
+                      GOSSIP_NAXXRAMAS      = "You are sad, crazy.";
+                      GOSSIP_HOLIDAY        = "It's time to get one surprise.";
+                      GOSSIP_WINTERN        = "We wish you a merry achievement.";
+                      break;
+    };
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_LONELY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NAXXRAMAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+
+    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_logroneitor_alliance(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    switch(uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(1291);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+2:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(1704);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+3:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(271);
+            pPlayer->CompletedAchievement(272);
+            break;
+        case GOSSIP_ACTION_INFO_DEF+4:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->CompletedAchievement(252);
+            break;
+    }
+    return true;
+}
+
 void AddSC_npcs_special()
 {
     Script* pNewScript;
@@ -2579,5 +2728,17 @@ void AddSC_npcs_special()
     pNewScript->Name = "pilgrim_table";
     pNewScript->pGossipHello = &GossipHello_pilgrim_table;
     pNewScript->pGossipSelect = &GossipSelect_pilgrim_table;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "logroneitor_horde";
+    pNewScript->pGossipHello = &GossipHello_logroneitor_horde;
+    pNewScript->pGossipSelect = &GossipSelect_logroneitor_horde;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "logroneitor_alliance";
+    pNewScript->pGossipHello = &GossipHello_logroneitor_alliance;
+    pNewScript->pGossipSelect = &GossipSelect_logroneitor_alliance;
     pNewScript->RegisterSelf();
 }
