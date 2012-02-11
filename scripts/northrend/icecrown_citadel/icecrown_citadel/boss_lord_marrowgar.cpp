@@ -382,11 +382,13 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
         m_uiAchievTimer = 8000;
         m_bEmerged = false;
         SetCombatMovement(false);
+        m_victimGuid.Clear();
     }
 
     instance_icecrown_citadel* m_pInstance;
     bool m_bEmerged;
     uint32 m_uiAchievTimer;
+    ObjectGuid m_victimGuid;
 
     void Reset()
     {
@@ -395,11 +397,11 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
 
     void AttackStart(Unit *pWho){}
 
-    void PassengerBoarded(Unit *pPassenger, int8 seat, bool bBoarded)
+    void JustDied(Unit *Killer)
     {
-        if (!bBoarded)
+        if (Unit *pCreator = m_creature->GetCreator())
         {
-            pPassenger->RemoveAurasDueToSpell(SPELL_IMPALED);
+            pCreator->RemoveAurasDueToSpell(SPELL_IMPALED);
             m_creature->ForcedDespawn();
         }
     }
