@@ -732,7 +732,7 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
              else
                  m_uiSlimePoolTimer -= uiDiff;
 
-             if (m_uiPhaseTimer <= uiDiff && m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL)
+             if (m_uiPhaseTimer <= uiDiff && m_pInstance->GetData(TYPE_NORTHREND_BEASTS) =! SNAKES_SPECIAL)
              {
                  m_uiPhase = PHASE_SUBMERGED;
                  DoCastSpellIfCan(m_creature, SPELL_EMERGE);
