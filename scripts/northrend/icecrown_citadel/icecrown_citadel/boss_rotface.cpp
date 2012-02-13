@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: boss_rotface
 SD%Complete: 99%
-SDComment: 
+SDComment:
 SDCategory: Icecrown Citadel
 EndScriptData */
 
@@ -142,8 +142,6 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
     uint32 m_uiSlimeFlowTimer;
     uint32 m_uiTurnTimer;
 
-    bool m_bNeedTurn;
-
     void Reset()
     {
         m_uiBerserkTimer = 5 * MINUTE * IN_MILLISECONDS;
@@ -229,26 +227,21 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         else
             m_uiBerserkTimer -= uiDiff;
 
-        if (m_bNeedTurn)
-        {
-            Unit *pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_OOZE_SPRAY_STALKER);
-            if (pFocus)
-            {
-                m_creature->SetFacingToObject(pFocus);
-                m_bNeedTurn = false;
-                m_uiTurnTimer = 8000;
-            }
-        }
-
         // Slime Spray
         if (m_uiSlimeSprayTimer <= uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY_SUMMON, CAST_TRIGGERED) == CAST_OK)
             {
+                Unit *pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_OOZE_SPRAY_STALKER);
+                if (pFocus)
+                    m_creature->SetFacingToObject(pFocus);
+
                 if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY) == CAST_OK)
                 {
                     DoScriptText(SAY_SLIME_SPRAY, m_creature);
                     m_uiSlimeSprayTimer = urand(17000, 23000);
+                    m_uiTurnTimer = 8000;
+                    return;
                 }
             }
         }
@@ -614,4 +607,3 @@ void AddSC_boss_rotface()
     newscript->GetAI = &GetAI_mob_precious;
     newscript->RegisterSelf();
 }
-
