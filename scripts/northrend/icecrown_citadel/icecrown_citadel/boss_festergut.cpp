@@ -166,6 +166,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
         }
 
         DoCastSpellIfCan(m_creature, SPELL_REMOVE_INOCULENT, CAST_TRIGGERED);
+        m_creature->RemoveAllAuras();
     }
 
     void JustDied(Unit *pKiller)

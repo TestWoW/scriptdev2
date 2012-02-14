@@ -17,7 +17,7 @@
 /* ScriptData
 SDName: boss_rotface
 SD%Complete: 99%
-SDComment: 
+SDComment:
 SDCategory: Icecrown Citadel
 EndScriptData */
 
@@ -78,6 +78,7 @@ enum BossSpells
     NPC_PUDDLE_STALKER          = 37013,
     NPC_LITTLE_OOZE             = 36897,
     NPC_BIG_OOZE                = 36899,
+    NPC_OOZE_SPRAY_STALKER      = 37986,
 };
 
 static uint32 uiMutatedInfections[5] =
@@ -139,6 +140,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
     //uint32 m_uiInfectionsRate;
     uint32 m_uiVileGasTimer;
     uint32 m_uiSlimeFlowTimer;
+    uint32 m_uiTurnTimer;
 
     void Reset()
     {
@@ -148,6 +150,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         //m_uiMutatedInfectionTimer = m_uiMutatedInfectionBeforeTimer = 60000;
         //m_uiInfectionsRate = 1;
         m_uiSlimeFlowTimer = 20000;
+        m_uiTurnTimer = 0;
     }
 
     void Aggro(Unit *pWho)
@@ -201,43 +204,16 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         DoScriptText(SAY_DEATH, m_creature);
     }
 
-    Unit* SelectRandomRangedTarget(Unit *pSource)
-    {
-        Unit *pResult = NULL;
-        std::list<Unit*> lTargets;
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-
-        for (ThreatList::const_iterator i = tList.begin();i != tList.end(); ++i)
-        {
-            if (!(*i)->getUnitGuid().IsPlayer())
-                continue;
-
-            if (Unit* pTmp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
-                lTargets.push_back(pTmp);
-        }
-
-        if (!lTargets.empty())
-        {
-            uint8 max = m_bIs25Man ? 8 : 3;
-            std::list<Unit*>::iterator iter;
-
-            lTargets.sort(ObjectDistanceOrderReversed(pSource));
-            iter = lTargets.begin();
-
-            if (max >= lTargets.size())
-                max = lTargets.size() - 1;
-
-            std::advance(iter, urand(0, max));
-            pResult = (*iter);
-        }
-
-        return pResult;
-    }
-
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_uiTurnTimer > uiDiff)
+        {
+            m_uiTurnTimer -= uiDiff;
+            return;
+        }
 
         // Berserk
         if (m_uiBerserkTimer <= uiDiff)
@@ -256,10 +232,16 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY_SUMMON, CAST_TRIGGERED) == CAST_OK)
             {
+                Unit *pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_OOZE_SPRAY_STALKER);
+                if (pFocus)
+                    m_creature->SetFacingToObject(pFocus);
+
                 if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY) == CAST_OK)
                 {
                     DoScriptText(SAY_SLIME_SPRAY, m_creature);
                     m_uiSlimeSprayTimer = urand(17000, 23000);
+                    m_uiTurnTimer = 8000;
+                    return;
                 }
             }
         }
@@ -331,6 +313,7 @@ struct MANGOS_DLL_DECL  mob_rotface_ooze_dummyAI : public ScriptedAI
     mob_rotface_ooze_dummyAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
+        m_creature->SetVisibility(VISIBILITY_OFF);
     }
     void Reset(){}
     void AttackStart(Unit *pWho){}
@@ -486,6 +469,7 @@ struct MANGOS_DLL_DECL mob_sticky_oozeAI : public ScriptedAI
     {
         SetCombatMovement(false);
         pCreature->CastSpell(pCreature, SPELL_STICKY_AURA, true);
+        m_creature->SetVisibility(VISIBILITY_ON);
     }
 
     void Reset(){}
@@ -623,4 +607,3 @@ void AddSC_boss_rotface()
     newscript->GetAI = &GetAI_mob_precious;
     newscript->RegisterSelf();
 }
-
