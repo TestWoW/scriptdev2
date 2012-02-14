@@ -859,6 +859,9 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         // Gut Spray
         if (m_uiGutSprayTimer <= uiDiff)
         {
@@ -883,6 +886,7 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
     mob_blistering_zombieAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        Reset();
     }
 
     ScriptedInstance *m_pInstance;
@@ -922,6 +926,9 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         DoMeleeAttackIfReady();
     }
 };
@@ -937,7 +944,6 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     mob_risen_archmageAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         Reset();
     }
 
@@ -945,7 +951,6 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     uint32 m_uiColumnOfFrostTimer;
     uint32 m_uiManaVoidTimer;
 
-    Difficulty m_uiMapDifficulty;
     ScriptedInstance *m_pInstance;
 
     void Reset()
@@ -972,6 +977,9 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         // Frostbolt Volley
         if (m_uiFrostboltVolleyTimer <= uiDiff)
@@ -1053,6 +1061,9 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         // Fireball
         if (m_uiFireballTimer <= uiDiff)
         {
@@ -1111,6 +1122,9 @@ struct MANGOS_DLL_DECL mob_suppresserAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         if (!m_bIsCasting)
         {
