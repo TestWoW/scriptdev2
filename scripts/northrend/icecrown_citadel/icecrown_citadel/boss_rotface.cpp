@@ -211,6 +211,10 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
 
         if (m_uiTurnTimer > uiDiff)
         {
+            Unit *pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_OOZE_SPRAY_STALKER);
+            if (pFocus)
+                m_creature->SetFacingToObject(pFocus);
+
             m_uiTurnTimer -= uiDiff;
             return;
         }
@@ -232,10 +236,6 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY_SUMMON, CAST_TRIGGERED) == CAST_OK)
             {
-                Unit *pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_OOZE_SPRAY_STALKER);
-                if (pFocus)
-                    m_creature->SetFacingToObject(pFocus);
-
                 if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY) == CAST_OK)
                 {
                     DoScriptText(SAY_SLIME_SPRAY, m_creature);
@@ -313,7 +313,7 @@ struct MANGOS_DLL_DECL  mob_rotface_ooze_dummyAI : public ScriptedAI
     mob_rotface_ooze_dummyAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
-        m_creature->SetVisibility(VISIBILITY_OFF);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
     void Reset(){}
     void AttackStart(Unit *pWho){}
@@ -607,3 +607,4 @@ void AddSC_boss_rotface()
     newscript->GetAI = &GetAI_mob_precious;
     newscript->RegisterSelf();
 }
+
