@@ -532,7 +532,7 @@ struct MANGOS_DLL_DECL mob_preciousAI : public ScriptedAI
         // Decimate
         if (m_uiDecimateTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PRECIOUS_DECIMATE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_PRECIOUS_DECIMATE) == CAST_OK)
                 m_uiDecimateTimer = 32000;
         }
         else
@@ -576,35 +576,35 @@ CreatureAI* GetAI_mob_precious(Creature *pCreature)
 
 void AddSC_boss_rotface()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "boss_rotface";
-    newscript->GetAI = &GetAI_boss_rotface;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_rotface";
+    pNewScript->GetAI = &GetAI_boss_rotface;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_rotface_ooze_dummy";
-    newscript->GetAI = &GetAI_mob_rotface_ooze_dummy;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_rotface_ooze_dummy";
+    pNewScript->GetAI = &GetAI_mob_rotface_ooze_dummy;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_little_ooze";
-    newscript->GetAI = &GetAI_mob_little_ooze;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_little_ooze";
+    pNewScript->GetAI = &GetAI_mob_little_ooze;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_big_ooze";
-    newscript->GetAI = &GetAI_mob_big_ooze;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_big_ooze";
+    pNewScript->GetAI = &GetAI_mob_big_ooze;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_sticky_ooze";
-    newscript->GetAI = &GetAI_mob_sticky_ooze;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_sticky_ooze";
+    pNewScript->GetAI = &GetAI_mob_sticky_ooze;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_precious";
-    newscript->GetAI = &GetAI_mob_precious;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_precious";
+    pNewScript->GetAI = &GetAI_mob_precious;
+    pNewScript->RegisterSelf();
 }
 

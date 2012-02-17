@@ -47,13 +47,6 @@ void instance_icecrown_citadel::Initialize()
 
     m_auiEncounter[TYPE_TELEPORT] = 0;
 
-    m_auiEvent = 0;
-    m_auiEventTimer = 1000;
-    m_uiCouncilInvocation = 0;
-    m_uiDirection = 0;
-    m_uiStinkystate = NOT_STARTED;
-    m_uiPreciousstate = NOT_STARTED;
-
     switch (Difficulty)
     {
          case RAID_DIFFICULTY_10MAN_NORMAL:
@@ -105,9 +98,19 @@ bool instance_icecrown_citadel::IsRaidWiped()
     {
         if (Player* pPlayer = i->getSource())
         {
+            if (pPlayer->isAlive() &&
+                (pPlayer->HasAura(642) || //Divine shield
+                 pPlayer->HasAura(1022) || // Hand of protection
+                 pPlayer->HasAura(45438) || // Ice block
+                 pPlayer->HasAura(5384) || // Feign Death
+                 pPlayer->HasAura(1784))) // Stealth
+                continue;
+
+            if (!pPlayer->IsInCombat())
+                continue;
+
             if (pPlayer->isAlive())
                 return false;
-
         }
     }
     return true;
@@ -266,6 +269,10 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
+        case GO_GREEN_DRAGON_DOOR_1:
+            if (m_auiEncounter[TYPE_SVALNA] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
         case GO_GREEN_DRAGON_DOOR_2:
             if (m_auiEncounter[TYPE_VALITHRIA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
@@ -317,7 +324,6 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
         case GO_VALITHRIA_DOOR_3:
         case GO_VALITHRIA_DOOR_4:
         case GO_FROSTWING_DOOR:
-        case GO_GREEN_DRAGON_DOOR_1:
         case GO_BLOODWING_DOOR:
         case GO_ORATORY_DOOR:
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
@@ -572,8 +578,19 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
              m_auiEncounter[TYPE_FROSTMOURNE_ROOM] = uiData;
              break;
          case TYPE_ICECROWN_QUESTS:
-            m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;
-            break;
+             m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;
+             break;
+         case TYPE_STINKY:
+             m_auiEncounter[TYPE_STINKY] = uiData;
+             break;
+         case TYPE_PRECIOUS:
+             m_auiEncounter[TYPE_PRECIOUS] = uiData;
+             break;
+         case TYPE_SVALNA:
+             m_auiEncounter[TYPE_SVALNA] = uiData;
+             if (uiData == DONE)
+                 DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
+             break;
     }
 
     if (uiData == DONE)
@@ -612,13 +629,10 @@ uint32 instance_icecrown_citadel::GetData(uint32 uiType)
         case TYPE_LICH_KING:
         case TYPE_FROSTMOURNE_ROOM:
         case TYPE_ICECROWN_QUESTS:
+        case TYPE_SVALNA:
+        case TYPE_STINKY:
+        case TYPE_PRECIOUS:
             return m_auiEncounter[uiType];
-
-        case DATA_DIRECTION:     return m_uiDirection;
-        case DATA_BLOOD_INVOCATION:         return m_uiCouncilInvocation;
-        case TYPE_STINKY:        return m_uiStinkystate;
-        case TYPE_PRECIOUS:      return m_uiPreciousstate;
-        case TYPE_EVENT:         return m_auiEvent;
     }
     return 0;
 }

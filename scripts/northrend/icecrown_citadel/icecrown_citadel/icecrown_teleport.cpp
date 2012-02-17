@@ -59,7 +59,7 @@ bool GOGossipSelect_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo, uin
         return false;
 
     if(pInstance->IsEncounterInProgress())
-        return true;
+        return false;
 
     if(pPlayer->IsInCombat()) 
         return false;

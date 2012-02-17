@@ -4,8 +4,8 @@
 
 #ifndef DEF_icecrown_citadel_H
 #define DEF_icecrown_citadel_H
-#include "BSW_instance.h"
 #include "BSW_ai.h"
+#include "BSW_instance.h"
 
 enum
 {
@@ -29,6 +29,7 @@ enum
     TYPE_ICECROWN_QUESTS,
     TYPE_STINKY,
     TYPE_PRECIOUS,
+    TYPE_SVALNA,
 
     NPC_LORD_MARROWGAR                  = 36612,
     NPC_LADY_DEATHWHISPER               = 36855,
@@ -55,9 +56,13 @@ enum
 
     NPC_CROK                            = 37129,
     NPC_ARNATH                          = 37122,
+    NPC_ARNATH_UNDEATH                  = 37491,
     NPC_BRANDON                         = 37123,
+    NPC_BRANDON_UNDEATH                 = 37493,
     NPC_GRONDEL                         = 37124,
+    NPC_GRONDEL_UNDEATH                 = 37494,
     NPC_RUPERT                          = 37125,
+    NPC_RUPERT_UNDEATH                  = 37495,
     NPC_SVALNA                          = 37126,
 
     NPC_VALITHRIA                       = 36789,
@@ -170,12 +175,12 @@ enum
     GO_ARTHAS_PLATFORM                  = 202161, //
     GO_ARTHAS_PRECIPICE                 = 202078, //
 
-    TYPE_EVENT_TIMER                    = 99,
-    TYPE_EVENT                          = 100,
-    TYPE_EVENT_NPC                      = 101,
+    //TYPE_EVENT_TIMER                    = 99,
+    //TYPE_EVENT                          = 100,
+    //TYPE_EVENT_NPC                      = 101,
     MAP_NUM                             = 631,
-    DATA_DIRECTION                      = 1001,
-    DATA_BLOOD_INVOCATION               = 1002,
+    //DATA_DIRECTION                      = 1001,
+    //DATA_BLOOD_INVOCATION               = 1002,
     DESPAWN_TIME                        = 300000,
     SPELL_SHADOWS_EDGE                  = 71168,
 
@@ -307,14 +312,6 @@ private:
     //Creatures GUID
     uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
 
-    uint32 m_uiCouncilInvocation;
-
-    uint32 m_auiEvent;
-    uint32 m_auiEventTimer;
-    uint32 m_uiDirection;
-
-    uint32 m_uiStinkystate;
-    uint32 m_uiPreciousstate;
     uint32 m_uiGunshipArmoryA_ID;
     uint32 m_uiGunshipArmoryH_ID;
     uint32 m_uiValithriaCache;
@@ -329,6 +326,7 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
+        m_creature->SetRespawnTime(7*DAY);
         Reset();
     }
 
@@ -337,41 +335,55 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
-    void Reset(){}
-    void UpdateAI(const uint32 uiDiff){}
+    uint32 m_uiCheckWipeTimer;
+
+    void Reset()
+    {
+        m_uiCheckWipeTimer = 2000;
+    }
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiCheckWipeTimer < uiDiff)
+        {
+            if (m_pInstance->IsRaidWiped())
+                m_creature->AI()->EnterEvadeMode();
+        }
+        else
+            m_uiCheckWipeTimer -= uiDiff;
+    }
 
     Unit* SelectRandomRangedTarget(Unit *pSource)
+    {
+        Unit *pResult = NULL;
+        std::list<Unit*> lTargets;
+        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+
+        for (ThreatList::const_iterator i = tList.begin();i != tList.end(); ++i)
         {
-            Unit *pResult = NULL;
-            std::list<Unit*> lTargets;
-            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+            if (!(*i)->getUnitGuid().IsPlayer())
+                continue;
 
-            for (ThreatList::const_iterator i = tList.begin();i != tList.end(); ++i)
-            {
-                if (!(*i)->getUnitGuid().IsPlayer())
-                    continue;
-
-                if (Unit* pTmp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
-                    lTargets.push_back(pTmp);
-            }
-
-            if (!lTargets.empty())
-            {
-                uint8 max = m_bIs25Man ? 8 : 3;
-                std::list<Unit*>::iterator iter;
-
-                lTargets.sort(ObjectDistanceOrderReversed(pSource));
-                iter = lTargets.begin();
-
-                if (max >= lTargets.size())
-                    max = lTargets.size() - 1;
-
-                std::advance(iter, urand(0, max));
-                pResult = (*iter);
-            }
-
-            return pResult;
+            if (Unit* pTmp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
+                lTargets.push_back(pTmp);
         }
+
+        if (!lTargets.empty())
+        {
+            uint8 max = m_bIs25Man ? 8 : 3;
+            std::list<Unit*>::iterator iter;
+
+            lTargets.sort(ObjectDistanceOrderReversed(pSource));
+            iter = lTargets.begin();
+
+            if (max >= lTargets.size())
+                max = lTargets.size() - 1;
+
+            std::advance(iter, urand(0, max));
+            pResult = (*iter);
+        }
+
+        return pResult;
+    }
 };
 
 #endif

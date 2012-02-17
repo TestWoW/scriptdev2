@@ -468,20 +468,20 @@ CreatureAI* GetAI_boss_lord_marrowgar(Creature* pCreature)
 
 void AddSC_boss_lord_marrowgar()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "boss_lord_marrowgar";
-    newscript->GetAI = &GetAI_boss_lord_marrowgar;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_lord_marrowgar";
+    pNewScript->GetAI = &GetAI_boss_lord_marrowgar;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_coldflame";
-    newscript->GetAI = &GetAI_mob_coldflame;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_coldflame";
+    pNewScript->GetAI = &GetAI_mob_coldflame;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_bone_spike";
-    newscript->GetAI = &GetAI_mob_bone_spike;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_bone_spike";
+    pNewScript->GetAI = &GetAI_mob_bone_spike;
+    pNewScript->RegisterSelf();
 
 }

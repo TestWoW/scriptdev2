@@ -1073,29 +1073,29 @@ CreatureAI* GetAI_mob_ooze_puddle(Creature* pCreature)
 
 void AddSC_boss_professor_putricide()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "boss_professor_putricide";
-    newscript->GetAI = &GetAI_boss_professor_putricide;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_professor_putricide";
+    pNewScript->GetAI = &GetAI_boss_professor_putricide;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_icc_volatile_ooze";
-    newscript->GetAI = &GetAI_mob_icc_volatile_ooze;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_icc_volatile_ooze";
+    pNewScript->GetAI = &GetAI_mob_icc_volatile_ooze;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_icc_gas_cloud";
-    newscript->GetAI = &GetAI_mob_icc_gas_cloud;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_icc_gas_cloud";
+    pNewScript->GetAI = &GetAI_mob_icc_gas_cloud;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_choking_gas_bomb";
-    newscript->GetAI = &GetAI_mob_choking_gas_bomb;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_choking_gas_bomb";
+    pNewScript->GetAI = &GetAI_mob_choking_gas_bomb;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_ooze_puddle";
-    newscript->GetAI = &GetAI_mob_ooze_puddle;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_ooze_puddle";
+    pNewScript->GetAI = &GetAI_mob_ooze_puddle;
+    pNewScript->RegisterSelf();
 }

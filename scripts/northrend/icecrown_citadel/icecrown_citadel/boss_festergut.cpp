@@ -286,6 +286,8 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             {
                 DoScriptText(SAY_SPORE, m_creature);
                 m_uiGasSporeTimer = 40000;
+                if (m_uiVileGasTimer <= 10000)
+                    m_uiVileGasTimer = 10000;
             }
         }
         else
@@ -408,7 +410,7 @@ struct MANGOS_DLL_DECL mob_stinkyAI : public ScriptedAI
         // Decimate
         if (m_uiDecimateTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STINKY_DECIMATE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_STINKY_DECIMATE) == CAST_OK)
                 m_uiDecimateTimer = 32000;
         }
         else
@@ -434,20 +436,20 @@ CreatureAI* GetAI_mob_stinky(Creature *pCreature)
 
 void AddSC_boss_festergut()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "boss_festergut";
-    newscript->GetAI = &GetAI_boss_festergut;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_festergut";
+    pNewScript->GetAI = &GetAI_boss_festergut;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_vile_gas_malleable_goo";
-    newscript->GetAI = &GetAI_mob_vile_gas_malleable_goo;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_vile_gas_malleable_goo";
+    pNewScript->GetAI = &GetAI_mob_vile_gas_malleable_goo;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_stinky";
-    newscript->GetAI = &GetAI_mob_stinky;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_stinky";
+    pNewScript->GetAI = &GetAI_mob_stinky;
+    pNewScript->RegisterSelf();
 }
 

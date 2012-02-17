@@ -95,10 +95,8 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
         Reset();
     }
 
-    uint32 m_uiShadows;
     uint32 m_uiPhase;
     uint32 m_uiPhaseTimer;
-    uint32 m_uiSummonTimer;
     uint32 m_uiBiteTimer;
     uint32 m_uiDeliriousSlashTimer;
     uint32 m_uiPactTimer;
@@ -109,19 +107,15 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
     uint32 m_uiBloodMirrorCheckTimer;
 
     bool m_bBite;
-    bool m_bCastShadows;
 
     void Reset()
     {
         m_bBite                     = false;
-        m_bCastShadows              = true;
         m_uiPhase                   = PHASE_GROUND;
         m_uiPhaseTimer              = 2*MINUTE * IN_MILLISECONDS;
-        m_uiShadows                 = 0;
         m_uiBiteTimer               = 15000;
         m_uiPactTimer               = 15000;
         m_uiShadowsTimer            = 30000;
-        m_uiSummonTimer             = 0;
         m_uiTwilightTimer           = urand(12000, 17000);
         m_uiDeliriousSlashTimer     = urand(15000, 20000);
         m_uiBloodMirrorCheckTimer   = 1000;

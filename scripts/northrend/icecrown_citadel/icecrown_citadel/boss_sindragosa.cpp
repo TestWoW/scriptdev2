@@ -39,7 +39,6 @@ enum BossSpells
     SPELL_PERMEATING_CHILL      = 70109,
     SPELL_UNCHAINED_MAGIC       = 69762,
     SPELL_INSTABILITY           = 69766,
-    SPELL_BACKLASH              = 69770, // deals dmg basing on Instability stacks
 
     // Phase 2
 
@@ -66,10 +65,12 @@ enum BossSpells
 
     GO_ICE_BLOCK                = 201722,
 
-// Rimefang
-    SPELL_FROST_AURA_1          = 70084,
+    // Rimefang
+    SPELL_FROST_AURA_RIME       = 71387,
     SPELL_ICY_BLAST             = 71376,
-// Spinestalker
+    SPELL_FROST_BREATH_RIME     = 71386,
+
+    // Spinestalker
     SPELL_BELLOWING_ROAR        = 36922,
     SPELL_CLEAVE_SPINESTALKER   = 40505,
     SPELL_TAIL_SWEEP            = 71369
@@ -114,7 +115,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 {
     boss_sindragosaAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        pCreature->SetSpeedRate(MOVE_RUN, 1.2f);
         Reset();
     }
 
@@ -150,6 +150,8 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         m_uiCheckTimer              = 1000;
 
         m_uiFlyingTimer             = 60000; // debug code
+
+        m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
     }
 
     void JustReachedHome()
@@ -230,7 +232,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         {
             m_uiPhase = PHASE_AIR;
 
-            int max = m_bIs25Man ? 5 : 2;
+            uint max = m_bIs25Man ? 5 : 2;
             if (m_bIs25Man && m_bIsHeroic)
                 max = 6;
 
@@ -238,11 +240,16 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
             // set timers
             m_uiIceTombTimer    = 5500;
-            m_uiFrostBombTimer  = 12000;
-            m_uiPhaseTimer      = 35000;
+            m_uiFrostBombTimer  = 15000;
+            m_uiPhaseTimer      = 36000;
         }
         else if (uiData == POINT_LAND)
         {
+            m_uiFrostBreathTimer    = urand(15000, 20000);
+            m_uiCleaveTimer         = urand(5000, 15000);
+            m_uiTailSmashTimer      = 20000;
+
+            m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
             m_uiPhase = PHASE_GROUND;
             SetCombatMovement(true);
             m_creature->SetLevitate(false);
@@ -404,15 +411,21 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 // Phase 2 (air)
                 if (m_uiPhaseTimer <= uiDiff)
                 {
-                    m_uiPhaseTimer = 35000;
-                    m_uiPhase = PHASE_FLYING;
-                    DoScriptText(SAY_TAKEOFF, m_creature);
+                    if (m_creature->IsNonMeleeSpellCasted(true))
+                        return;
 
-                    // fly to the air point
-                    SetCombatMovement(false);
-                    m_creature->SetLevitate(true);
-                    m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
-                    m_creature->GetMotionMaster()->MovePoint(POINT_AIR, SindragosaLoc[1].x, SindragosaLoc[1].y, SindragosaLoc[1].z);
+                    if (m_creature->GetHealthPercent() <= 85.0f)
+                    {
+                        m_uiPhaseTimer = 35000;
+                        m_uiPhase = PHASE_FLYING;
+                        DoScriptText(SAY_TAKEOFF, m_creature);
+
+                        // fly to the air point
+                        SetCombatMovement(false);
+                        m_creature->SetLevitate(true);
+                        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+                        m_creature->GetMotionMaster()->MovePoint(POINT_AIR, SindragosaLoc[1].x, SindragosaLoc[1].y, SindragosaLoc[1].z);
+                    }
                 }
                 else
                     m_uiPhaseTimer -= uiDiff;
@@ -455,7 +468,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 if (m_uiPhaseTimer <= uiDiff)
                 {
                     m_uiPhase = PHASE_FLYING;
-                    m_uiPhaseTimer = 42000;
+                    m_uiPhaseTimer = 110000;
 
                     // fly to the ground point
                     m_creature->GetMotionMaster()->MovePoint(POINT_LAND, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z);
@@ -635,29 +648,36 @@ CreatureAI* GetAI_mob_frost_bomb(Creature* pCreature)
     return new mob_frost_bombAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_rimefangAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_rimefangAI : public ScriptedAI
 {
-    mob_rimefangAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    mob_rimefangAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
 
-    ScriptedInstance *pInstance;
+    ScriptedInstance *m_pInstance;
     Creature* pBrother;
+
+    uint32 m_uiFrostBreathTimer;
+    uint32 m_uiIcyBlastTimer;
 
     void Reset()
     {
-        if(!pInstance) return;
-        if (pInstance->GetData(TYPE_SINDRAGOSA) != DONE)
-            pInstance->SetData(TYPE_SINDRAGOSA, NOT_STARTED);
-        resetTimers();
+        if(!m_pInstance)
+            return;
+
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         m_creature->SetRespawnDelay(30*MINUTE);
+
+        m_uiFrostBreathTimer = 10000;
+        m_uiIcyBlastTimer = 8000;
     }
 
     void MoveInLineOfSight(Unit* pWho)
     {
-        if (!pInstance || !pWho) return;
+        if (!m_pInstance || !pWho)
+            return;
 
         if (pWho->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -673,27 +693,30 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public BSWScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void JustReachedHome()
+    void Aggro(Unit *pWho)
     {
-        if (pInstance)
-            if (pInstance->GetData(TYPE_SINDRAGOSA) != DONE)
-                pInstance->SetData(TYPE_SINDRAGOSA, FAIL);
-    }
-
-    void Aggro(Unit *who)
-    {
-        if(!pInstance) return;
-        if (pInstance->GetData(TYPE_SINDRAGOSA) != DONE) pInstance->SetData(TYPE_SINDRAGOSA, IN_PROGRESS);
-        pBrother = pInstance->GetSingleCreatureFromStorage(NPC_SPINESTALKER);
-        if (pBrother && !pBrother->isAlive()) pBrother->Respawn();
-        if (pBrother) pBrother->SetInCombatWithZone();
-    }
-
-    void JustDied(Unit *killer)
-    {
-        if(!pInstance) return;
-        if (pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
+        if (!m_pInstance)
             return;
+
+        pBrother = m_pInstance->GetSingleCreatureFromStorage(NPC_SPINESTALKER);
+
+        if (pBrother && !pBrother->isAlive())
+            pBrother->Respawn();
+
+        if (pBrother)
+            pBrother->SetInCombatWithZone();
+
+        DoCastSpellIfCan(m_creature, SPELL_FROST_AURA_RIME, CAST_TRIGGERED);
+    }
+
+    void JustDied(Unit *pKiller)
+    {
+        if(!m_pInstance)
+            return;
+
+        if (m_pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
+            return;
+
         if (pBrother && !pBrother->isAlive())
         if (pBrother && !pBrother->isAlive())
         {
@@ -703,19 +726,39 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public BSWScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 uiDiff)
     {
-        if (!pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
+        else
+            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+
+        if (m_pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
         {
             m_creature->SetRespawnDelay(DAY);
             m_creature->ForcedDespawn();
             return;
         }
 
-        doCastAll(diff);
+        if (m_uiFrostBreathTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BREATH_RIME) == CAST_OK)
+                m_uiFrostBreathTimer = 13000;
+        }
+        else
+            m_uiFrostBreathTimer -= uiDiff;
+
+        if (m_uiIcyBlastTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1), SPELL_ICY_BLAST) == CAST_OK)
+                m_uiIcyBlastTimer = 10000;
+        }
+        else
+            m_uiIcyBlastTimer -= uiDiff;
+
         DoMeleeAttackIfReady();
     }
 };
@@ -726,29 +769,38 @@ CreatureAI* GetAI_mob_rimefang(Creature* pCreature)
     return new mob_rimefangAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_spinestalkerAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_spinestalkerAI : public ScriptedAI
 {
-    mob_spinestalkerAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    mob_spinestalkerAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
 
-    ScriptedInstance *pInstance;
+    ScriptedInstance *m_pInstance;
     Creature* pBrother;
+
+    uint32 m_uiBellowingRoarTimer;
+    uint32 m_uiCleaveTimer;
+    uint32 m_uiTailSweepTimer;
 
     void Reset()
     {
-        if(!pInstance) return;
-        if (pInstance->GetData(TYPE_SINDRAGOSA) != DONE)
-            pInstance->SetData(TYPE_SINDRAGOSA, NOT_STARTED);
-        resetTimers();
+        if(!m_pInstance)
+            return;
+
+        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         m_creature->SetRespawnDelay(30*MINUTE);
+
+        m_uiBellowingRoarTimer  = 15000;
+        m_uiCleaveTimer         = urand(6000, 10000);
+        m_uiTailSweepTimer      = 10000;
     }
 
     void MoveInLineOfSight(Unit* pWho)
     {
-        if (!pInstance || !pWho) return;
+        if (!m_pInstance || !pWho)
+            return;
 
         if (pWho->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -764,27 +816,25 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public BSWScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void JustReachedHome()
+    void Aggro(Unit *pWho)
     {
-        if (pInstance)
-            if (pInstance->GetData(TYPE_SINDRAGOSA) != DONE)
-                pInstance->SetData(TYPE_SINDRAGOSA, FAIL);
-    }
-
-    void Aggro(Unit *who)
-    {
-        if(!pInstance) return;
-        if (pInstance->GetData(TYPE_SINDRAGOSA) != DONE) pInstance->SetData(TYPE_SINDRAGOSA, IN_PROGRESS);
-        pBrother = pInstance->GetSingleCreatureFromStorage(NPC_RIMEFANG);
-        if (pBrother && !pBrother->isAlive()) pBrother->Respawn();
-        if (pBrother) pBrother->SetInCombatWithZone();
-    }
-
-    void JustDied(Unit *killer)
-    {
-        if (!pInstance)
+        if(!m_pInstance)
             return;
-        if (pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
+
+        pBrother = m_pInstance->GetSingleCreatureFromStorage(NPC_RIMEFANG);
+
+        if (pBrother && !pBrother->isAlive())
+            pBrother->Respawn();
+
+        if (pBrother)
+           pBrother->SetInCombatWithZone();
+    }
+
+    void JustDied(Unit *pKiller)
+    {
+        if (!m_pInstance)
+            return;
+        if (m_pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
             return;
         if (pBrother && !pBrother->isAlive())
         {
@@ -794,20 +844,47 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public BSWScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 uiDiff)
     {
-
-        if (!pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
+        else
+            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+
+        if (m_pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
         {
             m_creature->SetRespawnDelay(DAY);
             m_creature->ForcedDespawn();
             return;
         }
 
-        doCastAll(diff);
+        if (m_uiBellowingRoarTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_BELLOWING_ROAR) == CAST_OK)
+                m_uiBellowingRoarTimer = 15000;
+        }
+        else
+            m_uiBellowingRoarTimer -= uiDiff;
+
+        if (m_uiCleaveTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE_SPINESTALKER) == CAST_OK)
+                m_uiCleaveTimer = urand(6000, 10000);
+        }
+        else
+            m_uiCleaveTimer -= uiDiff;
+
+        if (m_uiTailSweepTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_TAIL_SWEEP) == CAST_OK)
+                m_uiTailSweepTimer = 15000;
+        }
+        else
+            m_uiTailSweepTimer -= uiDiff;
+
         DoMeleeAttackIfReady();
     }
 };
@@ -819,31 +896,31 @@ CreatureAI* GetAI_mob_spinestalker(Creature* pCreature)
 
 void AddSC_boss_sindragosa()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_sindragosa";
-    newscript->GetAI = &GetAI_boss_sindragosa;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_sindragosa";
+    pNewScript->GetAI = &GetAI_boss_sindragosa;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_rimefang";
-    newscript->GetAI = &GetAI_mob_rimefang;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_rimefang";
+    pNewScript->GetAI = &GetAI_mob_rimefang;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_spinestalker";
-    newscript->GetAI = &GetAI_mob_spinestalker;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_spinestalker";
+    pNewScript->GetAI = &GetAI_mob_spinestalker;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_ice_tomb";
-    newscript->GetAI = &GetAI_mob_ice_tomb;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_ice_tomb";
+    pNewScript->GetAI = &GetAI_mob_ice_tomb;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_frost_bomb";
-    newscript->GetAI = &GetAI_mob_frost_bomb;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_frost_bomb";
+    pNewScript->GetAI = &GetAI_mob_frost_bomb;
+    pNewScript->RegisterSelf();
 
 }

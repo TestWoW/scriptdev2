@@ -1659,15 +1659,15 @@ CreatureAI* GetAI_mob_blood_beast(Creature* pCreature)
 
 void AddSC_boss_deathbringer_saurfang()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "boss_deathbringer_saurfang";
-    newscript->GetAI = &GetAI_boss_deathbringer_saurfang;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_deathbringer_saurfang";
+    pNewScript->GetAI = &GetAI_boss_deathbringer_saurfang;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_blood_beast";
-    newscript->GetAI = &GetAI_mob_blood_beast;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_blood_beast";
+    pNewScript->GetAI = &GetAI_mob_blood_beast;
+    pNewScript->RegisterSelf();
 }
 
