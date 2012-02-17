@@ -336,7 +336,10 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
             case PHASE_BONE_STORM_CHARGING: // waiting to arrive at target position
             {
                 if (m_uiDebugTimer < uiDiff)
+                {
+                    m_uiDebugTimer = 30000;
                     m_uiPhase = PHASE_NORMAL;
+                }
                 else m_uiDebugTimer -= uiDiff;
                 break;
             }

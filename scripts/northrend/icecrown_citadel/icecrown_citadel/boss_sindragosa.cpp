@@ -417,6 +417,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     if (m_creature->GetHealthPercent() <= 85.0f)
                     {
                         m_uiPhaseTimer = 35000;
+                        m_uiFlyingTimer= 60000; // debug code
                         m_uiPhase = PHASE_FLYING;
                         DoScriptText(SAY_TAKEOFF, m_creature);
 
