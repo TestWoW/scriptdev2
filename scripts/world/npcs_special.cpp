@@ -2452,36 +2452,6 @@ bool GossipSelect_pilgrim_table(Player* pPlayer, Creature* pCreature, uint32 uiS
     return true;
 }
 
-<<<<<<< HEAD
-bool GossipHello_wintern_reveler(Player* pPlayer, Creature* pCreature)
-{
-    char const* GOSSIP_HELP;
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-     case LOCALE_enUS:
-     case LOCALE_koKR:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-                      GOSSIP_HELP        = "Ofrecer ayuda.";
-                      break;
-     case LOCALE_esMX:
-                      GOSSIP_HELP        = "Ofrecer ayuda.";
-                      break;
-     case LOCALE_ruRU:
-     default:
-                      GOSSIP_HELP        = "Help them.";
-                      break;
-    };
-
-    if (pPlayer->HasAura(26157) || pPlayer->HasAura(26272) || pPlayer->HasAura(26273) || pPlayer->HasAura(26274) || pPlayer->HasAura(26275))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(50155, pCreature->GetGUID());
-=======
 bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
 {
     char const* GOSSIP_LONELY;
@@ -2489,8 +2459,8 @@ bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
     char const* GOSSIP_DISASTER;
     char const* GOSSIP_HOLIDAY;
     char const* GOSSIP_WINTERN;
-	char const* GOSSIP_KING;
-	char const* GOSSIP_PINKY;
+    char const* GOSSIP_KING;
+    char const* GOSSIP_PINKY;
 
     switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
     {
@@ -2499,17 +2469,17 @@ bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
      case LOCALE_zhCN:
      case LOCALE_zhTW:
      case LOCALE_esES:
-	 case LOCALE_esMX:
+     case LOCALE_esMX:
                       GOSSIP_LONELY         = "Me siento sólo, we.";
                       GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
                       GOSSIP_DISASTER       = "Te voy a dar un beso, guapetón.";
                       GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
                       GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
-					  GOSSIP_KING			= "Rey del Festival de Fuego";
-					  GOSSIP_PINKY			= "El resplandor rosa del cohete";
+                      GOSSIP_KING	    = "Rey del Festival de Fuego";
+                      GOSSIP_PINKY	    = "El resplandor rosa del cohete";
                       break;
      case LOCALE_ruRU:
-	 case LOCALE_enUS:
+     case LOCALE_enUS:
      case LOCALE_frFR:
      case LOCALE_deDE:
      default:
@@ -2518,8 +2488,8 @@ bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
                       GOSSIP_DISASTER       = "Kiss me, baby.";
                       GOSSIP_HOLIDAY        = "It's time to get one surprise.";
                       GOSSIP_WINTERN        = "We wish you a merry achievement.";
-					  GOSSIP_KING			= "King of the Fire Festival";
-					  GOSSIP_PINKY			= "The Rocket's Pink Glare";
+                      GOSSIP_KING           = "King of the Fire Festival";
+                      GOSSIP_PINKY          = "The Rocket's Pink Glare";
                       break;
     };
 
@@ -2528,8 +2498,8 @@ bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DISASTER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_KING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_KING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
 
     pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
     return true;
@@ -2560,85 +2530,76 @@ bool GossipSelect_logroneitor_horde(Player* pPlayer, Creature* pCreature, uint32
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->CompletedAchievement(252);
             break;
-		case GOSSIP_ACTION_INFO_DEF+6:
+        case GOSSIP_ACTION_INFO_DEF+6:
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->CompletedAchievement(1145);
             break;
-		case GOSSIP_ACTION_INFO_DEF+7:
+        case GOSSIP_ACTION_INFO_DEF+7:
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->CompletedAchievement(1696);
             break;
-		default:
-			pPlayer->CLOSE_GOSSIP_MENU();
-			break;
->>>>>>> 71ab27345b7f4acf36c967cafae3e778b6e85e1a
+        default:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            break;
     }
     return true;
 }
 
-<<<<<<< HEAD
-bool GossipSelect_wintern_reveler(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-=======
 bool GossipHello_logroneitor_alliance(Player* pPlayer, Creature* pCreature)
 {
     char const* GOSSIP_LONELY;
     char const* GOSSIP_NAXXRAMAS;
     char const* GOSSIP_HOLIDAY;
     char const* GOSSIP_WINTERN;
-	char const* GOSSIP_KING;
-	char const* GOSSIP_PINKY;
+    char const* GOSSIP_KING;
+    char const* GOSSIP_PINKY;
 	
 
     switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
     {
-     case LOCALE_koKR:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-	 case LOCALE_esMX:
-                      GOSSIP_LONELY         = "Me siento sólo, we.";
-                      GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
-                      GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
-                      GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
-					  GOSSIP_KING			= "Rey del Festival de Fuego";
-					  GOSSIP_PINKY			= "El resplandor rosa del cohete";
-                      break;
-     case LOCALE_ruRU:
-	 case LOCALE_enUS:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     default:
-                      GOSSIP_LONELY         = "I'm lonely.";
-                      GOSSIP_NAXXRAMAS      = "You are sad, crazy.";
-                      GOSSIP_HOLIDAY        = "It's time to get one surprise.";
-                      GOSSIP_WINTERN        = "We wish you a merry achievement.";
-					  GOSSIP_KING			= "King of the Fire Festival";
-					  GOSSIP_PINKY			= "The Rocket's Pink Glare";
-                      break;
+    case LOCALE_koKR:
+    case LOCALE_zhCN:
+    case LOCALE_zhTW:
+    case LOCALE_esES:
+    case LOCALE_esMX:
+                     GOSSIP_LONELY         = "Me siento sólo, we.";
+                     GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
+                     GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
+                     GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
+                     GOSSIP_KING	    = "Rey del Festival de Fuego";
+                     GOSSIP_PINKY	    = "El resplandor rosa del cohete";
+                     break;
+    case LOCALE_ruRU:
+    case LOCALE_enUS:
+    case LOCALE_frFR:
+    case LOCALE_deDE:
+    default:
+                     GOSSIP_LONELY         = "I'm lonely, goblin.";
+                     GOSSIP_NAXXRAMAS      = "You are sad, crazy.";
+                     GOSSIP_HOLIDAY        = "It's time to get one surprise.";
+                     GOSSIP_WINTERN        = "We wish you a merry achievement.";
+                     GOSSIP_KING           = "King of the Fire Festival";
+                     GOSSIP_PINKY          = "The Rocket's Pink Glare";
+                     break;
     };
 
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_LONELY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NAXXRAMAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_KING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-	pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_KING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
 
     pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
     return true;
 }
 
 bool GossipSelect_logroneitor_alliance(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
->>>>>>> 71ab27345b7f4acf36c967cafae3e778b6e85e1a
 {
     switch(uiAction)
     {
         case GOSSIP_ACTION_INFO_DEF+1:
             pPlayer->CLOSE_GOSSIP_MENU();
-<<<<<<< HEAD
-            pPlayer->CompletedAchievement(252);
-            break;
-=======
             pPlayer->CompletedAchievement(1291);
             break;
         case GOSSIP_ACTION_INFO_DEF+2:
@@ -2654,18 +2615,17 @@ bool GossipSelect_logroneitor_alliance(Player* pPlayer, Creature* pCreature, uin
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->CompletedAchievement(252);
             break;
-		case GOSSIP_ACTION_INFO_DEF+5:
+        case GOSSIP_ACTION_INFO_DEF+5:
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->CompletedAchievement(1145);
             break;
-		case GOSSIP_ACTION_INFO_DEF+6:
+        case GOSSIP_ACTION_INFO_DEF+6:
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->CompletedAchievement(1696);
             break;
-		default:
-			pPlayer->CLOSE_GOSSIP_MENU();
-			break;
->>>>>>> 71ab27345b7f4acf36c967cafae3e778b6e85e1a
+        default:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            break;
     }
     return true;
 }
@@ -2800,11 +2760,6 @@ void AddSC_npcs_special()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-<<<<<<< HEAD
-    pNewScript->Name = "wintern_reveler";
-    pNewScript->pGossipHello = &GossipHello_wintern_reveler;
-    pNewScript->pGossipSelect = &GossipSelect_wintern_reveler;
-=======
     pNewScript->Name = "logroneitor_horde";
     pNewScript->pGossipHello = &GossipHello_logroneitor_horde;
     pNewScript->pGossipSelect = &GossipSelect_logroneitor_horde;
@@ -2814,6 +2769,5 @@ void AddSC_npcs_special()
     pNewScript->Name = "logroneitor_alliance";
     pNewScript->pGossipHello = &GossipHello_logroneitor_alliance;
     pNewScript->pGossipSelect = &GossipSelect_logroneitor_alliance;
->>>>>>> 71ab27345b7f4acf36c967cafae3e778b6e85e1a
     pNewScript->RegisterSelf();
 }
