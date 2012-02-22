@@ -396,7 +396,11 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
 ####*/
 struct MANGOS_DLL_DECL mob_coldflameAI : public ScriptedAI
 {
-    mob_coldflameAI(Creature *pCreature) : ScriptedAI(pCreature){}
+    mob_coldflameAI(Creature *pCreature) : ScriptedAI(pCreature)
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    }
     void Reset(){}
     void AttackStart(Unit *who){}
     void UpdateAI(const uint32 uiDiff){}
