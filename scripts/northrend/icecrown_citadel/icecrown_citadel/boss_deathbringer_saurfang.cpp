@@ -175,6 +175,9 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
         m_uiEventStep = 0;
         m_uiNextEventTimer = 0;
         n = 8;
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
 
         m_bIsAlliance = true;
 
@@ -508,7 +511,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->SetWalk(true);
                                 pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                 pTmp->GetPosition(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                 pTmp->_AddAura(70572);
                             }
                             // move guards
@@ -519,7 +522,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                     pTmp->SetWalk(true);
                                     pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                     pTmp->GetPosition(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                     pTmp->_AddAura(70572);
                                 }
                             }
@@ -716,7 +719,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->SetWalk(true);
                                 pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                 pTmp->GetPosition(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                 pTmp->_AddAura(SPELL_GRIP_OF_AGONY);
                             }
                             // move guards
@@ -727,7 +730,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                     pTmp->SetWalk(true);
                                     pTmp->SetSpeedRate(MOVE_WALK, 3.0f);
                                     pTmp->GetPosition(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z + 7.0f);
                                     pTmp->_AddAura(SPELL_GRIP_OF_AGONY);
                                 }
                             }
@@ -788,7 +791,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                 pTmp->GetPosition(x, y, z);
                                 m_creature->UpdateAllowedPositionZ(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                 pTmp->RemoveAllAuras();
                             }
                             // move guards
@@ -798,7 +801,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 {
                                     pTmp->GetPosition(x, y, z);
                                     m_creature->UpdateAllowedPositionZ(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                     pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                     pTmp->RemoveAllAuras();
                                 }
@@ -1173,7 +1176,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                 pTmp->GetPosition(x, y, z);
                                 m_creature->UpdateAllowedPositionZ(x, y, z);
-                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                 pTmp->RemoveAllAuras();
                             }
                             // move guards
@@ -1183,7 +1186,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
                                 {
                                     pTmp->GetPosition(x, y, z);
                                     m_creature->UpdateAllowedPositionZ(x, y, z);
-                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - frand(5.0f, 7.0f));
+                                    pTmp->GetMotionMaster()->MovePoint(0, x, y, z - 7.0f);
                                     pTmp->HandleEmote(EMOTE_ONESHOT_NONE);
                                     pTmp->RemoveAllAuras();
                                 }
@@ -1656,15 +1659,15 @@ CreatureAI* GetAI_mob_blood_beast(Creature* pCreature)
 
 void AddSC_boss_deathbringer_saurfang()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "boss_deathbringer_saurfang";
-    newscript->GetAI = &GetAI_boss_deathbringer_saurfang;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_deathbringer_saurfang";
+    pNewScript->GetAI = &GetAI_boss_deathbringer_saurfang;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_blood_beast";
-    newscript->GetAI = &GetAI_mob_blood_beast;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_blood_beast";
+    pNewScript->GetAI = &GetAI_mob_blood_beast;
+    pNewScript->RegisterSelf();
 }
 

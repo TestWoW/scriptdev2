@@ -129,18 +129,6 @@ enum
     SAY_SLAY_2                  = -1631145,
     SAY_BERSERK                 = -1631146,
     SAY_VICTORY                 = -1631147,
-
-    // Svalna
-    SAY_SVALNA_1                = -1631133,
-    SAY_CROK_1                  = -1631130,
-    SAY_SVALNA_2                = -1631135,
-    SAY_SVALNA_3                = -1631134,
-
-    SAY_SVALNA_AGGRO            = -1631136,
-    SAY_SVALNA_DEATH            = -1631139,
-    SAY_SVALNA_KILL             = -1631138,
-    SAY_SVALNA_AETHER           = -1631134,
-
 };
 
 static uint32 m_uiSummonedAddsEntries[SUMMON_TYPES_NUMBER] =
@@ -151,223 +139,15 @@ static uint32 m_uiSummonedAddsEntries[SUMMON_TYPES_NUMBER] =
     NPC_BLAZING_SKELETON
 };
 
-struct MANGOS_DLL_DECL mob_svalna_eventAI : public ScriptedAI
+struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
 {
-    mob_svalna_eventAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_valithria_dreamwalkerAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiStep = 0;
-        m_uiEventTimer = 0;
-        m_bIsEventStarted = false;
-        m_bIsEventFinished = false;
-    }
-
-    ScriptedInstance *m_pInstance;
-    uint32 m_uiStep;
-    uint32 m_uiEventTimer;
-    bool m_bIsEventStarted;
-    bool m_bIsEventFinished;
-
-    void Reset()
-    {
-    }
-
-    void NextStep(uint32 uiTimer)
-    {
-        m_uiEventTimer = uiTimer;
-        ++m_uiStep;
-    }
-
-    void MoveInLineOfSight(Unit *pWho)
-    {
-        if (!m_bIsEventStarted)
-        {
-            if (pWho->GetTypeId() == TYPEID_PLAYER)
-            {
-                m_bIsEventStarted = true;
-                NextStep(0);
-                return;
-            }
-        }
-
-        ScriptedAI::MoveInLineOfSight(pWho);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_bIsEventStarted || m_bIsEventFinished)
-            return;
-
-        if (m_uiEventTimer <= uiDiff)
-        {
-            if (Creature* pSvalna = m_pInstance->GetSingleCreatureFromStorage(NPC_SVALNA))
-            {
-                if (!pSvalna->isAlive())
-                {
-                    m_bIsEventFinished = true;
-                }
-            }
-
-            switch (m_uiStep)
-            {
-                case 0:
-                {
-                    NextStep(1000);
-                    break;
-                }
-                case 1:
-                {
-                    if (Creature* pSvalna = m_pInstance->GetSingleCreatureFromStorage(NPC_SVALNA)) 
-                    {
-                        DoScriptText(SAY_SVALNA_1, pSvalna);
-                        NextStep(12000);
-                    }
-                    break;
-                }
-                case 2:
-                {
-                    if (Creature* pCrok = m_pInstance->GetSingleCreatureFromStorage(NPC_CROK)) 
-                    {
-                        DoScriptText(SAY_CROK_1, pCrok);
-                        NextStep(6500);
-                    }
-                    break;
-                }
-                case 3:
-                {
-                    if (Creature* pSvalna = m_pInstance->GetSingleCreatureFromStorage(NPC_SVALNA)) 
-                    {
-                        DoScriptText(SAY_SVALNA_2, pSvalna);
-                        NextStep(30000);
-                    }
-                    break;
-                }
-                case 4:
-                {
-                    if (Creature* pSvalna = m_pInstance->GetSingleCreatureFromStorage(NPC_SVALNA)) 
-                    {
-                        DoScriptText(SAY_SVALNA_3, pSvalna);
-                        NextStep(30000);
-                    }
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-        else
-            m_uiEventTimer -= uiDiff;
-    }
-};
-
-CreatureAI* GetAI_mob_svalna_event(Creature* pCreature)
-{
-    return new mob_svalna_eventAI(pCreature);
-}
-
-struct MANGOS_DLL_DECL mob_svalnaAI : public ScriptedAI
-{
-    mob_svalnaAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    uint32 m_uiAetherBurstTimer;
-    uint32 m_uiMortalwoundTimer;
-    bool m_bAether1;
-    bool m_bAether2;
-
-    void Reset()
-    {
-        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
-
-        m_uiAetherBurstTimer = urand(6000, 8000);
-        m_uiMortalwoundTimer = urand(2000, 5000);
-
-        m_creature->RemoveAurasDueToSpell(71465);
-        m_bAether1 = false;
-        m_bAether2 = false;
-    }
-
-    void Aggro(Unit *pWho)
-    {
-        DoScriptText(SAY_SVALNA_AGGRO, m_creature);
-        m_creature->CastSpell(m_creature, 71465, false);
-    }
-
-    void JustDied(Unit *killer)
-    {
-        DoScriptText(SAY_SVALNA_DEATH, m_creature);
-    }
-
-    void KilledUnit(Unit *pVictim)
-    {
-        DoScriptText(SAY_SVALNA_KILL, m_creature);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, 0);
-
-        if (m_uiAetherBurstTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 71468) == CAST_OK)
-                m_uiAetherBurstTimer = 6000;
-        }
-        else
-            m_uiAetherBurstTimer -= uiDiff;
-
-        if (m_creature->GetHealthPercent() < 70.0f && !m_bAether1)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 71463) == CAST_OK)
-            {
-                DoScriptText(SAY_SVALNA_AETHER, m_creature);
-                m_bAether1 = true;
-            }
-        }
-
-        if (m_creature->GetHealthPercent() < 30.0f && !m_bAether2)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 71463) == CAST_OK)
-            {
-                DoScriptText(SAY_SVALNA_AETHER, m_creature);
-                m_bAether2 = true;
-            }
-        }
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mob_svalna(Creature *pCreature)
-{
-    return new mob_svalnaAI(pCreature);
-}
-
-struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
-{
-    boss_valithria_dreamwalkerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-
         SetCombatMovement(false);
         DoCastSpellIfCan(m_creature, SPELL_CORRUPTION, CAST_TRIGGERED);
 
         Reset();
     }
-
-    ScriptedInstance *m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
 
     bool m_bCombatStarted;
     bool m_bLichAggro;
@@ -525,7 +305,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
                 {
                     pTemp->DeleteThreatList();
                     pTemp->CombatStop(true);
-                    pTemp->DealDamage(pTemp, pTemp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    pTemp->ForcedDespawn();
                 }
             }
         }
@@ -534,36 +314,38 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
 
     uint32 GetNextSummonTimer()
     {
-        uint32 min = 6000;
-        uint32 max = 11000;
+        // max timer 20 - 25 sec
+        // min timer 15 - 20 sec
+        uint32 min = 5000;
+        uint32 max = 10000;
 
         if (m_uiSummonCounter > 10)
         {
-            min = 5500;
-            max = 10500;
+            min = 4000;
+            max = 9000;
         }
         if (m_uiSummonCounter > 20)
         {
-            min = 5000;
-            max = 10000;
+            min = 3000;
+            max = 8000;
         }
         if (m_uiSummonCounter > 30)
         {
-            min = 4500;
-            max = 9000;
+            min = 2000;
+            max = 7000;
         }
         if (m_uiSummonCounter > 40)
         {
-            min = 4000;
-            max = 8500;
+            min = 1000;
+            max = 6000;
         }
         if (m_uiSummonCounter > 50) // almost 7 minutes - considered as enrage
         {
-            min = 3500;
-            max = 8000;
+            min = 0;
+            max = 5000;
         }
 
-        return m_bIsEnrage ? 3000 : 8000 + urand(min, max);
+        return m_bIsEnrage ? 3000 : 15000 + urand(min, max);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -712,7 +494,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public ScriptedAI
                 }
             }
 
-            m_uiSummonSuppresserTimer = m_bIsEnrage ? urand(10000, 15000) : urand(15000, 30000);
+            m_uiSummonSuppresserTimer = m_bIsEnrage ? urand(10000, 15000) : urand(25000, 30000);
         }
         else
             m_uiSummonSuppresserTimer -= uiDiff;
@@ -859,6 +641,9 @@ struct MANGOS_DLL_DECL mob_gluttonous_abominationAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         // Gut Spray
         if (m_uiGutSprayTimer <= uiDiff)
         {
@@ -883,6 +668,7 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
     mob_blistering_zombieAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        Reset();
     }
 
     ScriptedInstance *m_pInstance;
@@ -913,7 +699,7 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
             uiDamage = 0;
             SetCombatMovement(false);
             if (DoCastSpellIfCan(m_creature, SPELL_ACID_BURST) == CAST_OK)
-                m_creature->ForcedDespawn(2000);
+                m_creature->ForcedDespawn(1000);
         }
     }
 
@@ -921,6 +707,9 @@ struct MANGOS_DLL_DECL mob_blistering_zombieAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         DoMeleeAttackIfReady();
     }
@@ -937,7 +726,6 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     mob_risen_archmageAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         Reset();
     }
 
@@ -945,7 +733,6 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     uint32 m_uiColumnOfFrostTimer;
     uint32 m_uiManaVoidTimer;
 
-    Difficulty m_uiMapDifficulty;
     ScriptedInstance *m_pInstance;
 
     void Reset()
@@ -972,6 +759,9 @@ struct MANGOS_DLL_DECL mob_risen_archmageAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         // Frostbolt Volley
         if (m_uiFrostboltVolleyTimer <= uiDiff)
@@ -1053,6 +843,9 @@ struct MANGOS_DLL_DECL mob_blazing_skeletonAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         // Fireball
         if (m_uiFireballTimer <= uiDiff)
         {
@@ -1111,6 +904,9 @@ struct MANGOS_DLL_DECL mob_suppresserAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->GetData(TYPE_VALITHRIA) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         if (!m_bIsCasting)
         {
@@ -1370,96 +1166,86 @@ CreatureAI* GetAI_mob_column_of_frost(Creature *pCreature)
 
 void AddSC_boss_valithria_dreamwalker()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_valithria_dreamwalker";
-    newscript->GetAI = &GetAI_boss_valithria_dreamwalker;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_valithria_dreamwalker";
+    pNewScript->GetAI = &GetAI_boss_valithria_dreamwalker;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_valithria_dream_phase";
-    newscript->GetAI = &GetAI_mob_valithria_dream_phase;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_valithria_dream_phase";
+    pNewScript->GetAI = &GetAI_mob_valithria_dream_phase;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_valithria_combat_trigger";
-    newscript->GetAI = &GetAI_mob_valithria_combat_trigger;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_valithria_combat_trigger";
+    pNewScript->GetAI = &GetAI_mob_valithria_combat_trigger;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_gluttonous_abomination";
-    newscript->GetAI = &GetAI_mob_gluttonous_abomination;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_gluttonous_abomination";
+    pNewScript->GetAI = &GetAI_mob_gluttonous_abomination;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_blistering_zombie";
-    newscript->GetAI = &GetAI_mob_blistering_zombie;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_blistering_zombie";
+    pNewScript->GetAI = &GetAI_mob_blistering_zombie;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_risen_archmage";
-    newscript->GetAI = &GetAI_mob_risen_archmage;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_risen_archmage";
+    pNewScript->GetAI = &GetAI_mob_risen_archmage;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_blazing_skeleton";
-    newscript->GetAI = &GetAI_mob_blazing_skeleton;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_blazing_skeleton";
+    pNewScript->GetAI = &GetAI_mob_blazing_skeleton;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_suppresser";
-    newscript->GetAI = &GetAI_mob_suppresser;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_suppresser";
+    pNewScript->GetAI = &GetAI_mob_suppresser;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_nightmare_portal_pre";
-    newscript->GetAI = &GetAI_mob_nightmare_portal_pre;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_nightmare_portal_pre";
+    pNewScript->GetAI = &GetAI_mob_nightmare_portal_pre;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_nightmare_portal";
-    newscript->pGossipHello = &GossipHello_mob_nightmare_portal;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_nightmare_portal";
+    pNewScript->pGossipHello = &GossipHello_mob_nightmare_portal;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_nightmare_cloud";
-    newscript->GetAI = &GetAI_mob_nightmare_cloud;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_nightmare_cloud";
+    pNewScript->GetAI = &GetAI_mob_nightmare_cloud;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_dream_portal_pre";
-    newscript->GetAI = &GetAI_mob_dream_portal_pre;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_dream_portal_pre";
+    pNewScript->GetAI = &GetAI_mob_dream_portal_pre;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_dream_portal";
-    newscript->pGossipHello = &GossipHello_mob_dream_portal;
+    pNewScript = new Script;
+    pNewScript->Name = "mob_dream_portal";
+    pNewScript->pGossipHello = &GossipHello_mob_dream_portal;
 
-    newscript->RegisterSelf();
-    newscript = new Script;
-    newscript->Name = "mob_dream_cloud";
-    newscript->GetAI = &GetAI_mob_dream_cloud;
-    newscript->RegisterSelf();
+    pNewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_dream_cloud";
+    pNewScript->GetAI = &GetAI_mob_dream_cloud;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_mana_void";
-    newscript->GetAI = &GetAI_mob_mana_void;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_mana_void";
+    pNewScript->GetAI = &GetAI_mob_mana_void;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_column_of_frost";
-    newscript->GetAI = &GetAI_mob_column_of_frost;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_svalna_event";
-    newscript->GetAI = &GetAI_mob_svalna_event;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_svalna";
-    newscript->GetAI = &GetAI_mob_svalna;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_column_of_frost";
+    pNewScript->GetAI = &GetAI_mob_column_of_frost;
+    pNewScript->RegisterSelf();
 }
 

@@ -600,7 +600,7 @@ struct MANGOS_DLL_DECL mob_toc_shamanAI : public boss_faction_championsAI
                 {
                     DoCastSpellIfCan(m_creature, SPELL_HEROISM);
 
-                if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_1_1))
+                /*if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_1_1))
                     pChampion->_AddAura(SPELL_HEROISM, 40000);
 
                 if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_1_3))
@@ -637,7 +637,7 @@ struct MANGOS_DLL_DECL mob_toc_shamanAI : public boss_faction_championsAI
                     pChampion->_AddAura(SPELL_HEROISM, 40000);
 
                 if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_1_14))
-                    pChampion->_AddAura(SPELL_HEROISM, 40000);
+                    pChampion->_AddAura(SPELL_HEROISM, 40000);*/
                 }
             }
             else
@@ -645,7 +645,7 @@ struct MANGOS_DLL_DECL mob_toc_shamanAI : public boss_faction_championsAI
                 {
                     DoCastSpellIfCan(m_creature, SPELL_BLOODLUST);
 
-                if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_2_1))
+                /*if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_2_1))
                     pChampion->_AddAura(SPELL_BLOODLUST, 40000);
 
                 if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_2_3))
@@ -682,7 +682,7 @@ struct MANGOS_DLL_DECL mob_toc_shamanAI : public boss_faction_championsAI
                     pChampion->_AddAura(SPELL_BLOODLUST, 40000);
 
                 if (Creature* pChampion = m_pInstance->GetSingleCreatureFromStorage(NPC_CRUSADER_2_14))
-                    pChampion->_AddAura(SPELL_BLOODLUST, 40000);
+                    pChampion->_AddAura(SPELL_BLOODLUST, 40000);*/
                 }
 
 

@@ -233,6 +233,7 @@ struct MANGOS_DLL_DECL npc_blood_orb_controlAI : public ScriptedAI
         m_uiCheckTimer = 1000;
         m_bIsInProgress = false;
         m_uiInvocationTimer = 30000;
+        m_creature->SetHealth(m_creature->GetMaxHealth());
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1000,55 +1001,55 @@ CreatureAI* GetAI_mob_kinetic_bomb_target(Creature* pCreature)
 
 void AddSC_blood_prince_council()
 {
-    Script* newscript;
+    Script* pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_taldaram_icc";
-    newscript->GetAI = &GetAI_boss_taldaram_icc;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_taldaram_icc";
+    pNewScript->GetAI = &GetAI_boss_taldaram_icc;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "boss_keleseth_icc";
-    newscript->GetAI = &GetAI_boss_keleseth_icc;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_keleseth_icc";
+    pNewScript->GetAI = &GetAI_boss_keleseth_icc;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "boss_valanar_icc";
-    newscript->GetAI = &GetAI_boss_valanar_icc;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_valanar_icc";
+    pNewScript->GetAI = &GetAI_boss_valanar_icc;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "boss_blood_queen_lanathel_intro";
-    newscript->GetAI = &GetAI_boss_blood_queen_lanathel_intro;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_blood_queen_lanathel_intro";
+    pNewScript->GetAI = &GetAI_boss_blood_queen_lanathel_intro;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_blood_orb_control";
-    newscript->GetAI = &GetAI_npc_blood_orb_control;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_blood_orb_control";
+    pNewScript->GetAI = &GetAI_npc_blood_orb_control;
+    pNewScript->RegisterSelf();
     
-    newscript = new Script;
-    newscript->Name = "mob_shock_vortex";
-    newscript->GetAI = &GetAI_mob_shock_vortex;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_shock_vortex";
+    pNewScript->GetAI = &GetAI_mob_shock_vortex;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_dark_nucleus";
-    newscript->GetAI = &GetAI_mob_dark_nucleus;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_dark_nucleus";
+    pNewScript->GetAI = &GetAI_mob_dark_nucleus;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_ball_of_flames";
-    newscript->GetAI = &GetAI_mob_ball_of_flames;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_ball_of_flames";
+    pNewScript->GetAI = &GetAI_mob_ball_of_flames;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_kinetic_bomb";
-    newscript->GetAI = &GetAI_mob_kinetic_bomb;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_kinetic_bomb";
+    pNewScript->GetAI = &GetAI_mob_kinetic_bomb;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_kinetic_bomb_target";
-    newscript->GetAI = &GetAI_mob_kinetic_bomb_target;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_kinetic_bomb_target";
+    pNewScript->GetAI = &GetAI_mob_kinetic_bomb_target;
+    pNewScript->RegisterSelf();
 }

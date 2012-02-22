@@ -112,6 +112,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
     uint32 m_uiBoneStormTimer;
     uint32 m_uiBoneStormChargeTimer;
     uint32 m_uiBoneStormColdflameTimer;
+    uint32 m_uiDebugTimer;
 
     void Reset()
     {
@@ -213,6 +214,29 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
         }
     }
 
+    Unit* SelectTargetForCharge()
+    {
+        std::list<ObjectGuid> lPotentialTargets;
+        const ThreatList &threatList = m_creature->getThreatManager().getThreatList();
+        for (ThreatList::const_iterator itr = threatList.begin();itr != threatList.end(); ++itr)
+        {
+            if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            {
+                if (pVictim->GetTypeId() == TYPEID_PLAYER)
+                    lPotentialTargets.push_back((*itr)->getUnitGuid());
+            }
+        }
+
+        if (!lPotentialTargets.empty())
+        {
+            std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
+            std::advance(i, urand(0, lPotentialTargets.size() - 1));
+            return m_creature->GetMap()->GetUnit(*i);
+        }
+        else
+            return NULL;
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -294,14 +318,15 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                 // next charge to random enemy
                 if (m_uiBoneStormChargeTimer <= uiDiff)
                 {
-                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    if (Unit *pTarget = SelectTargetForCharge())
                     {
                         float x, y, z;
                         pTarget->GetPosition(x, y, z);
                         m_creature->GetMotionMaster()->MovePoint(POINT_CHARGE, x, y, z);
                         m_uiBoneStormChargeTimer = 3000;
-                        m_uiPhase = PHASE_BONE_STORM_CHARGING;
+                        m_uiDebugTimer = 30000;
                     }
+                    m_uiPhase = PHASE_BONE_STORM_CHARGING;
                 }
                 else
                     m_uiBoneStormChargeTimer -= uiDiff;
@@ -310,6 +335,12 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
             }
             case PHASE_BONE_STORM_CHARGING: // waiting to arrive at target position
             {
+                if (m_uiDebugTimer < uiDiff)
+                {
+                    m_uiDebugTimer = 30000;
+                    m_uiPhase = PHASE_NORMAL;
+                }
+                else m_uiDebugTimer -= uiDiff;
                 break;
             }
             case PHASE_BONE_STORM_COLDFLAME:
@@ -382,11 +413,13 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
         m_uiAchievTimer = 8000;
         m_bEmerged = false;
         SetCombatMovement(false);
+        m_victimGuid.Clear();
     }
 
     instance_icecrown_citadel* m_pInstance;
     bool m_bEmerged;
     uint32 m_uiAchievTimer;
+    ObjectGuid m_victimGuid;
 
     void Reset()
     {
@@ -395,17 +428,20 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
 
     void AttackStart(Unit *pWho){}
 
-    void PassengerBoarded(Unit *pPassenger, int8 seat, bool bBoarded)
+    void JustDied(Unit *Killer)
     {
-        if (!bBoarded)
+        if (Unit *pCreator = m_creature->GetCreator())
         {
-            pPassenger->RemoveAurasDueToSpell(SPELL_IMPALED);
-            m_creature->ForcedDespawn();
+            pCreator->RemoveAurasDueToSpell(SPELL_IMPALED);
         }
+        m_creature->ForcedDespawn();
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
+        if (m_pInstance->GetData(TYPE_MARROWGAR) != IN_PROGRESS)
+            JustDied(m_creature);
+
         if (!m_bEmerged)
         {
             m_creature->HandleEmote(EMOTE_ONESHOT_EMERGE);
@@ -435,20 +471,20 @@ CreatureAI* GetAI_boss_lord_marrowgar(Creature* pCreature)
 
 void AddSC_boss_lord_marrowgar()
 {
-    Script *newscript;
-    newscript = new Script;
-    newscript->Name = "boss_lord_marrowgar";
-    newscript->GetAI = &GetAI_boss_lord_marrowgar;
-    newscript->RegisterSelf();
+    Script *pNewScript;
+    pNewScript = new Script;
+    pNewScript->Name = "boss_lord_marrowgar";
+    pNewScript->GetAI = &GetAI_boss_lord_marrowgar;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_coldflame";
-    newscript->GetAI = &GetAI_mob_coldflame;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_coldflame";
+    pNewScript->GetAI = &GetAI_mob_coldflame;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "mob_bone_spike";
-    newscript->GetAI = &GetAI_mob_bone_spike;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_bone_spike";
+    pNewScript->GetAI = &GetAI_mob_bone_spike;
+    pNewScript->RegisterSelf();
 
 }

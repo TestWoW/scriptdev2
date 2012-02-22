@@ -235,13 +235,6 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
     uint32 m_uiDominateMindTimer;
     uint32 m_uiVengefulShadeTimer;
     uint32 m_uiCheckTimer;
-
-    Creature *pAdherent;
-    Creature *pFanatic;
-    Creature *pDeformed;
-    Creature *pBoneAdherent;
-    Creature *pBoneFanatic;
-
     uint32 m_uiMindControlCount;
 
     void Reset()
@@ -276,11 +269,6 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
             if (m_bIsHeroic)
                 m_uiMindControlCount = 1; // 1 target on heroic 10man
         }
-        pAdherent = NULL;
-        pFanatic = NULL;
-        pDeformed = NULL;
-        pBoneAdherent = NULL;
-        pBoneFanatic = NULL;
     }
 
     void Aggro(Unit *pWho)
@@ -327,19 +315,18 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
         pSummoned->SetInCombatWithZone();
     }
 
-    bool CheckAchiev()
+    void CheckAchiev()
     {
-        pAdherent = GetClosestCreatureWithEntry(m_creature, NPC_CULT_ADHERENT, 100.0f);
-        pFanatic = GetClosestCreatureWithEntry(m_creature, NPC_CULT_FANATIC, 100.0f);
-        pDeformed = GetClosestCreatureWithEntry(m_creature, NPC_DEFORMED_FANATIC, 100.0f);
-        pBoneFanatic = GetClosestCreatureWithEntry(m_creature, NPC_REANIMATED_FANATIC, 100.0f);
-        pBoneAdherent = GetClosestCreatureWithEntry(m_creature, NPC_REANIMATED_ADHERENT, 100.0f);
+        Unit *pAdherent = m_pInstance->GetSingleCreatureFromStorage(NPC_CULT_ADHERENT);
+        Unit *pFanatic = m_pInstance->GetSingleCreatureFromStorage(NPC_CULT_FANATIC);
+        Unit *pDeformed = m_pInstance->GetSingleCreatureFromStorage(NPC_DEFORMED_FANATIC);
+        Unit *pBoneFanatic = m_pInstance->GetSingleCreatureFromStorage(NPC_REANIMATED_FANATIC);
+        Unit *pBoneAdherent = m_pInstance->GetSingleCreatureFromStorage(NPC_REANIMATED_ADHERENT);
 
         if (pAdherent && pFanatic && pDeformed && pBoneFanatic && pBoneAdherent)
-            return true;
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, true);
         else
-            return false;
-            //m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, true);
+            m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, false);
     }
 
     void DoSummonShade()
@@ -353,6 +340,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
             {
                 pShade->SetSpeedRate(MOVE_RUN, 0.5f);
                 pShade->AI()->AttackStart(pTarget);
+                pShade->AddThreat(pTarget, 100000.0f);
                 pShade->CastSpell(pShade, SPELL_VENGEFUL_BLAST_AURA, true);
             }
         }
@@ -417,8 +405,9 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
             m_uiBerserkTimer -= uiDiff;
 
         if (m_uiCheckTimer < uiDiff)
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, CheckAchiev());
-        else m_uiCheckTimer -= uiDiff;
+            CheckAchiev();
+        else
+            m_uiCheckTimer -= uiDiff;
 
         if (m_uiDeathAndDecayTimer <= uiDiff)
         {

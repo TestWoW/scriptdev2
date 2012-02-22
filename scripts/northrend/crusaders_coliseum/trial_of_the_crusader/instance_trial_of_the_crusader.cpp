@@ -39,6 +39,9 @@ EndScriptData */
             m_bAchievCriteria[i] = false;
 
         SetSpecialAchievementCriteria(TYPE_IMMORTALITY, true);
+        SetSpecialAchievementCriteria(TYPE_SKILL, true);
+        SetSpecialAchievementCriteria(TYPE_MAD_SKILL, true);
+        SetSpecialAchievementCriteria(TYPE_INSANITY, true);
 
         m_auiEncounter[TYPE_STAGE] = 0;
         m_auiEncounter[TYPE_COUNTER] = 50;
@@ -73,7 +76,7 @@ EndScriptData */
 
     void instance_trial_of_the_crusader::OnPlayerDeath(Player* pPlayer)
     {
-        if (IsEncounterInProgress())
+        if (IsEncounterInProgress() && (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC))
             SetSpecialAchievementCriteria(TYPE_IMMORTALITY, false);
     }
 
@@ -140,17 +143,29 @@ EndScriptData */
             case CRITERIA_ACHIEV_SALT_AND_PEPPER_25H:
                  return m_bAchievCriteria[TYPE_SALT_AND_PEPPER];
             case CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_10:
+                 if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
+                     return m_bAchievCriteria[TYPE_SKILL];
             case CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_25:
-                 return m_bAchievCriteria[TYPE_SKILL];
+                 if (Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
+                     return m_bAchievCriteria[TYPE_SKILL];
             case CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_10:
+                 if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
+                     return m_bAchievCriteria[TYPE_MAD_SKILL];
             case CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_25:
-                 return m_bAchievCriteria[TYPE_MAD_SKILL];
+                 if (Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
+                    return m_bAchievCriteria[TYPE_MAD_SKILL];
             case CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_10:
+                 if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
+                     return m_bAchievCriteria[TYPE_INSANITY];
             case CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_25:
-                 return m_bAchievCriteria[TYPE_INSANITY];
+                 if (Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
+                     return m_bAchievCriteria[TYPE_INSANITY];
             case CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_HORDE:
+                 if (pSource->GetTeam() == HORDE)
+                     return m_bAchievCriteria[TYPE_IMMORTALITY];
             case CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_ALLY:
-                 return m_bAchievCriteria[TYPE_IMMORTALITY];
+                 if (pSource->GetTeam() == ALLIANCE)
+                     return m_bAchievCriteria[TYPE_IMMORTALITY];
             default:
                  return false;
         }
@@ -227,8 +242,8 @@ EndScriptData */
                 m_auiCrusadersCount = uiData;
             break;
         case TYPE_VALKIRIES:
-            /*if (m_auiEncounter[4] == SPECIAL && uiData == SPECIAL)
-                uiData = DONE;*/
+            if (m_auiEncounter[4] == SPECIAL && uiData == SPECIAL)
+                uiData = DONE;
             m_auiEncounter[TYPE_VALKIRIES] = uiData;
             if (uiData == IN_PROGRESS)
                 SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, true);
@@ -300,7 +315,7 @@ EndScriptData */
             if (uiData < 50)
                 SetSpecialAchievementCriteria(TYPE_INSANITY, false);
 
-            //uiData = DONE;
+            uiData = DONE;
             break;
         case TYPE_EVENT:
             m_auiEncounter[TYPE_EVENT] = uiData;

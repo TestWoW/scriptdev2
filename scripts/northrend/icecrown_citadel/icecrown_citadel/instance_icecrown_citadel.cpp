@@ -47,13 +47,6 @@ void instance_icecrown_citadel::Initialize()
 
     m_auiEncounter[TYPE_TELEPORT] = 0;
 
-    m_auiEvent = 0;
-    m_auiEventTimer = 1000;
-    m_uiCouncilInvocation = 0;
-    m_uiDirection = 0;
-    m_uiStinkystate = NOT_STARTED;
-    m_uiPreciousstate = NOT_STARTED;
-
     switch (Difficulty)
     {
          case RAID_DIFFICULTY_10MAN_NORMAL:
@@ -91,6 +84,9 @@ bool instance_icecrown_citadel::IsEncounterInProgress()
         if (m_auiEncounter[i] == IN_PROGRESS)
             return true;
 
+    if (m_auiEncounter[TYPE_PUTRICIDE] == SPECIAL)
+        return true;
+
     return false;
 }
 
@@ -102,12 +98,64 @@ bool instance_icecrown_citadel::IsRaidWiped()
     {
         if (Player* pPlayer = i->getSource())
         {
+            if (pPlayer->isAlive() &&
+                (pPlayer->HasAura(642) || //Divine shield
+                 pPlayer->HasAura(1022) || // Hand of protection
+                 pPlayer->HasAura(45438) || // Ice block
+                 pPlayer->HasAura(5384) || // Feign Death
+                 pPlayer->HasAura(1784))) // Stealth
+                continue;
+
+            if (!pPlayer->IsInCombat())
+                continue;
+
             if (pPlayer->isAlive())
                 return false;
-
         }
     }
     return true;
+}
+
+void instance_icecrown_citadel::DoOpenDoor(ObjectGuid guid)
+{
+    if (guid.IsEmpty())
+        return;
+
+    GameObject* pGo = instance->GetGameObject(guid);
+
+    if (pGo)
+        pGo->SetGoState(GO_STATE_ACTIVE);
+}
+
+void instance_icecrown_citadel::DoCloseDoor(ObjectGuid guid)
+{
+    if (guid.IsEmpty())
+        return;
+
+    GameObject* pGo = instance->GetGameObject(guid);
+
+    if (pGo)
+        pGo->SetGoState(GO_STATE_READY);
+}
+
+void instance_icecrown_citadel::DoOpenDoor(uint32 entry)
+{
+    EntryGuidMap::iterator find = m_mGoEntryGuidStore.find(entry);
+    if (find != m_mGoEntryGuidStore.end())
+    {
+        ObjectGuid guid = find->second;
+        DoOpenDoor(guid);
+    }
+}
+
+void instance_icecrown_citadel::DoCloseDoor(uint32 entry)
+{
+    EntryGuidMap::iterator find = m_mGoEntryGuidStore.find(entry);
+    if (find != m_mGoEntryGuidStore.end())
+    {
+        ObjectGuid guid = find->second;
+        DoCloseDoor(guid);
+    }
 }
 
 void instance_icecrown_citadel::OnCreatureCreate(Creature* pCreature)
@@ -221,6 +269,10 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
+        case GO_GREEN_DRAGON_DOOR_1:
+            if (m_auiEncounter[TYPE_SVALNA] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
         case GO_GREEN_DRAGON_DOOR_2:
             if (m_auiEncounter[TYPE_VALITHRIA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
@@ -266,12 +318,12 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
         case GO_BLOODPRINCE_DOOR:
         case GO_ICECROWN_GRATE:
         case GO_SINDRAGOSA_ENTRANCE:
+        case GO_SINDRAGOSA_ICEWALL:
         case GO_VALITHRIA_DOOR_1:
         case GO_VALITHRIA_DOOR_2:
         case GO_VALITHRIA_DOOR_3:
         case GO_VALITHRIA_DOOR_4:
         case GO_FROSTWING_DOOR:
-        case GO_GREEN_DRAGON_DOOR_1:
         case GO_BLOODWING_DOOR:
         case GO_ORATORY_DOOR:
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
@@ -288,24 +340,22 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
         case TYPE_MARROWGAR:
             m_auiEncounter[TYPE_MARROWGAR] = uiData;
 
-            DoUseDoorOrButton(GO_MARROWGAR_DOOR);
-
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(GO_ICEWALL_1);
-                DoUseDoorOrButton(GO_ICEWALL_2);
-                // door to Deathwhisper are already open
-                //DoUseDoorOrButton(GO_ORATORY_DOOR);
+                DoOpenDoor(GO_ICEWALL_1);
+                DoOpenDoor(GO_ICEWALL_2);
+                DoOpenDoor(GO_ORATORY_DOOR);
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
+                DoCloseDoor(GO_MARROWGAR_DOOR);
                 SetSpecialAchievementCriteria(TYPE_BONED, true);
             }
+            else
+                DoOpenDoor(GO_MARROWGAR_DOOR);
             break;
          case TYPE_DEATHWHISPER:
             m_auiEncounter[TYPE_DEATHWHISPER] = uiData;
-
-            DoUseDoorOrButton(GO_ORATORY_DOOR);
 
             if (uiData == DONE)
             {
@@ -315,10 +365,13 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                       pGO->SetGoState(GO_STATE_READY);
                 }
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
+                DoCloseDoor(GO_ORATORY_DOOR);
                 SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, false);
             }
+            else
+                DoOpenDoor(GO_ORATORY_DOOR);
             break;
          case TYPE_FLIGHT_WAR:
             /*if (uiData == DONE && m_auiEncounter[TYPE_FLIGHT_WAR] != DONE) // add when implemented
@@ -338,14 +391,14 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                     }
                 }
             }*/
-            m_auiEncounter[3] = uiData;
+            m_auiEncounter[TYPE_FLIGHT_WAR] = uiData;
             break;
          case TYPE_SAURFANG:
             m_auiEncounter[TYPE_SAURFANG] = uiData;
 
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(GO_SAURFANG_DOOR);
+                DoOpenDoor(GO_SAURFANG_DOOR);
 
                 if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiSaurfangCache))
                 {
@@ -353,7 +406,7 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                         pChest->SetRespawnTime(7*DAY);
                 }
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
                 SetSpecialAchievementCriteria(TYPE_IVE_MADE_AND_MESS, true);
             }
@@ -361,43 +414,43 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
          case TYPE_FESTERGUT:
             m_auiEncounter[TYPE_FESTERGUT] = uiData;
 
-            DoUseDoorOrButton(GO_ORANGE_PLAGUE);
-
             if (uiData == DONE)
             {
                 if (m_auiEncounter[TYPE_ROTFACE] == DONE)
                 {
-                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
-                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE);
+                    DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
                 }
+                DoOpenDoor(GO_SCIENTIST_DOOR_ORANGE);
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
+                DoCloseDoor(GO_ORANGE_PLAGUE);
                 SetSpecialAchievementCriteria(TYPE_FLU_SHORT_SHORTAGE, true);
             }
+            else
+                DoOpenDoor(GO_ORANGE_PLAGUE);
             break;
          case TYPE_ROTFACE:
             m_auiEncounter[TYPE_ROTFACE] = uiData;
-
-            DoUseDoorOrButton(GO_GREEN_PLAGUE);
 
             if (uiData == DONE)
             {
                 if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
                 {
-                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN);
-                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
+                    DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
                 }
+                DoOpenDoor(GO_SCIENTIST_DOOR_GREEN);
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
+                DoCloseDoor(GO_GREEN_PLAGUE);
                 SetSpecialAchievementCriteria(TYPE_DANCES_WITH_OOZES, true);
             }
+            else
+                DoOpenDoor(GO_GREEN_PLAGUE);
             break;
          case TYPE_PUTRICIDE:
             m_auiEncounter[TYPE_PUTRICIDE] = uiData;
-
-            DoUseDoorOrButton(GO_SCIENTIST_DOOR);
 
             if (uiData == DONE)
             {
@@ -407,34 +460,36 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                     m_auiEncounter[TYPE_KINGS_OF_ICC] = DONE;
                 }
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS || uiData == SPECIAL)
             {
+                DoCloseDoor(GO_SCIENTIST_DOOR);
                 SetSpecialAchievementCriteria(TYPE_NAUSEA_HEATBURN_INDIGESTION, true);
             }
+            else
+                DoOpenDoor(GO_SCIENTIST_DOOR);
             break;
          case TYPE_BLOOD_COUNCIL:
             m_auiEncounter[TYPE_BLOOD_COUNCIL] = uiData;
 
-            DoUseDoorOrButton(GO_CRIMSON_HALL_DOOR);
-
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(GO_COUNCIL_DOOR_1);
-                DoUseDoorOrButton(GO_COUNCIL_DOOR_2);
+                DoOpenDoor(GO_COUNCIL_DOOR_1);
+                DoOpenDoor(GO_COUNCIL_DOOR_2);
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
+                DoCloseDoor(GO_CRIMSON_HALL_DOOR);
                 SetSpecialAchievementCriteria(TYPE_ORB_WHISPERER, true);
             }
+            else
+                DoOpenDoor(GO_CRIMSON_HALL_DOOR);
             break;
          case TYPE_LANATHEL:
             m_auiEncounter[TYPE_LANATHEL] = uiData;
 
-            DoUseDoorOrButton(GO_BLOODPRINCE_DOOR);
-
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(GO_ICECROWN_GRATE);
+                DoOpenDoor(GO_ICECROWN_GRATE);
 
                 if (m_auiEncounter[TYPE_PUTRICIDE] == DONE &&
                     m_auiEncounter[TYPE_SINDRAGOSA] == DONE)
@@ -442,27 +497,20 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                     m_auiEncounter[TYPE_KINGS_OF_ICC] = DONE;
                 }
             }
+            if (uiData == IN_PROGRESS)
+                DoCloseDoor(GO_BLOODPRINCE_DOOR);
+            else
+                DoOpenDoor(GO_BLOODPRINCE_DOOR);
             break;
          case TYPE_VALITHRIA:
             m_auiEncounter[TYPE_VALITHRIA] = uiData;
 
-            DoUseDoorOrButton(GO_GREEN_DRAGON_DOOR_1);
-            DoUseDoorOrButton(GO_VALITHRIA_DOOR_1);
-            DoUseDoorOrButton(GO_VALITHRIA_DOOR_2);
-
-            if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
-                instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
-            {
-                DoUseDoorOrButton(GO_VALITHRIA_DOOR_3);
-                DoUseDoorOrButton(GO_VALITHRIA_DOOR_4);
-            }
-
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(GO_GREEN_DRAGON_DOOR_2);
+                DoOpenDoor(GO_GREEN_DRAGON_DOOR_2);
 
-                DoUseDoorOrButton(GO_SINDRAGOSA_DOOR_1);
-                DoUseDoorOrButton(GO_SINDRAGOSA_DOOR_2);
+                DoOpenDoor(GO_SINDRAGOSA_DOOR_1);
+                DoOpenDoor(GO_SINDRAGOSA_DOOR_2);
 
                 if (GameObject* pChest = GetSingleGameObjectFromStorage( m_uiValithriaCache))
                 {
@@ -470,15 +518,36 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                         pChest->SetRespawnTime(7*DAY);
                 }
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
-                SetSpecialAchievementCriteria(TYPE_PORTAL_JOCKEY, true);
+                DoCloseDoor(GO_GREEN_DRAGON_DOOR_1);
+                DoOpenDoor(GO_VALITHRIA_DOOR_1);
+                DoOpenDoor(GO_VALITHRIA_DOOR_2);
+
+                if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
+                    instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                {
+                    DoOpenDoor(GO_VALITHRIA_DOOR_3);
+                    DoOpenDoor(GO_VALITHRIA_DOOR_4);
+                }
+                SetSpecialAchievementCriteria(TYPE_PORTAL_JOCKEY, false); // should be true when implemented
+            }
+            else
+            {
+                DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
+                DoCloseDoor(GO_VALITHRIA_DOOR_1);
+                DoCloseDoor(GO_VALITHRIA_DOOR_2);
+
+                if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
+                    instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+                {
+                    DoCloseDoor(GO_VALITHRIA_DOOR_3);
+                    DoCloseDoor(GO_VALITHRIA_DOOR_4);
+                }
             }
             break;
          case TYPE_SINDRAGOSA:
             m_auiEncounter[TYPE_SINDRAGOSA] = uiData;
-
-            DoUseDoorOrButton(GO_SINDRAGOSA_ENTRANCE);
 
             if (uiData == DONE)
             {
@@ -488,10 +557,14 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                     m_auiEncounter[TYPE_KINGS_OF_ICC] = DONE;
                 }
             }
-            else if (uiData == IN_PROGRESS)
+            if (uiData == IN_PROGRESS)
             {
+                DoCloseDoor(GO_SINDRAGOSA_ICEWALL);
                 SetSpecialAchievementCriteria(TYPE_ALL_YOU_CAN_EAT, true);
             }
+            else
+                DoOpenDoor(GO_SINDRAGOSA_ICEWALL);
+
             break;
          case TYPE_LICH_KING:
             m_auiEncounter[TYPE_LICH_KING] = uiData;
@@ -505,8 +578,19 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
              m_auiEncounter[TYPE_FROSTMOURNE_ROOM] = uiData;
              break;
          case TYPE_ICECROWN_QUESTS:
-            m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;
-            break;
+             m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;
+             break;
+         case TYPE_STINKY:
+             m_auiEncounter[TYPE_STINKY] = uiData;
+             break;
+         case TYPE_PRECIOUS:
+             m_auiEncounter[TYPE_PRECIOUS] = uiData;
+             break;
+         case TYPE_SVALNA:
+             m_auiEncounter[TYPE_SVALNA] = uiData;
+             if (uiData == DONE)
+                 DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
+             break;
     }
 
     if (uiData == DONE)
@@ -545,13 +629,10 @@ uint32 instance_icecrown_citadel::GetData(uint32 uiType)
         case TYPE_LICH_KING:
         case TYPE_FROSTMOURNE_ROOM:
         case TYPE_ICECROWN_QUESTS:
+        case TYPE_SVALNA:
+        case TYPE_STINKY:
+        case TYPE_PRECIOUS:
             return m_auiEncounter[uiType];
-
-        case DATA_DIRECTION:     return m_uiDirection;
-        case DATA_BLOOD_INVOCATION:         return m_uiCouncilInvocation;
-        case TYPE_STINKY:        return m_uiStinkystate;
-        case TYPE_PRECIOUS:      return m_uiPreciousstate;
-        case TYPE_EVENT:         return m_auiEvent;
     }
     return 0;
 }
