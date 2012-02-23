@@ -1011,6 +1011,8 @@ struct MANGOS_DLL_DECL mob_choking_gas_bombAI : public ScriptedAI
 {
     mob_choking_gas_bombAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         SetCombatMovement(false);
         m_uiExplosionTimer = 9500;
     }

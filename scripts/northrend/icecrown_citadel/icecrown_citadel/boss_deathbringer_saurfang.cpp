@@ -163,14 +163,11 @@ float fPositions[18][4] =
 };
 
 // Event handler
-struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
+struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public base_icc_bossAI
 {
-    boss_deathbringer_saurfang_eventAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_deathbringer_saurfang_eventAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (instance_icecrown_citadel*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         m_powerBloodPower = m_creature->getPowerType(); // don't call this function multiple times in script
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
 
         m_uiEventStep = 0;
         m_uiNextEventTimer = 0;
@@ -193,20 +190,15 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public ScriptedAI
         m_lGuards.clear();
     }
 
-    instance_icecrown_citadel *m_pInstance;
-
     uint32 m_uiNextEventTimer;
     uint32 m_uiEventStep;
     int8 n;
 
     bool m_bIsAlliance;
-    bool m_bIs25Man;
     bool m_bTeleported;
     bool m_bIsIntroStarted;
     bool m_bIsIntroFinished;
     bool m_bIsOutroStarted;
-
-    Difficulty m_uiMapDifficulty;
 
     ObjectGuid m_guidNpc;
     ObjectGuid m_guidVarian;
@@ -1325,16 +1317,9 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
 {
     boss_deathbringer_saurfangAI(Creature* pCreature) : boss_deathbringer_saurfang_eventAI(pCreature)
     {
-        m_pInstance = (instance_icecrown_citadel*)pCreature->GetInstanceData();
         m_powerBloodPower = m_creature->getPowerType(); // don't call this function multiple times in script
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-
         ResetFight();
     }
-
-    instance_icecrown_citadel *m_pInstance;
 
     uint32 m_uiRuneOfBloodTimer;
     uint32 m_uiBoilingBloodTimer;
@@ -1346,12 +1331,9 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     uint32 m_uiCheckTimer;
     uint32 m_uiMarksCount;
 
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
     bool m_bAchievFailed;
 
     Powers m_powerBloodPower;
-    Difficulty m_uiMapDifficulty;
 
     void ResetFight()
     {

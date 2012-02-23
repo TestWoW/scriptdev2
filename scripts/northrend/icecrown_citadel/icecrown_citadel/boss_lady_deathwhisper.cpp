@@ -342,6 +342,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
                 pShade->AI()->AttackStart(pTarget);
                 pShade->AddThreat(pTarget, 100000.0f);
                 pShade->CastSpell(pShade, SPELL_VENGEFUL_BLAST_AURA, true);
+                pShade->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
         }
     }

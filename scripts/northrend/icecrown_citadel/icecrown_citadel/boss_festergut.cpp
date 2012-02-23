@@ -361,6 +361,8 @@ struct MANGOS_DLL_DECL mob_vile_gas_malleable_gooAI : public ScriptedAI
     mob_vile_gas_malleable_gooAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
     void DamageTaken(Unit *pDealer, uint32 &uiDamage){ uiDamage = 0; }
     void Reset(){}
