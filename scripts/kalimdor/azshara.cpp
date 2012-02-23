@@ -501,7 +501,7 @@ bool GossipHello_npc_spirit_azuregos(Player *pPlayer, Creature *pCreature)
         pPlayer->GetQuestStatus(QUEST_AZU_GIVEN) != QUEST_STATUS_COMPLETE)
     {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_AZU1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU1, pCreature->GetGUID());
+        pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU1, pCreature->GetObjectGuid());
     }
     return true;
 }
@@ -511,51 +511,51 @@ bool GossipSelect_npc_spirit_azuregos(Player *pPlayer, Creature *pCreature, uint
     {
         case GOSSIP_ACTION_INFO_DEF:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU2, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU2, pCreature->GetObjectGuid());
             break;
         case GOSSIP_ACTION_INFO_DEF + 1:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU3, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU3, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 2:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU4, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU4, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 3:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU5, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU5, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 4:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU6, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU6, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 5:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_AZU7, pCreature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_AZU7, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 6:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU8, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_AZU8, pCreature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_AZU8, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 7:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU9, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU9, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU9, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 8:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU10, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU10, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU10, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 9:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU11, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_AZU11, pCreature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_AZU11, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 10:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU12, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU12, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU12, pCreature->GetObjectGuid());
             break;
     case GOSSIP_ACTION_INFO_DEF + 11:
             pPlayer->ADD_GOSSIP_ITEM( 0, GOSSIP_ITEM_AZU13, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU13, pCreature->GetGUID());
+            pPlayer->PlayerTalkClass->SendGossipMenu(GOSSIP_MENU_AZU13, pCreature->GetObjectGuid());
 
             if (!pPlayer->HasItemCount(ITEM_AZU_LEDGER,1))
             {
