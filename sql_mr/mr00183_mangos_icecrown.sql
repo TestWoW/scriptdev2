@@ -454,7 +454,7 @@ UPDATE `gameobject_template` SET `faction` = '114',`data0` = '0' WHERE `gameobje
 UPDATE `gameobject` SET `state` = '1' WHERE `id` IN (201369,201379);
 
 DELETE FROM `creature_model_info` WHERE (`modelid`=30362);
-INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`, `gender`, `modelid_other_gender`, `modelid_alternative`) VALUES (30362, 3, 15, 1, 0, 0);
+INSERT INTO `creature_model_info` (`modelid`, `bounding_radius`, `combat_reach`, `gender`, `modelid_other_gender`, `modelid_alternative`) VALUES (30362, 3, 20, 1, 0, 0);
 
 -- -------------------------------
 -- frost bomb target from Lordronn
