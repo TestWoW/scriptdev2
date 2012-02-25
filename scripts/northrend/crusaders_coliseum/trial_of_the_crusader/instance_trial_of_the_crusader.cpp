@@ -38,10 +38,13 @@ EndScriptData */
         for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS - 1; ++i)
             m_bAchievCriteria[i] = false;
 
-        SetSpecialAchievementCriteria(TYPE_IMMORTALITY, true);
-        SetSpecialAchievementCriteria(TYPE_SKILL, true);
-        SetSpecialAchievementCriteria(TYPE_MAD_SKILL, true);
-        SetSpecialAchievementCriteria(TYPE_INSANITY, true);
+        /*if (Difficulty > RAID_DIFFICULTY_25MAN_NORMAL)
+        {
+            SetSpecialAchievementCriteria(TYPE_IMMORTALITY, true);
+            SetSpecialAchievementCriteria(TYPE_SKILL, true);
+            SetSpecialAchievementCriteria(TYPE_MAD_SKILL, true);
+            SetSpecialAchievementCriteria(TYPE_INSANITY, true);
+        }*/
 
         m_auiEncounter[TYPE_STAGE] = 0;
         m_auiEncounter[TYPE_COUNTER] = 50;
@@ -145,27 +148,43 @@ EndScriptData */
             case CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_10:
                  if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
                      return m_bAchievCriteria[TYPE_SKILL];
+                 else
+                     return false;
             case CRITERIA_ACHIEV_TRIBUTE_TO_SKILL_25:
                  if (Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
                      return m_bAchievCriteria[TYPE_SKILL];
+                 else
+                     return false;
             case CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_10:
                  if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
                      return m_bAchievCriteria[TYPE_MAD_SKILL];
+                 else
+                     return false;
             case CRITERIA_ACHIEV_TRIBUTE_TO_MAD_SKILL_25:
                  if (Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
                     return m_bAchievCriteria[TYPE_MAD_SKILL];
+                 else
+                     return false;
             case CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_10:
                  if (Difficulty == RAID_DIFFICULTY_10MAN_HEROIC)
                      return m_bAchievCriteria[TYPE_INSANITY];
+                 else
+                     return false;
             case CRITERIA_ACHIEV_TRIBUTE_TO_INSANITY_25:
                  if (Difficulty == RAID_DIFFICULTY_25MAN_HEROIC)
                      return m_bAchievCriteria[TYPE_INSANITY];
+                 else
+                     return false;
             case CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_HORDE:
                  if (pSource->GetTeam() == HORDE)
                      return m_bAchievCriteria[TYPE_IMMORTALITY];
+                 else
+                     return false;
             case CRITERIA_ACHIEV_TRIBUTE_TO_IMMORTALITY_ALLY:
                  if (pSource->GetTeam() == ALLIANCE)
                      return m_bAchievCriteria[TYPE_IMMORTALITY];
+                 else
+                     return false;
             default:
                  return false;
         }
