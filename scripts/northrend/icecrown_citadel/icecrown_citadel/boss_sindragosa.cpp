@@ -127,7 +127,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
     uint32 m_uiFrostBreathTimer;
     uint32 m_uiTailSmashTimer;
     uint32 m_uiIcyGripTimer;
-    uint32 m_uiBlisteringColdTimer;
     uint32 m_uiUnchainedMagicTimer;
     uint32 m_uiFlyingTimer;
     uint32 m_uiFrostBeaconTimer;
@@ -145,7 +144,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         m_uiTailSmashTimer          = 20000;
         m_uiFrostBreathTimer        = 5000;
         m_uiIcyGripTimer            = 35000;
-        m_uiBlisteringColdTimer     = 36000;
         m_uiUnchainedMagicTimer     = urand(15000, 30000);
         m_uiCheckTimer              = 1000;
 
@@ -242,8 +240,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
             DoMark(max);
 
-            // set timers
-            m_uiIceTombTimer    = 5500;
             m_uiFrostBombTimer  = 15000;
             m_uiPhaseTimer      = 36000;
         }
@@ -286,11 +282,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             if (!(*itr)->getUnitGuid().IsPlayer())
                 continue;
 
-            if (m_creature->getVictim() &&
+            /*if (m_creature->getVictim() &&
                 (*itr)->getUnitGuid() == m_creature->getVictim()->GetObjectGuid())
             {
                 continue;
-            }
+            }*/
 
             if (Unit *pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
                 targetUnitList.push_back(pUnit);
@@ -318,6 +314,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             if (Unit *pTarget = (*itr))
                 m_creature->CastSpell(pTarget, SPELL_FROST_BEACON, true);
         }
+        m_uiIceTombTimer = 7000;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -359,7 +356,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     m_uiPhase = PHASE_THREE;
                     DoScriptText(SAY_PHASE_3, m_creature);
                     m_uiFrostBeaconTimer = 15000;
-                    m_uiIceTombTimer = 20000;
                     return;
                 }
 
@@ -386,6 +382,8 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 {
                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BREATH) == CAST_OK)
                         m_uiFrostBreathTimer = urand(15000, 20000);
+                    if (m_uiPhaseTimer < 5000)
+                        m_uiPhaseTimer = 5000;
                 }
                 else
                     m_uiFrostBreathTimer -= uiDiff;
@@ -479,8 +477,10 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 // Phase One (ground)
                 if (m_uiPhaseTimer <= uiDiff)
                 {
-                    m_uiPhase = PHASE_FLYING;
-                    m_uiPhaseTimer = 110000;
+                    m_uiPhase               = PHASE_FLYING;
+                    m_uiPhaseTimer          = 110000;
+                    m_uiTailSmashTimer      = 20000;
+                    m_uiFrostBreathTimer    = 5000;
 
                     // fly to the ground point
                     m_creature->GetMotionMaster()->MovePoint(POINT_LAND, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z);
@@ -498,8 +498,13 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     if (Unit *pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_FROST_BEACON, SELECT_FLAG_PLAYER))
                     {
                         if (DoCastSpellIfCan(pVictim, SPELL_FROST_BEACON) == CAST_OK)
-                            m_uiFrostBeaconTimer = 20000;
+                        {
+                            m_uiIceTombTimer = 7000;
+                        }
                     }
+                    m_uiFrostBeaconTimer = 20000;
+                    if (m_uiIcyGripTimer <= 7000)
+                        m_uiIcyGripTimer = 7000;
                 }
                 else
                     m_uiFrostBeaconTimer -= uiDiff;
@@ -508,7 +513,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 if (m_uiIceTombTimer <= uiDiff)
                 {
                     if (DoCastSpellIfCan(m_creature, SPELL_ICE_TOMB) == CAST_OK)
-                        m_uiIceTombTimer = 20000;
+                        m_uiIceTombTimer = 50000; // for no repeat spell, true timer set above, in frost beacon timer;
                 }
                 else
                     m_uiIceTombTimer -= uiDiff;
@@ -578,11 +583,13 @@ struct MANGOS_DLL_DECL mob_ice_tombAI : public ScriptedAI
 {
     mob_ice_tombAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         SetCombatMovement(false);
         m_uiCheckTimer = 1000;
         m_creature->SetRespawnDelay(7 * DAY * IN_MILLISECONDS);
     }
 
+    ScriptedInstance *m_pInstance;
     uint32 m_uiCheckTimer;
 
     void Reset(){}
@@ -599,6 +606,11 @@ struct MANGOS_DLL_DECL mob_ice_tombAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+        if (m_pInstance->GetData(TYPE_SINDRAGOSA) != IN_PROGRESS)
+        {
+            JustDied(m_creature);
+        }
+
         if (m_uiCheckTimer <= uiDiff)
         {
             if (Unit *pCreator = m_creature->GetCreator())
@@ -680,7 +692,7 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public ScriptedAI
             return;
 
         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
-        m_creature->SetRespawnDelay(30*MINUTE);
+        m_creature->SetRespawnDelay(1 * HOUR);
 
         m_uiFrostBreathTimer = 10000;
         m_uiIcyBlastTimer = 8000;
@@ -745,8 +757,6 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public ScriptedAI
 
         if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
             m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
-        else
-            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
 
         if (m_pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
         {
@@ -802,7 +812,7 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public ScriptedAI
             return;
 
         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
-        m_creature->SetRespawnDelay(30*MINUTE);
+        m_creature->SetRespawnDelay(1 * HOUR);
 
         m_uiBellowingRoarTimer  = 15000;
         m_uiCleaveTimer         = urand(6000, 10000);
@@ -863,8 +873,6 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public ScriptedAI
 
         if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
             m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
-        else
-            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
 
         if (m_pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
         {

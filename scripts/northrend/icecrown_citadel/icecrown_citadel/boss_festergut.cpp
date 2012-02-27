@@ -71,11 +71,6 @@ enum
     SPELL_MALLEABLE_GOO         = 72295,
     SPELL_MALLEABLE_GOO_VISUAL  = 75845,
     SPELL_MALLEABLE_GOO_MISSILE = 70852,
-
-    // other
-    NPC_ORANGE_GAS_STALKER      = 36659, // has dummy auras of the orange gas
-    NPC_PUDDLE_STALKER          = 37013, // dummy npc for initial gas flowing from pipes animation
-    NPC_MALLEABLE_GOO           = 38556,
 };
 
 // talks
@@ -303,8 +298,8 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             {
                 pTarget->CastSpell(pTarget, SPELL_VILE_GAS_SUMMON_TRIG, true);
                 DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
-                m_uiVileGasTimer = 30000;
             }
+            m_uiVileGasTimer = 30000;
         }
         else
             m_uiVileGasTimer -= uiDiff;
@@ -345,7 +340,6 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             }
             else m_uiCheckTimer = uiDiff;
         }
-
 
         DoMeleeAttackIfReady();
     }

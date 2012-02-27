@@ -73,12 +73,6 @@ enum BossSpells
     SPELL_VILE_GAS_SUMMON_TRIG  = 72287,
     SPELL_VILE_GAS              = 71307,
     SPELL_VILE_GAS_TRIGGERED    = 72272,
-
-    // others
-    NPC_PUDDLE_STALKER          = 37013,
-    NPC_LITTLE_OOZE             = 36897,
-    NPC_BIG_OOZE                = 36899,
-    NPC_OOZE_SPRAY_STALKER      = 37986,
 };
 
 static uint32 uiMutatedInfections[5] =
@@ -115,15 +109,6 @@ static Locations SpawnLoc[]=
     {4419.419922f, 3164.149902f, 360.46f, 5.8f},                // NorthWest
     {4471.930176f, 3163.899902f, 360.46f, 5.8f},                // NorthEast
     {4472.549805f, 3110.770020f, 360.46f, 5.8f},                // SouthEast
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-    {4472.54f, 3110.77f, 360.46f, 5.8f},
-
 };
 // Rotface
 struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
@@ -311,7 +296,7 @@ struct MANGOS_DLL_DECL  mob_rotface_ooze_dummyAI : public ScriptedAI
     {
         SetCombatMovement(false);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->SetVisibility(VISIBILITY_ON);
+        m_creature->SetVisibility(VISIBILITY_OFF);
     }
     void Reset(){}
     void AttackStart(Unit *pWho){}
@@ -319,10 +304,7 @@ struct MANGOS_DLL_DECL  mob_rotface_ooze_dummyAI : public ScriptedAI
     {
         uiDamage = 0;
     }
-    void UpdateAI(const uint32 uiDiff)
-    {
-
-    }
+    void UpdateAI(const uint32 uiDiff){}
 };
 
 CreatureAI* GetAI_mob_rotface_ooze_dummy(Creature* pCreature)

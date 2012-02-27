@@ -92,6 +92,19 @@ enum
 
     NPC_COMBAT_TRIGGER                  = 38752,
 
+    NPC_PUDDLE_STALKER                  = 37013,
+    NPC_LITTLE_OOZE                     = 36897,
+    NPC_BIG_OOZE                        = 36899,
+    NPC_OOZE_SPRAY_STALKER              = 37986,
+    NPC_ORANGE_GAS_STALKER              = 36659,
+    NPC_MALLEABLE_GOO                   = 38556,
+    NPC_GREEN_ORANGE_OOZE_STALKER       = 37824,
+    NPC_GROWING_OOZE_PUDDLE             = 37690,
+    NPC_GROWING_OOZE_PUDDLE_TRIG        = 38234,
+    NPC_CHOKING_GAS_BOMB                = 38159,
+    NPC_VOLATILE_OOZE                   = 37697,
+    NPC_MUTATED_ABOMINATION             = 37672,
+
     GO_TELEPORT_GOSSIP_MESSAGE          = 99323,
     TELEPORT_GOSSIP_MESSAGE             = 99322,
 

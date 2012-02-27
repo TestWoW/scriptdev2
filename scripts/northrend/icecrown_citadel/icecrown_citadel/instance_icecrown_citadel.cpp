@@ -199,6 +199,18 @@ void instance_icecrown_citadel::OnCreatureCreate(Creature* pCreature)
         case NPC_FROSTMOURNE_TRIGGER:
         case NPC_FROSTMOURNE_HOLDER:
         case NPC_BLOOD_ORB_CONTROL:
+        case NPC_PUDDLE_STALKER:
+        case NPC_LITTLE_OOZE:
+        case NPC_BIG_OOZE:
+        case NPC_OOZE_SPRAY_STALKER:
+        case NPC_ORANGE_GAS_STALKER:
+        case NPC_MALLEABLE_GOO:
+        case NPC_GREEN_ORANGE_OOZE_STALKER:
+        case NPC_GROWING_OOZE_PUDDLE:
+        case NPC_GROWING_OOZE_PUDDLE_TRIG:
+        case NPC_CHOKING_GAS_BOMB:
+        case NPC_VOLATILE_OOZE:
+        case NPC_MUTATED_ABOMINATION:
              m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
              break;
     }

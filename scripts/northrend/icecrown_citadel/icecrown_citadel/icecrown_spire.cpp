@@ -706,8 +706,8 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public ScriptedAI
     void Reset()
     {
         m_uiCleaveTimer = 7000;
-        m_uiBlizzardTimer = 10000;
-        m_uiFrostBreathTimer = 5000;
+        m_uiBlizzardTimer = 20000;
+        m_uiFrostBreathTimer = 15000;
         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         m_creature->SetRespawnDelay(DAY);
     }
@@ -719,8 +719,6 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public ScriptedAI
 
         if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
             m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
-        else
-            m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
 
         if (m_uiCleaveTimer < uiDiff)
         {
