@@ -263,10 +263,10 @@ bool GossipHello_npc_toc_announcer(Player* pPlayer, Creature* pCreature)
         case LOCALE_zhCN:
         case LOCALE_zhTW:
         case LOCALE_esES:
-             _message = "¡Estamos listos!";
+             _message = "\A1Estamos listos!";
              break;
         case LOCALE_esMX:
-             _message = "¡Estamos listos!";
+             _message = "\A1Estamos listos!";
              break;
         case LOCALE_ruRU:
              _message = "A5340 3>B>2K!";
@@ -350,7 +350,7 @@ switch(uiAction) {
                  continue;
              float x, y, z;
              pPlayer->GetPosition(x, y, z);
-             pPlayer->MonsterMoveJump(x, y, z + 10.0f, 3.14f, 10.0f, 0.0f, true);
+             pPlayer->MonsterMoveToDestination(x, y, z + 10.0f, M_PI_F, 10.0f, 0.0f, true);
         }
         if (GameObject* pGoFloor = pInstance->GetSingleGameObjectFromStorage(GO_ARGENT_COLISEUM_FLOOR))
         {
@@ -525,7 +525,7 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
                          continue;
                      float x, y, z;
                      pPlayer->GetPosition(x, y, z);
-                     pPlayer->MonsterMoveJump(x, y, z + 10.0f, 3.14f, 10.0f, 0.0f, true);
+                     pPlayer->MonsterMoveToDestination(x, y, z + 10.0f, M_PI_F, 10.0f, 0.0f, true);
                 }
                 UpdateTimer = 1500;
                 m_pInstance->SetData(TYPE_EVENT,5080);
