@@ -206,11 +206,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 if (pTarget)
                 {
                     SpellAuraHolderPtr holder = pTarget->GetSpellAuraHolder(70127);
-                    if (!holder)
+                    if (m_bIs25Man && !m_bIsHeroic)
                         holder = pTarget->GetSpellAuraHolder(72528);
-                    if (!holder)
+                    if (!m_bIs25Man && m_bIsHeroic)
                         holder = pTarget->GetSpellAuraHolder(72529);
-                    if (!holder)
+                    if (m_bIs25Man && m_bIsHeroic)
                         holder = pTarget->GetSpellAuraHolder(72530);
                     if (holder)
                     {

@@ -118,7 +118,6 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         Reset();
     }
 
-    uint32 m_uiBerserkTimer;
     uint32 m_uiSlimeSprayTimer;
     uint32 m_uiMutatedInfectionTimer;
     uint32 m_uiInfectionsRate;
@@ -128,7 +127,6 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
 
     void Reset()
     {
-        m_uiBerserkTimer = 5 * MINUTE * IN_MILLISECONDS;
         m_uiSlimeSprayTimer = urand(17000, 23000);
         m_uiVileGasTimer = 20000;
         //m_uiMutatedInfectionTimer = 50000;
@@ -198,22 +196,12 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
             Unit *pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_OOZE_SPRAY_STALKER);
             if (pFocus)
                 m_creature->SetFacingToObject(pFocus);
+            else if (!pFocus)
+                m_creature->InterruptNonMeleeSpells(true);
 
             m_uiTurnTimer -= uiDiff;
             return;
         }
-
-        // Berserk
-        if (m_uiBerserkTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-            {
-                DoScriptText(SAY_BERSERK, m_creature);
-                m_uiBerserkTimer = 5 * MINUTE * IN_MILLISECONDS;
-            }
-        }
-        else
-            m_uiBerserkTimer -= uiDiff;
 
         // Slime Spray
         if (m_uiSlimeSprayTimer <= uiDiff)
@@ -295,8 +283,8 @@ struct MANGOS_DLL_DECL  mob_rotface_ooze_dummyAI : public ScriptedAI
     mob_rotface_ooze_dummyAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->SetVisibility(VISIBILITY_OFF);
+        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        Reset();
     }
     void Reset(){}
     void AttackStart(Unit *pWho){}
@@ -415,6 +403,7 @@ struct MANGOS_DLL_DECL mob_big_oozeAI : public ScriptedAI
                             m_pInstance->SetSpecialAchievementCriteria(TYPE_DANCES_WITH_OOZES, false);
                             DoScriptText(SAY_OOZE_EXPLODE, pRotface);
                             m_uiCheckTimer = 10000;
+                            return;
                         }
                     }
                 }
@@ -448,7 +437,7 @@ struct MANGOS_DLL_DECL mob_sticky_oozeAI : public ScriptedAI
     {
         SetCombatMovement(false);
         pCreature->CastSpell(pCreature, SPELL_STICKY_AURA, true);
-        m_creature->SetVisibility(VISIBILITY_ON);
+        Reset();
     }
 
     void Reset(){}

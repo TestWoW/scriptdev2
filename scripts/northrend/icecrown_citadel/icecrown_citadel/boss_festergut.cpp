@@ -193,11 +193,11 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
                 if (pTarget)
                 {
                     SpellAuraHolderPtr holder = pTarget->GetSpellAuraHolder(69291);
-                    if (!holder)
+                    if (m_bIs25Man && !m_bIsHeroic)
                         holder = pTarget->GetSpellAuraHolder(72101);
-                    if (!holder)
+                    if (!m_bIs25Man && m_bIsHeroic)
                         holder = pTarget->GetSpellAuraHolder(72102);
-                    if (!holder)
+                    if (m_bIs25Man && m_bIsHeroic)
                         holder = pTarget->GetSpellAuraHolder(72103);
                     if (holder)
                     {

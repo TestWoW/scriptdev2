@@ -360,7 +360,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
         {
             SpellSchoolMask damageSchoolMask;
 
-            if ((damageSchoolMask & SPELL_SCHOOL_MASK_SPELL) && uiDamage >= 23000)
+            if ((damageSchoolMask & SPELL_SCHOOL_MASK_SPELL) && uiDamage >= m_bIs25Man ? 25000 : 23000)
                 m_pInstance->SetSpecialAchievementCriteria(TYPE_ORB_WHISPERER, false);
         }
     }

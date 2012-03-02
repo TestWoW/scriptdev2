@@ -35,6 +35,7 @@ enum BossSpells
         SPELL_SHADOW_BOLT                       = 71254,
         SPELL_FROSTBOLT                         = 71420,
         SPELL_FROSTBOLT_VOLLEY                  = 72905,
+        SPELL_BLIND                             = 43433,
 
         // Cult Adherents
         NPC_CULT_ADHERENT                       = 37949,
@@ -431,6 +432,9 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
                     if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_DOMINATE_MIND, SELECT_FLAG_PLAYER))
                         DoCastSpellIfCan(pTarget, SPELL_DOMINATE_MIND, CAST_TRIGGERED);
                 }*/
+
+                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_DOMINATE_MIND, SELECT_FLAG_PLAYER))
+                    DoCastSpellIfCan(pTarget, SPELL_BLIND, CAST_TRIGGERED); // Blind, temporally hack, remove when MC implemented
 
                 DoScriptText(SAY_DOMINATE_MIND, m_creature);
                 m_uiDominateMindTimer = 45000;
