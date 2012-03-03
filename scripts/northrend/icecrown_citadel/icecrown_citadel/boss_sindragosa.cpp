@@ -282,11 +282,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             if (!(*itr)->getUnitGuid().IsPlayer())
                 continue;
 
-            /*if (m_creature->getVictim() &&
+            if (m_creature->getVictim() &&
                 (*itr)->getUnitGuid() == m_creature->getVictim()->GetObjectGuid())
             {
                 continue;
-            }*/
+            }
 
             if (Unit *pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
                 targetUnitList.push_back(pUnit);
@@ -314,7 +314,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             if (Unit *pTarget = (*itr))
                 m_creature->CastSpell(pTarget, SPELL_FROST_BEACON, true);
         }
-        m_uiIceTombTimer = 7000;
+        m_uiIceTombTimer = 6500;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -356,6 +356,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     m_uiPhase = PHASE_THREE;
                     DoScriptText(SAY_PHASE_3, m_creature);
                     m_uiFrostBeaconTimer = 15000;
+                    m_uiIceTombTimer = 50000;
                     return;
                 }
 
@@ -499,7 +500,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     {
                         if (DoCastSpellIfCan(pVictim, SPELL_FROST_BEACON) == CAST_OK)
                         {
-                            m_uiIceTombTimer = 7000;
+                            m_uiIceTombTimer = 6500;
                         }
                     }
                     m_uiFrostBeaconTimer = 20000;
