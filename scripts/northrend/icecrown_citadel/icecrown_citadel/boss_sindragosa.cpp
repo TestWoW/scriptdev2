@@ -496,7 +496,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 // Frost Beacon
                 if (m_uiFrostBeaconTimer <= uiDiff)
                 {
-                    if (Unit *pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_FROST_BEACON, SELECT_FLAG_PLAYER))
+                    if (Unit *pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_FROST_BEACON, SELECT_FLAG_PLAYER))
                     {
                         if (DoCastSpellIfCan(pVictim, SPELL_FROST_BEACON) == CAST_OK)
                         {
