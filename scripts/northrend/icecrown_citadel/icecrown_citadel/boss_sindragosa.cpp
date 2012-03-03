@@ -314,7 +314,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             if (Unit *pTarget = (*itr))
                 m_creature->CastSpell(pTarget, SPELL_FROST_BEACON, true);
         }
-        m_uiIceTombTimer = 6500;
+        m_uiIceTombTimer = 5500;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -496,16 +496,20 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 // Frost Beacon
                 if (m_uiFrostBeaconTimer <= uiDiff)
                 {
-                    if (Unit *pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_FROST_BEACON, SELECT_FLAG_PLAYER))
+                    if (Unit *pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_FROST_BEACON, SELECT_FLAG_PLAYER))
                     {
                         if (DoCastSpellIfCan(pVictim, SPELL_FROST_BEACON) == CAST_OK)
                         {
-                            m_uiIceTombTimer = 6500;
+                            m_uiIceTombTimer = 5500;
                         }
                     }
                     m_uiFrostBeaconTimer = 20000;
-                    if (m_uiIcyGripTimer <= 7000)
-                        m_uiIcyGripTimer = 7000;
+                    if (m_uiIcyGripTimer <= 6000)
+                        m_uiIcyGripTimer = 6000;
+                    if (m_uiTailSmashTimer <= 6000)
+                        m_uiTailSmashTimer = 6000;
+                    if (m_uiFrostBreathTimer <= 6000)
+                        m_uiFrostBreathTimer = 6000;
                 }
                 else
                     m_uiFrostBeaconTimer -= uiDiff;
