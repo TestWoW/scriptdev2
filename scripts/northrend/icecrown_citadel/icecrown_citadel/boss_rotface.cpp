@@ -115,9 +115,11 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
 {
     boss_rotfaceAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
+        max = m_bIs25Man ? 8 : 3;
         Reset();
     }
 
+    uint32 max;
     uint32 m_uiSlimeSprayTimer;
     uint32 m_uiMutatedInfectionTimer;
     uint32 m_uiInfectionsRate;

@@ -365,7 +365,7 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
             m_uiCheckWipeTimer -= uiDiff;
     }
 
-    Unit* SelectRandomRangedTarget(Unit *pSource)
+    Unit* SelectRandomRangedTarget(Unit *pSource, uint32 max = 1)
     {
         Unit *pResult = NULL;
         std::list<Unit*> lTargets;
@@ -382,7 +382,6 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
 
         if (!lTargets.empty())
         {
-            uint8 max = m_bIs25Man ? 8 : 3;
             std::list<Unit*>::iterator iter;
 
             lTargets.sort(ObjectDistanceOrderReversed(pSource));

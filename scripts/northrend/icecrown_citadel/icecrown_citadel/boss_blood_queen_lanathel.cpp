@@ -247,11 +247,11 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
                 !pVictim->HasAuraOfDifficulty(70877) &&     // Frenzied Bloodthirst
                 !pVictim->HasAuraOfDifficulty(70445) &&     // Blood Mirror
                 !pVictim->HasAuraOfDifficulty(70923))       // Uncontrollable Frenzy
-                    {
-                        return pVictim;
-                    }
+                {
+                    return pVictim;
                 }
             }
+        }
 
         return NULL;
     }
@@ -275,34 +275,26 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
         if (m_uiBloodMirrorCheckTimer < uiDiff)
         {
-            if (Unit *pTarget1 = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO,0))
+            if (Unit *pTank = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
             {
-                if (Unit *pTarget2 = SelectClosestFriendlyTarget(pTarget1))
+                if (Unit *pOff = SelectClosestFriendlyTarget(pTank))
                 {
-                    if(pTarget1->HasAura(SPELL_BLOOD_MIRROR_OFF))
-                        pTarget1->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
+                    if(pTank->HasAura(SPELL_BLOOD_MIRROR_OFF))
+                        pTank->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
 
-                    if(pTarget2->HasAura(SPELL_BLOOD_MIRROR_TANK))
-                        pTarget2->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_TANK);
+                    if(pOff->HasAura(SPELL_BLOOD_MIRROR_TANK))
+                        pOff->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_TANK);
 
-                    if (!pTarget1->HasAura(SPELL_BLOOD_MIRROR_TANK))
+                    if (!pTank->HasAura(SPELL_BLOOD_MIRROR_TANK))
                     {
-                        pTarget2->CastSpell(pTarget1, SPELL_BLOOD_MIRROR_TANK, true);
+                        pOff->CastSpell(pTank, SPELL_BLOOD_MIRROR_TANK, true);
                     }
-                    if (!pTarget2->HasAura(SPELL_BLOOD_MIRROR_OFF))
+                    if (!pOff->HasAura(SPELL_BLOOD_MIRROR_OFF))
                     {
-                        pTarget1->CastSpell(pTarget2, SPELL_BLOOD_MIRROR_OFF, true);
+                        pTank->CastSpell(pOff, SPELL_BLOOD_MIRROR_OFF, true);
                     }
                 }
             }
-            /*if (!m_creature->getVictim()->HasAura(SPELL_BLOOD_MIRROR_TANK))
-            {
-                if (Unit *pTarget2 = SelectClosestFriendlyTarget(m_creature->getVictim()))
-                {
-                    pTarget2->CastSpell(pTarget1, SPELL_BLOOD_MIRROR_TANK, true);
-                    pTarget1->CastSpell(pTarget2, SPELL_BLOOD_MIRROR_OFF, true);
-                }
-            }*/
             m_uiBloodMirrorCheckTimer = 3000;
         }
         else m_uiBloodMirrorCheckTimer -= uiDiff;
@@ -422,6 +414,7 @@ struct MANGOS_DLL_DECL mob_swarming_shadowsAI : public ScriptedAI
     mob_swarming_shadowsAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_creature->SetVisibility(VISIBILITY_ON);
         Reset();
     }
 

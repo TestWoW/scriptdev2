@@ -153,11 +153,12 @@ struct MANGOS_DLL_DECL boss_professor_putricideAI : public base_icc_bossAI
 {
     boss_professor_putricideAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
+        max = m_bIs25Man ? 8 : 3;
         Reset();
     }
 
     uint32 m_uiPhase;
-
+    uint32 max;
     uint32 m_uiHealthCheckTimer;
     uint32 m_uiTransitionTimer;
     uint32 m_uiEnrageTimer;
@@ -563,7 +564,7 @@ struct MANGOS_DLL_DECL boss_professor_putricideAI : public base_icc_bossAI
                 {
                     for (int i = 0; i < (m_bIs25Man ? 2 : 1); ++i)
                     {
-                        if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
+                        if (Unit *pTarget = SelectRandomRangedTarget(m_creature, max))
                         {
                             float x, y, z;
                             pTarget->GetPosition(x, y, z);
