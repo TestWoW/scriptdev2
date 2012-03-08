@@ -99,11 +99,13 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
 {
     boss_festergutAI(Creature *pCreature) : base_icc_bossAI(pCreature)
     {
+        max = m_bIs25Man ? 2 : 1;
         Reset();
     }
 
     bool m_bAchievFail;
 
+    uint32 max;
     uint32 m_uiBerserkTimer;
     uint32 m_uiGastricBloatTimer;
     uint32 m_uiInhaleBlightTimer;
@@ -294,11 +296,13 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             // DoCastSpellIfCan(m_creature, SPELL_VILE_GAS_SUMMON, CAST_TRIGGERED);
             // DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
 
-            if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
+            /*if (Unit *pTarget = SelectRandomRangedTarget(m_creature, max)) // Bugged
             {
                 pTarget->CastSpell(pTarget, SPELL_VILE_GAS_SUMMON_TRIG, true);
                 DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
-            }
+            }*/
+            if (Unit *pTarget = SelectRandomRangedTarget(m_creature, max)) // Temp hack
+                DoCastSpellIfCan(m_creature, 69240, CAST_TRIGGERED);
             m_uiVileGasTimer = 30000;
         }
         else
@@ -311,7 +315,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             {
                 if (Creature *pProfessor = m_pInstance->GetSingleCreatureFromStorage(NPC_PROFESSOR_PUTRICIDE))
                 {
-                    if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
+                    if (Unit *pTarget = SelectRandomRangedTarget(m_creature, max))
                     {
                         // pProfessor->CastSpell(m_creature, SPELL_MALLEABLE_GOO_SUMMON, true);
                         // pProfessor->CastSpell(m_creature, SPELL_MALLEABLE_GOO, true);
@@ -355,8 +359,6 @@ struct MANGOS_DLL_DECL mob_vile_gas_malleable_gooAI : public ScriptedAI
     mob_vile_gas_malleable_gooAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
     void DamageTaken(Unit *pDealer, uint32 &uiDamage){ uiDamage = 0; }
     void Reset(){}
