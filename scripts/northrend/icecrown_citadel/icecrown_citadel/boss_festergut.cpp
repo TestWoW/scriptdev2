@@ -99,13 +99,11 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
 {
     boss_festergutAI(Creature *pCreature) : base_icc_bossAI(pCreature)
     {
-        max = m_bIs25Man ? 2 : 1;
         Reset();
     }
 
     bool m_bAchievFail;
 
-    uint32 max;
     uint32 m_uiBerserkTimer;
     uint32 m_uiGastricBloatTimer;
     uint32 m_uiInhaleBlightTimer;
@@ -296,12 +294,12 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             // DoCastSpellIfCan(m_creature, SPELL_VILE_GAS_SUMMON, CAST_TRIGGERED);
             // DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
 
-            /*if (Unit *pTarget = SelectRandomRangedTarget(m_creature, max)) // Bugged
+            /*if (Unit *pTarget = SelectRandomRangedTarget(m_creature) // Bugged
             {
                 pTarget->CastSpell(pTarget, SPELL_VILE_GAS_SUMMON_TRIG, true);
                 DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
             }*/
-            if (Unit *pTarget = SelectRandomRangedTarget(m_creature, max)) // Temp hack
+            if (Unit *pTarget = SelectRandomRangedTarget(m_creature)) // Temp hack
                 DoCastSpellIfCan(m_creature, 69240, CAST_TRIGGERED);
             m_uiVileGasTimer = 30000;
         }
@@ -315,7 +313,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             {
                 if (Creature *pProfessor = m_pInstance->GetSingleCreatureFromStorage(NPC_PROFESSOR_PUTRICIDE))
                 {
-                    if (Unit *pTarget = SelectRandomRangedTarget(m_creature, max))
+                    if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
                     {
                         // pProfessor->CastSpell(m_creature, SPELL_MALLEABLE_GOO_SUMMON, true);
                         // pProfessor->CastSpell(m_creature, SPELL_MALLEABLE_GOO, true);
