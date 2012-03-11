@@ -665,7 +665,7 @@ struct MANGOS_DLL_DECL mob_nerubian_borrowerAI : public BSWScriptedAI
                 m_uiShadowStrikeTimer -= uiDiff;
         }
 
-        if (m_creature->GetHealthPercent() < 20.0f && !m_bIsSubmerged && !hasAura(SPELL_PERMAFROST, m_creature))
+        /*if (m_creature->GetHealthPercent() < 20.0f && !m_bIsSubmerged && !m_creature->HasAura(SPELL_PERMAFROST))
         {
             m_creature->CastSpell(m_creature, SPELL_SUBMERGE_BURROWER, false);
             m_creature->RemoveAllAuras();
@@ -694,7 +694,7 @@ struct MANGOS_DLL_DECL mob_nerubian_borrowerAI : public BSWScriptedAI
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             DoScriptText(EMOTE_OUT_OF_THE_GROUND, m_creature);
             m_bIsSubmerged = false;
-        }
+        }*/
 
         DoMeleeAttackIfReady();
     }
