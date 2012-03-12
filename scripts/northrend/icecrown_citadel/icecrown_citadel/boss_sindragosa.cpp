@@ -355,7 +355,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
                     m_uiPhase = PHASE_THREE;
                     DoScriptText(SAY_PHASE_3, m_creature);
-                    m_uiFrostBeaconTimer = 15000;
+                    m_uiFrostBeaconTimer = 10000;
                     m_uiIceTombTimer = 50000;
                     return;
                 }
