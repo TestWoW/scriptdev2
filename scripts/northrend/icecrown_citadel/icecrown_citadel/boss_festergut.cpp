@@ -71,6 +71,8 @@ enum
     SPELL_MALLEABLE_GOO         = 72295,
     SPELL_MALLEABLE_GOO_VISUAL  = 75845,
     SPELL_MALLEABLE_GOO_MISSILE = 70852,
+
+    NPC_VILE_GAS                = 38548,
 };
 
 // talks
@@ -294,13 +296,11 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             // DoCastSpellIfCan(m_creature, SPELL_VILE_GAS_SUMMON, CAST_TRIGGERED);
             // DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
 
-            /*if (Unit *pTarget = SelectRandomRangedTarget(m_creature) // Bugged
+            if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
             {
                 pTarget->CastSpell(pTarget, SPELL_VILE_GAS_SUMMON_TRIG, true);
                 DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
-            }*/
-            if (Unit *pTarget = SelectRandomRangedTarget(m_creature)) // Temp hack
-                DoCastSpellIfCan(m_creature, 69240, CAST_TRIGGERED);
+            }
             m_uiVileGasTimer = 30000;
         }
         else
@@ -357,6 +357,9 @@ struct MANGOS_DLL_DECL mob_vile_gas_malleable_gooAI : public ScriptedAI
     mob_vile_gas_malleable_gooAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
+        m_creature->SetVisibility(VISIBILITY_ON);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
     void DamageTaken(Unit *pDealer, uint32 &uiDamage){ uiDamage = 0; }
     void Reset(){}
