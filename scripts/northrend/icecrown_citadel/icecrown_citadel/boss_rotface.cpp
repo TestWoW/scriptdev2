@@ -283,7 +283,9 @@ struct MANGOS_DLL_DECL  mob_rotface_ooze_dummyAI : public ScriptedAI
     mob_rotface_ooze_dummyAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
-        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->SetVisibility(VISIBILITY_ON);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         Reset();
     }
     void Reset(){}
