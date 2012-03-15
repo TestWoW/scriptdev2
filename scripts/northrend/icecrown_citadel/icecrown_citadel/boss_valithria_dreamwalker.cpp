@@ -418,7 +418,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
             }
 
             // check if encounter is completed
-            if (fHP > 95.0f)
+            if (fHP >= 100.0f)
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_DREAMWALKER_RAGE) == CAST_OK)
                 {
