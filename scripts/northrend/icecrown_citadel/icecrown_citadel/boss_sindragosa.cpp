@@ -355,7 +355,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
                     m_uiPhase = PHASE_THREE;
                     DoScriptText(SAY_PHASE_3, m_creature);
-                    m_uiFrostBeaconTimer = 10000;
+                    m_uiFrostBeaconTimer = 15000;
                     m_uiIceTombTimer = 50000;
                     return;
                 }
@@ -504,8 +504,8 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                         }
                     }
                     m_uiFrostBeaconTimer = 20000;
-                    if (m_uiIcyGripTimer <= 8000)
-                        m_uiIcyGripTimer = 8000;
+                    if (m_uiIcyGripTimer <= 6000)
+                        m_uiIcyGripTimer = 6000;
                     if (m_uiTailSmashTimer <= 6000)
                         m_uiTailSmashTimer = 6000;
                     if (m_uiFrostBreathTimer <= 6000)
@@ -643,6 +643,9 @@ struct MANGOS_DLL_DECL mob_frost_bombAI : public ScriptedAI
     mob_frost_bombAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         Reset();
+        m_creature->SetVisibility(VISIBILITY_ON);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
     uint32 m_uiFrostBombTimer;

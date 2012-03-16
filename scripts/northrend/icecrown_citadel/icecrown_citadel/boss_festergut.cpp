@@ -71,8 +71,6 @@ enum
     SPELL_MALLEABLE_GOO         = 72295,
     SPELL_MALLEABLE_GOO_VISUAL  = 75845,
     SPELL_MALLEABLE_GOO_MISSILE = 70852,
-
-    NPC_VILE_GAS                = 38548,
 };
 
 // talks
@@ -397,8 +395,9 @@ struct MANGOS_DLL_DECL mob_stinkyAI : public ScriptedAI
 
     void JustDied(Unit *killer)
     {
-        if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_FESTERGUT))
-            DoScriptText(SAY_STINKY_DIES,pTemp,killer);
+        if (m_pInstance)
+            if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_FESTERGUT))
+                DoScriptText(SAY_STINKY_DIES,pTemp,killer);
     }
 
     void UpdateAI(const uint32 uiDiff)

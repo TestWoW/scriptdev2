@@ -91,7 +91,11 @@ enum
     NPC_SPINESTALKER                    = 37534,
 
     NPC_COMBAT_TRIGGER                  = 38752,
-
+    NPC_CULT_ADHERENT                   = 37949,
+    NPC_REANIMATED_ADHERENT             = 38010,
+    NPC_CULT_FANATIC                    = 37890,
+    NPC_REANIMATED_FANATIC              = 38009,
+    NPC_DEFORMED_FANATIC                = 38135,
     NPC_PUDDLE_STALKER                  = 37013,
     NPC_LITTLE_OOZE                     = 36897,
     NPC_BIG_OOZE                        = 36899,
@@ -299,7 +303,7 @@ public:
     void OnObjectCreate(GameObject* pGo);
     void OnCreatureCreate(Creature* pCreature);
 
-    bool IsEncounterInProgress();
+    bool IsEncounterInProgress() const;
     bool IsRaidWiped();
 
     void DoOpenDoor(ObjectGuid guid);
@@ -340,6 +344,7 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
         m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
         m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         m_creature->SetRespawnTime(7*DAY);
+        m_creature->SetLevitate(false);
         Reset();
     }
 

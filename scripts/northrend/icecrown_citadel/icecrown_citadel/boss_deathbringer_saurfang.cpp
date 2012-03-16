@@ -213,6 +213,9 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public base_icc_boss
 
     void Reset()
     {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_SAURFANG, FAIL);
+
         if (m_bIsAlliance)
         {
             if (Creature *pTmp = m_creature->GetMap()->GetCreature(m_guidVarian))
@@ -1450,6 +1453,9 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->IsRaidWiped())
+            m_creature->AI()->EnterEvadeMode();
 
         if (!m_bAchievFailed)
         {

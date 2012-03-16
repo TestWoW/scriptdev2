@@ -391,6 +391,9 @@ struct MANGOS_DLL_DECL mob_big_oozeAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_pInstance->GetData(TYPE_ROTFACE) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         // Unstable Ooze
         if (m_uiCheckTimer <= uiDiff)
         {
@@ -484,8 +487,9 @@ struct MANGOS_DLL_DECL mob_preciousAI : public ScriptedAI
 
     void JustDied(Unit *killer)
     {
-        if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ROTFACE))
-            DoScriptText(SAY_PRECIOUS_DIES,pTemp,killer);
+        if (m_pInstance)
+            if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_ROTFACE))
+                DoScriptText(SAY_PRECIOUS_DIES,pTemp,killer);
     }
 
     void JustSummoned(Unit *pSummoned)

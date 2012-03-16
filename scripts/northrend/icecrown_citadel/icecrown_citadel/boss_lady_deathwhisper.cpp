@@ -37,10 +37,6 @@ enum BossSpells
         SPELL_FROSTBOLT_VOLLEY                  = 72905,
         SPELL_BLIND                             = 43433,
 
-        // Cult Adherents
-        NPC_CULT_ADHERENT                       = 37949,
-        NPC_REANIMATED_ADHERENT                 = 38010,
-
         SPELL_FROST_FEVER                       = 71129,
         SPELL_SHROUD_OF_THE_OCCULT              = 70768,
         SPELL_DEATHCHILL_BOLT                   = 70594,
@@ -49,11 +45,6 @@ enum BossSpells
         SPELL_DARK_EMPOWERMENT                  = 70896,
         SPELL_DARK_MARTYRDOM                    = 70897,
         SPELL_ADHERENTS_DETERMINATION           = 71234,
-
-        // Cult Fanatic
-        NPC_CULT_FANATIC                        = 37890,
-        NPC_REANIMATED_FANATIC                  = 38009,
-        NPC_DEFORMED_FANATIC                    = 38135,
 
         SPELL_SHADOW_CLEAVE                     = 70670,
         SPELL_NECROTIC_STRIKE                   = 70659,
@@ -324,7 +315,9 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
         Unit *pBoneFanatic = m_pInstance->GetSingleCreatureFromStorage(NPC_REANIMATED_FANATIC);
         Unit *pBoneAdherent = m_pInstance->GetSingleCreatureFromStorage(NPC_REANIMATED_ADHERENT);
 
-        if (pAdherent && pFanatic && pDeformed && pBoneFanatic && pBoneAdherent)
+        if (pAdherent && pFanatic && pDeformed && pBoneFanatic && pBoneAdherent &&
+            pAdherent->isAlive() && pFanatic->isAlive() && pDeformed->isAlive() &&
+            pBoneFanatic->isAlive() && pBoneAdherent->isAlive())
             m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, true);
         else
             m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, false);
@@ -407,7 +400,10 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
             m_uiBerserkTimer -= uiDiff;
 
         if (m_uiCheckTimer < uiDiff)
+        {
             CheckAchiev();
+            m_uiCheckTimer = 1000;
+        }
         else
             m_uiCheckTimer -= uiDiff;
 

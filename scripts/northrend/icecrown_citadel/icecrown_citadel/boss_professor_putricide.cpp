@@ -834,7 +834,7 @@ struct MANGOS_DLL_DECL mob_icc_gas_cloudAI : public ScriptedAI
         if (m_creature->GetDistance(m_creature->getVictim()) <= 2.0f)
         {
             m_creature->InterruptSpell(CURRENT_CHANNELED_SPELL);
-            m_creature->getVictim()->CastSpell(m_creature->getVictim(), SPELL_EXPUNGED_GAS, true);
+            DoCastSpellIfCan(m_creature->getVictim(), SPELL_EXPUNGED_GAS, CAST_TRIGGERED);
             m_creature->getVictim()->RemoveAurasDueToSpell(SPELL_GASEOUS_BLOAT);
             SetCombatMovement(false);
             m_creature->GetMotionMaster()->Clear();
@@ -958,9 +958,9 @@ struct MANGOS_DLL_DECL mob_icc_volatile_oozeAI : public ScriptedAI
                     {
                         Unit *pTarget = NULL;
 
-                        pTarget = pProf->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_OOZE_ADHESIVE, SELECT_FLAG_PLAYER);
-                        /*if (!pTarget)
-                            pTarget = pProf->getVictim();*/
+                        pTarget = pProf->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_OOZE_ADHESIVE, SELECT_FLAG_PLAYER);
+                        if (!pTarget)
+                            pTarget = pProf->getVictim();
 
                         if (pTarget)
                         {
@@ -984,7 +984,7 @@ struct MANGOS_DLL_DECL mob_icc_volatile_oozeAI : public ScriptedAI
         {
             m_creature->InterruptSpell(CURRENT_CHANNELED_SPELL);
             m_creature->getVictim()->RemoveAurasDueToSpell(SPELL_OOZE_ADHESIVE);
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_OOZE_ERUPTION);
+            m_creature->getVictim()->CastSpell(m_creature->getVictim(), SPELL_OOZE_ERUPTION, true);
             SetCombatMovement(false);
             m_creature->GetMotionMaster()->Clear();
             m_bIsWaiting = true;
@@ -1023,6 +1023,7 @@ struct MANGOS_DLL_DECL mob_choking_gas_bombAI : public ScriptedAI
             m_uiExplosionTimer -= uiDiff;
     }
 };
+
 CreatureAI* GetAI_mob_choking_gas_bomb(Creature* pCreature)
 {
     return new mob_choking_gas_bombAI(pCreature);
@@ -1059,6 +1060,7 @@ struct MANGOS_DLL_DECL mob_ooze_puddleAI : public ScriptedAI
         }
     }
 };
+
 CreatureAI* GetAI_mob_ooze_puddle(Creature* pCreature)
 {
     return new mob_ooze_puddleAI(pCreature);

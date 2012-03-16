@@ -258,13 +258,14 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
     void JustDied(Unit *killer)
     {
-        if(!m_pInstance)
-        return;
+        if (!m_pInstance)
+            return;
 
         m_pInstance->SetData(TYPE_LANATHEL, DONE);
         DoScriptText(SAY_DEATH,m_creature,killer);
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 0);
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+        m_creature->GetMotionMaster()->MovePoint(3, m_creature->GetPositionX(), m_creature->GetPositionY(), QueenLocs[0].z);
      }
 
 
@@ -324,7 +325,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
             if (m_uiDeliriousSlashTimer < uiDiff)
             {
-                if (Unit* pTarget= m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,2))
+                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,2))
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_DELIRIOUS_SLASH) == CAST_OK)
                         m_uiDeliriousSlashTimer = urand(15000, 20000);
@@ -334,7 +335,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
             if (m_uiPactTimer < uiDiff)
             {
-                if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
+                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,1))
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_PACT_OF_DARKFALLEN) == CAST_OK)
                     {
@@ -360,7 +361,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
             if (m_uiBiteTimer < uiDiff && !m_bBite)
             {
-                if (Unit* pTarget= SelectVampiricBiteTarget())
+                if (Unit* pTarget = SelectVampiricBiteTarget())
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_VAMPIRIC_BITE) == CAST_OK)
                     {
@@ -371,7 +372,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
             }
             else m_uiBiteTimer -= uiDiff;
 
-            if (m_uiPhaseTimer < uiDiff && m_creature->GetHealthPercent() >= 10)
+            if (m_uiPhaseTimer < uiDiff && m_creature->GetHealthPercent() >= 5)
             {
                 m_uiPhase = PHASE_MOVING_CENTER;
                 m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_GROUND, QueenLocs[0].x, QueenLocs[0].y, QueenLocs[0].z);

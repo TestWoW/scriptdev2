@@ -78,7 +78,7 @@ void instance_icecrown_citadel::Initialize()
     };
 }
 
-bool instance_icecrown_citadel::IsEncounterInProgress()
+bool instance_icecrown_citadel::IsEncounterInProgress() const
 {
     for(uint8 i = 1; i < MAX_ENCOUNTERS-2 ; ++i)
         if (m_auiEncounter[i] == IN_PROGRESS)
@@ -211,6 +211,11 @@ void instance_icecrown_citadel::OnCreatureCreate(Creature* pCreature)
         case NPC_CHOKING_GAS_BOMB:
         case NPC_VOLATILE_OOZE:
         case NPC_MUTATED_ABOMINATION:
+        case NPC_CULT_ADHERENT:
+        case NPC_REANIMATED_ADHERENT:
+        case NPC_CULT_FANATIC:
+        case NPC_REANIMATED_FANATIC:
+        case NPC_DEFORMED_FANATIC:
              m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
              break;
     }
