@@ -281,8 +281,8 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             {
                 DoScriptText(SAY_SPORE, m_creature);
                 m_uiGasSporeTimer = 40000;
-                if (m_uiVileGasTimer <= 10000)
-                    m_uiVileGasTimer = 10000;
+                if (m_uiVileGasTimer <= 15000)
+                    m_uiVileGasTimer = 15000;
             }
         }
         else
