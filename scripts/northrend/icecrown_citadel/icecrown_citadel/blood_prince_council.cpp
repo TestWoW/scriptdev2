@@ -109,6 +109,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathel_introAI : public ScriptedAI
 {
     boss_blood_queen_lanathel_introAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_creature->SetRespawnTime(7*DAY);
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }

@@ -124,6 +124,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
     uint32 m_uiVileGasTimer;
     uint32 m_uiSlimeFlowTimer;
     uint32 m_uiTurnTimer;
+    uint32 m_uiBerserkTimer;
 
     void Reset()
     {
@@ -133,6 +134,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         //m_uiInfectionsRate = 1;
         m_uiSlimeFlowTimer = 20000;
         m_uiTurnTimer = 0;
+        m_uiBerserkTimer = 10 * MINUTE * IN_MILLISECONDS;
     }
 
     void Aggro(Unit *pWho)
@@ -190,6 +192,18 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        // Berserk
+        if (m_uiBerserkTimer <= uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+            {
+                DoScriptText(SAY_BERSERK, m_creature);
+                m_uiBerserkTimer = 10 * MINUTE * IN_MILLISECONDS;
+            }
+        }
+        else
+            m_uiBerserkTimer -= uiDiff;
 
         if (m_uiTurnTimer > uiDiff)
         {
