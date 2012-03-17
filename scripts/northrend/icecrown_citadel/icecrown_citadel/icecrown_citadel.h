@@ -402,6 +402,24 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
 
         return pResult;
     }
+
+    void DoRemoveAuraFromAll(uint32 auraId)
+    {
+        if (auraId == 0)
+            return;
+
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget->HasAura(auraId))
+                    pTarget->RemoveAurasDueToSpell(auraId);
+            }
+        }
+    }
 };
 
 #endif
