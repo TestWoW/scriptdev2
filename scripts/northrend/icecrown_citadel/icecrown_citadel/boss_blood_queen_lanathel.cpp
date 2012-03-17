@@ -37,7 +37,7 @@ enum BossSpells
     SPELL_ESSENCE_OF_BLOOD_QUEEN_2          = 70871,
     SPELL_FRENZIED_BLOODTHIRST              = 70877,
     SPELL_UNCONTROLLABLE_FRENZY             = 70923,
-    SPELL_PACT_OF_DARKFALLEN                = 71340,
+    SPELL_PACT_OF_DARKFALLEN                = 71336,
     SPELL_SWARMING_SHADOWS                  = 71264,
     SPELL_TWILIGHT_BLOODBOLT                = 71446,
     SPELL_BLOODBOLT_WHIRL                   = 71772,
@@ -130,6 +130,10 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LANATHEL, FAIL);
+
+        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_OFF);
+        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_TANK);
+        DoRemoveAuraFromAll(SPELL_ESSENCE_OF_BLOOD_QUEEN);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -266,6 +270,9 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 0);
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
         m_creature->GetMotionMaster()->MovePoint(3, m_creature->GetPositionX(), m_creature->GetPositionY(), QueenLocs[0].z);
+        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_OFF);
+        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_TANK);
+        DoRemoveAuraFromAll(SPELL_ESSENCE_OF_BLOOD_QUEEN);
      }
 
 
@@ -335,14 +342,14 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
             if (m_uiPactTimer < uiDiff)
             {
-                if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
-                {
-                    if (DoCastSpellIfCan(pTarget, SPELL_PACT_OF_DARKFALLEN) == CAST_OK)
+                //if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
+                //{
+                    if (DoCastSpellIfCan(m_creature, SPELL_PACT_OF_DARKFALLEN) == CAST_OK)
                     {
                         DoScriptText(SAY_PACT, m_creature);
                         m_uiPactTimer = 30000;
                     }
-                }
+                //}
             }
             else m_uiPactTimer -= uiDiff;
 
