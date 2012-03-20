@@ -45,7 +45,7 @@ struct MANGOS_DLL_DECL npc_dalaran_guardian_mageAI : public ScriptedAI
         if (m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
             return;
 
-        if (pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho) && !pWho->HasAura(70972) && !pWho->HasAura(70974))
         {
             if (m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho)) && m_creature->IsWithinLOSInMap(pWho))
             {

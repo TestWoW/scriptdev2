@@ -421,7 +421,7 @@ UPDATE `creature_template` SET `ScriptName`='' WHERE `entry`= 24693;
 -- ---------------------
 -- Valithria dreamwalker
 -- ---------------------
---- delete unused spear
+-- delete unused spear
 DELETE FROM `creature` WHERE `id` = 38248;
 UPDATE `creature_template` SET `faction_A` = 35, `faction_H` = 35, `AIName` = '', `ScriptName` = 'boss_valithria_dreamwalker' WHERE `entry` = 36789;
 UPDATE `creature_template` SET `faction_A` = 35, `faction_H` = 35 WHERE `entry` = 38174; -- 25man difficulty
