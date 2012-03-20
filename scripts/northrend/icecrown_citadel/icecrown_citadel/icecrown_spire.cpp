@@ -730,14 +730,14 @@ struct MANGOS_DLL_DECL mob_spire_frostwyrmAI : public ScriptedAI
         if (m_uiBlizzardTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0), SPELL_BLIZZARD) == CAST_OK)
-                m_uiBlizzardTimer = 10000;
+                m_uiBlizzardTimer = 25000;
         }
         else m_uiBlizzardTimer -= uiDiff;
 
         if (m_uiFrostBreathTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BREATH) == CAST_OK)
-                m_uiFrostBreathTimer = 10000;
+                m_uiFrostBreathTimer = 20000;
         }
         else m_uiFrostBreathTimer -= uiDiff;
 
@@ -798,7 +798,7 @@ struct MANGOS_DLL_DECL mob_frost_giantAI : public base_icc_bossAI
         if (m_uiStompTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_STOMP) == CAST_OK)
-                m_uiStompTimer = 10000;
+                m_uiStompTimer = 20000;
         }
         else m_uiStompTimer -= uiDiff;
 
@@ -812,7 +812,7 @@ struct MANGOS_DLL_DECL mob_frost_giantAI : public base_icc_bossAI
         if (m_uiArticBreathTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0), SPELL_ARTIC_BREATH) == CAST_OK)
-                m_uiArticBreathTimer = 15000;
+                m_uiArticBreathTimer = 30000;
         }
         else m_uiArticBreathTimer -= uiDiff;
 

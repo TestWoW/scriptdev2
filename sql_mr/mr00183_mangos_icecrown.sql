@@ -72,7 +72,7 @@ DELETE FROM `spell_area` WHERE `spell` IN
 UPDATE `creature_template` SET `vehicle_id` = 639, `AIName`='', `PowerType` = 3, `ScriptName`='boss_deathbringer_saurfang' WHERE `entry`=37813;
 UPDATE `creature_template` SET `vehicle_id` = 639, `AIName`='', `PowerType` = 3 WHERE `entry` IN (38402,38582,38583);
 UPDATE `creature` SET `position_x` = -476.621,`position_y` = 2211.11,`position_z` = 541.197, `spawntimesecs` = 604800 WHERE `id` = 37813;
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (37813, 38402, 38582, 38583);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (37813, 38402, 38582, 38583);
 UPDATE `creature_template` SET `ScriptName`='mob_blood_beast', `AIName`='' WHERE `entry`= 38508;
 DELETE FROM `spell_script_target` WHERE `entry` IN (72260, 72202, 72278,72279,72280);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES
@@ -141,7 +141,7 @@ UPDATE `gameobject_template` SET `faction` = '114',`data0` = '0' WHERE `gameobje
 UPDATE `gameobject` SET `state` = '1' WHERE `guid` IN (72526,72525);
 UPDATE `creature_template` SET `ScriptName`='mob_coldflame', `minlevel` = 82, `maxlevel` = 82, `modelid_1` = 11686, `modelid_2` = 11686, `modelid_3` = 11686, `modelid_4` = 11686, `faction_A` = 14, `faction_H` = 14, `AIName`=''  WHERE `entry`= 36672;
 UPDATE `creature_template` SET `ScriptName`='mob_bone_spike', `AIName`='' WHERE `entry`= 38711;
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (36612, 37957, 37958, 37959);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (36612, 37957, 37958, 37959);
 
 -- --------------
 -- Gunship battle
@@ -175,6 +175,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 
 UPDATE `creature_template` SET `ScriptName` = 'mob_stinky', `mechanic_immune_mask` = '667893759' WHERE `entry` = 37025;
 UPDATE `creature_template` SET `ScriptName` = 'mob_precious', `mechanic_immune_mask` = '667893759' WHERE `entry` = 37217;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (37025, 38064, 37217, 38103);
 
 -- -------
 -- Rotface
@@ -182,7 +183,7 @@ UPDATE `creature_template` SET `ScriptName` = 'mob_precious', `mechanic_immune_m
 
 UPDATE `creature_template` SET `ScriptName`='boss_rotface', `AIName`=''  WHERE `entry`= 36627;
 UPDATE `gameobject_template` SET `faction` = '114' WHERE `gameobject_template`.`entry` IN (201370);
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (36627, 38390, 38549, 38550);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (36627, 38390, 38549, 38550);
 UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201370);
 UPDATE `creature_template` SET `ScriptName`='mob_little_ooze', `AIName`='' WHERE `entry`= 36897;
 UPDATE `creature_template` SET `ScriptName`='mob_big_ooze', `AIName`='' WHERE `entry`= 36899;
@@ -227,7 +228,7 @@ VALUES
 
 UPDATE `creature_template` SET `ScriptName`='boss_festergut', `AIName`=''  WHERE `entry`= 36626;
 UPDATE `gameobject_template` SET `faction` = '114' WHERE `gameobject_template`.`entry` IN (201371);
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (36626, 37504, 37505, 37506);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (36626, 37504, 37505, 37506);
 UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201371);
 UPDATE `creature_template` SET `ScriptName`='mob_vile_gas_malleable_goo', `AIName`='', `flags_extra` = `flags_extra` | 2 | 128  WHERE `entry` IN (38548, 38556);
 -- orange gas stalker
@@ -271,7 +272,7 @@ UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 33554432 | 2 WHERE 
 
 UPDATE `creature_template` SET `ScriptName`='boss_professor_putricide', `AIName`='' WHERE `entry`= 36678;
 UPDATE `creature_template` SET `PowerType` = 0, `vehicle_id` = 587 WHERE `entry` IN (36678, 38431, 38585, 38586);
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (36678, 38431, 38585, 38586);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (36678, 38431, 38585, 38586);
 UPDATE `gameobject_template` SET `faction` = '114',`data0` = '0' WHERE `gameobject_template`.`entry` IN (201372,201614,201613, 201612);
 UPDATE `gameobject` SET `state` = '1' WHERE `id` IN (201612,201614,201613);
 UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201372);
@@ -338,7 +339,7 @@ UPDATE `creature_template` SET `minhealth` = 30469825, `maxhealth` = 30469825 WH
 -- --------
 
 UPDATE `creature_template` SET `ScriptName`='boss_taldaram_icc', `AIName`='' WHERE `entry`= 37973;
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (37973, 38400, 38771, 38772);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (37973, 38400, 38771, 38772);
 UPDATE `creature_template` SET `ScriptName`='mob_ball_of_flames', `AIName`='',`minlevel` = 82, `maxlevel` = 82, `faction_A` = 14, `faction_H` = 14 WHERE `entry` IN (38332, 38451);
 
 -- -------
@@ -346,7 +347,7 @@ UPDATE `creature_template` SET `ScriptName`='mob_ball_of_flames', `AIName`='',`m
 -- -------
 
 UPDATE `creature_template` SET `ScriptName`='boss_valanar_icc', `AIName`='' WHERE `entry`= 37970;
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (37970, 38401, 38784, 38785);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (37970, 38401, 38784, 38785);
 UPDATE `creature_template` SET `ScriptName`='mob_kinetic_bomb', `AIName`='',`minlevel` = 82, `maxlevel` = 82, `faction_A` = 14, `faction_H` = 14 WHERE `entry`= 38454;
 UPDATE `creature_template` SET `ScriptName`='mob_shock_vortex', `AIName`='',`minlevel` = 82, `maxlevel` = 82, `faction_A` = 14, `faction_H` = 14 WHERE `entry`= 38422;
 UPDATE `creature_template` SET `ScriptName`='mob_kinetic_bomb_target', `AIName`='' WHERE `entry`= 38458;
@@ -360,7 +361,7 @@ INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `procFlags`, `procEx`) VA
 -- --------
 
 UPDATE `creature_template` SET `ScriptName`='boss_keleseth_icc', `AIName`='' WHERE `entry`= 37972;
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (36678, 38399, 38769, 38770);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (36678, 38399, 38769, 38770);
 UPDATE `creature_template` SET `ScriptName`='mob_dark_nucleus', `AIName`='',`minlevel` = 82, `maxlevel` = 82, `faction_A` = 14, `faction_H` = 14 WHERE `entry`= 38369;
 
 DELETE FROM  `creature_template_addon` WHERE `entry` IN (37972,37973,37970,38401,38784,38785,38399,38769,38770,38400,38771,38772);
@@ -382,7 +383,7 @@ UPDATE `gameobject` SET `state` = '0' WHERE `id` IN (201376);
 -- ---------------
 
 UPDATE `creature_template` SET `ScriptName`='boss_blood_queen_lanathel', `AIName`='' WHERE `entry`= 37955;
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (37955, 38434, 38435, 38436);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (37955, 38434, 38435, 38436);
 UPDATE `creature_template` SET  `minlevel` = 80, `maxlevel` = 80, `AIName` ='', `faction_A`= 14, `faction_H` = 14,`ScriptName`='mob_swarming_shadows' WHERE `entry`= 38163;
 UPDATE `gameobject_template` SET `faction` = '0', `ScriptName` = 'go_frostwing_sigil' WHERE `gameobject_template`.`entry` IN (202181);
 DELETE FROM `spell_proc_event` WHERE entry IN (70871);
@@ -467,9 +468,10 @@ UPDATE `gameobject` SET `state` = '1' WHERE `id` IN (201380,201381,201382,201383
 -- Sindragosa
 -- ----------
 UPDATE `creature_template` SET `ScriptName`='boss_sindragosa', `AIName`='' WHERE `entry`= 36853;
-UPDATE `creature_template` SET `mechanic_immune_mask` = '1073881087' WHERE `entry`  IN (36853, 38265, 38266, 38267);
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (36853, 38265, 38266, 38267);
 UPDATE `creature_template` SET `ScriptName`='mob_rimefang', `AIName`='' WHERE `entry`= 37533;
 UPDATE `creature_template` SET `ScriptName`='mob_spinestalker', `AIName`='' WHERE `entry`= 37534;
+UPDATE `creature_template` SET `mechanic_immune_mask` = '667893759' WHERE `entry`  IN (37533, 38220, 37534, 38219);
 
 UPDATE `creature_template` SET `ScriptName`='mob_ice_tomb', `AIName`='' WHERE `entry`= 36980;
 UPDATE `creature_template` SET `ScriptName`='mob_frost_bomb', `AIName`='' WHERE `entry`= 37186;
