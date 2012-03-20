@@ -504,8 +504,8 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                         }
                     }
                     m_uiFrostBeaconTimer = 20000;
-                    if (m_uiIcyGripTimer <= 8000)
-                        m_uiIcyGripTimer = 8000;
+                    if (m_uiIcyGripTimer <= 10000)
+                        m_uiIcyGripTimer = 10000;
                     if (m_uiTailSmashTimer <= 6000)
                         m_uiTailSmashTimer = 6000;
                     if (m_uiFrostBreathTimer <= 6000)
