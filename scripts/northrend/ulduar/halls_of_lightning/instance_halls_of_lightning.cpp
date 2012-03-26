@@ -31,7 +31,10 @@ EndScriptData */
 3 - Loken
 */
 
-instance_halls_of_lightning::instance_halls_of_lightning(Map* pMap) : ScriptedInstance(pMap)
+instance_halls_of_lightning::instance_halls_of_lightning(Map* pMap) : ScriptedInstance(pMap),
+    m_uiGolemsKilled(0),
+    m_bTimely(false),
+    m_bEmpowered(false)
 {
     Initialize();
 }
@@ -47,7 +50,28 @@ void instance_halls_of_lightning::OnCreatureCreate(Creature* pCreature)
     {
         case NPC_BJARNGRIM:
         case NPC_IONAR:
+        case NPC_GOLEM:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
+            break;
+    }
+}
+
+void instance_halls_of_lightning::OnCreatureDeath(Creature* pCreature)
+{
+    switch(pCreature->GetEntry())
+    {
+        case NPC_GOLEM:
+            ++m_uiGolemsKilled;
+            break;
+    }
+}
+
+void instance_halls_of_lightning::OnCreatureEnterCombat(Creature* pCreature)
+{
+    switch(pCreature->GetEntry())
+    {
+        case NPC_VOLKHAN:
+            m_uiGolemsKilled = 0;
             break;
     }
 }
@@ -99,13 +123,19 @@ void instance_halls_of_lightning::SetData(uint32 uiType, uint32 uiData)
                 DoStartTimedAchievement(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEV_START_LOKEN_ID);
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(GO_LOKEN_DOOR);
+                //DoUseDoorOrButton(GO_LOKEN_DOOR);
 
                 //Appears to be type 5 GO with animation. Need to figure out how this work, code below only placeholder
                 if (GameObject* pGlobe = GetSingleGameObjectFromStorage(GO_LOKEN_THRONE))
                     pGlobe->SetGoState(GO_STATE_ACTIVE);
             }
             m_auiEncounter[uiType] = uiData;
+            break;
+        case TYPE_STRUCK:
+            m_bEmpowered = (uiData == DONE);
+            break;
+        case TYPE_TIMELY:
+            m_bTimely = (uiData == FAIL);
             break;
     }
 
@@ -129,6 +159,21 @@ uint32 instance_halls_of_lightning::GetData(uint32 uiType)
         return m_auiEncounter[uiType];
 
     return 0;
+}
+
+bool instance_halls_of_lightning::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+{
+    switch (uiCriteriaId)
+    {
+        case ACHIEV_STRUCK:
+            return m_bEmpowered;
+        case ACHIEV_SHATTER:
+            return m_uiGolemsKilled <= 4;
+        case ACHIEV_TIMELY:
+            return !m_bTimely;
+        default:
+            return false;
+    }
 }
 
 void instance_halls_of_lightning::Load(const char* chrIn)

@@ -74,7 +74,8 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
     uint32 m_uiLightningNova_Timer;
     uint32 m_uiPulsingShockwave_Timer;
     uint32 m_uiResumePulsingShockwave_Timer;
-    uint32 m_uiAchievTimer;
+    uint32 m_uiAchievCheckTimer;
+    uint32 m_uiEncounterTimer;
 
     uint32 m_uiHealthAmountModifier;
 
@@ -86,7 +87,8 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
         m_uiLightningNova_Timer = 20000;
         m_uiPulsingShockwave_Timer = 2000;
         m_uiResumePulsingShockwave_Timer = 15000;
-        m_uiAchievTimer = 0;
+        m_uiAchievCheckTimer = 0;
+        m_uiEncounterTimer = 0;
 
         m_uiHealthAmountModifier = 1;
 
@@ -99,7 +101,10 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_LOKEN, IN_PROGRESS);
+            m_pInstance->SetData(TYPE_TIMELY, DONE);
+        }
     }
 
     void JustDied(Unit* pKiller)
@@ -108,9 +113,6 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LOKEN, DONE);
-
-        if (!m_bIsRegularMode && m_uiAchievTimer < 120000)
-             m_pInstance->DoCompleteAchievement(ACHIEV_TIMELY_DEATH);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -125,11 +127,23 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        m_uiAchievTimer += uiDiff;
-
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (!m_bIsRegularMode)
+        {
+            if (m_uiAchievCheckTimer < uiDiff)
+            {
+                if (m_uiEncounterTimer > 120000)
+                    m_pInstance->SetData(TYPE_TIMELY, FAIL);
+
+                m_uiAchievCheckTimer = 500;
+            }
+            else m_uiAchievCheckTimer -= uiDiff;
+        }
+
+        m_uiEncounterTimer += uiDiff;
 
         if (m_bIsAura)
         {
