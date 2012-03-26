@@ -88,7 +88,8 @@ enum
         SPELL_RUNE_OF_BLOOD_DEBUFF              = 72410,
 
         // Blood Nova
-        SPELL_BLOOD_NOVA                        = 72378,
+        SPELL_BLOOD_NOVA                        = 72380,
+        //SPELL_BLOOD_NOVA                        = 72378,
 
         // Boiling Blood
         SPELL_BOILING_BLOOD                     = 72385,
@@ -1454,9 +1455,6 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_pInstance->IsRaidWiped())
-            m_creature->AI()->EnterEvadeMode();
-
         if (!m_bAchievFailed)
         {
             if (m_uiCheckTimer < uiDiff)
@@ -1527,17 +1525,22 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         // Boiling Blood
         if (m_uiBoilingBloodTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_BLOOD_NOVA) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_BOILING_BLOOD) == CAST_OK)
                 m_uiBoilingBloodTimer = urand(10000, 35000);
         }
         else
             m_uiBoilingBloodTimer -= uiDiff;
 
-        // Boiling Blood
+        // Blood Nova
         if (m_uiBloodNovaTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature,SPELL_BOILING_BLOOD) == CAST_OK)
-                m_uiBloodNovaTimer = urand(16000, 35000);
+            if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
+            {
+                if (DoCastSpellIfCan(m_creature,SPELL_BLOOD_NOVA) == CAST_OK)
+                    m_uiBloodNovaTimer = urand(16000, 35000);
+            }
+            /*if (DoCastSpellIfCan(m_creature,SPELL_BLOOD_NOVA) == CAST_OK)
+                m_uiBloodNovaTimer = urand(16000, 35000);*/
         }
         else
             m_uiBloodNovaTimer -= uiDiff;
