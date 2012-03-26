@@ -29,7 +29,8 @@ enum BossSpells
     SPELL_BERSERK                           = 47008,
     SPELL_INCITE_TERROR                     = 73070,
     SPELL_SHROUD_OF_SORROW                  = 72981,
-    SPELL_DELIRIOUS_SLASH                   = 72261,
+    SPELL_DELIRIOUS_SLASH_1                 = 71623,
+    SPELL_DELIRIOUS_SLASH_2                 = 72264,
     SPELL_BLOOD_MIRROR_TANK                 = 70821,
     SPELL_BLOOD_MIRROR_OFF                  = 70838,
     SPELL_VAMPIRIC_BITE                     = 71726,
@@ -224,7 +225,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
                 !(*itr).getSource()->isAlive() ||                                // don't target dead players
                 (*itr).getSource()->isGameMaster() ||                            // don't target GMs
                 (*itr).getSource()->GetObjectGuid() == pVictim->GetObjectGuid()) // don't target current victim
-                continue;
+                    continue;
 
                 float dist = pVictim->GetDistance((*itr).getSource());
                 if (dist < lastDist)
@@ -249,7 +250,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
             {
                 if (!pVictim->HasAuraOfDifficulty(70867) && // Essence of the Blood Queen
                 !pVictim->HasAuraOfDifficulty(70877) &&     // Frenzied Bloodthirst
-                !pVictim->HasAuraOfDifficulty(70445) &&     // Blood Mirror
+                !pVictim->HasAuraOfDifficulty(SPELL_BLOOD_MIRROR_OFF) &&     // Blood Mirror
                 !pVictim->HasAuraOfDifficulty(70923))       // Uncontrollable Frenzy
                 {
                     return pVictim;
@@ -283,9 +284,9 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
         if (m_uiBloodMirrorCheckTimer < uiDiff)
         {
-            if (Unit *pTank = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
+            if (Unit *pTank = /*m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0)*/m_creature->getVictim())
             {
-                if (Unit *pOff = SelectClosestFriendlyTarget(pTank))
+                if (Unit *pOff = SelectClosestFriendlyTarget(m_creature->getVictim()))
                 {
                     if(pTank->HasAura(SPELL_BLOOD_MIRROR_OFF))
                         pTank->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
@@ -330,7 +331,29 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
             }
             else m_uiTwilightTimer -= uiDiff;
 
-            if (m_uiDeliriousSlashTimer < uiDiff)
+            // Delirious Slash
+            if (m_uiDeliriousSlashTimer <= uiDiff)
+            {
+                /**
+                 * Spell that handles targeting - we can do this here.
+                 * if (DoCastSpellIfCan(m_creature, SPELL_DELIRIOUS_SLASH) == CAST_OK)
+                 */
+                if (Unit *pTarget = SelectClosestFriendlyTarget(m_creature->getVictim()))
+                {
+                    uint32 spell = SPELL_DELIRIOUS_SLASH_1;
+
+                    // if target is not in 5yd range then cast spell with charge effect
+                    if (!m_creature->IsWithinDist(pTarget, 5.0f))
+                        spell = SPELL_DELIRIOUS_SLASH_2;
+
+                    if (DoCastSpellIfCan(pTarget, spell) == CAST_OK)
+                        m_uiDeliriousSlashTimer = 15000;
+                }
+            }
+            else
+                m_uiDeliriousSlashTimer -= uiDiff;
+
+            /*if (m_uiDeliriousSlashTimer < uiDiff)
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,2))
                 {
@@ -338,7 +361,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
                         m_uiDeliriousSlashTimer = urand(15000, 20000);
                 }
             }
-            else m_uiDeliriousSlashTimer -= uiDiff;
+            else m_uiDeliriousSlashTimer -= uiDiff;*/
 
             if (m_uiPactTimer < uiDiff)
             {
@@ -463,4 +486,3 @@ void AddSC_boss_blood_queen_lanathel()
     pNewScript->GetAI = &GetAI_mob_swarming_shadows;
     pNewScript->RegisterSelf();
 }
-
