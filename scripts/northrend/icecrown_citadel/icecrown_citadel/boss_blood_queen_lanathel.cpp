@@ -303,7 +303,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
                     }
                 }
             }
-            m_uiBloodMirrorCheckTimer = 3000;
+            m_uiBloodMirrorCheckTimer = 500;
         }
         else m_uiBloodMirrorCheckTimer -= uiDiff;
 
