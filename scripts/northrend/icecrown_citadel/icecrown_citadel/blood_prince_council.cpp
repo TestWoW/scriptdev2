@@ -486,6 +486,7 @@ struct MANGOS_DLL_DECL boss_valanar_iccAI : public base_blood_prince_council_bos
     {
         base_blood_prince_council_bossAI::Aggro(pWho);
 
+        m_creature->SetHealth(m_creature->GetMaxHealth());
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_BLOOD_COUNCIL, IN_PROGRESS);
