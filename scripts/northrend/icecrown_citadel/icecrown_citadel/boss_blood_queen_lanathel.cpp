@@ -284,9 +284,9 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
         if (m_uiBloodMirrorCheckTimer < uiDiff)
         {
-            if (Unit *pTank = /*m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0)*/m_creature->getVictim())
+            if (Unit *pTank = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
             {
-                if (Unit *pOff = SelectClosestFriendlyTarget(m_creature->getVictim()))
+                if (Unit *pOff = SelectClosestFriendlyTarget(pTank))
                 {
                     if(pTank->HasAura(SPELL_BLOOD_MIRROR_OFF))
                         pTank->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
