@@ -87,8 +87,9 @@ enum
     EMOTE_DRAGONFLIGHT_PORTAL   = -1608006,
     EMOTE_KEEPER_PORTAL         = -1608007,
 
-    ACHIEV_DANCE_WITH_VOID      = 7587,
-    ACHIEV_DESHIDRATATION       = 7320,
+    ACHIEV_VOID_DANCE           = 7587,
+    ACHIEV_DEHYDRATATION        = 7320,
+    ACHIEV_DEFENSELESS          = 6803,
 };
 
 struct Locations

@@ -115,19 +115,6 @@ struct MANGOS_DLL_DECL instance_violet_hold : public ScriptedInstance
         m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
     }
 
-    bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
-    {
-        switch (uiCriteriaId)
-        {
-            case ACHIEV_DANCE_WITH_VOID:
-                return !m_bCriteriaDanceWithVoidFailed;
-            case ACHIEV_DESHIDRATATION:
-                return !m_bCriteriaDeshidratationFailed;
-            default:
-                return 0;
-        }
-    }
-
     void SetData(uint32 uiType, uint32 uiData)
     {
         switch(uiType)
@@ -287,6 +274,21 @@ struct MANGOS_DLL_DECL instance_violet_hold : public ScriptedInstance
                 return m_uiDisruptions;
         }
         return 0;
+    }
+
+    bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+    {
+        switch (uiCriteriaId)
+        {
+            case ACHIEV_DEHYDRATATION:
+                return !m_bCriteriaDeshidratationFailed;
+            case ACHIEV_VOID_DANCE:
+                return !m_bCriteriaDanceWithVoidFailed;
+            case ACHIEV_DEFENSELESS:
+                return m_uiShieldPercent >= 100;
+            default:
+                return false;
+        }
     }
 
 const char* Save()
