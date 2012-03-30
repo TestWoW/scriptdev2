@@ -1536,7 +1536,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
         {
             if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
             {
-                if (DoCastSpellIfCan(m_creature,SPELL_BLOOD_NOVA) == CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_BLOOD_NOVA) == CAST_OK)
                     m_uiBloodNovaTimer = urand(16000, 35000);
             }
             /*if (DoCastSpellIfCan(m_creature,SPELL_BLOOD_NOVA) == CAST_OK)
