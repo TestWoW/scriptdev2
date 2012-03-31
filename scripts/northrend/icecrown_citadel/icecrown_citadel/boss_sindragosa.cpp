@@ -151,8 +151,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
         m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
         m_creature->SetSpeedRate(MOVE_WALK, 1.2f);
-
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void JustReachedHome()
@@ -163,7 +161,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         SetCombatMovement(true);
         m_creature->SetLevitate(false);
         m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
     void Aggro(Unit *pWho)
@@ -232,6 +229,8 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
         if (uiData == POINT_AIR)
         {
+            m_creature->SetSpeedRate(MOVE_RUN, 0);
+            m_creature->SetSpeedRate(MOVE_WALK, 0);
             m_uiPhase = PHASE_AIR;
 
             uint max = m_bIs25Man ? 5 : 2;
@@ -251,7 +250,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
             m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
             m_creature->SetSpeedRate(MOVE_WALK, 1.2f);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             m_uiPhase = PHASE_GROUND;
             SetCombatMovement(true);
             m_creature->SetLevitate(false);
@@ -270,6 +268,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         z = SindragosaLoc[0].z;
 
         m_creature->CastSpell(x, y, z, SPELL_FROST_BOMB, false);
+        m_creature->SummonCreature(NPC_FROST_BOMB, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 20000);
     }
 
     void DoMark(uint32 count)
@@ -429,8 +428,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                         m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
                         m_creature->SetSpeedRate(MOVE_WALK, 1.2f);
 
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
                         // fly to the air point
                         SetCombatMovement(false);
                         m_creature->SetLevitate(true);
@@ -480,8 +477,8 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 {
                     m_uiPhase               = PHASE_FLYING;
                     m_uiPhaseTimer          = 110000;
-                    m_uiTailSmashTimer      = 20000;
-                    m_uiFrostBreathTimer    = 5000;
+                    m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
+                    m_creature->SetSpeedRate(MOVE_WALK, 1.2f);
 
                     // fly to the ground point
                     m_creature->GetMotionMaster()->MovePoint(POINT_LAND, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z);
