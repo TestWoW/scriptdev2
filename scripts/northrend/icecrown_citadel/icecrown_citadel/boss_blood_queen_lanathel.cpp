@@ -47,6 +47,7 @@ enum BossSpells
     NPC_SWARMING_SHADOWS                    = 38163,
     SPELL_SWARMING_SHADOWS_VISUAL           = 71267,
     THIRST_QUENCHED_AURA                    = 72154,
+    SPELL_GUSHING_WOUND                     = 72132,
 };
 
 // talks
@@ -284,24 +285,25 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
         if (m_uiBloodMirrorCheckTimer < uiDiff)
         {
-            if (Unit *pTank = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
+            if (Unit *pOff = SelectClosestFriendlyTarget(m_creature->getVictim()))
             {
-                if (Unit *pOff = SelectClosestFriendlyTarget(pTank))
+                if(m_creature->getVictim()->HasAura(SPELL_BLOOD_MIRROR_OFF))
+                    m_creature->getVictim()->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
+
+                if(pOff->HasAura(SPELL_BLOOD_MIRROR_TANK))
+                    pOff->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_TANK);
+
+                if (!m_creature->getVictim()->HasAura(SPELL_BLOOD_MIRROR_TANK))
                 {
-                    if(pTank->HasAura(SPELL_BLOOD_MIRROR_OFF))
-                        pTank->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
-
-                    if(pOff->HasAura(SPELL_BLOOD_MIRROR_TANK))
-                        pOff->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_TANK);
-
-                    if (!pTank->HasAura(SPELL_BLOOD_MIRROR_TANK))
-                    {
-                        pOff->CastSpell(pTank, SPELL_BLOOD_MIRROR_TANK, true);
-                    }
-                    if (!pOff->HasAura(SPELL_BLOOD_MIRROR_OFF))
-                    {
-                        pTank->CastSpell(pOff, SPELL_BLOOD_MIRROR_OFF, true);
-                    }
+                    pOff->CastSpell(m_creature->getVictim(), SPELL_BLOOD_MIRROR_TANK, true);
+                    /*if (pOff->HasAura(SPELL_SHADOWS_EDGE) && !pOff->HasAura(SPELL_GUSHING_WOUND) && m_bIs25Man)
+                        pOff->CastSpell(pOff, SPELL_GUSHING_WOUND, true);*/
+                }
+                if (!pOff->HasAura(SPELL_BLOOD_MIRROR_OFF))
+                {
+                    m_creature->getVictim()->CastSpell(pOff, SPELL_BLOOD_MIRROR_OFF, true);
+                    /*if (m_creature->getVictim()->HasAura(SPELL_SHADOWS_EDGE) && !m_creature->getVictim()->HasAura(SPELL_GUSHING_WOUND) && m_bIs25Man)
+                        m_creature->getVictim()->CastSpell(m_creature->getVictim(), SPELL_GUSHING_WOUND, true);*/
                 }
             }
             m_uiBloodMirrorCheckTimer = 500;

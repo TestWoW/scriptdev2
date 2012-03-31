@@ -40,6 +40,8 @@ enum BossSpells
     SPELL_UNCHAINED_MAGIC       = 69762,
     SPELL_INSTABILITY           = 69766,
 
+    SPELL_FROST_INFUSION        = 72292,
+
     // Phase 2
 
     // Ice Tomb related
@@ -217,6 +219,23 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                             m_bAchievFail = true;
                         }
                     }
+                }
+            }
+        }
+    }
+
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    {
+        if (pTarget && pTarget->HasAura(SPELL_SHADOWS_EDGE))
+        {
+            if (pSpell->Id == 69649 ||     // Frost Breath (Sindragosa)
+                pSpell->Id == 71056 ||
+                pSpell->Id == 71057 ||
+                pSpell->Id == 71058)
+            {
+                if (m_bIs25Man)
+                {
+                    pTarget->CastSpell(pTarget, SPELL_FROST_INFUSION, true);
                 }
             }
         }
@@ -608,11 +627,6 @@ struct MANGOS_DLL_DECL mob_ice_tombAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_pInstance->GetData(TYPE_SINDRAGOSA) != IN_PROGRESS)
-        {
-            JustDied(m_creature);
-        }
-
         if (m_uiCheckTimer <= uiDiff)
         {
             if (Unit *pCreator = m_creature->GetCreator())

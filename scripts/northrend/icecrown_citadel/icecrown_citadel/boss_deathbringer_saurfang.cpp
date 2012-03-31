@@ -1453,7 +1453,10 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     void UpdateFightAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        {
+            //m_creature->AI()->EnterEvadeMode();
             return;
+        }
 
         if (!m_bAchievFailed)
         {
