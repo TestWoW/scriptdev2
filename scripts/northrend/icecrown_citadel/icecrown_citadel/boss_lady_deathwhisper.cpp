@@ -55,6 +55,8 @@ enum BossSpells
         // Vengeful Shade
         NPC_VENGEFUL_SHADE                      = 38222,
         SPELL_VENGEFUL_BLAST_AURA               = 71494, // must proc on melee hit
+
+        SPELL_ACHIEVEMENT_CREDIT                = 72827,
 };
 
 // talks
@@ -288,6 +290,21 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
 
         m_pInstance->SetData(TYPE_DEATHWHISPER, DONE);
 
+        if (CheckAchiev())
+        {
+            Map* pMap = m_creature->GetMap();
+            Map::PlayerList const& lPlayers = pMap->GetPlayers();
+
+            if (!lPlayers.isEmpty())
+            {
+                for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                    if (Player* pPlayer = itr->getSource())
+                        pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEVEMENT_CREDIT, 0, 0);
+                }
+            }
+        }
+
         DoScriptText(SAY_DEATH, m_creature);
     }
 
@@ -307,7 +324,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
         pSummoned->SetInCombatWithZone();
     }
 
-    void CheckAchiev()
+    bool CheckAchiev()
     {
         Unit *pAdherent = m_pInstance->GetSingleCreatureFromStorage(NPC_CULT_ADHERENT);
         Unit *pFanatic = m_pInstance->GetSingleCreatureFromStorage(NPC_CULT_FANATIC);
@@ -318,9 +335,9 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
         if (pAdherent && pFanatic && pDeformed && pBoneFanatic && pBoneAdherent &&
             pAdherent->isAlive() && pFanatic->isAlive() && pDeformed->isAlive() &&
             pBoneFanatic->isAlive() && pBoneAdherent->isAlive())
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, true);
+            return true;
         else
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, false);
+            return false;
     }
 
     void DoSummonShade()
@@ -399,13 +416,13 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
         else
             m_uiBerserkTimer -= uiDiff;
 
-        if (m_uiCheckTimer < uiDiff)
+        /*if (m_uiCheckTimer < uiDiff)
         {
             CheckAchiev();
             m_uiCheckTimer = 1000;
         }
         else
-            m_uiCheckTimer -= uiDiff;
+            m_uiCheckTimer -= uiDiff;*/
 
         if (m_uiDeathAndDecayTimer <= uiDiff)
         {
@@ -491,6 +508,14 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
                 }
                 else
                     m_uiSummonWaveTimer -= uiDiff;
+
+                if (m_uiFrostboltVolleyTimer <= uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_FROSTBOLT_VOLLEY) == CAST_OK)
+                        m_uiFrostboltVolleyTimer = urand(15000, 20000);
+                }
+                else
+                    m_uiFrostboltVolleyTimer -= uiDiff;
             }
 
             if (m_uiTouchOfInsignificanceTimer <= uiDiff)
@@ -511,14 +536,6 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
             }
             else
                 m_uiFrostboltTimer -= uiDiff;
-
-            if (m_uiFrostboltVolleyTimer <= uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_FROSTBOLT_VOLLEY) == CAST_OK)
-                    m_uiFrostboltVolleyTimer = urand(15000, 20000);
-            }
-            else
-                m_uiFrostboltVolleyTimer -= uiDiff;
 
             if (m_uiVengefulShadeTimer <= uiDiff)
             {

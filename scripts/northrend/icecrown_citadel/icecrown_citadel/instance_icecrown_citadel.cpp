@@ -385,7 +385,6 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
             if (uiData == IN_PROGRESS)
             {
                 DoCloseDoor(GO_ORATORY_DOOR);
-                SetSpecialAchievementCriteria(TYPE_FULL_HOUSE, false);
             }
             else
                 DoOpenDoor(GO_ORATORY_DOOR);
@@ -686,11 +685,6 @@ bool instance_icecrown_citadel::CheckAchievementCriteriaMeet(uint32 uiCriteriaId
     case CRITERIA_BONED_10H:
     case CRITERIA_BONED_25H:
         return m_abAchievCriteria[TYPE_BONED];
-    case CRITERIA_FULL_HOUSE_10N:
-    case CRITERIA_FULL_HOUSE_25N:
-    case CRITERIA_FULL_HOUSE_10H:
-    case CRITERIA_FULL_HOUSE_25H:
-        return m_abAchievCriteria[TYPE_FULL_HOUSE];
     case CRITERIA_IVE_MADE_AND_MESS_10N:
     case CRITERIA_IVE_MADE_AND_MESS_10H:
     case CRITERIA_IVE_MADE_AND_MESS_25N:
