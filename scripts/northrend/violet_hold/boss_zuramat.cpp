@@ -47,7 +47,7 @@ enum
     SPELL_VOID_SENTRY_AURA_H                  = 54351,
     SPELL_SHADOW_BOLT_VOLLEY                  = 54358, // 54342? 54358?
     SPELL_SHADOW_BOLT_VOLLEY_H                = 59747,
-    SPELL_VOID_SHIFTED                        = 54343,
+    SPELL_VOID_SHIFTED                        = 54343
 };
 
 struct MANGOS_DLL_DECL boss_zuramatAI : public ScriptedAI
@@ -76,6 +76,7 @@ struct MANGOS_DLL_DECL boss_zuramatAI : public ScriptedAI
         MovementStarted = false;
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
     }
 
     void JustReachedHome()
@@ -85,7 +86,6 @@ struct MANGOS_DLL_DECL boss_zuramatAI : public ScriptedAI
             m_pInstance->SetData(TYPE_ZURAMAT, FAIL);
             m_pInstance->SetData(TYPE_EVENT, FAIL);
             m_pInstance->SetData(TYPE_RIFT, FAIL);
-            m_pInstance->SetData(TYPE_ACHIEV_ZURAMAT, IN_PROGRESS);
 
             if(m_pInstance->GetData(TYPE_PORTAL6) == IN_PROGRESS) 
                 m_pInstance->SetData(TYPE_PORTAL6, NOT_STARTED);
@@ -204,13 +204,6 @@ struct MANGOS_DLL_DECL boss_zuramatAI : public ScriptedAI
         }
         else m_uiSummonVoidSentry_Timer -= uiDiff;
 
-        if (m_bIsRegularMode)
-            m_pInstance->SetData(TYPE_ACHIEV_ZURAMAT, FAIL);
-
-        if (Creature *pVoid = m_pInstance->GetSingleCreatureFromStorage(NPC_VOID_SENTRY))
-            if (!pVoid->isAlive())
-                 m_pInstance->SetData(TYPE_ACHIEV_ZURAMAT, FAIL);
-
         DoMeleeAttackIfReady();
     }
 
@@ -219,14 +212,10 @@ struct MANGOS_DLL_DECL boss_zuramatAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         DespawnSentry();
 
-        if (m_pInstance)
-        {
+        if (m_pInstance){
             m_pInstance->SetData(TYPE_ZURAMAT, DONE);
-
-            if(m_pInstance->GetData(TYPE_PORTAL6) == IN_PROGRESS) 
-               m_pInstance->SetData(TYPE_PORTAL6, DONE);
-            else 
-               m_pInstance->SetData(TYPE_PORTAL12, DONE);
+        if(m_pInstance->GetData(TYPE_PORTAL6) == IN_PROGRESS) {m_pInstance->SetData(TYPE_PORTAL6, DONE);}
+            else {m_pInstance->SetData(TYPE_PORTAL12, DONE);}
         }
     }
 

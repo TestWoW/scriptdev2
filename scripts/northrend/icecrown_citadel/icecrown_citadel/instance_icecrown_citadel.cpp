@@ -770,7 +770,6 @@ InstanceData* GetInstanceData_instance_icecrown_citadel(Map* pMap)
     return new instance_icecrown_citadel(pMap);
 }
 
-
 void AddSC_instance_icecrown_citadel()
 {
     Script* pNewScript;

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -13,11 +13,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+// Jaraxxus - Magic aura (from start?) not fully offlike implemented.
+// Legion flame visual effect not imlemented
 
 /* ScriptData
-SDName: boss_jaraxxus
-SDComment:
-SDAuthor: by Walkum, achievs and improves by carlos93.
+SDName: trial_of_the_crusader
+SD%Complete: 80%
+SDComment: by /dev/rsa
+SDCategory: Crusader Coliseum
 EndScriptData */
 
 #include "precompiled.h"
@@ -108,6 +111,8 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
     uint32 m_uiEnrageTimer;
     uint32 m_uiCheckTimer;
 
+    std::list<Creature*> mistressEntryList;
+
     void Reset() 
     {
         if (!m_pInstance) 
@@ -126,6 +131,8 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         m_uiCheckTimer              = 1000;
 
         m_creature->SetRespawnDelay(DAY);
+
+        mistressEntryList.clear();
     }
 
     void JustReachedHome()
@@ -169,7 +176,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
 
     void CheckAchiev()
     {
-        std::list<Creature*> mistressEntryList;
+        mistressEntryList.clear();
         GetCreatureListWithEntryInGrid(mistressEntryList, m_creature, NPC_MISTRESS, 250.0f);
 
         if (mistressEntryList.empty())

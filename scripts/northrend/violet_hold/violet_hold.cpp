@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -137,12 +137,11 @@ struct MANGOS_DLL_DECL mob_vh_dragonsAI : public ScriptedAI
         m_uiBackstab_Timer = 7100;
         m_uiBlink_Timer = 7000;
 
-        if (creatureEntry == NPC_KEEPER
-            || creatureEntry == NPC_GUARDIAN)
+        if (creatureEntry == NPC_KEEPER || creatureEntry == NPC_GUARDIAN)
         {
             SetCombatMovement(false);
             m_creature->GetMotionMaster()->MoveRandom();
-        };
+        }
 
     }
 

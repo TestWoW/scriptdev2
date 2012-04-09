@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -32,9 +32,7 @@ EndScriptData */
 */
 
 instance_halls_of_lightning::instance_halls_of_lightning(Map* pMap) : ScriptedInstance(pMap),
-    m_uiGolemsKilled(0),
-    m_bTimely(false),
-    m_bEmpowered(false)
+    m_bIsShatterResistant(false)
 {
     Initialize();
 }
@@ -50,28 +48,8 @@ void instance_halls_of_lightning::OnCreatureCreate(Creature* pCreature)
     {
         case NPC_BJARNGRIM:
         case NPC_IONAR:
-        case NPC_GOLEM:
+        case NPC_VOLKHAN_ANVIL:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
-            break;
-    }
-}
-
-void instance_halls_of_lightning::OnCreatureDeath(Creature* pCreature)
-{
-    switch(pCreature->GetEntry())
-    {
-        case NPC_GOLEM:
-            ++m_uiGolemsKilled;
-            break;
-    }
-}
-
-void instance_halls_of_lightning::OnCreatureEnterCombat(Creature* pCreature)
-{
-    switch(pCreature->GetEntry())
-    {
-        case NPC_VOLKHAN:
-            m_uiGolemsKilled = 0;
             break;
     }
 }
@@ -86,10 +64,6 @@ void instance_halls_of_lightning::OnObjectCreate(GameObject* pGo)
             break;
         case GO_IONAR_DOOR:
             if (m_auiEncounter[TYPE_IONAR] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            break;
-        case GO_LOKEN_DOOR:
-            if (m_auiEncounter[TYPE_LOKEN] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_LOKEN_THRONE:
@@ -111,6 +85,10 @@ void instance_halls_of_lightning::SetData(uint32 uiType, uint32 uiData)
         case TYPE_VOLKHAN:
             if (uiData == DONE)
                 DoUseDoorOrButton(GO_VOLKHAN_DOOR);
+            if (uiData == IN_PROGRESS)
+                m_bIsShatterResistant = true;
+            if (uiData == SPECIAL)
+                m_bIsShatterResistant = false;
             m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_IONAR:
@@ -123,19 +101,11 @@ void instance_halls_of_lightning::SetData(uint32 uiType, uint32 uiData)
                 DoStartTimedAchievement(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEV_START_LOKEN_ID);
             if (uiData == DONE)
             {
-                //DoUseDoorOrButton(GO_LOKEN_DOOR);
-
                 //Appears to be type 5 GO with animation. Need to figure out how this work, code below only placeholder
                 if (GameObject* pGlobe = GetSingleGameObjectFromStorage(GO_LOKEN_THRONE))
                     pGlobe->SetGoState(GO_STATE_ACTIVE);
             }
             m_auiEncounter[uiType] = uiData;
-            break;
-        case TYPE_STRUCK:
-            m_bEmpowered = (uiData == DONE);
-            break;
-        case TYPE_TIMELY:
-            m_bTimely = (uiData == FAIL);
             break;
     }
 
@@ -163,17 +133,10 @@ uint32 instance_halls_of_lightning::GetData(uint32 uiType)
 
 bool instance_halls_of_lightning::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
 {
-    switch (uiCriteriaId)
-    {
-        case ACHIEV_STRUCK:
-            return m_bEmpowered;
-        case ACHIEV_SHATTER:
-            return m_uiGolemsKilled <= 4;
-        case ACHIEV_TIMELY:
-            return !m_bTimely;
-        default:
-            return false;
-    }
+    if (uiCriteriaId == ACHIEV_CRIT_RESISTANT)
+        return m_bIsShatterResistant;
+
+    return false;
 }
 
 void instance_halls_of_lightning::Load(const char* chrIn)

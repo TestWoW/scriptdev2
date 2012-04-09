@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -36,9 +36,7 @@ npc_garments_of_quests   80%    NPC's related to all Garments of-quests 5621, 56
 npc_injured_patient     100%    patients for triage-quests (6622 and 6624)
 npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
 npc_innkeeper            25%    ScriptName not assigned. Innkeepers in general.
-npc_lunaclaw_spirit     100%    Appears at two different locations, quest 6001/6002
 npc_mount_vendor        100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
-npc_rogue_trainer        80%    Scripted trainers, so they are able to offer item 17126 for class quest 6681
 npc_sayge               100%    Darkmoon event fortune teller, buff player based on answers given
 npc_tabard_vendor        50%    allow recovering quest related tabards, achievement related ones need core support
 npc_locksmith            75%    list of keys needs to be confirmed
@@ -1104,40 +1102,6 @@ bool GossipSelect_npc_innkeeper(Player* pPlayer, Creature* pCreature, uint32 uiS
 }
 
 /*######
-## npc_lunaclaw_spirit
-######*/
-
-enum
-{
-    QUEST_BODY_HEART_A      = 6001,
-    QUEST_BODY_HEART_H      = 6002,
-
-    TEXT_ID_DEFAULT         = 4714,
-    TEXT_ID_PROGRESS        = 4715
-};
-
-#define GOSSIP_ITEM_GRANT   "You have thought well, spirit. I ask you to grant me the strength of your body and the strength of your heart."
-
-bool GossipHello_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(QUEST_BODY_HEART_A) == QUEST_STATUS_INCOMPLETE || pPlayer->GetQuestStatus(QUEST_BODY_HEART_H) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_GRANT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-    pPlayer->SEND_GOSSIP_MENU(TEXT_ID_DEFAULT, pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
-    {
-        pPlayer->SEND_GOSSIP_MENU(TEXT_ID_PROGRESS, pCreature->GetObjectGuid());
-        pPlayer->AreaExploredOrEventHappens((pPlayer->GetTeam() == ALLIANCE) ? QUEST_BODY_HEART_A : QUEST_BODY_HEART_H);
-    }
-    return true;
-}
-
-/*######
 ## npc_mount_vendor
 ######*/
 
@@ -1223,36 +1187,6 @@ bool GossipSelect_npc_mount_vendor(Player* pPlayer, Creature* pCreature, uint32 
         pPlayer->SEND_VENDORLIST(pCreature->GetObjectGuid());
 
     return true;
-}
-
-/*######
-## npc_rogue_trainer
-######*/
-
-bool GossipHello_npc_rogue_trainer(Player* pPlayer, Creature* pCreature)
-{
-   if (pPlayer->getClass() != CLASS_ROGUE) return false;
-
-   if (pPlayer->getLevel() >= 24 && !pPlayer->HasItemCount(17126,1) && !pPlayer->GetQuestRewardStatus(6681))
-        if (pCreature->isQuestGiver())
-        {
-            pPlayer->PrepareGossipMenu(pCreature,50195);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<Take the letter>", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->SEND_GOSSIP_MENU(5996, pCreature->GetObjectGuid());
-            return true;
-        }
-    return false;
-}
-
-bool GossipSelect_npc_rogue_trainer(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF)
-    {
-        pPlayer->CastSpell(pPlayer,21100,false);
-        pPlayer->CLOSE_GOSSIP_MENU();
-        return true;
-    } 
-    else return false;
 }
 
 /*######
@@ -2391,245 +2325,6 @@ CreatureAI* GetAI_npc_shade_of_horseman(Creature* pCreature)
     return new npc_shade_of_horsemanAI (pCreature);
 };
 
-bool GossipHello_pilgrim_table(Player* pPlayer, Creature* pCreature)
-{
-    char const* GOSSIP_SIT;
-    char const* GOSSIP_WAR_FOOD;
-    char const* GOSSIP_SHARE_FOOD;
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-     case LOCALE_enUS:
-     case LOCALE_koKR:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-                      GOSSIP_SIT         = "Sentarse a comer.";
-                      GOSSIP_WAR_FOOD    = "Lanzar comida a alguien.";
-                      GOSSIP_SHARE_FOOD  = "Ofrecer comida a alguien.";
-                      break;
-     case LOCALE_esMX:
-                      GOSSIP_SIT         = "Sentarse a comer.";
-                      GOSSIP_WAR_FOOD    = "Lanzar comida a alguien.";
-                      GOSSIP_SHARE_FOOD  = "Ofrecer comida a alguien.";
-                      break;
-     case LOCALE_ruRU:
-     default:
-                      GOSSIP_SIT         = "Sit down.";
-                      GOSSIP_WAR_FOOD    = "Throw food.";
-                      GOSSIP_SHARE_FOOD  = "Offer food.";
-                      break;
-    };
-
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SIT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WAR_FOOD, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SHARE_FOOD, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-
-    pPlayer->SEND_GOSSIP_MENU(50001, pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_pilgrim_table(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch(uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CastSpell(pPlayer,65403,false);
-            pPlayer->CastSpell(pPlayer,61849,true);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(3579);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(3558);
-            break;
-    }
-    return true;
-}
-
-bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
-{
-    char const* GOSSIP_LONELY;
-    char const* GOSSIP_NAXXRAMAS;
-    char const* GOSSIP_DISASTER;
-    char const* GOSSIP_HOLIDAY;
-    char const* GOSSIP_WINTERN;
-    char const* GOSSIP_KING;
-    char const* GOSSIP_PINKY;
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-     
-     case LOCALE_koKR:
-     case LOCALE_zhCN:
-     case LOCALE_zhTW:
-     case LOCALE_esES:
-     case LOCALE_esMX:
-                      GOSSIP_LONELY         = "Me siento sólo, we.";
-                      GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
-                      GOSSIP_DISASTER       = "Te voy a dar un beso, guapetón.";
-                      GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
-                      GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
-                      GOSSIP_KING	    = "Rey del Festival de Fuego";
-                      GOSSIP_PINKY	    = "El resplandor rosa del cohete";
-                      break;
-     case LOCALE_ruRU:
-     case LOCALE_enUS:
-     case LOCALE_frFR:
-     case LOCALE_deDE:
-     default:
-                      GOSSIP_LONELY         = "I'm lonely, goblin.";
-                      GOSSIP_NAXXRAMAS      = "You are sad, crazy.";
-                      GOSSIP_DISASTER       = "Kiss me, baby.";
-                      GOSSIP_HOLIDAY        = "It's time to get one surprise.";
-                      GOSSIP_WINTERN        = "We wish you a merry achievement.";
-                      GOSSIP_KING           = "King of the Fire Festival";
-                      GOSSIP_PINKY          = "The Rocket's Pink Glare";
-                      break;
-    };
-
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_LONELY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NAXXRAMAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_DISASTER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_KING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-
-    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_logroneitor_horde(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch(uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1291);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1704);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1280);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(271);
-            pPlayer->CompletedAchievement(272);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(252);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+6:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1145);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+7:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1696);
-            break;
-        default:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            break;
-    }
-    return true;
-}
-
-bool GossipHello_logroneitor_alliance(Player* pPlayer, Creature* pCreature)
-{
-    char const* GOSSIP_LONELY;
-    char const* GOSSIP_NAXXRAMAS;
-    char const* GOSSIP_HOLIDAY;
-    char const* GOSSIP_WINTERN;
-    char const* GOSSIP_KING;
-    char const* GOSSIP_PINKY;
-	
-
-    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
-    {
-    case LOCALE_koKR:
-    case LOCALE_zhCN:
-    case LOCALE_zhTW:
-    case LOCALE_esES:
-    case LOCALE_esMX:
-                     GOSSIP_LONELY         = "Me siento sólo, we.";
-                     GOSSIP_NAXXRAMAS      = "Me das pena, loco.";
-                     GOSSIP_HOLIDAY        = "Llevo mucho tiempo queriendo algo...";
-                     GOSSIP_WINTERN        = "Navidaaad, navidaaad, quiero mi logro de navidaaad...";
-                     GOSSIP_KING	    = "Rey del Festival de Fuego";
-                     GOSSIP_PINKY	    = "El resplandor rosa del cohete";
-                     break;
-    case LOCALE_ruRU:
-    case LOCALE_enUS:
-    case LOCALE_frFR:
-    case LOCALE_deDE:
-    default:
-                     GOSSIP_LONELY         = "I'm lonely, goblin.";
-                     GOSSIP_NAXXRAMAS      = "You are sad, crazy.";
-                     GOSSIP_HOLIDAY        = "It's time to get one surprise.";
-                     GOSSIP_WINTERN        = "We wish you a merry achievement.";
-                     GOSSIP_KING           = "King of the Fire Festival";
-                     GOSSIP_PINKY          = "The Rocket's Pink Glare";
-                     break;
-    };
-
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_LONELY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NAXXRAMAS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HOLIDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_WINTERN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_KING, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-
-    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_logroneitor_alliance(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch(uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1291);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1704);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(271);
-            pPlayer->CompletedAchievement(272);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(252);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1145);
-            break;
-        case GOSSIP_ACTION_INFO_DEF+6:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->CompletedAchievement(1696);
-            break;
-        default:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            break;
-    }
-    return true;
-}
-
 /*########
 npc_wild_turkey
 #########*/
@@ -2656,7 +2351,7 @@ struct MANGOS_DLL_DECL npc_wild_turkeyAI : public ScriptedAI
     {
         DoMeleeAttackIfReady();
     }
-
+    
     void JustDied(Unit* pKiller)
     {
         if (pKiller && pKiller->GetTypeId() == TYPEID_PLAYER)
@@ -2701,9 +2396,9 @@ CreatureAI* GetAI_npc_wild_turkey(Creature* pCreature)
     return new npc_wild_turkeyAI (pCreature);
 };
 
-/*######
-## npc_experience
-######*/
+/*###### 
+## npc_experience 
+######*/ 
 
 #define EXP_COST                100000//10 00 00 copper (10golds)
 #define GOSSIP_TEXT_EXP         14736
@@ -2806,21 +2501,9 @@ void AddSC_npcs_special()
     pNewScript->RegisterSelf(false);                         // script and error report disabled, but script can be used for custom needs, adding ScriptName
 
     pNewScript = new Script;
-    pNewScript->Name = "npc_lunaclaw_spirit";
-    pNewScript->pGossipHello =  &GossipHello_npc_lunaclaw_spirit;
-    pNewScript->pGossipSelect = &GossipSelect_npc_lunaclaw_spirit;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
     pNewScript->Name = "npc_mount_vendor";
     pNewScript->pGossipHello =  &GossipHello_npc_mount_vendor;
     pNewScript->pGossipSelect = &GossipSelect_npc_mount_vendor;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_rogue_trainer";
-    pNewScript->pGossipHello =  &GossipHello_npc_rogue_trainer;
-    pNewScript->pGossipSelect = &GossipSelect_npc_rogue_trainer;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -2881,28 +2564,10 @@ void AddSC_npcs_special()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "pilgrim_table";
-    pNewScript->pGossipHello = &GossipHello_pilgrim_table;
-    pNewScript->pGossipSelect = &GossipSelect_pilgrim_table;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "logroneitor_horde";
-    pNewScript->pGossipHello = &GossipHello_logroneitor_horde;
-    pNewScript->pGossipSelect = &GossipSelect_logroneitor_horde;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "logroneitor_alliance";
-    pNewScript->pGossipHello = &GossipHello_logroneitor_alliance;
-    pNewScript->pGossipSelect = &GossipSelect_logroneitor_alliance;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
     pNewScript->Name = "npc_wild_turkey";
     pNewScript->GetAI = &GetAI_npc_wild_turkey;
     pNewScript->RegisterSelf();
-
+    
     pNewScript = new Script;
     pNewScript->Name = "npc_experience";
     pNewScript->pGossipHello =  &GossipHello_npc_experience;

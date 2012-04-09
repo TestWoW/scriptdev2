@@ -331,8 +331,6 @@ struct MANGOS_DLL_DECL boss_varosAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        m_creature->SetInCombatWithZone();
-
         if(m_uiCheckTimer < uiDiff)
         {
             CheckVehicle();

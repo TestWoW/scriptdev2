@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -35,10 +35,10 @@ enum
     SPELL_PORTAL_BEAM               = 56046,
 
     //////////////// PHASE 1 ////////////////
-    SPELL_ARCANE_BREATH_10          = 56272,
-    SPELL_ARCANE_BREATH_25          = 60072,
-    SPELL_ARCANE_STORM_10           = 61693,
-    SPELL_ARCANE_STORM_25           = 61694,
+    SPELL_ARCANE_BREATH             = 56272,
+    SPELL_ARCANE_BREATH_H           = 60072,
+    SPELL_ARCANE_STORM              = 61693,
+    SPELL_ARCANE_STORM_H            = 61694,
     SPELL_VORTEX                    = 56105,
     SPELL_VORTEX_DMG_AURA           = 56266, // on 10 sec, deal 2000 damage all player around caster
     SPELL_VORTEX_VISUAL             = 55873, // visual effect around platform. summon trigger
@@ -50,7 +50,7 @@ enum
     //////////////// PHASE 2 ////////////////
     SPELL_ARCANE_BOMB_MISSILE       = 56430,
     SPELL_ARCANE_BOMB_DAMAGE        = 56431, // cast by arcane overload
-    SPELL_ARCANE_OVERLOAD           = 51052, // cast this on arcane overload NPCs
+    SPELL_ARCANE_OVERLOAD           = 56432, // cast this on arcane overload NPCs
     SPELL_SURGE_OF_POWER_BREATH     = 56505, // omfg, they say deep breath, but its this!
     SPELL_DESTROY_PLATFORM_PRE      = 58842, // lights all over the platform
     SPELL_DESTROY_PLATFORM_BOOM     = 59084, // Big Blue boom
@@ -63,8 +63,8 @@ enum
     //////////////// PHASE 3 ////////////////
     SPELL_STATIC_FIELD_MISSILE      = 57430,
     SPELL_STATIC_FIELD              = 57428,
-    SPELL_SURGE_OF_POWER_10         = 57407, // this is on one target
-    SPELL_SURGE_OF_POWER_25         = 60936, // this is on unlimited tagets, must limit it in mangos
+    SPELL_SURGE_OF_POWER            = 57407, // this is on one target
+    SPELL_SURGE_OF_POWER_H          = 60936, // this is on unlimited tagets, must limit it in mangos
     SPELL_ARCANE_PULSE              = 57432,
 
     SPELL_ALEXSTRASZAS_GIFT_BEAM    = 61028,
@@ -72,8 +72,8 @@ enum
 
     // ******************************** Items, NPCs & GameObjects ******************************** //
 
-    ITEM_KEY_TO_FOCUSING_IRIS_10    = 44582,
-    ITEM_KEY_TO_FOCUSING_IRIS_25    = 44581,
+    ITEM_KEY_TO_FOCUSING_IRIS       = 44582,
+    ITEM_KEY_TO_FOCUSING_IRIS_H     = 44581,
 
     //////////////// PHASE 1 ////////////////
     NPC_VORTEX                      = 30090,
@@ -166,17 +166,7 @@ enum
 
     //hacks
     SPELL_FLIGHT                    = 59553,
-    MODEL_ID_INVISIBLE              = 11686,
-
-    // Achievements
-    ACHIEV_6MIN_10                  = 1874,
-    ACHIEV_6MIN_25                  = 1875,
-    ACHIEV_KILL_10                  = 622,
-    ACHIEV_KILL_25                  = 623,
-    ACHIEV_LOW_RAID_10              = 1869,
-    ACHIEV_LOW_RAID_25              = 1870,
-    ACHIEV_SCIOR_10                 = 2148,
-    ACHIEV_SCIOR_25                 = 2149,
+    MODEL_ID_INVISIBLE              = 11686
 };
 
 struct LocationsXY
@@ -239,15 +229,11 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
-    bool m_bIs25Man;
-
-    Difficulty m_uiMapDifficulty;
 
     uint8 m_uiPhase;
     uint8 m_uiSubPhase;
@@ -347,17 +333,6 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        m_pInstance->DoCompleteAchievement(m_bIs25Man ? ACHIEV_KILL_25 : ACHIEV_KILL_10);
-
-        Map* pMalygos = m_creature->GetMap();
-        if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_10MAN_NORMAL)
-        if (pMalygos->GetPlayersCountExceptGMs() <= 9)
-            m_pInstance->DoCompleteAchievement(ACHIEV_LOW_RAID_10);
-
-        if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_25MAN_NORMAL)
-        if (pMalygos->GetPlayersCountExceptGMs() <= 21)
-            m_pInstance->DoCompleteAchievement(ACHIEV_LOW_RAID_25);
-
         DoScriptText(SAY_DEATH, m_creature);
         DespawnCreatures(NPC_STATIC_FIELD);
         m_creature->SummonCreature(NPC_ALEXSTRASZA, CENTER_X+20.0f, CENTER_Y+20.0f, AIR_Z, 0, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -400,10 +375,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
         {
             pUnit->CastSpell(pUnit, SPELL_ARCANE_BOMB_DAMAGE, true);
             pUnit->CastSpell(pUnit, SPELL_ARCANE_OVERLOAD, false, 0, 0, m_creature->GetObjectGuid());
-            pUnit->CastSpell(pUnit, SPELL_ARCANE_OVERLOAD, false, 0, 0, m_creature->GetObjectGuid());
-            pUnit->CastSpell(pUnit, SPELL_ARCANE_OVERLOAD, false, 0, 0, m_creature->GetObjectGuid());
-            pUnit->CastSpell(pUnit, SPELL_ARCANE_OVERLOAD, false, 0, 0, m_creature->GetObjectGuid());
-            //pUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
     }
 
@@ -745,7 +717,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
 
             if (m_uiArcaneBreathTimer <= uiDiff)
             {
-                DoCast(m_creature, m_bIs25Man ? SPELL_ARCANE_BREATH_25 : SPELL_ARCANE_BREATH_10);
+                DoCast(m_creature, m_bIsRegularMode ? SPELL_ARCANE_BREATH : SPELL_ARCANE_BREATH_H);
                 m_uiArcaneBreathTimer = urand(13000, 16000);
             }
             else
@@ -753,7 +725,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
 
             if (m_uiArcaneStormTimer <= uiDiff)
             {
-                DoCastSpellIfCan(m_creature, m_bIs25Man ? SPELL_ARCANE_STORM_25 : SPELL_ARCANE_STORM_10);
+                DoCastSpellIfCan(m_creature, m_bIsRegularMode ? SPELL_ARCANE_STORM : SPELL_ARCANE_STORM_H);
                 m_uiArcaneStormTimer = urand(10000, 15000);
             }
             else
@@ -801,7 +773,6 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                 if (m_creature->GetHealthPercent() <= 50.0f)
                 {
                     m_creature->InterruptNonMeleeSpells(true);
-                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     DoScriptText(SAY_END_PHASE1, m_creature);
                     DespawnCreatures(NPC_POWER_SPARK);
                     m_uiPhase = PHASE_ADDS;
@@ -1018,7 +989,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
 
             if (m_uiArcaneStormTimer <= uiDiff)
             {
-                DoCast(m_creature, m_bIs25Man ? SPELL_ARCANE_STORM_25 : SPELL_ARCANE_STORM_10);
+                DoCast(m_creature, m_bIsRegularMode ? SPELL_ARCANE_STORM : SPELL_ARCANE_STORM_H);
                 m_uiArcaneStormTimer = urand(6000, 10000);
             }
             else
@@ -1058,7 +1029,7 @@ struct MANGOS_DLL_DECL boss_malygosAI : public ScriptedAI
                             m_uiTimer = 6500;
                             if (urand(0, 1))
                                 DoScriptText(SAY_SURGE_OF_POWER, m_creature);
-                            DoCast(pTarget, m_bIs25Man ? SPELL_SURGE_OF_POWER_25 : SPELL_SURGE_OF_POWER_10);
+                            DoCast(pTarget, m_bIsRegularMode ? SPELL_SURGE_OF_POWER : SPELL_SURGE_OF_POWER_H);
                             break;
                         }
                 }
@@ -1266,17 +1237,12 @@ struct MANGOS_DLL_DECL npc_scion_of_eternityAI : public ScriptedAI
 {
     npc_scion_of_eternityAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
-    bool m_bIs25Man;
     uint32 m_uiArcaneBarrageTimer;
-    Difficulty m_uiMapDifficulty;
 
     void Reset()
     {
@@ -1304,14 +1270,6 @@ struct MANGOS_DLL_DECL npc_scion_of_eternityAI : public ScriptedAI
             m_uiArcaneBarrageTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
-    }
-
-    void JustDied(Unit* killer)
-    {
-         if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_10MAN_NORMAL) 
-             m_pInstance->DoCompleteAchievement(ACHIEV_SCIOR_10);
-         if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_25MAN_NORMAL) 
-             m_pInstance->DoCompleteAchievement(ACHIEV_SCIOR_25);
     }
 }; 
 
@@ -1434,8 +1392,6 @@ struct MANGOS_DLL_DECL npc_alexstraszaAI : public ScriptedAI
                     m_uiTimer = 19500;
                     break;
                 case 4:
-                    m_creature->SummonGameobject(190816, 753.751f, 1303.47f, 214.64f, 0, 0);
-                    m_creature->SummonGameobject(190816, 759.5f, 1328.27f, 258.741f, 0, 0);
                     DoCast(m_creature, SPELL_ALEXSTRASZAS_GIFT_BEAM);
                        m_uiTimer = 3000;
                     break;

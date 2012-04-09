@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -40,20 +40,6 @@ void instance_forge_of_souls::OnCreatureCreate(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
     {
-        case NPC_SILVANA_BEGIN:
-        case NPC_SILVANA_END:
-        case NPC_JAINA_BEGIN:
-        case NPC_JAINA_END:
-        case NPC_ARCHMAGE_ELANDRA:
-        case NPC_ARCHMAGE_KORELN:
-        case NPC_DARK_RANGER_KALIRA:
-        case NPC_DARK_RANGER_LORALEN:
-        case NPC_COLISEUM_CHAMPION_A_P:
-        case NPC_COLISEUM_CHAMPION_A_F:
-        case NPC_COLISEUM_CHAMPION_A_M:
-        case NPC_COLISEUM_CHAMPION_H_F:
-        case NPC_COLISEUM_CHAMPION_H_T:
-        case NPC_COLISEUM_CHAMPION_H_M:
         case NPC_DEVOURER_OF_SOULS:
         case NPC_BRONJAHM:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();

@@ -17,7 +17,7 @@
 
 /* ScriptData
 SDName: Boss_Drakos
-SD%Complete:
+SD%Complete: 80%
 SDComment:
 SDAuthor:
 SDCategory: Oculus
@@ -41,8 +41,6 @@ enum
     SAY_STOMP_2                                   = -1578010,
     SAY_STOMP_3                                   = -1578011,
 
-    SAY_BELGAR                                    = -1578040,
-
     SPELL_MAGIC_PULL                              = 51336,
     SPELL_MAGIC_PULL_EFFECT                       = 50770,
     SPELL_THUNDERING_STOMP_N                      = 50774,
@@ -58,123 +56,6 @@ enum
 /****
 * Boss_Drakos
 ****/
-
-struct MANGOS_DLL_DECL drakos_eventAI : public ScriptedAI
-{
-    drakos_eventAI(Creature *pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    bool m_bIsRegularMode;
-
-    uint32 m_uiStep;
-    uint32 m_uiPhase_timer;
-
-    bool m_bIsOutro;
-
-    void Reset()
-    {
-        m_bIsOutro        = true;
-        m_uiPhase_timer   = 3000;
-        m_uiStep          = 1;
-
-        if (Creature* pEternos = m_pInstance->GetSingleCreatureFromStorage(NPC_ETERNOS))
-        {
-            pEternos->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        }
-        if (Creature* pVerdisa = m_pInstance->GetSingleCreatureFromStorage(NPC_VERDISA))
-        {
-            pVerdisa->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        }
-        if (Creature* pBelgar = m_pInstance->GetSingleCreatureFromStorage(NPC_BELGAR))
-        {
-            pBelgar->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-        }
-    }
-
-    void JumpToNextStep(uint32 uiTimer)
-    {
-        m_uiPhase_timer = uiTimer;
-        m_uiStep++;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if(m_bIsOutro)
-        {
-        if (m_uiPhase_timer <= uiDiff)
-        {
-            switch(m_uiStep)
-            {
-                case 1:
-                    if (GameObject* pDoorOne = m_pInstance->GetSingleGameObjectFromStorage(GO_DRAGON_CAGE_DOOR_1))
-                    {
-                        pDoorOne->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    if (GameObject* pDoorTwo = m_pInstance->GetSingleGameObjectFromStorage(GO_DRAGON_CAGE_DOOR_2))
-                    {
-                        pDoorTwo->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    if (GameObject* pDoorThree = m_pInstance->GetSingleGameObjectFromStorage(GO_DRAGON_CAGE_DOOR_3))
-                    {
-                        pDoorThree->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    JumpToNextStep(4000);
-                    break;
-                case 2:
-                    if (Creature* pEternos = m_pInstance->GetSingleCreatureFromStorage(NPC_ETERNOS))
-                    {
-                        pEternos->GetMotionMaster()->MovePoint(0, 942.89f, 1059.64f, 359.96f);
-                    }
-                    if (Creature* pVerdisa = m_pInstance->GetSingleCreatureFromStorage(NPC_VERDISA))
-                    {
-                        pVerdisa->GetMotionMaster()->MovePoint(0, 949.44f, 1033.27f, 359.96f);
-                    }
-                    if (Creature* pBelgar = m_pInstance->GetSingleCreatureFromStorage(NPC_BELGAR))
-                    {
-                        pBelgar->GetMotionMaster()->MovePoint(0, 941.19f, 1043.98f, 359.96f);
-                    }
-                    JumpToNextStep(4000);
-                    break;
-                case 3:
-                    if (Creature* pEternos = m_pInstance->GetSingleCreatureFromStorage(NPC_ETERNOS))
-                    {
-                        pEternos->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    }
-                    if (Creature* pVerdisa = m_pInstance->GetSingleCreatureFromStorage(NPC_VERDISA))
-                    {
-                        pVerdisa->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    }
-                    if (Creature* pBelgar = m_pInstance->GetSingleCreatureFromStorage(NPC_BELGAR))
-                    {
-                        pBelgar->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    }
-                    JumpToNextStep(1000);
-                    break;
-                case 4:
-                    if (Creature* pBelgar = m_pInstance->GetSingleCreatureFromStorage(NPC_BELGAR))
-                    {
-                        DoScriptText(SAY_BELGAR, pBelgar);
-                    }
-                    JumpToNextStep(4000);
-                    break;
-                case 5:
-                    break;
-            }
-        }
-        else m_uiPhase_timer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_drakos_event(Creature* pCreature)
-{
-    return new drakos_eventAI(pCreature);
-}
 
 struct MANGOS_DLL_DECL boss_drakosAI : public ScriptedAI
 {
@@ -222,8 +103,6 @@ struct MANGOS_DLL_DECL boss_drakosAI : public ScriptedAI
 
     void JustDied(Unit* killer)
     {
-        m_creature->SummonCreature(NPC_TRIGGER, 940.41f, 1043.79f, 359.96f, 0.21, TEMPSUMMON_MANUAL_DESPAWN, 30000);
-
         DoScriptText(SAY_DEATH, m_creature);
 
         if (m_pInstance)
@@ -403,11 +282,6 @@ CreatureAI* GetAI_npc_unstable_sphere(Creature* pCreature)
 void AddSC_boss_drakos()
 {
     Script *pNewScript;
-
-    pNewScript = new Script;
-    pNewScript->Name = "drakos_event";
-    pNewScript->GetAI = &GetAI_drakos_event;
-    pNewScript->RegisterSelf();
 
     pNewScript = new Script;
     pNewScript->Name = "boss_drakos";

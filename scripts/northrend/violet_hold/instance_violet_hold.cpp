@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -44,8 +44,6 @@ struct MANGOS_DLL_DECL instance_violet_hold : public ScriptedInstance
     std::string m_strInstData;
 
     bool bIsInBoss;
-    bool m_bCriteriaDanceWithVoidFailed;
-    bool m_bCriteriaDeshidratationFailed;
 
     uint8 m_uiLastBossID;
     uint8 m_uiLastBossIDConst;
@@ -193,12 +191,7 @@ struct MANGOS_DLL_DECL instance_violet_hold : public ScriptedInstance
             case TYPE_LASTBOSS_ID:
             m_uiLastBossIDConst = uiData;
             break;
-            case TYPE_ACHIEV_ZURAMAT:
-            m_bCriteriaDanceWithVoidFailed = (uiData == FAIL);
-            return;
-            case TYPE_ACHIEV_ICHORON:
-            m_bCriteriaDeshidratationFailed = (uiData == FAIL);
-            return;
+
         }
         if (uiData == DONE)
         {
@@ -274,21 +267,6 @@ struct MANGOS_DLL_DECL instance_violet_hold : public ScriptedInstance
                 return m_uiDisruptions;
         }
         return 0;
-    }
-
-    bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
-    {
-        switch (uiCriteriaId)
-        {
-            case ACHIEV_DEHYDRATATION:
-                return !m_bCriteriaDeshidratationFailed;
-            case ACHIEV_VOID_DANCE:
-                return !m_bCriteriaDanceWithVoidFailed;
-            case ACHIEV_DEFENSELESS:
-                return m_uiShieldPercent >= 100;
-            default:
-                return false;
-        }
     }
 
 const char* Save()
