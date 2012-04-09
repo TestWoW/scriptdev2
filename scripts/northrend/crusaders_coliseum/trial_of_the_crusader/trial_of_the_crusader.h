@@ -1,18 +1,6 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
+/* Copyright (C) 2009 - 2010 by /dev/rsa for ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+ * This program is free software licensed under GPL version 2
+ * Please see the included DOCS/LICENSE.TXT for more information */
 
 #ifndef DEF_CRUSADER_H
 #define DEF_CRUSADER_H
@@ -234,12 +222,12 @@ enum NorthrendBeasts
 
 enum AnnounserMessages
 {
-    MSG_BEASTS                      = 724001,
-    MSG_JARAXXUS                    = 724002,
-    MSG_CRUSADERS                   = 724003,
-    MSG_VALKIRIES                   = 724004,
-    MSG_LICH_KING                   = 724005,
-    MSG_ANUBARAK                    = 724006,
+    MSG_BEASTS                 = 724001,
+    MSG_JARAXXUS               = 724002,
+    MSG_CRUSADERS              = 724003,
+    MSG_VALKIRIES              = 724004,
+    MSG_LICH_KING              = 724005,
+    MSG_ANUBARAK               = 724006,
 };
 
 class MANGOS_DLL_DECL instance_trial_of_the_crusader : public BSWScriptedInstance

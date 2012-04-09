@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: Boss_Blackheart_the_Inciter
-SD%Complete: 60
-SDComment: Incite Chaos needs further research and core support
+SD%Complete: 75
+SDComment: Incite Chaos not functional since core lacks Mind Control support
 SDCategory: Auchindoun, Shadow Labyrinth
 EndScriptData */
 
@@ -26,7 +26,8 @@ EndScriptData */
 
 enum
 {
-    SPELL_INCITE_CHAOS      = 33676,                        // triggers 33684 on party members - needs core support
+    SPELL_INCITE_CHAOS      = 33676,
+    SPELL_INCITE_CHAOS_B    = 33684,                        // Debuff applied to each member of party
     SPELL_CHARGE            = 33709,
     SPELL_WAR_STOMP         = 33707,
 
@@ -63,15 +64,20 @@ struct MANGOS_DLL_DECL boss_blackheart_the_inciterAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
+    bool   m_bInciteChaos;
     uint32 m_uiInciteChaosTimer;
+    uint32 m_uiInciteChaosWaitTimer;
     uint32 m_uiChargeTimer;
     uint32 m_uiKnockbackTimer;
 
     void Reset()
     {
-        m_uiInciteChaosTimer = 15000;
-        m_uiChargeTimer      = 5000;
-        m_uiKnockbackTimer   = 15000;
+        m_bInciteChaos = false;
+        m_uiInciteChaosTimer = 20000;
+        m_uiInciteChaosWaitTimer = 15000;
+        m_uiChargeTimer = 5000;
+        m_uiKnockbackTimer = 15000;
+        SetCombatMovement(true);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -113,14 +119,45 @@ struct MANGOS_DLL_DECL boss_blackheart_the_inciterAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        // ToDo: this needs future core and script support
-        /*if (m_uiInciteChaosTimer < uiDiff)
+        if (m_bInciteChaos)
+        {
+            if (m_uiInciteChaosWaitTimer < uiDiff)
+            {
+                m_bInciteChaos = false;
+                m_uiInciteChaosWaitTimer = 15000;
+                SetCombatMovement(true);
+                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+            }
+            else
+                m_uiInciteChaosWaitTimer -= uiDiff;
+
+            return;
+        }
+
+        if (m_uiInciteChaosTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_INCITE_CHAOS) == CAST_OK)
+            {
+                std::vector<ObjectGuid> vGuids;
+                m_creature->FillGuidsListFromThreatList(vGuids);
+                for (std::vector<ObjectGuid>::const_iterator itr = vGuids.begin();itr != vGuids.end(); ++itr)
+                {
+                    Unit* pTarget = m_creature->GetMap()->GetUnit(*itr);
+
+                    if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER)
+                        pTarget->CastSpell(pTarget, SPELL_INCITE_CHAOS_B, true, NULL, NULL, m_creature->GetObjectGuid());
+                }
+
+                DoResetThreat();
+                m_bInciteChaos = true;
                 m_uiInciteChaosTimer = 40000;
+                SetCombatMovement(false);
+                m_creature->StopMoving();
+                return;
+            }
         }
         else
-            m_uiInciteChaosTimer -= uiDiff;*/
+            m_uiInciteChaosTimer -= uiDiff;
 
         // Charge Timer
         if (m_uiChargeTimer < uiDiff)
@@ -144,7 +181,6 @@ struct MANGOS_DLL_DECL boss_blackheart_the_inciterAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
-
 CreatureAI* GetAI_boss_blackheart_the_inciter(Creature* pCreature)
 {
     return new boss_blackheart_the_inciterAI(pCreature);

@@ -186,41 +186,4 @@ static Locations DragonsWP[]=
     {1829.64f,  804.194f, 44.355f}, // 26
 };
 
-class MANGOS_DLL_DECL instance_violet_hold : public ScriptedInstance
-{
-    public:
-        instance_violet_hold(Map* pMap);
-        void Initialize();
-
-        void Clear();
-        void InitWorldState(bool Enable);
-        void OnPlayerEnter(Player* pPlayer);
-        bool IsEncounterInProgress() const;
-        void OnCreatureCreate(Creature* pCreature);
-        void OnObjectCreate(GameObject* pGo);
-
-        void SetData(uint32 uiType, uint32 uiData);
-        uint32 GetData(uint32 uiType);
-
-        bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
-
-        const char* Save() { return m_strInstData.c_str(); }
-        void Load(const char* chrIn);
-
-    private:
-        uint32 m_auiEncounter[MAX_ENCOUNTER+1];
-        std::string m_strInstData;
-
-        bool bIsInBoss;
-        bool m_bCriteriaDanceWithVoidFailed;
-        bool m_bCriteriaDeshidratationFailed;
-
-        uint8 m_uiLastBossID;
-        uint8 m_uiLastBossIDConst;
-        uint8 m_uiRiftPortalCount;
-        uint32 m_uiShieldPercent;
-        uint32 m_uiDisruptions;
-        int8 m_uiPortalTime;
-};
-
 #endif

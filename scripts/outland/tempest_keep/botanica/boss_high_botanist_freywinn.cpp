@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,175 +17,155 @@
 /* ScriptData
 SDName: Boss_High_Botanist_Freywinn
 SD%Complete: 90
-SDComment: Timers may need some fine adjustments
+SDComment: some strange visual related to tree form(if aura lost before normal duration end). possible make summon&transform -process smoother(transform after delay)
 SDCategory: Tempest Keep, The Botanica
 EndScriptData */
 
 #include "precompiled.h"
 
-enum
-{
-    SAY_AGGRO                   = -1553000,
-    SAY_KILL_1                  = -1553001,
-    SAY_KILL_2                  = -1553002,
-    SAY_TREE_1                  = -1553003,
-    SAY_TREE_2                  = -1553004,
-    SAY_DEATH                   = -1553005,
+#define SAY_AGGRO                   -1553000
+#define SAY_KILL_1                  -1553001
+#define SAY_KILL_2                  -1553002
+#define SAY_TREE_1                  -1553003
+#define SAY_TREE_2                  -1553004
+#define SAY_DEATH                   -1553005
 
-    SPELL_TRANQUILITY           = 34550,
-    SPELL_TREE_FORM             = 34551,
-    SPELL_SUMMON_FRAYER         = 34557,
-    SPELL_PLANT_WHITE           = 34759,
-    SPELL_PLANT_GREEN           = 34761,
-    SPELL_PLANT_BLUE            = 34762,
-    SPELL_PLANT_RED             = 34763,
+#define SPELL_TRANQUILITY           34550
+#define SPELL_TREE_FORM             34551
 
-    NPC_FRAYER_PROTECTOR        = 19953,
-};
+#define SPELL_SUMMON_FRAYER         34557
+#define ENTRY_FRAYER                19953
+
+#define SPELL_PLANT_WHITE           34759
+#define SPELL_PLANT_GREEN           34761
+#define SPELL_PLANT_BLUE            34762
+#define SPELL_PLANT_RED             34763
 
 struct MANGOS_DLL_DECL boss_high_botanist_freywinnAI : public ScriptedAI
 {
     boss_high_botanist_freywinnAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
-    uint32 m_uiSummonSeedlingTimer;
-    uint32 m_uiTreeFormTimer;
-    uint32 m_uiFrayerTimer;
-    uint32 m_uiTreeFormEndTimer;
-    uint8 m_uiFrayerAddsCount;
-    bool m_bCanMoveFree;
+    GUIDList Adds_List;
+
+    uint32 SummonSeedling_Timer;
+    uint32 TreeForm_Timer;
+    uint32 MoveCheck_Timer;
+    uint32 DeadAddsCount;
+    bool MoveFree;
 
     void Reset()
     {
-        m_uiSummonSeedlingTimer = 6000;
-        m_uiTreeFormTimer       = 30000;
-        m_uiTreeFormEndTimer    = 0;
-        m_uiFrayerAddsCount     = 0;
-        m_uiFrayerTimer         = 0;
-        m_bCanMoveFree          = true;
+        Adds_List.clear();
+
+        SummonSeedling_Timer = 6000;
+        TreeForm_Timer = 30000;
+        MoveCheck_Timer = 1000;
+        DeadAddsCount = 0;
+        MoveFree = true;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature *summoned)
     {
-        if (pSummoned->GetEntry() == NPC_FRAYER_PROTECTOR)
-            ++m_uiFrayerAddsCount;
-
-        // Attack players
-        if (m_creature->getVictim())
-            pSummoned->AI()->AttackStart(m_creature->getVictim());
+        if (summoned->GetEntry() == ENTRY_FRAYER)
+            Adds_List.push_back(summoned->GetObjectGuid());
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
-    {
-        if (pSummoned->GetEntry() == NPC_FRAYER_PROTECTOR)
-        {
-            --m_uiFrayerAddsCount;
-
-            // When all 3 Frayers are killed stop the tree form action (if not done this already)
-            if (!m_uiFrayerAddsCount && !m_bCanMoveFree)
-            {
-                m_uiTreeFormEndTimer = 0;
-
-                if (m_creature->getVictim())
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-
-                // Interrupt all spells and remove auras
-                m_creature->InterruptNonMeleeSpells(true);
-                m_creature->RemoveAllAuras();
-                m_bCanMoveFree = true;
-            }
-        }
-    }
-
-    // Wrapper to summon one seedling
     void DoSummonSeedling()
     {
         switch(urand(0, 3))
         {
-            case 0: DoCastSpellIfCan(m_creature, SPELL_PLANT_WHITE); break;
-            case 1: DoCastSpellIfCan(m_creature, SPELL_PLANT_GREEN); break;
-            case 2: DoCastSpellIfCan(m_creature, SPELL_PLANT_BLUE);  break;
-            case 3: DoCastSpellIfCan(m_creature, SPELL_PLANT_RED);   break;
+            case 0: DoCastSpellIfCan(m_creature,SPELL_PLANT_WHITE); break;
+            case 1: DoCastSpellIfCan(m_creature,SPELL_PLANT_GREEN); break;
+            case 2: DoCastSpellIfCan(m_creature,SPELL_PLANT_BLUE); break;
+            case 3: DoCastSpellIfCan(m_creature,SPELL_PLANT_RED); break;
         }
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* victim)
     {
         DoScriptText(urand(0, 1) ? SAY_KILL_1 : SAY_KILL_2, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* Killer)
     {
         DoScriptText(SAY_DEATH, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 diff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_uiTreeFormTimer < uiDiff)
+        if (TreeForm_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_TRANQUILITY) == CAST_OK)
-            {
-                 // Note: This should remove only negative auras
-                m_creature->RemoveAllAuras();
+            DoScriptText(urand(0, 1) ? SAY_TREE_1 : SAY_TREE_2, m_creature);
 
-                DoCastSpellIfCan(m_creature, SPELL_TREE_FORM, CAST_TRIGGERED);
-                DoScriptText(urand(0, 1) ? SAY_TREE_1 : SAY_TREE_2, m_creature);
+            if (m_creature->IsNonMeleeSpellCasted(false))
+                m_creature->InterruptNonMeleeSpells(true);
 
-                m_creature->GetMotionMaster()->MoveIdle();
-                m_bCanMoveFree       = false;
-                m_uiFrayerTimer      = 1000;
-                m_uiTreeFormEndTimer = 45000;
-                m_uiTreeFormTimer    = 75000;
-            }
-        }
-        else
-            m_uiTreeFormTimer -= uiDiff;
+            m_creature->RemoveAllAuras();
 
-        // The Frayer is summoned after one second in the tree phase
-        if (m_uiFrayerTimer)
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_FRAYER, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_TRANQUILITY,   CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_TREE_FORM,     CAST_TRIGGERED);
+
+            m_creature->GetMotionMaster()->MoveIdle();
+            MoveFree = false;
+
+            TreeForm_Timer = 75000;
+        }else TreeForm_Timer -= diff;
+
+        if (!MoveFree)
         {
-            if (m_uiFrayerTimer <= uiDiff)
+            if (MoveCheck_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_FRAYER, CAST_TRIGGERED) == CAST_OK)
-                    m_uiFrayerTimer = 0;
-            }
-            else
-                m_uiFrayerTimer -= uiDiff;
-        }
+                for(GUIDList::iterator itr = Adds_List.begin(); itr != Adds_List.end(); ++itr)
+                {
+                    if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+                    {
+                        if (!pTemp->isAlive())
+                        {
+                            Adds_List.erase(itr);
+                            ++DeadAddsCount;
+                            break;
+                        }
+                    }
+                }
 
-        // Tree phase will be removed when the timer expires;
-        if (m_uiTreeFormEndTimer)
-        {
-            if (m_uiTreeFormEndTimer <= uiDiff)
-            {
-                if (m_creature->getVictim())
+                if (DeadAddsCount < 3 && TreeForm_Timer-30000 < diff)
+                    DeadAddsCount = 3;
+
+                if (DeadAddsCount >= 3)
+                {
+                    Adds_List.clear();
+                    DeadAddsCount = 0;
+
+                    m_creature->InterruptNonMeleeSpells(true);
+                    m_creature->RemoveAllAuras();
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                m_bCanMoveFree = true;
-                m_uiTreeFormEndTimer = 0;
+                    MoveFree = true;
+                }
+                MoveCheck_Timer = 500;
             }
-            else
-                m_uiTreeFormEndTimer -= uiDiff;
+            else MoveCheck_Timer -= diff;
+
+            return;
         }
 
-        // Don't do any other actions during tree form
-        if (!m_bCanMoveFree)
-            return;
+        /*if (m_creature->HasAura(SPELL_TREE_FORM, EFFECT_INDEX_0) || m_creature->HasAura(SPELL_TRANQUILITY, EFFECT_INDEX_0))
+            return;*/
 
-        // one random seedling every 5 secs, but not in tree form
-        if (m_uiSummonSeedlingTimer < uiDiff)
+        //one random seedling every 5 secs, but not in tree form
+        if (SummonSeedling_Timer < diff)
         {
             DoSummonSeedling();
-            m_uiSummonSeedlingTimer = 6000;
-        }
-        else
-            m_uiSummonSeedlingTimer -= uiDiff;
+            SummonSeedling_Timer = 6000;
+        }else SummonSeedling_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }

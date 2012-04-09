@@ -778,7 +778,7 @@ struct MANGOS_DLL_DECL npc_sinclariAI : public ScriptedAI
                 else if ( m_uiRiftPortalCount == 6
                          || m_uiRiftPortalCount == 12)
                 {
-                    if((m_uiRiftPortalCount == 6 && m_pInstance->GetData(TYPE_PORTAL6) != DONE) || (m_uiRiftPortalCount == 12 && m_pInstance->GetData(TYPE_PORTAL12) != DONE))
+                    if(m_uiRiftPortalCount == 6 && m_pInstance->GetData(TYPE_PORTAL6) != DONE || m_uiRiftPortalCount == 12 && m_pInstance->GetData(TYPE_PORTAL12) != DONE)
                     {
                         if (Creature* pTemp = m_creature->SummonCreature(NPC_PORTAL, PortalLoc[0].x, PortalLoc[0].y, PortalLoc[0].z, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                         {
@@ -1025,7 +1025,6 @@ struct MANGOS_DLL_DECL npc_azure_saboteurAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         if (m_bIsActiving)
-        {
             if (m_uiDisruption_Timer < uiDiff)
             {
                 if (m_uiDisruptionCounter < 3) 
@@ -1055,7 +1054,6 @@ struct MANGOS_DLL_DECL npc_azure_saboteurAI : public ScriptedAI
                 m_uiDisruption_Timer = 1000;
             }
             else m_uiDisruption_Timer -= uiDiff;
-        }
     }
 };
 

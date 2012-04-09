@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+   Copyright (C) 2011 MangosR2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -28,15 +28,12 @@ enum
     NPC_MOGRAINE                    = 3976,
     NPC_WHITEMANE                   = 3977,
     NPC_VORREL                      = 3981,
-    NPC_INTERROGATOR_VISHAS         = 3983,
 
     NPC_HEAD                        = 23775,
     NPC_PUMPKIN_FIEND               = 23545,
     NPC_HEADLESS_HORSEMAN           = 23682,
 
     GO_WHITEMANE_DOOR               = 104600,
-
-    SAY_TRIGGER_VORREL              = -1189015,
 };
 
 class MANGOS_DLL_DECL instance_scarlet_monastery : public ScriptedInstance
@@ -47,7 +44,6 @@ class MANGOS_DLL_DECL instance_scarlet_monastery : public ScriptedInstance
         void Initialize();
 
         void OnCreatureCreate(Creature* pCreature);
-        void OnCreatureDeath(Creature* pCreature);
         void OnObjectCreate(GameObject* pGo);
 
         void SetData(uint32 uiType, uint32 uiData);

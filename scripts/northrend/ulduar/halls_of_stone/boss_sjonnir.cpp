@@ -55,6 +55,11 @@ enum
 
     NPC_FORGED_IRON_TROGG       = 27979,
     NPC_FORGED_IRON_DWARF       = 27982,
+
+    ACHIEV_COMPLETE             = 485,
+    ACHIEV_COMPLETE_H           = 496,
+
+    NPC_DAILY_DUNGEON           = 22852,
 };
 
 struct Locations
@@ -226,6 +231,12 @@ struct MANGOS_DLL_DECL boss_sjonnirAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        m_creature->SummonCreature(NPC_DAILY_DUNGEON, 1310.10f, 649.66f, 189.60f, 2.49f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+
+        DoScriptText(SAY_DEATH, m_creature);
+
+        m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_COMPLETE : ACHIEV_COMPLETE_H);
+
         m_creature->SummonCreature(NPC_BRANN_OUTRO, 1307.582f, 666.809f, 189.607f, 6.28, TEMPSUMMON_MANUAL_DESPAWN, 30000);
 
         if (Creature* pBrann = m_pInstance->GetSingleCreatureFromStorage(NPC_BRANN_EVENT))

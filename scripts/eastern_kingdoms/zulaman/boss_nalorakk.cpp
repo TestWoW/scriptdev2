@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -45,16 +45,16 @@ enum
 
     SPELL_BERSERK           = 45078,                        //unsure, this increases damage, size and speed
 
-    // Defines for Troll form
-    SPELL_BRUTAL_SWIPE      = 42384,
+    //Defines for Troll form
+    SPELL_BRUTALSWIPE       = 42384,
     SPELL_MANGLE            = 42389,
     SPELL_SURGE             = 42402,
-    SPELL_BEAR_SHAPE        = 42377,
+    SPELL_BEARFORM          = 42377,
 
-    // Defines for Bear form
-    SPELL_LACERATING_SLASH  = 42395,
-    SPELL_REND_FLESH        = 42397,
-    SPELL_DEAFENING_ROAR    = 42398
+    //Defines for Bear form
+    SPELL_LACERATINGSLASH   = 42395,
+    SPELL_RENDFLESH         = 42397,
+    SPELL_DEAFENINGROAR     = 42398
 };
 
 struct MANGOS_DLL_DECL boss_nalorakkAI : public ScriptedAI
@@ -67,30 +67,38 @@ struct MANGOS_DLL_DECL boss_nalorakkAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    uint32 m_uiChangeFormTimer;
-    uint32 m_uiBrutalSwipeTimer;
-    uint32 m_uiMangleTimer;
-    uint32 m_uiSurgeTimer;
-    uint32 m_uiLaceratingSlashTimer;
-    uint32 m_uiRendFleshTimer;
-    uint32 m_uiDeafeningRoarTimer;
-    uint32 m_uiBerserkTimer;
-    bool m_bIsInBearForm;
+    uint32 ChangeForm_Timer;
+    uint32 BrutalSwipe_Timer;
+    uint32 Mangle_Timer;
+    uint32 Surge_Timer;
+    uint32 LaceratingSlash_Timer;
+    uint32 RendFlesh_Timer;
+    uint32 DeafeningRoar_Timer;
+    uint32 ShapeShiftCheck_Timer;
+    uint32 Berserk_Timer;
+    bool inBearForm;
+    bool Berserking;
+    bool ChangedToBear;
+    bool ChangedToTroll;
 
     void Reset()
     {
-        m_uiChangeFormTimer         = 45000;
-        m_uiBrutalSwipeTimer        = 12000;
-        m_uiMangleTimer             = 15000;
-        m_uiSurgeTimer              = 20000;
-        m_uiLaceratingSlashTimer    = 6000;
-        m_uiRendFleshTimer          = 6000;
-        m_uiDeafeningRoarTimer      = 20000;
-        m_uiBerserkTimer            = 10*MINUTE*IN_MILLISECONDS;
-        m_bIsInBearForm             = false;
+        ChangeForm_Timer = 45000;
+        BrutalSwipe_Timer = 12000;
+        Mangle_Timer = 15000;
+        Surge_Timer = 20000;
+        LaceratingSlash_Timer = 6000;
+        RendFlesh_Timer = 6000;
+        DeafeningRoar_Timer = 20000;
+        ShapeShiftCheck_Timer = 40000;
+        Berserk_Timer = 600000;
+        inBearForm = false;
+        Berserking = false;
+        ChangedToBear = false;
+        ChangedToTroll = true;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
@@ -98,12 +106,12 @@ struct MANGOS_DLL_DECL boss_nalorakkAI : public ScriptedAI
             m_pInstance->SetData(TYPE_NALORAKK, IN_PROGRESS);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* victim)
     {
         DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* Killer)
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -119,127 +127,124 @@ struct MANGOS_DLL_DECL boss_nalorakkAI : public ScriptedAI
             m_pInstance->SetData(TYPE_NALORAKK, FAIL);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 diff)
     {
-        // Return since we have no target
+        //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        // Berserking
-        if (m_uiBerserkTimer)
+        //Berserking
+        if ((Berserk_Timer < diff) && (!Berserking))
         {
-            if (m_uiBerserkTimer <= uiDiff)
+            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                {
-                    DoScriptText(SAY_BERSERK, m_creature);
-                    m_uiBerserkTimer = 0;
-                }
+                DoScriptText(SAY_BERSERK, m_creature);
+                Berserking = true;
             }
-            else
-                m_uiBerserkTimer -= uiDiff;
-        }
+        }else Berserk_Timer -= diff;
+
+        //Don't check if we're shapeshifted every UpdateAI
+        if (ShapeShiftCheck_Timer < diff)
+        {
+            //This will return true if we have bearform aura
+            inBearForm = m_creature->HasAura(SPELL_BEARFORM, EFFECT_INDEX_0);
+            ShapeShiftCheck_Timer = 1000;
+        }else ShapeShiftCheck_Timer -= diff;
 
         //Spells for Troll Form (only to be casted if we NOT have bear phase aura)
-        if (!m_bIsInBearForm)
+        if (!inBearForm)
         {
-            // Brutal Swipe (some sources may say otherwise, but I've never seen this in Bear form)
-            if (m_uiBrutalSwipeTimer < uiDiff)
+            //We just changed to troll form!
+            if (!ChangedToTroll)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BRUTAL_SWIPE) == CAST_OK)
-                    m_uiBrutalSwipeTimer = urand(7000, 15000);
-            }
-            else
-                m_uiBrutalSwipeTimer -= uiDiff;
+                DoScriptText(SAY_TOTROLL, m_creature);
 
-            // Mangle
-            if (m_uiMangleTimer < uiDiff)
+                ChangedToTroll = true;
+                ChangedToBear = false;
+                //Reset spell timers
+                LaceratingSlash_Timer = urand(6000, 25000);
+                RendFlesh_Timer = urand(6000, 25000);
+                DeafeningRoar_Timer = urand(15000, 25000);
+                ShapeShiftCheck_Timer = 40000;
+            }
+
+            //Brutal Swipe (some sources may say otherwise, but I've never seen this in Bear form)
+            if (BrutalSwipe_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MANGLE) == CAST_OK)
-                    m_uiMangleTimer = urand(3000, 15000);
-            }
-            else
-                m_uiMangleTimer -= uiDiff;
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_BRUTALSWIPE);
+                BrutalSwipe_Timer = urand(7000, 15000);
+            }else BrutalSwipe_Timer -= diff;
 
-            // Surge
-            if (m_uiSurgeTimer < uiDiff)
+            //Mangle
+            if (Mangle_Timer < diff)
+            {
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_MANGLE);
+                Mangle_Timer = urand(3000, 15000);
+            }else Mangle_Timer -= diff;
+
+            //Surge
+            if (Surge_Timer < diff)
             {
                 //select a random unit other than the main tank
-                Unit* pTtarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+                Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
 
                 //if there aren't other units, cast on the tank
-                if (!pTtarget)
-                    pTtarget = m_creature->getVictim();
+                if (!target)
+                    target = m_creature->getVictim();
 
-                if (DoCastSpellIfCan(pTtarget, SPELL_SURGE) == CAST_OK)
-                {
+                if (DoCastSpellIfCan(target, SPELL_SURGE) == CAST_OK)
                     DoScriptText(SAY_SURGE, m_creature);
-                    m_uiSurgeTimer = urand(15000, 32500);
-                }
-            }
-            else
-                m_uiSurgeTimer -= uiDiff;
 
-            // Change to Bear Form if we're in Troll Form for 45sec
-            if (m_uiChangeFormTimer < uiDiff)
+                Surge_Timer = urand(15000, 32500);
+            }else Surge_Timer -= diff;
+
+            //Change to Bear Form if we're in Troll Form for 45sec
+            if (ChangeForm_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_BEAR_SHAPE, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
-                {
-                    DoScriptText(SAY_TOBEAR, m_creature);
-                    m_uiChangeFormTimer         = 30000;
-                    m_bIsInBearForm             = true;
-                    // Reset bear form timers
-                    m_uiLaceratingSlashTimer    = urand(6000, 25000);
-                    m_uiRendFleshTimer          = urand(6000, 25000);
-                    m_uiDeafeningRoarTimer      = urand(15000, 25000);
-                }
-            }
-            else
-                m_uiChangeFormTimer -= uiDiff;
+                m_creature->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                m_creature->InterruptSpell(CURRENT_GENERIC_SPELL);
+                DoCastSpellIfCan(m_creature, SPELL_BEARFORM);
+                //And 30sec (bear form) + 45sec (troll form) before we should cast this again
+                ChangeForm_Timer = 75000;
+            }else ChangeForm_Timer -= diff;
         }
         //Spells for Bear Form (only to be casted if we have bear phase aura)
         else
         {
-            // Timer to yell and reset spell timers when bear aura expires
-            if (m_uiChangeFormTimer < uiDiff)
+            //We just changed to bear form!
+            if (!ChangedToBear)
             {
-                DoScriptText(SAY_TOTROLL, m_creature);
-                m_uiChangeFormTimer     = 45000;
-                m_bIsInBearForm         = false;
-                // Reset troll form timers
-                m_uiSurgeTimer          = urand(15000, 32000);
-                m_uiBrutalSwipeTimer    = urand(7000, 20000);
-                m_uiMangleTimer         = urand(3000, 20000);
-            }
-            else
-                m_uiChangeFormTimer -= uiDiff;
+                DoScriptText(SAY_TOBEAR, m_creature);
 
-            // Lacerating Slash
-            if (m_uiLaceratingSlashTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_LACERATING_SLASH) == CAST_OK)
-                    m_uiLaceratingSlashTimer = urand(6000, 20000);
+                ChangedToBear = true;
+                ChangedToTroll = false;
+                //Reset spell timers
+                Surge_Timer = urand(15000, 32000);
+                BrutalSwipe_Timer = urand(7000, 20000);
+                Mangle_Timer = urand(3000, 20000);
+                ShapeShiftCheck_Timer = 25000;
             }
-            else
-                m_uiLaceratingSlashTimer -= uiDiff;
 
-            // Rend Flesh
-            if (m_uiRendFleshTimer < uiDiff)
+            //Lacerating Slash
+            if (LaceratingSlash_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_REND_FLESH) == CAST_OK)
-                    m_uiRendFleshTimer = urand(6000, 20000);
-            }
-            else
-                m_uiRendFleshTimer -= uiDiff;
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_LACERATINGSLASH);
+                LaceratingSlash_Timer = urand(6000, 20000);
+            }else LaceratingSlash_Timer -= diff;
 
-            // Deafening Roar
-            if (m_uiDeafeningRoarTimer < uiDiff)
+            //Rend Flesh
+            if (RendFlesh_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_DEAFENING_ROAR) == CAST_OK)
-                    m_uiDeafeningRoarTimer = urand(15000, 25000);
-            }
-            else
-                m_uiDeafeningRoarTimer -= uiDiff;
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_RENDFLESH);
+                RendFlesh_Timer = urand(6000, 20000);
+            }else RendFlesh_Timer -= diff;
+
+            //Deafening Roar
+            if (DeafeningRoar_Timer < diff)
+            {
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_DEAFENINGROAR);
+                DeafeningRoar_Timer = urand(15000, 25000);
+            }else DeafeningRoar_Timer -= diff;
         }
 
         DoMeleeAttackIfReady();

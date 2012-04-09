@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -7,15 +7,15 @@
 
 enum
 {
-    MAX_ENCOUNTER                   = 3,
+    MAX_ENCOUNTER                   = 4,
 
     TYPE_HYDROMANCER_THESPIA        = 1,
     TYPE_MEKGINEER_STEAMRIGGER      = 2,
     TYPE_WARLORD_KALITHRESH         = 3,
+    TYPE_DISTILLER                  = 4,
 
-    NPC_NAGA_DISTILLER              = 17954,
     NPC_STEAMRIGGER                 = 17796,
-    NPC_KALITHRESH                  = 17798,
+    //NPC_KALITRESH                 = 17798,
     //NPC_THESPIA                   = 17797,
 
     GO_MAIN_CHAMBERS_DOOR           = 183049,
@@ -32,8 +32,6 @@ class MANGOS_DLL_DECL instance_steam_vault : public ScriptedInstance
 
         void OnCreatureCreate(Creature* pCreature);
         void OnObjectCreate(GameObject* pGo);
-
-        void OnCreatureDeath(Creature* pCreature);
 
         void SetData(uint32 uiType, uint32 uiData);
         uint32 GetData(uint32 uiType);

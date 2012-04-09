@@ -66,6 +66,16 @@ void instance_halls_of_lightning::OnCreatureDeath(Creature* pCreature)
     }
 }
 
+void instance_halls_of_lightning::OnCreatureEnterCombat(Creature* pCreature)
+{
+    switch(pCreature->GetEntry())
+    {
+        case NPC_VOLKHAN:
+            m_uiGolemsKilled = 0;
+            break;
+    }
+}
+
 void instance_halls_of_lightning::OnObjectCreate(GameObject* pGo)
 {
     switch(pGo->GetEntry())
@@ -101,8 +111,6 @@ void instance_halls_of_lightning::SetData(uint32 uiType, uint32 uiData)
         case TYPE_VOLKHAN:
             if (uiData == DONE)
                 DoUseDoorOrButton(GO_VOLKHAN_DOOR);
-            if (uiData == IN_PROGRESS)
-                m_uiGolemsKilled = 0;
             m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_IONAR:

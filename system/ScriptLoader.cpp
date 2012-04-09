@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
 * This program is free software licensed under GPL version 2
 * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -241,9 +241,8 @@ extern void AddSC_razorfen_downs();
 extern void AddSC_instance_razorfen_kraul();                // razorfen_kraul
 extern void AddSC_razorfen_kraul();
 extern void AddSC_boss_ayamiss();                           // ruins_of_ahnqiraj
-extern void AddSC_boss_buru();
-extern void AddSC_boss_kurinnaxx();
 extern void AddSC_boss_ossirian();
+extern void AddSC_boss_kurinnaxx();
 extern void AddSC_boss_moam();
 extern void AddSC_ruins_of_ahnqiraj();
 extern void AddSC_instance_ruins_of_ahnqiraj();
@@ -270,7 +269,6 @@ extern void AddSC_bloodmyst_isle();
 extern void AddSC_boss_azuregos();
 extern void AddSC_darkshore();
 extern void AddSC_desolace();
-extern void AddSC_durotar();
 extern void AddSC_dustwallow_marsh();
 extern void AddSC_felwood();
 extern void AddSC_feralas();
@@ -373,12 +371,12 @@ extern void AddSC_boss_keristrasza();
 extern void AddSC_boss_ormorok();
 extern void AddSC_boss_telestra();
 extern void AddSC_instance_nexus();
-extern void AddSC_oculus();
 extern void AddSC_boss_drakos();                            // nexus, oculus
+extern void AddSC_boss_eregos();
 extern void AddSC_boss_varos();
-extern void AddSC_boss_eregos();                            // nexus, oculus
 extern void AddSC_boss_urom();
 extern void AddSC_instance_oculus();
+extern void AddSC_oculus();
 extern void AddSC_boss_sartharion();                        // obsidian_sanctum
 extern void AddSC_instance_obsidian_sanctum();
 extern void AddSC_boss_baltharus();                         // ruby_sanctum
@@ -397,7 +395,6 @@ extern void AddSC_boss_sjonnir();
 extern void AddSC_boss_krystallus();
 extern void AddSC_halls_of_stone();
 extern void AddSC_instance_halls_of_stone();
-
 extern void AddSC_boss_iron_council();                      // ulduar, ulduar
 extern void AddSC_boss_algalon();
 extern void AddSC_boss_auriaya();
@@ -771,9 +768,8 @@ void AddScripts()
     AddSC_instance_razorfen_kraul();                        // razorfen_kraul
     AddSC_razorfen_kraul();
     AddSC_boss_ayamiss();                                   // ruins_of_ahnqiraj
-    AddSC_boss_buru();
-    AddSC_boss_kurinnaxx();
     AddSC_boss_ossirian();
+    AddSC_boss_kurinnaxx();
     AddSC_boss_moam();
     AddSC_ruins_of_ahnqiraj();
     AddSC_instance_ruins_of_ahnqiraj();
@@ -800,7 +796,6 @@ void AddScripts()
     AddSC_boss_azuregos();
     AddSC_darkshore();
     AddSC_desolace();
-    AddSC_durotar();
     AddSC_dustwallow_marsh();
     AddSC_felwood();
     AddSC_feralas();
@@ -903,12 +898,12 @@ void AddScripts()
     AddSC_boss_ormorok();
     AddSC_boss_telestra();
     AddSC_instance_nexus();
-    AddSC_oculus();
     AddSC_boss_drakos();                                    // nexus, oculus
+    AddSC_boss_eregos();
     AddSC_boss_varos();
-    AddSC_boss_eregos();                                    // nexus, oculus
     AddSC_boss_urom();
     AddSC_instance_oculus();
+    AddSC_oculus();
     AddSC_boss_sartharion();                                // obsidian_sanctum
     AddSC_instance_obsidian_sanctum();
     AddSC_boss_baltharus();                                 // ruby_sanctum
@@ -927,7 +922,6 @@ void AddScripts()
     AddSC_boss_krystallus();
     AddSC_halls_of_stone();
     AddSC_instance_halls_of_stone();
-
     AddSC_boss_iron_council();                              // ulduar, ulduar
     AddSC_boss_algalon();
     AddSC_boss_auriaya();
@@ -944,7 +938,7 @@ void AddScripts()
     AddSC_boss_yogg_saron();
     AddSC_instance_ulduar();
     AddSC_ulduar();
-
+    
     AddSC_boss_ingvar();                                    // UK, utgarde_keep
     AddSC_boss_keleseth();
     AddSC_boss_skarvald_and_dalronn();

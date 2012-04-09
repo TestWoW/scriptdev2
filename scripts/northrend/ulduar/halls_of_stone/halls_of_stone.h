@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -9,105 +9,55 @@ enum
 {
     MAX_ENCOUNTER           = 4,
 
-    TYPE_TRIBUNAL           = 0,
-    TYPE_MAIDEN             = 1,
-    TYPE_KRYSTALLUS         = 2,
-    TYPE_SJONNIR            = 3,
-    TYPE_GOOD_GRIEF         = 4,
-    TYPE_BRANN              = 5,
+    DATA_KRYSTALLUS         = 1,
+    DATA_GRIEF              = 2,
+    DATA_BRANN              = 3,
+    DATA_SJONNIR            = 4,
 
-    NPC_KADDRAK             = 30898,
-    NPC_ABEDNEUM            = 30899,
-    NPC_MARNAK              = 30897,
-    NPC_TRIBUNAL_OF_AGES    = 28234,
-    NPC_WORLDTRIGGER        = 22515,
+    DATA_KADDRAK            = 5,
+    DATA_ABEDNEUM           = 6,
+    DATA_MARNAK             = 7,
+
+    DATA_GO_TRIBUNAL_CONSOLE = 8,
+    DATA_GO_SKY_FLOOR       = 9,
+    DATA_GO_KADDRAK         = 10,
+    DATA_GO_ABEDNEUM        = 11,
+    DATA_GO_MARNAK          = 12,
+
+    TYPE_KRYSTALLUS         = 20,
+    TYPE_GRIEF              = 21,
+    TYPE_BRANN              = 22,
+    TYPE_SJONNIR            = 23,
+
+    NPC_KRYSTALLUS          = 27977,
+    NPC_GRIEF               = 27975,
     NPC_BRANN               = 28070,
     NPC_BRANN_EVENT         = 24575,
     NPC_BRANN_OUTRO         = 24577,
     NPC_SJONNIR             = 27978,
+
     NPC_MALFORMED_OOZE      = 28165,
 
-    GO_DOOR_MAIDEN          = 191292,
-    GO_DOOR_TRIBUNAL        = 191294,                       // possibly closed during event?
-    GO_DOOR_TO_TRIBUNAL     = 191295,
-    GO_DOOR_SJONNIR         = 191296,
+    NPC_KADDRAK             = 30898, // left
+    NPC_ABEDNEUM            = 30899, // middle
+    NPC_MARNAK              = 30897, // right
 
-    GO_TRIBUNAL_CHEST       = 190586,
-    GO_TRIBUNAL_CHEST_H     = 193996,
+    GO_GRIEF_DOOR           = 191292,
+    GO_BRANN_DOOR           = 191293,
+    GO_SJONNIR_DOOR         = 191296,
 
-    GO_TRIBUNAL_HEAD_RIGHT  = 191670,                       // marnak
-    GO_TRIBUNAL_HEAD_CENTER = 191669,                       // abedneum
-    GO_TRIBUNAL_HEAD_LEFT   = 191671,                       // kaddrak
+    GO_KADDRAK              = 191671, // left
+    GO_ABEDNEUM             = 191669, // middle
+    GO_MARNAK               = 191670, // right
 
     GO_TRIBUNAL_CONSOLE     = 193907,
-    GO_TRIBUNAL_FLOOR       = 191527,
+    GO_TRIBUNAL_CHEST       = 190586,
+    GO_TRIBUNAL_CHEST_H     = 193996,
+    GO_TRIBUNAL_SKY_FLOOR   = 191527,
 
     GO_SJONNIR_CONSOLE      = 193906,
 
-    MAX_FACES               = 3,
-    FACE_MARNAK             = 0,
-    FACE_ABEDNEUM           = 1,
-    FACE_KADDRAK            = 2,
-
-    // Achiev Criterias
-    ACHIEV_START_MAIDEN_ID  = 20383,
-    ACHIEV_GOOD_GRIEF       = 7143,
-    ACHIEV_BRANN            = 7590,
     ACHIEV_SJONNIR_OOZE     = 7593,
-};
-
-struct Face
-{
-    Face() : m_bIsActive(false), m_uiTimer(1000) {}
-
-    ObjectGuid m_leftEyeGuid;
-    ObjectGuid m_rightEyeGuid;
-    ObjectGuid m_goFaceGuid;
-    ObjectGuid m_speakerGuid;
-    bool m_bIsActive;
-    uint32 m_uiTimer;
-};
-
-class MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
-{
-    public:
-        instance_halls_of_stone(Map* pMap);
-        void Initialize();
-
-        void OnCreatureCreate(Creature* pCreature);
-        void OnCreatureDeath(Creature* pCreature);
-        void OnObjectCreate(GameObject* pGo);
-
-        void SetData(uint32 uiType, uint32 uiData);
-        uint32 GetData(uint32 uiType);
-
-        bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
-
-        const char* Save() { return m_strInstData.c_str(); }
-        void Load(const char* chrIn);
-
-        void Update(uint32 uiDiff);
-
-        void ActivateFace(uint8 uiFace, bool bAfterEvent);
-        void DoFaceSpeak(uint8 uiFace, int32 iTextId);
-
-    private:
-        void SortFaces();
-        void ProcessFace(uint8 uiFace);
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        Face m_aFaces[MAX_FACES];
-        std::string m_strInstData;
-
-        GUIDList m_lKaddrakGUIDs;
-        GUIDList m_lAbedneumGUIDs;
-        GUIDList m_lMarnakGUIDs;
-        GUIDList m_lTribunalGUIDs;
-        GUIDList m_lWorldtriggerGUIDs;
-
-        bool m_bGoodGriefFailed;
-        bool m_bBrannFailed;
-        uint32 m_uiOozesKilled;
 };
 
 #endif

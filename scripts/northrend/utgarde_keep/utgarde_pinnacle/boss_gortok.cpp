@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,15 +16,10 @@
 
 /* ScriptData
 SDName: Boss_Gortok
-SD%Complete: 20%
+SD%Complete:
 SDComment:
 SDCategory: Utgarde Pinnacle
 EndScriptData */
-
-/* TODO
-implement Orb - a red ball-> this Orb activate the mobs
-*/
-
 
 #include "precompiled.h"
 #include "utgarde_pinnacle.h"
@@ -36,8 +31,15 @@ enum
     SAY_SLAY_2              = -1575017,
     SAY_DEATH               = -1575018,
 
-    SPELL_FREEZE_ANIM       = 16245,
+    //Others Spells
 
+    SPELL_ORB_VISUAL        = 48044,
+    SPELL_ORB_CHANNEL       = 48048,
+    SPELL_FREEZE_ANIM       = 16245,
+    SPELL_WAKEUP_GORTOK     = 47670,
+    SPELL_AWAKEN_SUBBOSS    = 47669,
+
+    //Gortok Spell's
     SPELL_IMPALE            = 48261,
     SPELL_IMPALE_H          = 59268,
 
@@ -46,26 +48,145 @@ enum
 
     SPELL_ARCING_SMASH      = 48260,
 
-    SPELL_ORB_VISUAL        = 48044, // not used
+    //FurlBorg Spell's
+    SPELL_CHAIN_LIGHTING_N  = 48140,
+    SPELL_CHAIN_LIGHTING_H  = 59273,
+    SPELL_CRAZED            = 48139,
+    SPELL_TERRIFYING_ROAR   = 48144,
 
-    SPELL_FREEZE            = 16245
+    //Worgen Spells
+    SPELL_MORTAL_WOUND_N    = 48137,
+    SPELL_MORTAL_WOUND_H    = 59265,
+    SPELL_ENRAGE_1          = 48138,
+    SPELL_ENRAGE_2          = 48142,
+
+    //Rhino Spells
+    SPELL_GORE_N            = 48130,
+    SPELL_GORE_H            = 59264,
+    SPELL_GRIEVOUS_WOUND_N  = 48105,
+    SPELL_GRIEVOUS_WOUND_H  = 59263,
+    SPELL_STOMP             = 48131,
+
+    //Jormungar Spells
+    SPELL_ACID_SPIT         = 48132,
+    SPELL_ACID_SPLATTER_N   = 48136,
+    SPELL_ACID_SPLATTER_H   = 59272,
+    SPELL_POISON_BREATH_N   = 48133,
+    SPELL_POISON_BREATH_H   = 59271,
+
+    POINT_ID_ORB            = 1
 };
 
-enum Phase
-{
-    PHASE_BEGIN             = 0,
-    PHASE_FRENZIED_WORGEN   = 1,
-    PHASE_RAVENOUS_FURLBORG = 2,
-    PHASE_MASSIVE_JORMUNGAR = 3,
-    PHASE_FEROCIOUS_RHINO   = 4,
-    PHASE_GORTOK_PALEHOOF   = 5,
-};
+#define ORB_SPAWN_X             238.61f
+#define ORB_SPAWN_Y             -460.71f
+#define ORB_MOVE_X              279.11f
+#define ORB_MOVE_Y              -452.01f
+#define ORB_Z                   109.57f
 
-enum SubBossSteps
+struct MANGOS_DLL_DECL npc_gortok_orbAI : public ScriptedAI
 {
-    PHASE_SUB_BOSS_BEGIN    = 0,
-    PHASE_SUB_BOSS_INFIGHT  = 1,
-    PHASE_SUB_BOSS_END      = 2,
+    npc_gortok_orbAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        Reset();
+    }
+
+    ScriptedInstance* m_pInstance;
+    uint32 m_uiStepTimer;
+    uint32 m_uiStep;
+    bool m_bTimeToAct;
+    uint32 m_uiBossEntry;
+    uint8 m_uiBossCount;
+
+    void Reset()
+    {
+        m_uiStepTimer = 4000;
+        m_uiStep = 1;
+        m_bTimeToAct = true;
+        m_uiBossEntry = urand(NPC_WORGEN, NPC_RHINO);
+        m_uiBossCount = 0;
+        m_creature->SetLevitate(true);
+        m_creature->SetDisplayId(16925);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->CastSpell(m_creature, SPELL_ORB_VISUAL, true);
+    }
+
+    void MovementInform(uint32 uiType, uint32 uiPointId)
+    {
+        if (uiType != POINT_MOTION_TYPE)
+            return;
+
+        if (uiPointId == POINT_ID_ORB)
+            DoAction();
+    }
+
+    void DoAction()
+    {
+        m_uiStepTimer = 2000;
+        m_uiStep = 3;
+        m_bTimeToAct = true;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_pInstance)
+            return;
+
+        if (m_bTimeToAct)
+            if (m_uiStepTimer <= uiDiff)
+            {
+                switch (m_uiStep)
+                {
+                    case 1:
+                        m_creature->MonsterMoveWithSpeed(ORB_SPAWN_X, ORB_SPAWN_Y, ORB_Z+4.0f, 4000);
+                        m_creature->GetMap()->CreatureRelocation(m_creature, ORB_SPAWN_X, ORB_SPAWN_Y, ORB_Z+4.0f, 0);
+                        m_uiStepTimer = 4000;
+                        break;
+                    case 2:
+                        m_creature->GetMotionMaster()->MovePoint(POINT_ID_ORB, ORB_MOVE_X, ORB_MOVE_Y, ORB_Z+2.0f);
+                        m_bTimeToAct = false;
+                        break;
+                    case 3:
+                        if (Creature* pBoss = m_pInstance->GetSingleCreatureFromStorage(m_uiBossEntry))
+                        {
+                            pBoss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            SpellEntry* pTempSpell = (SpellEntry*)GetSpellStore()->LookupEntry(SPELL_WAKEUP_GORTOK);
+                            if (pTempSpell)
+                            {
+                                pTempSpell->EffectImplicitTargetA[0] = TARGET_EFFECT_SELECT;
+                                pTempSpell->EffectImplicitTargetB[0] = 0;
+                                pTempSpell->EffectImplicitTargetA[1] = TARGET_EFFECT_SELECT;
+                                pTempSpell->EffectImplicitTargetB[1] = 0;
+                                pTempSpell->EffectImplicitTargetA[2] = TARGET_EFFECT_SELECT;
+                                pTempSpell->EffectImplicitTargetB[2] = 0;
+                                m_creature->CastSpell(pBoss, pTempSpell, true);
+                            }
+                        }
+                        m_uiStepTimer = 10000;
+                        break;
+                    case 4:
+                        if (Creature* pBoss = m_pInstance->GetSingleCreatureFromStorage(m_uiBossEntry))
+                        {
+                            pBoss->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
+                            pBoss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                            pBoss->SetInCombatWithZone();
+                        }
+                        ++m_uiBossCount;
+                        ++m_uiBossEntry;
+                        if (m_uiBossEntry > NPC_RHINO)
+                            m_uiBossEntry = NPC_WORGEN;
+                        if (m_uiBossCount == 4)
+                            m_uiBossEntry = NPC_GORTOK;
+                        if (m_uiBossCount == 5)
+                            m_creature->ForcedDespawn();
+                        m_bTimeToAct = false;
+                        break;
+                }
+                ++m_uiStep;
+            }
+            else
+                m_uiStepTimer -= uiDiff;
+    }
 };
 
 /*######
@@ -76,36 +197,56 @@ struct MANGOS_DLL_DECL boss_gortokAI : public ScriptedAI
 {
     boss_gortokAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (instance_pinnacle*)pCreature->GetInstanceData();
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    instance_pinnacle* m_pInstance;
+    ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
 
-    Phase m_uiPhase;
-    uint8 m_uiSubBossSteps;
-    uint8 m_uiSubBossCount;
-    uint8 m_uiSubBossMax;
-
-    uint32 m_uiCheckForDeathSubBoss;
-
-    uint32 m_uiWitheringRoar;
-    uint32 m_uiImpale;
-    uint32 m_uiArcingSmash;
+    uint32 uiArcingSmashTimer;
+    uint32 uiImpaleTimer;
+    uint32 uiWhiteringRoarTimer;
 
     void Reset()
     {
-        m_uiPhase = PHASE_BEGIN;
-        m_uiSubBossSteps =  PHASE_SUB_BOSS_BEGIN;
-        m_uiSubBossCount = 0;
-        m_uiSubBossMax = m_bIsRegularMode ? 2 : 4;
-        m_uiCheckForDeathSubBoss = 2000;
+        uiArcingSmashTimer = 15000;
+        uiImpaleTimer = 12000;
+        uiWhiteringRoarTimer = 10000;
 
-        m_uiWitheringRoar = urand(7000,11000);
-        m_uiImpale = 9000;
-        m_uiArcingSmash = 5000;
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+
+        if (m_pInstance)
+        {
+            m_pInstance->SetData(TYPE_GORTOK, NOT_STARTED);
+
+            Creature* pTemp;
+            if ((pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_WORGEN)) && pTemp->isDead())
+                pTemp->Respawn();
+            if ((pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_RHINO)) && pTemp->isDead())
+                pTemp->Respawn();
+            if ((pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JORMUNGAR)) && pTemp->isDead())
+                pTemp->Respawn();
+            if ((pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_FURLBORG)) && pTemp->isDead())
+                pTemp->Respawn();
+
+            if (GameObject* pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_STASIS_GENERATOR))
+            {
+                pGo->SetGoState(GO_STATE_READY);
+                pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            }
+
+            if (Creature* pController = m_pInstance->GetSingleCreatureFromStorage(NPC_STASIS_CONTROLLER))
+                pController->ForcedDespawn();
+        }
+    }
+
+    void JustReachedHome()
+    {
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
     }
 
     void Aggro(Unit* pWho)
@@ -113,36 +254,12 @@ struct MANGOS_DLL_DECL boss_gortokAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void AttackStart(Unit* who)
     {
-        ScriptedAI::MoveInLineOfSight(pWho);
-        if (m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho)) && m_creature->IsWithinLOSInMap(pWho))
-        {
-            if (m_uiPhase==PHASE_BEGIN)
-            {
-                if (m_pInstance)
-                {
-                    switch(urand(0,3))
-                    {
-                        case 0: m_uiPhase = PHASE_FRENZIED_WORGEN; break;
-                        case 1: m_uiPhase = PHASE_RAVENOUS_FURLBORG; break;
-                        case 2: m_uiPhase = PHASE_MASSIVE_JORMUNGAR; break;
-                        case 3: m_uiPhase = PHASE_FEROCIOUS_RHINO; break;
-                        default: m_uiPhase = PHASE_FRENZIED_WORGEN; break;
-                    }
-                }
-            }
-        }
-    }
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            return;
 
-    void AttackStart(Unit* pWho)
-    {
-        if (m_uiPhase==PHASE_GORTOK_PALEHOOF)
-        {
-            m_creature->RemoveAurasDueToSpell(SPELL_FREEZE);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            ScriptedAI::AttackStart(pWho);
-        }
+        ScriptedAI::AttackStart(who);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -154,210 +271,475 @@ struct MANGOS_DLL_DECL boss_gortokAI : public ScriptedAI
     {
         DoScriptText(SAY_DEATH, m_creature);
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_GORTOK, DONE);
-    }
-
-    void EnterEvadeMode()
-    {
-        ScriptedAI::EnterEvadeMode();
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_GORTOK, FAIL);
-    }
-
-    void BeginSubBossPhase()
-    {
-        if (m_pInstance)
-        {
-            Creature* pTemp;
-            switch(m_uiPhase)
-            {
-                case PHASE_FRENZIED_WORGEN:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_WORGEN);
-                    break;
-                }
-                case PHASE_RAVENOUS_FURLBORG:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_FURBOLG);
-                    break;
-                }
-                case PHASE_MASSIVE_JORMUNGAR:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JORMUNGAR);
-                    break;
-                }
-                case PHASE_FEROCIOUS_RHINO:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_RHINO);
-                    break;
-                }
-                default:
-                    break;
-            }
-            if (pTemp)
-            {
-                pTemp->RemoveAurasDueToSpell(SPELL_FREEZE);
-                pTemp->SetInCombatWithZone();
-                pTemp->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            }
-        }
-    }
-
-    Phase getValityPhase()
-    {
-        uint32 result = m_uiPhase;
-        ++result;
-        if (result > PHASE_FEROCIOUS_RHINO)
-            result = PHASE_FRENZIED_WORGEN;
-        return (Phase)result;
-    }
-
-    bool IsSubBossDead()
-    {
-        bool result = false;
-        if (m_pInstance)
-        {
-            Creature* pTemp;
-            switch(m_uiPhase)
-            {
-                case PHASE_FRENZIED_WORGEN:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_WORGEN);
-                    break;
-                }
-                case PHASE_RAVENOUS_FURLBORG:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_FURBOLG);
-                    break;
-                }
-                case PHASE_MASSIVE_JORMUNGAR:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_JORMUNGAR);
-                    break;
-                }
-                case PHASE_FEROCIOUS_RHINO:
-                {
-                    pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_RHINO);
-                    break;
-                }
-                default:
-                    break;
-            }
-            if (pTemp)
-            {
-                pTemp->RemoveAurasDueToSpell(SPELL_FREEZE);
-                if (pTemp->isDead())
-                    result = true;
-            }
-        }
-        return result;
+        if(m_pInstance)
+           m_pInstance->SetData(TYPE_GORTOK, DONE);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        switch(m_uiPhase)
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (uiArcingSmashTimer <= uiDiff)
         {
-            case PHASE_BEGIN:
-                // Nothing
-                break;
-            case PHASE_FRENZIED_WORGEN:
-            case PHASE_RAVENOUS_FURLBORG:
-            case PHASE_MASSIVE_JORMUNGAR:
-            case PHASE_FEROCIOUS_RHINO:
-                switch(m_uiSubBossSteps)
-                {
-                    case PHASE_SUB_BOSS_BEGIN:
-                    {
-                        ++m_uiSubBossCount;
-                        BeginSubBossPhase();
-                        m_uiSubBossSteps = PHASE_SUB_BOSS_INFIGHT;
-                        break;
-                    }
-                    case PHASE_SUB_BOSS_INFIGHT:
-                    {
-                        if (m_uiCheckForDeathSubBoss < uiDiff)
-                        {
-                            if (IsSubBossDead())
-                            {
-                                m_uiSubBossSteps = PHASE_SUB_BOSS_END;
-                            }
-                            m_uiCheckForDeathSubBoss = 2000;
-                        }
-                        else
-                            m_uiCheckForDeathSubBoss -= uiDiff;
-
-                        break;                        
-                    }
-                    case PHASE_SUB_BOSS_END:
-                    {
-                        if (m_uiSubBossCount >= m_uiSubBossMax)
-                        {
-                            m_uiPhase = PHASE_GORTOK_PALEHOOF;
-                            m_creature->SetInCombatWithZone();
-                            return;
-                        }
-                        m_uiPhase = getValityPhase();
-                        m_uiSubBossSteps = PHASE_SUB_BOSS_BEGIN;
-                        break;
-                    }
-                    default:
-                        m_uiSubBossSteps = PHASE_SUB_BOSS_BEGIN;
-
-                }
-                break;
-            case PHASE_GORTOK_PALEHOOF:
-
-                if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-                    return;
-
-                if (m_uiWitheringRoar < uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, m_bIsRegularMode ? SPELL_WITHERING_ROAR : SPELL_WITHERING_ROAR_H) == CAST_OK)
-                        m_uiWitheringRoar = urand(7000,11000);
-                }
-                else
-                    m_uiWitheringRoar -= uiDiff;
-                
-                if (m_uiImpale < uiDiff)
-                {
-                    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, 0.0f, SELECT_FLAG_PLAYER))
-                    {
-                        if (DoCastSpellIfCan(pTarget, m_bIsRegularMode ? SPELL_IMPALE : SPELL_IMPALE_H) == CAST_OK)
-                            m_uiImpale = 9000;
-                    }
-                }
-                else
-                    m_uiImpale -= uiDiff;
-
-                if (m_uiArcingSmash < uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCING_SMASH) == CAST_OK)
-                        m_uiArcingSmash = 5000;
-                }
-                else
-                    m_uiArcingSmash -= uiDiff;
-                        
-                DoMeleeAttackIfReady();
-                break;
-            default:
-                m_uiPhase = PHASE_BEGIN;
+            DoCast(m_creature, SPELL_ARCING_SMASH);
+            uiArcingSmashTimer = urand(13000, 17000);
         }
+        else
+            uiArcingSmashTimer -= uiDiff;
+
+        if (uiImpaleTimer <= uiDiff)
+        {
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                DoCast(pTarget, SPELL_IMPALE);
+            uiImpaleTimer = urand(8000, 12000);
+        }
+        else
+            uiImpaleTimer -= uiDiff;
+
+        if (uiWhiteringRoarTimer <= uiDiff)
+        {
+            DoCast(m_creature, SPELL_WITHERING_ROAR);
+            uiWhiteringRoarTimer = urand(8000, 12000);
+        }
+        else
+            uiWhiteringRoarTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
     }
 };
+
+struct MANGOS_DLL_DECL npc_furlborgAI : public ScriptedAI
+{
+    npc_furlborgAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        Reset();
+    }
+
+    uint32 uiChainLightingTimer;
+    uint32 uiCrazedTimer;
+    uint32 uiTerrifyingRoarTimer;
+
+    ScriptedInstance* m_pInstance;
+    bool m_bIsRegularMode;
+
+    void Reset()
+    {
+        uiChainLightingTimer = 5000;
+        uiCrazedTimer = 10000;
+        uiTerrifyingRoarTimer = 15000;
+
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+
+        if (m_pInstance)
+            if (Creature* pGortok = m_pInstance->GetSingleCreatureFromStorage(NPC_GORTOK))
+                if (pGortok->isAlive())
+                    ((boss_gortokAI*)pGortok->AI())->Reset();
+    }
+
+    void JustReachedHome()
+    {
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+    }
+
+    void AttackStart(Unit* who)
+    {
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            return;
+
+        ScriptedAI::AttackStart(who);
+    }
+
+    void JustDied(Unit* killer)
+    {
+        if (m_pInstance)
+        {
+            if (Creature* pController = m_pInstance->GetSingleCreatureFromStorage(NPC_STASIS_CONTROLLER))
+                ((npc_gortok_orbAI*)pController->AI())->DoAction();
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (uiChainLightingTimer <= uiDiff)
+        {
+            DoCast(m_creature->getVictim(), m_bIsRegularMode ? SPELL_CHAIN_LIGHTING_N : SPELL_CHAIN_LIGHTING_H);
+            uiChainLightingTimer = 5000 + rand()%5000;
+        }
+        else
+            uiChainLightingTimer -=  uiDiff;
+
+        if (uiCrazedTimer <= uiDiff)
+        {
+            DoCast(m_creature, SPELL_CRAZED);
+            uiCrazedTimer = 8000 + rand()%4000;
+        }
+        else
+            uiCrazedTimer -=  uiDiff;
+
+        if (uiTerrifyingRoarTimer <= uiDiff)
+        {
+            DoCast(m_creature, SPELL_TERRIFYING_ROAR);
+            uiTerrifyingRoarTimer = 10000 + rand()%10000;
+        }
+        else
+            uiTerrifyingRoarTimer -=  uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct MANGOS_DLL_DECL npc_worgenAI : public ScriptedAI
+{
+    npc_worgenAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        Reset();
+    }
+
+    uint32 uiMortalWoundTimer;
+    uint32 uiEnrage1Timer;
+    uint32 uiEnrage2Timer;
+
+    ScriptedInstance* m_pInstance;
+    bool m_bIsRegularMode;
+
+    void Reset()
+    {
+        uint32 uiMortalWoundTimer = 5000;
+        uint32 uiEnrage1Timer = 15000;
+        uint32 uiEnrage2Timer = 10000;
+
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+
+        if (m_pInstance)
+            if (Creature* pGortok = m_pInstance->GetSingleCreatureFromStorage(NPC_GORTOK))
+                if (pGortok->isAlive())
+                    ((boss_gortokAI*)pGortok->AI())->Reset();
+    }
+
+    void JustReachedHome()
+    {
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+    }
+
+    void AttackStart(Unit* who)
+    {
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            return;
+
+        ScriptedAI::AttackStart(who);
+    }
+
+    void JustDied(Unit* killer)
+    {
+        if (m_pInstance)
+        {
+            if (Creature* pController = m_pInstance->GetSingleCreatureFromStorage(NPC_STASIS_CONTROLLER))
+                ((npc_gortok_orbAI*)pController->AI())->DoAction();
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+           return;
+
+        if (uiMortalWoundTimer <= uiDiff)
+        {
+            DoCast(m_creature->getVictim(), m_bIsRegularMode ? SPELL_MORTAL_WOUND_N : SPELL_MORTAL_WOUND_H);
+            uiMortalWoundTimer = 3000 + rand()%4000;
+        }
+        else
+            uiMortalWoundTimer -= uiDiff;
+
+        if (uiEnrage1Timer <= uiDiff)
+        {
+            DoCast(m_creature, SPELL_ENRAGE_1);
+            uiEnrage1Timer = 15000;
+        }
+        else
+            uiEnrage1Timer -= uiDiff;
+
+        if (uiEnrage2Timer <= uiDiff)
+        {
+            DoCast(m_creature, SPELL_ENRAGE_2);
+            uiEnrage2Timer = 10000;
+        }
+        else
+            uiEnrage2Timer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct MANGOS_DLL_DECL npc_rhinoAI : public ScriptedAI
+{
+    npc_rhinoAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        Reset();
+    }
+
+    uint32 uiStompTimer;
+    uint32 uiGoreTimer;
+    uint32 uiGrievousWoundTimer;
+
+    ScriptedInstance* m_pInstance;
+    bool m_bIsRegularMode;
+
+    void Reset()
+    {
+        uiStompTimer = 10000;
+        uiGoreTimer = 15000;
+        uiGrievousWoundTimer = 20000;
+
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+
+        if (m_pInstance)
+            if (Creature* pGortok = m_pInstance->GetSingleCreatureFromStorage(NPC_GORTOK))
+                if (pGortok->isAlive())
+                    ((boss_gortokAI*)pGortok->AI())->Reset();
+    }
+
+    void JustReachedHome()
+    {
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+    }
+
+    void AttackStart(Unit* who)
+    {
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            return;
+
+        ScriptedAI::AttackStart(who);
+    }
+
+    void JustDied(Unit* killer)
+    {
+        if (m_pInstance)
+        {
+            if (Creature* pController = m_pInstance->GetSingleCreatureFromStorage(NPC_STASIS_CONTROLLER))
+                ((npc_gortok_orbAI*)pController->AI())->DoAction();
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+           return;
+
+        if (uiStompTimer <= uiDiff)
+        {
+            DoCast(m_creature->getVictim(), SPELL_STOMP);
+            uiStompTimer = 8000 + rand()%4000;
+        }
+        else
+            uiStompTimer -= uiDiff;
+
+        if (uiGoreTimer <= uiDiff)
+        {
+            DoCast(m_creature->getVictim(), m_bIsRegularMode ? SPELL_GORE_N : SPELL_GORE_H);
+            uiGoreTimer = 13000 + rand()%4000;
+        }
+        else
+            uiGoreTimer -= uiDiff;
+
+        if (uiGrievousWoundTimer <= uiDiff)
+        {
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                DoCast(pTarget, m_bIsRegularMode ? SPELL_GRIEVOUS_WOUND_N : SPELL_GRIEVOUS_WOUND_H);
+            uiGrievousWoundTimer = 18000 + rand()%4000;
+        }
+        else
+            uiGrievousWoundTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct MANGOS_DLL_DECL npc_jormungarAI : public ScriptedAI
+{
+    npc_jormungarAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        Reset();
+    }
+
+    uint32 uiAcidSpitTimer;
+    uint32 uiAcidSplatterTimer;
+    uint32 uiPoisonBreathTimer;
+
+    ScriptedInstance* m_pInstance;
+    bool m_bIsRegularMode;
+
+    void Reset()
+    {
+        uiAcidSpitTimer = 3000;
+        uiAcidSplatterTimer = 12000;
+        uiPoisonBreathTimer = 10000;
+
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+
+        if (m_pInstance)
+            if (Creature* pGortok = m_pInstance->GetSingleCreatureFromStorage(NPC_GORTOK))
+                if (pGortok->isAlive())
+                    ((boss_gortokAI*)pGortok->AI())->Reset();
+    }
+
+    void JustReachedHome()
+    {
+        DoCast(m_creature, SPELL_FREEZE_ANIM);
+    }
+
+    void AttackStart(Unit* who)
+    {
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            return;
+
+        ScriptedAI::AttackStart(who);
+    }
+
+    void JustDied(Unit* killer)
+    {
+        if (m_pInstance)
+        {
+            if (Creature* pController = m_pInstance->GetSingleCreatureFromStorage(NPC_STASIS_CONTROLLER))
+                ((npc_gortok_orbAI*)pController->AI())->DoAction();
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+           return;
+
+        if (uiAcidSpitTimer <= uiDiff)
+        {
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                DoCast(pTarget, SPELL_ACID_SPIT);
+            uiAcidSpitTimer = 2000 + rand()%2000;
+        }
+        else
+            uiAcidSpitTimer -= uiDiff;
+
+        if (uiAcidSplatterTimer <= uiDiff)
+        {
+            DoCast(m_creature, m_bIsRegularMode ? SPELL_ACID_SPLATTER_N : SPELL_ACID_SPLATTER_H);
+            uiAcidSplatterTimer = 10000 + rand()%4000;
+        }
+        else
+            uiAcidSplatterTimer -= uiDiff;
+
+        if (uiPoisonBreathTimer <= uiDiff)
+        {
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                DoCast(pTarget, m_bIsRegularMode ? SPELL_POISON_BREATH_N : SPELL_POISON_BREATH_H);
+            uiPoisonBreathTimer = 8000 + rand()%4000;
+        }
+        else
+            uiPoisonBreathTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+bool GOUse_gortok_generator(Player* pPlayer, GameObject* pGo)
+{
+    ScriptedInstance* m_pInstance = (ScriptedInstance*)pGo->GetInstanceData();
+
+    if (m_pInstance && m_pInstance->GetData(TYPE_GORTOK) == NOT_STARTED)
+    {
+        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+        pGo->SetGoState(GO_STATE_ACTIVE);
+        Creature* pController = pGo->SummonCreature(NPC_STASIS_CONTROLLER, ORB_SPAWN_X, ORB_SPAWN_Y, ORB_Z, 0, TEMPSUMMON_DEAD_DESPAWN, 0);
+        m_pInstance->SetData(TYPE_GORTOK, IN_PROGRESS);
+    }
+    return true;
+}
 
 CreatureAI* GetAI_boss_gortok(Creature* pCreature)
 {
     return new boss_gortokAI(pCreature);
 }
 
+CreatureAI* GetAI_npc_worgen(Creature* pCreature)
+{
+    return new npc_worgenAI(pCreature);
+}
+
+CreatureAI* GetAI_npc_furlborg(Creature* pCreature)
+{
+    return new npc_furlborgAI(pCreature);
+}
+
+CreatureAI* GetAI_npc_rhino(Creature* pCreature)
+{
+    return new npc_rhinoAI(pCreature);
+}
+
+CreatureAI* GetAI_npc_jormungar(Creature* pCreature)
+{
+    return new npc_jormungarAI(pCreature);
+}
+
+CreatureAI* GetAI_npc_gortok_orb(Creature* pCreature)
+{
+    return new npc_gortok_orbAI(pCreature);
+}
+
 void AddSC_boss_gortok()
 {
-    Script* pNewScript;
+    Script *newscript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_gortok";
-    pNewScript->GetAI = &GetAI_boss_gortok;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_gortok";
+    newscript->GetAI = &GetAI_boss_gortok;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_worgen";
+    newscript->GetAI = &GetAI_npc_worgen;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_furlborg";
+    newscript->GetAI = &GetAI_npc_furlborg;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_rhino";
+    newscript->GetAI = &GetAI_npc_rhino;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_jormungar";
+    newscript->GetAI = &GetAI_npc_jormungar;
+    newscript->RegisterSelf();
+	
+    newscript = new Script;
+    newscript->Name = "npc_gortok_orb";
+    newscript->GetAI = &GetAI_npc_gortok_orb;
+    newscript->RegisterSelf();
+	
+    newscript = new Script;
+    newscript->Name = "go_gortok_generator";
+    newscript->pGOUse=&GOUse_gortok_generator;
+    newscript->RegisterSelf();
 }

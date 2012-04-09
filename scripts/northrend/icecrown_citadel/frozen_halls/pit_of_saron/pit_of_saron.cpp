@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: pit_of_saron
-SD%Complete: 0
-SDComment:
+SD%Complete: 90%
+SDComment: TODO: Slaves event when use GO ball and chain. Some love for Krick and Tyrannus event
 SDCategory: Pit of Saron
 EndScriptData */
 
@@ -50,22 +50,22 @@ static LocationsXY MoveLoc[]=
 
 enum
 {
-    SAY_SPEECH_SYLVANAS1    = -1658003,
-    SAY_SPEECH_SYLVANAS2    = -1658007,
-    SAY_SPEECH_SYLVANAS3    = -1658011,
-    SAY_SPEECH_SYLVANAS4    = -1658013,
+    SAY_SPEECH_SYLVANAS1    = -1610047,
+    SAY_SPEECH_SYLVANAS2    = -1610048,
+    SAY_SPEECH_SYLVANAS3    = -1610049,
+    SAY_SPEECH_SYLVANAS4    = -1610050,
 
-    SAY_SPEECH_JAINA1       = -1658002,
-    SAY_SPEECH_JAINA2       = -1658006,
-    SAY_SPEECH_JAINA3       = -1658009,
-    SAY_SPEECH_JAINA4       = -1658010,
-    SAY_SPEECH_JAINA5       = -1658012,
+    SAY_SPEECH_JAINA1       = -1610042,
+    SAY_SPEECH_JAINA2       = -1610043,
+    SAY_SPEECH_JAINA3       = -1610044,
+    SAY_SPEECH_JAINA4       = -1610045,
+    SAY_SPEECH_JAINA5       = -1610046,
 
-    SAY_TYRANNUS1           = -1658001,
-    SAY_TYRANNUS2           = -1658004,
-    SAY_TYRANNUS3           = -1658005,
-    SAY_TYRANNUS4           = -1658072,
-    SAY_TYRANNUS5           = -1658008, 
+    SAY_TYRANNUS1           = -1610200,
+    SAY_TYRANNUS2           = -1610201,
+    SAY_TYRANNUS3           = -1610202,
+    SAY_TYRANNUS4           = -1610203,
+    SAY_TYRANNUS5           = -1610204, 
     SPELL_NECROTIC_POWER    = 69347,
 };
 
@@ -98,7 +98,7 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
         m_lGuards.clear();
         creatureEntry = m_creature->GetEntry();
 
-        if (m_pInstance)
+        if(m_pInstance)
             m_pInstance->SetData(TYPE_INTRO, NOT_STARTED);
     }
 
@@ -106,9 +106,9 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
     {
         if (pWho->isInAccessablePlaceFor(m_creature) && !m_bIsIntro && pWho->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(pWho, 50) && m_creature->IsWithinLOSInMap(pWho))
         {
-            if (m_pInstance && m_creature->GetPositionZ() > 525.0f)
+            if(m_pInstance && m_creature->GetPositionZ() > 525.0f)
             {
-                if (m_pInstance->GetData(TYPE_INTRO) != DONE)
+                if(m_pInstance->GetData(TYPE_INTRO) != DONE)
                 {
                     m_bIsIntro = true;
                     m_uiSpeech_Timer = 5000;
@@ -187,216 +187,215 @@ struct MANGOS_DLL_DECL npc_sylvanas_jaina_pos_startAI: public ScriptedAI
     {
         if (m_bIsIntro)
         {
-            if (m_uiSpeech_Timer < uiDiff)
+            if(m_uiSpeech_Timer < uiDiff)
             {
-                switch (m_uiIntro_Phase)
+                switch(m_uiIntro_Phase)
                 {
-                    case 0:
-                        if (m_pInstance)
-                            m_pInstance->SetData(TYPE_INTRO, IN_PROGRESS);
+                case 0:
+                    if(m_pInstance)
+                        m_pInstance->SetData(TYPE_INTRO, IN_PROGRESS);
 
-                        if (Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 526.501f, 237.639f, 543.686f, 3.431f, TEMPSUMMON_TIMED_DESPAWN, 40000))
-                        {
-                            pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            DoScriptText(SAY_TYRANNUS1, pTyrannus);
-                            m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
-                        }
+                    if(Creature* pTyrannus = m_creature->SummonCreature(NPC_TYRANNUS_INTRO, 526.501f, 237.639f, 543.686f, 3.431f, TEMPSUMMON_TIMED_DESPAWN, 40000))
+                    {
+                        pTyrannus->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                        DoScriptText(SAY_TYRANNUS1, pTyrannus);
+                        m_uiTyrannusGuid = pTyrannus->GetObjectGuid();
+                    }
 
-                        switch (creatureEntry)
-                        {
-                            case NPC_JAINA_PART1:
-                                SummonAlyChampions();
-                                break;
-                            case NPC_SYLVANAS_PART1:
-                                SummonHordeChampions();
-                                break;
-                        }
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 7000;
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        SummonAlyChampions();
                         break;
-                    case 1:
-                        if (Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
-                            DoScriptText(SAY_TYRANNUS2, pTyrannus);
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 13000;
+                    case NPC_SYLVANAS_PART1:
+                        SummonHordeChampions();
                         break;
-                    case 2:
-                        switch (creatureEntry)
-                        {
-                            case NPC_JAINA_PART1:
-                                DoScriptText(SAY_SPEECH_JAINA1, m_creature);
-                                m_creature->setFaction(1802);
-                                for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
-                                {
-                                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
-                                    {
-                                        pTemp->SetWalk(false);
-                                        pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x + urand(0, 20), MoveLoc[1].y + urand(0, 20), MoveLoc[1].z);
-                                    }
-                                }
-                                break;
-                            case NPC_SYLVANAS_PART1:
-                                DoScriptText(SAY_SPEECH_SYLVANAS1, m_creature);
-                                m_creature->setFaction(1801);
-                                for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
-                                {
-                                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
-                                    {
-                                        pTemp->SetWalk(false);
-                                        pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x + urand(0, 20), MoveLoc[1].y + urand(0, 20), MoveLoc[1].z);
-                                    }
-                                }
-                                break;
-                        }
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 5000;
-                        break;
-                    case 3:
-                        float x, y, z;
-                        if (Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
-                            DoScriptText(SAY_TYRANNUS3, pTyrannus);
+                    }
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 7000;
+                    break;
+                case 1:
+                    if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
+                        DoScriptText(SAY_TYRANNUS2, pTyrannus);
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 13000;
+                    break;
+                case 2:
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        DoScriptText(SAY_SPEECH_JAINA1, m_creature);
+                        m_creature->setFaction(1802);
                         for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
                         {
                             if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
                             {
-                                pTemp->GetPosition(x, y, z);
-                                pTemp->GetMotionMaster()->MovePoint(0, x, y, z + 5.0f);
-                                pTemp->_AddAura(69413);
+                                pTemp->SetWalk(false);
+                                pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x + urand(0, 20), MoveLoc[1].y + urand(0, 20), MoveLoc[1].z);
                             }
                         }
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 5000;
                         break;
-                    case 4:
-                        if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
-                        {
-                            DoScriptText(SAY_TYRANNUS4, pTyrannus);
-                        }
-                        switch (creatureEntry)
-                        {
-                            case NPC_JAINA_PART1:
-                                DoScriptText(SAY_SPEECH_JAINA2, m_creature);
-                                break;
-                            case NPC_SYLVANAS_PART1:
-                                DoScriptText(SAY_SPEECH_SYLVANAS2, m_creature);
-                                break;
-                        }
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 5000;
-                        break;
-                    case 5:
-                        if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
-                        {
-                            pTyrannus->CastSpell(pTyrannus, 69753, false);
-                        }
+                    case NPC_SYLVANAS_PART1:
+                        DoScriptText(SAY_SPEECH_SYLVANAS1, m_creature);
+                        m_creature->setFaction(1801);
                         for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
                         {
                             if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
                             {
+                                pTemp->SetWalk(false);
+                                pTemp->GetMotionMaster()->MovePoint(0, MoveLoc[1].x + urand(0, 20), MoveLoc[1].y + urand(0, 20), MoveLoc[1].z);
+                            }
+                        }
+                        break;
+                    }
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 5000;
+                    break;
+                case 3:
+                    float x, y, z;
+                    if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
+                        DoScriptText(SAY_TYRANNUS3, pTyrannus);
+                    for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
+                    {
+                        if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
+                        {
+                            pTemp->GetPosition(x, y, z);
+                            pTemp->GetMotionMaster()->MovePoint(0, x, y, z + 5.0f);
+                            pTemp->_AddAura(69413);
+                        }
+                    }
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 5000;
+                    break;
+                case 4:
+                    if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
+                    {
+                        DoScriptText(SAY_TYRANNUS4, pTyrannus);
+                    }
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        DoScriptText(SAY_SPEECH_JAINA2, m_creature);
+                        break;
+                    case NPC_SYLVANAS_PART1:
+                        DoScriptText(SAY_SPEECH_SYLVANAS2, m_creature);
+                        break;
+                    }
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 5000;
+                    break;
+                case 5:
+                    if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
+                    {
+                        pTyrannus->CastSpell(pTyrannus, 69753, false);
+                    }
+                    for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
+                    {
+                        if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
+                        {
+                            pTemp->GetPosition(x, y, z);
+                            pTemp->GetMotionMaster()->MovePoint(0, x, y, z - 5.0f);
+                        }
+                    }  
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 1000;
+                    break;
+                case 6:
+                    if(Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
+                    {
+                        DoScriptText(SAY_TYRANNUS5, pTyrannus);
+                        for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
+                        {
+                            if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
+                            {
+                                pTemp->setFaction(21);
+                                pTemp->SetDisplayId(9785);
                                 pTemp->GetPosition(x, y, z);
                                 pTemp->GetMotionMaster()->MovePoint(0, x, y, z - 5.0f);
+                                pTemp->SetSpeedRate(MOVE_RUN, 0.8f);
+                                pTemp->GetPosition(x, y, z);
+                                pTemp->GetMotionMaster()->MovePoint(0, SummonLoc[2].x + urand(0, 20), SummonLoc[2].y + urand(0, 20), z);
+                                pTemp->RemoveAurasDueToSpell(69413);
                             }
-                        }  
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 1000;
-                        break;
-                    case 6:
-                        if (Creature* pTyrannus = m_pInstance->instance->GetCreature(m_uiTyrannusGuid))
+                        }
+                    }  
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 5000;
+                    break;
+                case 7:
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        DoScriptText(SAY_SPEECH_JAINA3, m_creature);
+                        for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
                         {
-                            DoScriptText(SAY_TYRANNUS5, pTyrannus);
-                            for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
+                            if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
                             {
-                                if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
-                                {
-                                    pTemp->setFaction(21);
-                                    pTemp->SetDisplayId(9785);
-                                    pTemp->GetPosition(x, y, z);
-                                    pTemp->GetMotionMaster()->MovePoint(0, x, y, z - 5.0f);
-                                    pTemp->SetSpeedRate(MOVE_RUN, 0.8f);
-                                    pTemp->GetPosition(x, y, z);
-                                    pTemp->GetMotionMaster()->MovePoint(0, SummonLoc[2].x + urand(0, 20), SummonLoc[2].y + urand(0, 20), z);
-                                    pTemp->RemoveAurasDueToSpell(69413);
-                                }
-                            }
-                        }  
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 5000;
-                        break;
-                    case 7:
-                        switch (creatureEntry)
-                        {
-                            case NPC_JAINA_PART1:
-                                DoScriptText(SAY_SPEECH_JAINA3, m_creature);
-                                for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
-                                {
-                                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
-                                    {
-                                        m_creature->CastSpell(pTemp, 72906, false);
-                                    } 
-                                }
-                                break;
-                            case NPC_SYLVANAS_PART1:
-                                for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
-                                {
-                                    if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
-                                    {
-                                        m_creature->CastSpell(pTemp, 59514, true);
-                                    } 
-                                }
-                                break;
+                                m_creature->CastSpell(pTemp, 72906, false);
+                            } 
                         }
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 5000;
                         break;
-                    case 8:
-                        switch (creatureEntry)
+                    case NPC_SYLVANAS_PART1:
+                        for (GUIDList::iterator i = m_lGuards.begin(); i != m_lGuards.end(); ++i)
                         {
-                            case NPC_JAINA_PART1:
-                                DoScriptText(SAY_SPEECH_JAINA4, m_creature);
-                                break;
-                            case NPC_SYLVANAS_PART1:
-                                DoScriptText(SAY_SPEECH_SYLVANAS3, m_creature);
-                                break;
+                            if (Creature *pTemp = m_creature->GetMap()->GetCreature(*i))
+                            {
+                                m_creature->CastSpell(pTemp, 59514, true);
+                            } 
                         }
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 7000;
                         break;
-                    case 9:
-                        switch (creatureEntry)
-                        {
-                            case NPC_JAINA_PART1:
-                                DoScriptText(SAY_SPEECH_JAINA5, m_creature);
-                                break;
-                            case NPC_SYLVANAS_PART1:
-                                DoScriptText(SAY_SPEECH_SYLVANAS4, m_creature);
-                                break;
-                        }
-                        if (m_pInstance)
-                            m_pInstance->SetData(TYPE_INTRO,DONE);
+                    }
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 5000;
+                    break;
+                case 8:
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        DoScriptText(SAY_SPEECH_JAINA4, m_creature);
+                        break;
+                    case NPC_SYLVANAS_PART1:
+                        DoScriptText(SAY_SPEECH_SYLVANAS3, m_creature);
+                        break;
+                    }
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 7000;
+                    break;
+                case 9:
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        DoScriptText(SAY_SPEECH_JAINA5, m_creature);
+                        break;
+                    case NPC_SYLVANAS_PART1:
+                        DoScriptText(SAY_SPEECH_SYLVANAS4, m_creature);
+                        break;
+                    }
+                    if(m_pInstance)
+                        m_pInstance->SetData(TYPE_INTRO,DONE);
+                    ++m_uiIntro_Phase;
+                    m_uiSpeech_Timer = 10000;
+                    break;
+                case 10:
+                    switch (creatureEntry)
+                    {
+                    case NPC_JAINA_PART1:
+                        m_creature->ForcedDespawn();
+                        break;
+                    case NPC_SYLVANAS_PART1:
+                        m_creature->ForcedDespawn();
+                        break;
+                    }
+                    ++m_uiIntro_Phase;
+                    m_bIsIntro = false;
+                    m_uiSpeech_Timer = 1000;
+                    break;
 
-                        ++m_uiIntro_Phase;
-                        m_uiSpeech_Timer = 10000;
-                        break;
-                    case 10:
-                        switch (creatureEntry)
-                        {
-                            case NPC_JAINA_PART1:
-                                m_creature->ForcedDespawn();
-                                break;
-                            case NPC_SYLVANAS_PART1:
-                                m_creature->ForcedDespawn();
-                                break;
-                        }
-                        ++m_uiIntro_Phase;
-                        m_bIsIntro = false;
-                        m_uiSpeech_Timer = 1000;
-                        break;
-                    default:
-                        m_uiSpeech_Timer = 100000;
+                default:
+                    m_uiSpeech_Timer = 100000;
                 }
             }
-            else
-                m_uiSpeech_Timer -= uiDiff;
+            else m_uiSpeech_Timer -= uiDiff;
         }
     }
 };

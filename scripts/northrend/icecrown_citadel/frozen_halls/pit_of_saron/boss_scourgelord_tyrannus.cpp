@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -51,14 +51,14 @@ enum
     SPELL_ICY_BLAST_SLOW                = 69238,
     SPELL_ICY_BLAST_SLOW_H              = 69628,
 
-    SAY_OUTRO1_SLAVE_HORDE              = -1658061,
-    SAY_OUTRO1_SLAVE_ALLY               = -1658061,
-    SAY_OUTRO2_SLAVE                    = -1658062,
-    SAY_OUTRO3_HORDE                    = -1658064,
-    SAY_OUTRO3_ALY                      = -1658063,
-    SAY_OUTRO4_HORDE                    = -1658067,
-    SAY_OUTRO4_ALY                      = -1658065,
-    SAY_OUTRO5_ALY                      = -1658066,
+    SAY_OUTRO1_SLAVE_HORDE              = -1610094,
+    SAY_OUTRO1_SLAVE_ALLY               = -1610101,
+    SAY_OUTRO2_SLAVE                    = -1610095,
+    SAY_OUTRO3_HORDE                    = -1610096,
+    SAY_OUTRO3_ALY                      = -1610097,
+    SAY_OUTRO4_HORDE                    = -1610098,
+    SAY_OUTRO4_ALY                      = -1610099,
+    SAY_OUTRO5_ALY                      = -1610100,
 
     SPELL_FROST_BOMB                    = 70521,
 
@@ -81,24 +81,24 @@ struct LocationsXY
 
 enum gauntlet
 {
-    SAY_GAUNTLET1            = -1610081,
-    SAY_GAUNTLET2            = -1610082,
-    SAY_TUNNEL               = -1610083,
+    SAY_GAUNTLET1		= -1610081,
+    SAY_GAUNTLET2		= -1610082,
+    SAY_TUNNEL			= -1610083,
     // icicle event
-    NPC_COLLAPSING_ICICLE    = 36847,
-    SPELL_ICICLE             = 69428,
-    SPELL_ICICLE_DMG         = 69426,
-    SPELL_ICICLE_SUMMON      = 69424,
+    NPC_COLLAPSING_ICICLE	= 36847,
+    SPELL_ICICLE			= 69428,
+    SPELL_ICICLE_DMG		= 69426,
+    SPELL_ICICLE_SUMMON		= 69424,
     // mobs
     // first 2 waves
-    NPC_WRATHBRINGER         = 36840,
-    NPC_FLAMEBEARER          = 36893,
-    NPC_DEATHBRINGER         = 36892,
+    NPC_WRATHBRINGER		= 36840,
+    NPC_FLAMEBEARER			= 36893,
+    NPC_DEATHBRINGER		= 36892,
     // another 2 waves
-    NPC_FALLEN_WARRIOR       = 36841,
-    NPC_WRATHBONE_COLDWRAITH = 36842,
-    NPC_WRATHBONE_SORCERER   = 37728,    // this is for the end event, not used
-    NPC_GLACIAL_REVENANT     = 36874,
+    NPC_FALLEN_WARRIOR		= 36841,
+    NPC_WRATHBONE_COLDWRAITH= 36842,
+    NPC_WRATHBONE_SORCERER	= 37728,	// this is for the end event, not used
+    NPC_GLACIAL_REVENANT	= 36874,
 };
 
 static LocationsXY SummonLoc[]=

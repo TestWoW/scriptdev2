@@ -26,17 +26,15 @@ EndScriptData */
 
 enum saysSD2
 {
-    SAY_AGGRO                           = -1658014,
-    SAY_SLAY_1                          = -1658015,
-    SAY_SLAY_2                          = -1658019,
-    SAY_BOULDER_HIT                     = -1658022,         // TODO How must this be handled?
-    SAY_DEATH                           = -1658017,
+    SAY_AGGRO                           = -1610051,
+    SAY_SLAY_1                          = -1610052,
+    SAY_BOULDER_HIT                     = -1610054,         // TODO How must this be handled?
+    SAY_DEATH                           = -1610057,
+    SAY_FORGE_1                         = -1610055,
+    SAY_FORGE_2                         = -1610056,
+    SAY_TYRANNUS_GARFROST               = -1610058,
 
-    SAY_FORGE_1                         = -1658018,
-    SAY_FORGE_2                         = -1658071,
-    SAY_TYRANNUS_GARFROST               = -1658020,
-
-    EMOTE_THROW_SARONITE                = -1658022,
+    EMOTE_THROW_SARONITE                = -1610053,
     EMOTE_DEEP_FREEZE                   = -1658023,
 
     SPELL_PERMAFROST                    = 70326,
@@ -53,10 +51,10 @@ enum saysSD2
     SPELL_FORGE_MACE_H                  = 70335,
     SPELL_FORGE_BLADE                   = 68774,
     SPELL_FORGE_BLADE_H                 = 70334,
-
-    SAY_FREE_SLAVE_HORDE                = -1658013,
-    SAY_FREE_SLAVE_ALLY                 = -1658012,
-    SAY_TYRANNUS_OUTRO                  = -1658020,
+    
+    SAY_FREE_SLAVE_HORDE                = -1610059,
+    SAY_FREE_SLAVE_ALLY                 = -1610102,
+    SAY_TYRANNUS_OUTRO                  = -1610058,
 
     PHASE_NO_ENCHANTMENT                = 1,
     PHASE_BLADE_ENCHANTMENT             = 2,
@@ -81,7 +79,6 @@ struct LocationsXY
     float x, y, z, o;
     uint32 id;
 };
-
 static LocationsXY SummonLoc[]=
 {
     {719.812f, -167.183f, 526.721f,},
@@ -93,7 +90,7 @@ static LocationsXY MoveLoc[]=
 {
     {677.445f, -186.521f, 526.702f},
     {708.190f, -194.619f, 526.805f},
-    {687.257f, -193.644f, 526.717f},
+    {687.257f, -193.644f, 526.717f}, 
 };
 
 #define HOME_X                      712.927f
@@ -310,7 +307,7 @@ struct MANGOS_DLL_DECL boss_forgemaster_garfrostAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        DoScriptText(urand(0,1) ? SAY_SLAY_1 : SAY_SLAY_2, m_creature);
+        DoScriptText(SAY_SLAY_1, m_creature);
     }
 
     void MovementInform(uint32 uiMotionType, uint32 uiPointId)

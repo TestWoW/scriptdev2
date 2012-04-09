@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+   Copyright (C) 2011 MangosR2_ScriptDev2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -1593,7 +1593,7 @@ enum mograine
     SAY_LIGHT_OF_DAWN67               = -1609267, // Highlord Tirion Fordring
     SAY_LIGHT_OF_DAWN68               = -1609268, // Highlord Darion Mograine
 
-    EMOTE_LIGHT_OF_DAWN01             = -1609269, // Emotes
+    EMOTE_LIGHT_OF_DAWN01             = -1609269,  // Emotes
     EMOTE_LIGHT_OF_DAWN02             = -1609270,
     EMOTE_LIGHT_OF_DAWN03             = -1609271,
     EMOTE_LIGHT_OF_DAWN04             = -1609272,
@@ -1714,7 +1714,7 @@ struct Locations
 static Locations LightofDawnLoc[]=
 {
     {2281.335f, -5300.409f, 85.170f, 0.0f},     // 0 Tirion Fordring loc
-    {2283.896f, -5287.914f, 83.066f, 1.55f},    // 1 Tirion Fordring loc2
+    {2283.896f, -5287.914f, 83.066f, 1.55f},  // 1 Tirion Fordring loc2
     {2281.461f, -5263.014f, 81.164f, 0.0f},     // 2 Tirion charges
     {2262.277f, -5293.477f, 82.167f, 0.0f},     // 3 Tirion run
     {2270.286f, -5287.73f, 82.262f, 0.0f},      // 4 Tirion relocate
@@ -1735,11 +1735,11 @@ static Locations LightofDawnLoc[]=
     {2289.02f, -5281.985f, 82.207f, 0.0f},      // 19 Koltira loc2
     {2273.289f, -5273.675f, 81.701f, 0.0f},     // 20 Thassarian loc1
     {2273.332f, -5275.544f, 81.849f, 0.0f},     // 21 Thassarian loc2
-    {2281.198f, -5257.397f, 80.224f, 4.66f},    // 22 Alexandros loc1
+    {2281.198f, -5257.397f, 80.224f, 4.66f},  // 22 Alexandros loc1
     {2281.156f, -5259.934f, 80.647f, 0.0f},     // 23 Alexandros loc2
-    {2281.294f, -5281.895f, 82.445f, 1.35f},    // 24 Darion loc1
+    {2281.294f, -5281.895f, 82.445f, 1.35f},  // 24 Darion loc1
     {2281.093f, -5263.013f, 81.125f, 0.0f},     // 25 Darion loc1
-    {2281.313f, -5250.282f, 79.322f, 4.69f},    // 26 Lich King spawns
+    {2281.313f, -5250.282f, 79.322f, 4.69f},  // 26 Lich King spawns
     {2281.523f, -5261.058f, 80.877f, 0.0f},     // 27 Lich king move forwards
     {2272.709f, -5255.552f, 78.226f, 0.0f},     // 28 Lich king kicked
     {2273.972f, -5257.676f, 78.862f, 0.0f}      // 29 Lich king moves forward
@@ -1826,15 +1826,15 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
             UpdateWorldState(m_creature->GetMap(), WORLD_STATE_EVENT_BEGIN, 0);
 
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiTirionGUID))
-                pTemp->ForcedDespawn();
+                pTemp->SetDeathState(JUST_DIED);
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiKorfaxGUID))
-                pTemp->ForcedDespawn();
+                pTemp->SetDeathState(JUST_DIED);
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiMaxwellGUID))
-                pTemp->ForcedDespawn();
+                pTemp->SetDeathState(JUST_DIED);
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiEligorGUID))
-                pTemp->ForcedDespawn();
+                pTemp->SetDeathState(JUST_DIED);
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiRayneGUID))
-                pTemp->ForcedDespawn();
+                pTemp->SetDeathState(JUST_DIED);
 
             uiTirionGUID.Clear();
             uiKorfaxGUID.Clear();
@@ -1845,57 +1845,51 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
             for (uint8 i = 0; i < ENCOUNTER_DEFENDER_NUMBER; ++i)
             {
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiDefenderGUID[i]))
-                    pTemp->ForcedDespawn();
+                    pTemp->SetDeathState(JUST_DIED);
                 uiDefenderGUID[i].Clear();
             }
             for (uint8 i = 0; i < ENCOUNTER_EARTHSHATTER_NUMBER; ++i)
             {
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiEarthshatterGUID[i]))
-                    pTemp->ForcedDespawn();
+                    pTemp->SetDeathState(JUST_DIED);
                 uiEarthshatterGUID[i].Clear();
             }
 
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiKoltiraGUID))
-            {
                 pTemp->SetDeathState(JUST_DIED);
-                pTemp->Respawn();
-            }
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiOrbazGUID))
-            {
                 pTemp->SetDeathState(JUST_DIED);
-                pTemp->Respawn();
-            }
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiThassarianGUID))
-            {
                 pTemp->SetDeathState(JUST_DIED);
-                pTemp->Respawn();
-            }
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiLichKingGUID))
-                pTemp->ForcedDespawn();
+                pTemp->SetDeathState(JUST_DIED);
 
+            uiKoltiraGUID.Clear();
+            uiOrbazGUID.Clear();
+            uiThassarianGUID.Clear();
             uiLichKingGUID.Clear();
             for(uint8 i = 0; i < ENCOUNTER_ABOMINATION_NUMBER; ++i)
             {
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiAbominationGUID[i]))
-                    pTemp->ForcedDespawn();
+                    pTemp->SetDeathState(JUST_DIED);
                 uiAbominationGUID[i].Clear();
             }
             for(uint8 i = 0; i < ENCOUNTER_BEHEMOTH_NUMBER; ++i)
             {
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiBehemothGUID[i]))
-                    pTemp->ForcedDespawn();
+                    pTemp->SetDeathState(JUST_DIED);
                 uiBehemothGUID[i].Clear();
             }
             for(uint8 i = 0; i < ENCOUNTER_GHOUL_NUMBER; ++i)
             {
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiGhoulGUID[i]))
-                    pTemp->ForcedDespawn();
+                    pTemp->SetDeathState(JUST_DIED);
                 uiGhoulGUID[i].Clear();
             }
             for(uint8 i = 0; i < ENCOUNTER_WARRIOR_NUMBER; ++i)
             {
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiWarriorGUID[i]))
-                    pTemp->ForcedDespawn();
+                    pTemp->SetDeathState(JUST_DIED);
                 uiWarriorGUID[i].Clear();
             }
         }
@@ -1933,7 +1927,7 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
         switch(i)
         {
             case 0:
-                uiStep = 1;
+                m_creature->SetWalk(false);
                 SetEscortPaused(true);
                 break;
             case 1:
@@ -1969,8 +1963,6 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiKoltiraGUID))
                     pTemp->Unmount();
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiThassarianGUID))
-                    pTemp->Unmount();
-                if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiOrbazGUID))
                     pTemp->Unmount();
 
                 bIsBattle = true;
@@ -2025,8 +2017,6 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiKoltiraGUID))
                     pTemp->SetStandState(UNIT_STAND_STATE_KNEEL);
                 if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiThassarianGUID))
-                    pTemp->SetStandState(UNIT_STAND_STATE_KNEEL);
-                if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiOrbazGUID))
                     pTemp->SetStandState(UNIT_STAND_STATE_KNEEL);
                 SetEscortPaused(true);
                 break;
@@ -2098,10 +2088,7 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
                         uiPhase_timer = 500;
                         if (uiSummon_counter < ENCOUNTER_GHOUL_NUMBER)
                         {
-                            float fX = (m_creature->GetPositionX()-20)+rand()%40;
-                            float fY = (m_creature->GetPositionY()-20)+rand()%40;
-                            float fZ = m_creature->GetTerrain()->GetWaterOrGroundLevel(fX,fY,m_creature->GetPositionZ());
-                            if (Creature* pTemp = m_creature->SummonCreature(NPC_ACHERUS_GHOUL, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                            if (Creature* pTemp = m_creature->SummonCreature(NPC_ACHERUS_GHOUL, (m_creature->GetPositionX()-20)+rand()%40, (m_creature->GetPositionY()-20)+rand()%40, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
                             {
                                 pTemp->SetWalk(false);
                                 pTemp->setFaction(2084);
@@ -2121,10 +2108,7 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
                         uiPhase_timer = 500;
                         if (uiSummon_counter < ENCOUNTER_ABOMINATION_NUMBER)
                         {
-                            float fX = (m_creature->GetPositionX()-20)+rand()%40;
-                            float fY = (m_creature->GetPositionY()-20)+rand()%40;
-                            float fZ = m_creature->GetTerrain()->GetWaterOrGroundLevel(fX,fY,m_creature->GetPositionZ());
-                            if (Creature* pTemp = m_creature->SummonCreature(NPC_RAMPAGING_ABOMINATION, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                            if (Creature* pTemp = m_creature->SummonCreature(NPC_RAMPAGING_ABOMINATION, (m_creature->GetPositionX()-20)+rand()%40, (m_creature->GetPositionY()-20)+rand()%40, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
                             {
                                 pTemp->SetWalk(false);
                                 pTemp->setFaction(2084);
@@ -2144,10 +2128,7 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
                         uiPhase_timer = 500;
                         if (uiSummon_counter < ENCOUNTER_WARRIOR_NUMBER)
                         {
-                            float fX = (m_creature->GetPositionX()-20)+rand()%40;
-                            float fY = (m_creature->GetPositionY()-20)+rand()%40;
-                            float fZ = m_creature->GetTerrain()->GetWaterOrGroundLevel(fX,fY,m_creature->GetPositionZ());
-                            if (Creature* pTemp = m_creature->SummonCreature(NPC_WARRIOR_OF_THE_FROZEN_WASTES, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                            if (Creature* pTemp = m_creature->SummonCreature(NPC_WARRIOR_OF_THE_FROZEN_WASTES, (m_creature->GetPositionX()-20)+rand()%40, (m_creature->GetPositionY()-20)+rand()%40, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
                             {
                                 pTemp->SetWalk(false);
                                 pTemp->setFaction(2084);
@@ -2167,10 +2148,7 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
                         uiPhase_timer = 500;
                         if (uiSummon_counter < ENCOUNTER_BEHEMOTH_NUMBER)
                         {
-                            float fX = (m_creature->GetPositionX()-20)+rand()%40;
-                            float fY = (m_creature->GetPositionY()-20)+rand()%40;
-                            float fZ = m_creature->GetTerrain()->GetWaterOrGroundLevel(fX,fY,m_creature->GetPositionZ());
-                            if (Creature* pTemp = m_creature->SummonCreature(NPC_FLESH_BEHEMOTH, fX, fY, fZ, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
+                            if (Creature* pTemp = m_creature->SummonCreature(NPC_FLESH_BEHEMOTH, (m_creature->GetPositionX()-20)+rand()%40, (m_creature->GetPositionY()-20)+rand()%40, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 300000))
                             {
                                 pTemp->SetWalk(false);
                                 pTemp->setFaction(2084);
@@ -2342,7 +2320,7 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
 
                     case 27:
                         if (Creature* pTemp = m_creature->GetMap()->GetCreature(uiDarionGUID))
-                            pTemp->ForcedDespawn();
+                            pTemp->SetDeathState(JUST_DIED);
                         JumpToNextStep(24000);
                         break;
 
@@ -2776,8 +2754,9 @@ struct MANGOS_DLL_DECL npc_highlord_darion_mograineAI : public npc_escortAI
                                         i->getSource()->CastSpell(i->getSource(), SPELL_THE_LIGHT_OF_DAWN_Q, false);
                             }
                         }
-                        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                        JumpToNextStep(60000); // 1 minute wait before despawn
+                        m_creature->SetVisibility(VISIBILITY_OFF); // respawns another Darion for quest turn in
+                        m_creature->SummonCreature(NPC_HIGHLORD_DARION_MOGRAINE, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 180000);
+                        JumpToNextStep(1000);
                         break;
 
                     case 72:
@@ -3124,7 +3103,8 @@ bool GossipSelect_npc_highlord_darion_mograine(Player* pPlayer, Creature* pCreat
     {
         case GOSSIP_ACTION_INFO_DEF+1:
             pPlayer->CLOSE_GOSSIP_MENU();
-            ((npc_highlord_darion_mograineAI*)pCreature->AI())->Start(true, pPlayer, NULL ,true);
+            ((npc_highlord_darion_mograineAI*)pCreature->AI())->uiStep = 1;
+            ((npc_highlord_darion_mograineAI*)pCreature->AI())->Start(false, pPlayer);
             break;
     }
     return true;
@@ -3293,9 +3273,9 @@ struct MANGOS_DLL_DECL mob_acherus_ghoulAI : public ScriptedAI
 enum
 {
     SPELL_REVIVE    =    51918,
-};
 
-#define REVIVE_WHISPER "It is not yet your time, champion. Rise! Rise and fight once more!"
+    SAY_REVIVE      =    -1609089,
+};
 
 struct MANGOS_DLL_DECL npc_valkyr_battle_maidenAI : ScriptedAI
 {
@@ -3351,7 +3331,7 @@ struct MANGOS_DLL_DECL npc_valkyr_battle_maidenAI : ScriptedAI
                     break;
                 case 2:
                     DoCast(pPlayer, SPELL_REVIVE, true);
-                    m_creature->MonsterWhisper(REVIVE_WHISPER, pPlayer);
+                    m_creature->MonsterWhisper(SAY_REVIVE, pPlayer);
                     // cause 51918 has cast time of 2 seconds
                     m_uiPhaseTimer = 3000;
                     m_uiPhase++;
@@ -3527,12 +3507,12 @@ struct MANGOS_DLL_DECL npc_mine_carAI : public ScriptedAI
 
 enum
 {
-    SPELL_CAR_DRAG  = 52465,
-    SPELL_CAR_CHECK = 54173
-};
+    SPELL_CAR_DRAG       = 52465,
+    SPELL_CAR_CHECK      = 54173,
 
-#define SAY_SCARLET_MINER1  "Where'd this come from? I better get this down to the ships before the foreman sees it!"
-#define SAY_SCARLET_MINER2  "Now I can have a rest!"
+    SAY_SCARLET_MINER1   = -1609090,
+    SAY_SCARLET_MINER2   = -1609091,
+};
 
 struct MANGOS_DLL_DECL npc_scarlet_minerAI : public npc_escortAI
 {
@@ -4026,6 +4006,94 @@ struct MANGOS_DLL_DECL mob_scarlet_courierAI : ScriptedAI
     }
 };
 
+// Teleporter up
+
+enum
+{
+    GOSSIP_TELEPORT    = 50000,
+};
+
+bool GossipHello_teleport_acherus_up(Player* pPlayer, Creature* pCreature)
+{
+    char const* GOSSIP_OPTION_UP;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_OPTION_UP = "Quiero ir al piso de arriba.";
+                      break;
+     case LOCALE_esMX:
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_OPTION_UP = "I want go to up floor.";
+                      break;
+    };
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_UP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetObjectGuid());
+
+    return true;
+}
+
+bool GossipSelect_teleport_acherus_up(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    switch (uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        pPlayer->TeleportTo(0, 2402.44f, -5633.27f, 420.66f, 3.71f);
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+    return true;
+}
+
+// Teleporter down
+
+bool GossipHello_teleport_acherus_down(Player* pPlayer, Creature* pCreature)
+{
+    char const* GOSSIP_OPTION_UP;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_OPTION_UP = "Quiero ir al piso de abajo.";
+                      break;
+     case LOCALE_esMX:
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_OPTION_UP = "I want go to down floor.";
+                      break;
+    };
+
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_UP, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    pPlayer->SEND_GOSSIP_MENU(GOSSIP_TELEPORT, pCreature->GetObjectGuid());
+
+    return true;
+}
+
+bool GossipSelect_teleport_acherus_down(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    switch (uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        pPlayer->TeleportTo(0, 2402.44f, -5633.27f, 377.02f, 3.71f);
+        pPlayer->CLOSE_GOSSIP_MENU();
+    }
+    return true;
+}
 CreatureAI* GetAI_mob_scarlet_courier(Creature* pCreature)
 {
     return new mob_scarlet_courierAI(pCreature);
@@ -4188,5 +4256,17 @@ void AddSC_ebon_hold()
     pNewScript = new Script;
     pNewScript->Name= "mob_scarlet_courier";
     pNewScript->GetAI = &GetAI_mob_scarlet_courier;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "teleport_acherus_up";
+    pNewScript->pGossipHello = &GossipHello_teleport_acherus_up;
+    pNewScript->pGossipSelect = &GossipSelect_teleport_acherus_up;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "teleport_acherus_down";
+    pNewScript->pGossipHello = &GossipHello_teleport_acherus_down;
+    pNewScript->pGossipSelect = &GossipSelect_teleport_acherus_down;
     pNewScript->RegisterSelf();
 }

@@ -65,12 +65,13 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equ
 -- Thaelis has wrong faction was gettting killed by his own kind 8P
 UPDATE `creature_template` SET `faction_A` = 16, `faction_H` = 16 WHERE `entry` = 15949;
 
--- ------------
 -- Quest 13828, 13829, 13835, 13838, 13837, 13839, 13625, 13677
 -- ------------
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_melee_target' WHERE `entry` = 33229;
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_ranged_target' WHERE `entry` = 33243;
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_charge_target' WHERE `entry` = 33272;
+
+-- ------------
 
 -- ------------
 -- Quest 13663

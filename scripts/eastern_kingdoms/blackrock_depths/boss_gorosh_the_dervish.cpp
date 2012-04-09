@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 MangosR2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -26,21 +26,21 @@ EndScriptData */
 
 enum
 {
-    SPELL_WHIRLWIND             = 15589,
-    SPELL_MORTALSTRIKE          = 24573,
+    SPELL_WHIRLWIND            = 15589,
+    SPELL_MORTALSTRIKE         = 24573,
 };
 
 struct MANGOS_DLL_DECL boss_gorosh_the_dervishAI : public ScriptedAI
 {
     boss_gorosh_the_dervishAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
 
-    uint32 m_uiWhirlWindTimer;
-    uint32 m_uiMortalStrikeTimer;
+    uint32 m_uiWhirlWind_Timer;
+    uint32 m_uiMortalStrike_Timer;
 
     void Reset()
     {
-        m_uiWhirlWindTimer = 12000;
-        m_uiMortalStrikeTimer = 22000;
+        m_uiWhirlWind_Timer = 12000;
+        m_uiMortalStrike_Timer = 22000;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -48,28 +48,21 @@ struct MANGOS_DLL_DECL boss_gorosh_the_dervishAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //WhirlWind_Timer
-        if (m_uiWhirlWindTimer < uiDiff)
+        if (m_uiWhirlWind_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_WHIRLWIND);
-            m_uiWhirlWindTimer = 15000;
-        }
-        else
-            m_uiWhirlWindTimer -= uiDiff;
+            DoCastSpellIfCan(m_creature,SPELL_WHIRLWIND);
+            m_uiWhirlWind_Timer = 15000;
+        }else m_uiWhirlWind_Timer -= uiDiff;
 
-        //MortalStrike_Timer
-        if (m_uiMortalStrikeTimer < uiDiff)
+        if (m_uiMortalStrike_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALSTRIKE);
-            m_uiMortalStrikeTimer = 15000;
-        }
-        else
-            m_uiMortalStrikeTimer -= uiDiff;
+            DoCastSpellIfCan(m_creature->getVictim(),SPELL_MORTALSTRIKE);
+            m_uiMortalStrike_Timer = 15000;
+        }else m_uiMortalStrike_Timer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
 };
-
 CreatureAI* GetAI_boss_gorosh_the_dervish(Creature* pCreature)
 {
     return new boss_gorosh_the_dervishAI(pCreature);

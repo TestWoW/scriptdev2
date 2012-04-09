@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -53,12 +53,8 @@ void instance_blackwing_lair::OnCreatureCreate(Creature* pCreature)
             if (pCreature->IsWithinDist2d(aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], 50.0f))
                 m_lTechnicianGuids.push_back(pCreature->GetObjectGuid());
             break;
-        case NPC_MONSTER_GENERATOR:
-            m_lGeneratorGuids.push_back(pCreature->GetObjectGuid());
-            break;
-        case NPC_BLACKWING_ORB_TRIGGER:
         case NPC_VAELASTRASZ:
-            m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
+            m_mNpcEntryGuidStore[NPC_VAELASTRASZ] = pCreature->GetObjectGuid();
             break;
     }
 }
@@ -68,7 +64,6 @@ void instance_blackwing_lair::OnObjectCreate(GameObject* pGo)
     switch(pGo->GetEntry())
     {
         case GO_DOOR_RAZORGORE_ENTER:
-        case GO_ORB_OF_DOMINATION:
             break;
         case GO_DOOR_RAZORGORE_EXIT:
             if (m_auiEncounter[TYPE_RAZORGORE] == DONE)
@@ -90,9 +85,6 @@ void instance_blackwing_lair::OnObjectCreate(GameObject* pGo)
             if (m_auiEncounter[TYPE_LASHLAYER] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-        case GO_BLACK_DRAGON_EGG:
-            m_lDragonEggGuids.push_back(pGo->GetObjectGuid());
-            return;
 
         default:
             return;
@@ -109,14 +101,6 @@ void instance_blackwing_lair::SetData(uint32 uiType, uint32 uiData)
             DoUseDoorOrButton(GO_DOOR_RAZORGORE_ENTER);
             if (uiData == DONE)
                 DoUseDoorOrButton(GO_DOOR_RAZORGORE_EXIT);
-            else if (uiData == FAIL)
-            {
-                // Reset the Orb of Domination and the eggs
-                if (GameObject* pOrb = GetSingleGameObjectFromStorage(GO_ORB_OF_DOMINATION))
-                    pOrb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-
-                // ToDo: reset the Dragon Eggs
-            }
             break;
         case TYPE_VAELASTRASZ:
             m_auiEncounter[uiType] = uiData;
@@ -193,18 +177,6 @@ uint32 instance_blackwing_lair::GetData(uint32 uiType)
         return m_auiEncounter[uiType];
 
     return 0;
-}
-
-void instance_blackwing_lair::OnCreatureDeath(Creature* pCreature)
-{
-    if (pCreature->GetEntry() == NPC_GRETHOK_CONTROLLER)
-    {
-        if (GameObject* pOrb = GetSingleGameObjectFromStorage(GO_ORB_OF_DOMINATION))
-            pOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-
-        if (Creature* pOrbTrigger = GetSingleCreatureFromStorage(NPC_BLACKWING_ORB_TRIGGER))
-            pOrbTrigger->InterruptNonMeleeSpells(false);
-    }
 }
 
 InstanceData* GetInstanceData_instance_blackwing_lair(Map* pMap)

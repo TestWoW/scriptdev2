@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 MangosR2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -41,13 +41,13 @@ struct MANGOS_DLL_DECL boss_magmusAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    uint32 m_uiFieryBurstTimer;
-    uint32 m_uiWarStompTimer;
+    uint32 m_uiFieryBurst_Timer;
+    uint32 m_uiWarStomp_Timer;
 
     void Reset()
     {
-        m_uiFieryBurstTimer = 5000;
-        m_uiWarStompTimer = 0;
+        m_uiFieryBurst_Timer = 5000;
+        m_uiWarStomp_Timer = 0;
     }
 
     void Aggro(Unit* pWho)
@@ -70,29 +70,26 @@ struct MANGOS_DLL_DECL boss_magmusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //FieryBurst_Timer
-        if (m_uiFieryBurstTimer < uiDiff)
+        if (m_uiFieryBurst_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIERYBURST);
-            m_uiFieryBurstTimer = 6000;
+            DoCastSpellIfCan(m_creature->getVictim(),SPELL_FIERYBURST);
+            m_uiFieryBurst_Timer = 6000;
         }
         else
-            m_uiFieryBurstTimer -= uiDiff;
+            m_uiFieryBurst_Timer -= uiDiff;
 
-        //WarStomp_Timer
         if (m_creature->GetHealthPercent() < 51.0f)
         {
-            if (m_uiWarStompTimer < uiDiff)
+            if (m_uiWarStomp_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature, SPELL_WARSTOMP);
-                m_uiWarStompTimer = 8000;
+                DoCastSpellIfCan(m_creature->getVictim(),SPELL_WARSTOMP);
+                m_uiWarStomp_Timer = 8000;
             }
             else
-                m_uiWarStompTimer -= uiDiff;
+                m_uiWarStomp_Timer -= uiDiff;
         }
 
         DoMeleeAttackIfReady();

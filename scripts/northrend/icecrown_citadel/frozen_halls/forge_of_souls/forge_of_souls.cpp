@@ -197,17 +197,40 @@ bool StartEvent;
 
 bool GossipHello_npc_jaina_and_sylvana_FSintro(Player* pPlayer, Creature* pCreature)
 {
+    char const* GOSSIP_OPTION_ALLY;
+    char const* GOSSIP_OPTION_HORDE;
+
+    switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
+    {
+     case LOCALE_enUS:
+     case LOCALE_koKR:
+     case LOCALE_frFR:
+     case LOCALE_deDE:
+     case LOCALE_zhCN:
+     case LOCALE_zhTW:
+     case LOCALE_esES:
+                      GOSSIP_OPTION_ALLY   = "¿Qué es lo que quieres de mí, mi señora?";
+                      GOSSIP_OPTION_HORDE  = "¿Qué es lo que quieres de mí, mi reina?";
+                      break;
+     case LOCALE_esMX:
+     case LOCALE_ruRU:
+     default:
+                      GOSSIP_OPTION_ALLY   = "What would you have of me, My Lady?";
+                      GOSSIP_OPTION_HORDE  = "What would you have of me, Banshee Queen?";
+                      break;
+    };
+
            if (pCreature->isQuestGiver())
              pPlayer->PrepareQuestMenu( pCreature->GetObjectGuid());
             switch(pCreature->GetEntry())
               {
                 case 37597:
                   if(((npc_jaina_and_sylvana_FSintroAI*)pCreature->AI())->StartEvent != true)
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What would you have of me, My Lady?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_ALLY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                   break;
                 case 37596:
                   if(((npc_jaina_and_sylvana_FSintroAI*)pCreature->AI())->StartEvent != true)
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What would you have of me, Banshee Queen?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_OPTION_HORDE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                   break;
                }
 
@@ -232,25 +255,27 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_FSextroAI : public ScriptedAI
         Reset();
    }
 
-ScriptedInstance* m_pInstance;
+    ScriptedInstance* m_pInstance;
 
-uint32 StepTimer;
-uint32 Step;
-uint64 m_uiLiderGUID;
-uint32 uiSummon_counter;
+    uint32 StepTimer;
+    uint32 Step;
+    uint32 uiSummon_counter;
 
     void Reset()
     {
-            if (m_pInstance)
-               if (m_pInstance->GetData(TYPE_DEVOURER_OF_SOULS) != DONE)
-                  {
-                   m_pInstance->SetData(TYPE_DEVOURER_OF_SOULS, NOT_STARTED);
-                   Step = 0;
-                   m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                   m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                  } else Step = 10;
-            StepTimer = 100;
-            m_creature->SetVisibility(VISIBILITY_OFF);
+        if (m_pInstance)
+        {
+            if (m_pInstance->GetData(TYPE_DEVOURER_OF_SOULS) != DONE)
+            {
+                m_pInstance->SetData(TYPE_DEVOURER_OF_SOULS, NOT_STARTED);
+                Step = 0;
+                m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            }
+            else Step = 10;
+        }
+        StepTimer = 100;
+        m_creature->SetVisibility(VISIBILITY_OFF);
     }
 
    void UpdateAI(const uint32 diff)
@@ -271,7 +296,7 @@ uint32 uiSummon_counter;
                   m_creature->SetWalk(false);
                   m_creature->GetMotionMaster()->MovePoint(0, 5653.337f, 2496.407f, 708.829f);
                   uiSummon_counter = 0;
-                  StepTimer = 400;
+                  StepTimer = 4000;
                   ++Step;
                   break;
                 case 1:

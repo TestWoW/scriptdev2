@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -59,7 +59,7 @@ enum
   SAY_UTHER_H_09                     = -1668457,
   SAY_JAINA_10                       = -1668458,
   SAY_UTHER_A_11                     = -1668459,
-  SAY_UTHER_H_11                     = -1668660,
+  SAY_UTHER_H_11                     = -1668460,
   SAY_JAINA_12                       = -1668461,
   SAY_SYLVANA_12                     = -1668462,
   SAY_UTHER_A_13                     = -1668463,
@@ -142,6 +142,11 @@ enum
   SPELL_ESCAPED_FROM_ARTHAS          = 72830,
 
   FACTION                            = 2076,
+
+  ACHIEV_COMPLETE_NORMAL             = 4518,
+  ACHIEV_COMPLETE_HEROIC             = 4521,
+
+  NPC_DAILY_DUNGEON                  = 22852,
 };
 
 struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
@@ -205,7 +210,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
             case 5:
                 if(Creature* pTarget = m_creature->SummonCreature(NPC_ALTAR_TARGET,5309.374f,2006.788f,711.615f,1.37f,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,360000))
                 {
-                    m_creature->SetGuidValue(UNIT_FIELD_TARGET, pTarget->GetObjectGuid());
+                    m_creature->SetUInt64Value(UNIT_FIELD_TARGET, pTarget->GetObjectGuid());
                     pTarget->SetCreatorGuid(ObjectGuid());
                 }
                 m_pInstance->SetNextEvent(6,m_creature->GetEntry(),1000);
@@ -219,7 +224,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
                 if (m_creature->GetEntry() == NPC_SYLVANA)
                 {
                     DoScriptText(SAY_SYLVANA_INTRO_03, m_creature);
-                    m_pInstance->SetNextEvent(7,m_creature->GetEntry(),5000);
+                    m_pInstance->SetNextEvent(7,m_creature->GetEntry(),6000);
                 }
                 break;
             case 7:
@@ -245,8 +250,8 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
                     pUther = Uther;
                     Uther->SetCreatorGuid(ObjectGuid());
                     Uther->SetRespawnDelay(DAY);
-                    Uther->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
-                    m_creature->SetGuidValue(UNIT_FIELD_TARGET, Uther->GetObjectGuid());
+                    Uther->SetUInt64Value(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                    m_creature->SetUInt64Value(UNIT_FIELD_TARGET, Uther->GetObjectGuid());
                     if (m_creature->GetEntry() == NPC_JAINA)
                     {
                         DoScriptText(SAY_UTHER_A_01, Uther);
@@ -328,7 +333,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRintroAI : public ScriptedAI
                 else if (m_creature->GetEntry() == NPC_SYLVANA && pUther)
                 {
                     DoScriptText(SAY_UTHER_H_07, pUther);
-                    m_pInstance->SetNextEvent(16,m_creature->GetEntry(),6000);
+                    m_pInstance->SetNextEvent(16,m_creature->GetEntry(),19500);
                 }
                 break;
             case 16:
@@ -528,6 +533,9 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
    npc_jaina_and_sylvana_HRextroAI(Creature *pCreature) : npc_escortAI(pCreature)
    {
         m_pInstance = (BSWScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        wallTarget.Clear();
+        oldflag = 0;
         Reset();
    }
 
@@ -536,6 +544,8 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
     uint32 CastTimer;
     uint32 HoldTimer;
     uint8 m_wallNum;
+    uint32 oldflag;
+    bool m_bIsRegularMode;
     bool Fight;
     ObjectGuid wallTarget;
     uint32    m_chestID;
@@ -549,7 +559,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
         HoldTimer = 10000;
         Fight = true;
         m_wallNum = 0;
-        wallTarget = ObjectGuid();
+        wallTarget.Clear();
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
@@ -615,11 +625,13 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
     void DoDestructWall()
     {
         m_pInstance->DoOpenDoor(GO_ICE_WALL);
+
         if (Creature* pWallTarget = m_creature->GetMap()->GetCreature(wallTarget))
         {
             pWallTarget->ForcedDespawn();
         }
-        wallTarget =  ObjectGuid();
+
+        wallTarget.Clear();
         m_wallNum = 0;
     }
 
@@ -861,6 +873,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
             case 611:
               if (GameObject* pCave = m_pInstance->GetSingleGameObjectFromStorage(GO_CAVE))
                   pCave->SetGoState(GO_STATE_READY);
+              m_pInstance->DoCompleteAchievement(m_bIsRegularMode ? ACHIEV_COMPLETE_NORMAL : ACHIEV_COMPLETE_HEROIC);
               m_creature->RemoveAurasDueToSpell(SPELL_SILENCE);
               m_creature->SetLevitate(false);
               m_creature->CastSpell(m_creature, SPELL_SHIELD_DISRUPTION,false);
@@ -870,6 +883,7 @@ struct MANGOS_DLL_DECL npc_jaina_and_sylvana_HRextroAI : public npc_escortAI
               m_pInstance->SetNextEvent(612,m_creature->GetEntry(),10000);
               break;
            case 612:
+              m_creature->SummonCreature(NPC_DAILY_DUNGEON, 5235.22f, 1671.81f, 784.302f, 0.02f, TEMPSUMMON_MANUAL_DESPAWN, 5000);
               m_creature->CastSpell(m_creature,SPELL_ESCAPED_FROM_ARTHAS,false);
               m_pInstance->SetData(TYPE_LICH_KING, DONE);
               DoScriptText(SAY_ESCAPE_02, m_creature);
@@ -1019,8 +1033,8 @@ CreatureAI* GetAI_npc_jaina_and_sylvana_HRextro(Creature* pCreature)
 
 enum GENERAL_EVENT
 {
-   SAY_AGGRO                    = -1594519,
-   SAY_DEATH                    = -1594520,
+   SAY_AGGRO                    = -1668534,
+   SAY_DEATH                    = -1668535,
 
    SPELL_SHIELD_THROWN          = 69222,
 };
@@ -1109,7 +1123,7 @@ struct MANGOS_DLL_DECL npc_frostworn_generalAI : public ScriptedAI
         if(m_uiShieldTimer < uiDiff)
         {
             if(Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-               DoCast(pTarget,SPELL_SHIELD_THROWN);
+               m_creature->CastSpell(pTarget, SPELL_SHIELD_THROWN, false);
             m_uiShieldTimer = urand(4000, 8000);
         }
         else m_uiShieldTimer -= uiDiff;
@@ -1139,6 +1153,7 @@ struct MANGOS_DLL_DECL npc_spiritual_reflectionAI : public BSWScriptedAI
     npc_spiritual_reflectionAI(Creature *pCreature) : BSWScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        victimGuid.Clear();
         Reset();
     }
 
@@ -1151,7 +1166,7 @@ struct MANGOS_DLL_DECL npc_spiritual_reflectionAI : public BSWScriptedAI
         if (!m_pInstance)
             return;
         isMirror = false;
-        victimGuid = ObjectGuid();
+        victimGuid.Clear();
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 

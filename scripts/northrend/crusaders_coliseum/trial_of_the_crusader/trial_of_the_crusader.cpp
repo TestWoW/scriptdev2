@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -15,10 +15,9 @@
  */
 
 /* ScriptData
-SDName: Trial Of the crusader
-SD%Complete: 60%
-SDComment: event script by /dev/rsa
-SDCategory: trial_of_the_crusader
+SDName: trial_of_the_crusader
+SDComment:
+SDAuthor: rsa
 EndScriptData */
 
 #include "precompiled.h"
@@ -43,7 +42,7 @@ static _Messages _GossipMessage[]=
 
 enum
 {
-    NUM_MESSAGES                = 5,
+    NUM_MESSAGES = 5,
     SPELL_WILFRED_PORTAL        = 68424,
     SPELL_JARAXXUS_CHAINS       = 67924,
 };
@@ -105,131 +104,131 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
         {
             switch (m_pInstance->GetData(TYPE_STAGE))
             {
-                case 0:
-                    break;
-                case 1:
-                    if (m_bIsHeroic)
-                    {
-                        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_IN_PROGRESS)
-                        {
-                            if (WormsTimer <= diff)
-                            {
-                                            m_pInstance->SetData(TYPE_STAGE,2);
-                                            m_pInstance->SetData(TYPE_EVENT,200);
-                                            m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
-                                            m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
-                            }
-                            else
-                                WormsTimer -= diff;
-                        }
-                    }
-                    if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_DONE)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE,2);
-                        m_pInstance->SetData(TYPE_EVENT,200);
-                        m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
-                        m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
-                    }
-                    if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE,0);
-                        m_pInstance->SetData(TYPE_EVENT,666);
-                        m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
-                        m_creature->SetDeathState(JUST_DIED);
-                        m_creature->Respawn();
-                    }
-                    break;
-                case 2:
-                    if (m_bIsHeroic)
-                    {
-                        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) != ICEHOWL_IN_PROGRESS)
-                        {
-                            if (IcehowlTimer <= diff)
-                            {
-                                m_pInstance->SetData(TYPE_STAGE,3);
-                                m_pInstance->SetData(TYPE_EVENT,300);
-                                m_pInstance->SetData(TYPE_NORTHREND_BEASTS,ICEHOWL_IN_PROGRESS);
-                                m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
-                            }
-                            else
-                                IcehowlTimer -= diff;
-                        }
-                    }
-                    if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_DONE)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE,3);
-                        m_pInstance->SetData(TYPE_EVENT,300);
-                        m_pInstance->SetData(TYPE_NORTHREND_BEASTS, ICEHOWL_IN_PROGRESS);
-                        m_pInstance->SetData(TYPE_BEASTS, IN_PROGRESS);
-                    }
-                    if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE,0);
-                        m_pInstance->SetData(TYPE_EVENT,666);
-                        m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
-                        m_creature->SetDeathState(JUST_DIED);
-                        m_creature->Respawn();
-                    }
-                    break;
-                case 3:
-                    if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == ICEHOWL_DONE)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE,0);
-                        m_pInstance->SetData(TYPE_BEASTS, DONE);
-                        m_pInstance->SetData(TYPE_EVENT,400);
-                        m_pInstance->SetData(TYPE_NORTHREND_BEASTS, DONE);
-                    }
-                    if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE,0);
-                        m_pInstance->SetData(TYPE_EVENT,666);
-                        m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
-                        m_creature->SetDeathState(JUST_DIED);
-                        m_creature->Respawn();
-                    };
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    break;
-                case 6:
-                    if (m_pInstance->GetData(TYPE_CRUSADERS_COUNT) == 0 && m_pInstance->GetData(TYPE_CRUSADERS) == IN_PROGRESS)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE, 0);
-                        m_pInstance->SetData(TYPE_CRUSADERS, DONE);
-                        m_pInstance->SetData(TYPE_EVENT, 3100);
-                    }
-                    break;
-                case 7:
-                    if (m_pInstance->GetData(TYPE_VALKIRIES) == DONE)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE, 0);
-                        m_pInstance->SetData(TYPE_EVENT, 4020);
-                        m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    }
-                    if (m_pInstance->GetData(TYPE_VALKIRIES) == FAIL)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE, 0);
-                        m_pInstance->SetData(TYPE_EVENT, 0);
-                    }
-                    break;
-                case 8:
-                    break;
-                case 9:
-                    if (m_pInstance->GetData(TYPE_ANUBARAK) == DONE)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE, 10);
-                        m_pInstance->SetData(TYPE_EVENT, 6000);
-                    }
-                    if (m_pInstance->GetData(TYPE_ANUBARAK) == FAIL)
-                    {
-                        m_pInstance->SetData(TYPE_STAGE, 0);
-                        m_pInstance->SetData(TYPE_EVENT, 0);
-                    }
-                    break;
-                case 10:
-                    //m_creature->ForcedDespawn();
-                    break;
+                 case 0:
+                      break;
+                 case 1:
+                      if (m_bIsHeroic)
+                      {
+		          if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_IN_PROGRESS)
+			  {		 
+			      if (WormsTimer <= diff)
+			      {
+                                  m_pInstance->SetData(TYPE_STAGE,2);
+                                  m_pInstance->SetData(TYPE_EVENT,200);
+                                  m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
+                                  m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+			      }
+                              else
+                                  WormsTimer -= diff;
+                          }
+	              }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == GORMOK_DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,2);
+                          m_pInstance->SetData(TYPE_EVENT,200);
+                          m_pInstance->SetData(TYPE_NORTHREND_BEASTS,SNAKES_IN_PROGRESS);
+                          m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_EVENT,666);
+                          m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
+                      }
+                      break;
+                 case 2:
+                      if (m_bIsHeroic)
+                      {
+		          if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) != ICEHOWL_IN_PROGRESS)
+			  {		 
+			      if (IcehowlTimer <= diff)
+			      {
+                                  m_pInstance->SetData(TYPE_STAGE,3);
+                                  m_pInstance->SetData(TYPE_EVENT,300);
+                                  m_pInstance->SetData(TYPE_NORTHREND_BEASTS,ICEHOWL_IN_PROGRESS);
+                                  m_pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
+			      }
+                              else
+                                  IcehowlTimer -= diff;
+                          }
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,3);
+                          m_pInstance->SetData(TYPE_EVENT,300);
+                          m_pInstance->SetData(TYPE_NORTHREND_BEASTS, ICEHOWL_IN_PROGRESS);
+                          m_pInstance->SetData(TYPE_BEASTS, IN_PROGRESS);
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_EVENT,666);
+                          m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
+                      }
+                      break;
+                 case 3:
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == ICEHOWL_DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_BEASTS, DONE);
+                          m_pInstance->SetData(TYPE_EVENT,400);
+                          m_pInstance->SetData(TYPE_NORTHREND_BEASTS, DONE);
+                      }
+                      if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE,0);
+                          m_pInstance->SetData(TYPE_EVENT,666);
+                          m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
+                          m_creature->SetDeathState(JUST_DIED);
+                          m_creature->Respawn();
+                      };
+                      break;
+                 case 4:
+                      break;
+                 case 5:
+                      break;
+                 case 6:
+                      if (m_pInstance->GetData(TYPE_CRUSADERS_COUNT) == 0 && m_pInstance->GetData(TYPE_CRUSADERS) == IN_PROGRESS)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE, 0);
+                          m_pInstance->SetData(TYPE_CRUSADERS, DONE);
+                          m_pInstance->SetData(TYPE_EVENT, 3100);
+                      }
+                      break;
+                 case 7:
+                      if (m_pInstance->GetData(TYPE_VALKIRIES) == DONE)
+                      {
+                           m_pInstance->SetData(TYPE_STAGE, 0);
+                           m_pInstance->SetData(TYPE_EVENT, 4020);
+                           m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                      }
+                      if (m_pInstance->GetData(TYPE_VALKIRIES) == FAIL)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE, 0);
+                          m_pInstance->SetData(TYPE_EVENT, 0);
+                      }
+                      break;
+                 case 8:
+                      break;
+                 case 9:
+                      if (m_pInstance->GetData(TYPE_ANUBARAK) == DONE)
+                      {
+                          m_pInstance->SetData(TYPE_STAGE, 10);
+                          m_pInstance->SetData(TYPE_EVENT, 6000);
+                      }
+                      if (m_pInstance->GetData(TYPE_ANUBARAK) == FAIL)
+                      {
+                           m_pInstance->SetData(TYPE_STAGE, 0);
+                           m_pInstance->SetData(TYPE_EVENT, 0);
+                      }
+                      break;
+                 case 10:
+                      //m_creature->ForcedDespawn();
+                      break;
             }
         }
         else DelayTimer -= diff;
@@ -243,6 +242,7 @@ CreatureAI* GetAI_npc_toc_announcer(Creature* pCreature)
 
 bool GossipHello_npc_toc_announcer(Player* pPlayer, Creature* pCreature)
 {
+ 
     ScriptedInstance* m_pInstance;
     m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
     char const* _message;
@@ -256,21 +256,21 @@ bool GossipHello_npc_toc_announcer(Player* pPlayer, Creature* pCreature)
 
     switch (LocaleConstant currentlocale = pPlayer->GetSession()->GetSessionDbcLocale())
     {
-        case LOCALE_esES:
-             _message = "¡Estamos listos!";
-             break;
-        case LOCALE_esMX:
-             _message = "¡Estamos listos!";
-             break;
-        case LOCALE_ruRU:
-             _message = "Всегда готовы!";
-             break;
         case LOCALE_enUS:
         case LOCALE_koKR:
         case LOCALE_frFR:
         case LOCALE_deDE:
         case LOCALE_zhCN:
         case LOCALE_zhTW:
+        case LOCALE_esES:
+             _message = "\A1Estamos listos!";
+             break;
+        case LOCALE_esMX:
+             _message = "\A1Estamos listos!";
+             break;
+        case LOCALE_ruRU:
+             _message = "A5340 3>B>2K!";
+             break;
         default:
              _message = "We are ready!";
              break;
@@ -299,41 +299,48 @@ bool GossipSelect_npc_toc_announcer(Player* pPlayer, Creature* pCreature, uint32
 {
     ScriptedInstance* pInstance;
     pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
-    if (!pInstance)
-        return false;
+    if (!pInstance) return false;
 
 pPlayer->CLOSE_GOSSIP_MENU();
 
 switch(uiAction) {
     case GOSSIP_ACTION_INFO_DEF+1: 
+    {
         if (pInstance->GetData(TYPE_BEASTS) != DONE) 
         {
             pInstance->SetData(TYPE_EVENT,110);
             pInstance->SetData(TYPE_NORTHREND_BEASTS,NOT_STARTED);
             pInstance->SetData(TYPE_BEASTS,IN_PROGRESS);
         };
-        break;
+    break;
+    };
+
     case GOSSIP_ACTION_INFO_DEF+2: 
+    {
         if (pInstance->GetData(TYPE_JARAXXUS) != DONE)
             pInstance->SetData(TYPE_EVENT,1010);
+    break;
+    };
 
-        break;
     case GOSSIP_ACTION_INFO_DEF+3: 
+    {
         if (pInstance->GetData(TYPE_CRUSADERS) != DONE) 
         {
-            if (pPlayer->GetTeam() == ALLIANCE)
-                pInstance->SetData(TYPE_EVENT,3000);
-            else
-                pInstance->SetData(TYPE_EVENT,3001);
+            if (pPlayer->GetTeam() == ALLIANCE) pInstance->SetData(TYPE_EVENT,3000);
+            else pInstance->SetData(TYPE_EVENT,3001);
         };
-        break;
+    break;
+    };
+
     case GOSSIP_ACTION_INFO_DEF+4: 
+    {
         if (pInstance->GetData(TYPE_VALKIRIES) != DONE)
             pInstance->SetData(TYPE_EVENT,4000);
+    break;
+    };
 
-        break;
     case GOSSIP_ACTION_INFO_DEF+5: 
+    {
         Map* pMap = pCreature->GetMap();
         Map::PlayerList const &lPlayers = pMap->GetPlayers();
         for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
@@ -354,14 +361,14 @@ switch(uiAction) {
         pCreature->CastSpell(pCreature,69016,false);
 
         Creature* pTemp = pInstance->GetSingleCreatureFromStorage(NPC_ANUBARAK);
-
         if (!pTemp || !pTemp->isAlive())
             pCreature->SummonCreature(NPC_ANUBARAK, SpawnLoc[19].x, SpawnLoc[19].y, SpawnLoc[19].z, 5, TEMPSUMMON_CORPSE_TIMED_DESPAWN, DESPAWN_TIME);
      
         if (pCreature->GetVisibility() == VISIBILITY_ON)
             pCreature->SetVisibility(VISIBILITY_OFF);
 
-        break;
+    break;
+    };
 };
 
 return true;
@@ -409,7 +416,6 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(m_uiGuid))
             return pCreature;
-
         return NULL;
     }
 
@@ -517,7 +523,6 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
                      Unit* pPlayer = itr->getSource();
                      if (!pPlayer) 
                          continue;
-
                      float x, y, z;
                      pPlayer->GetPosition(x, y, z);
                      pPlayer->MonsterMoveToDestination(x, y, z + 10.0f, M_PI_F, 10.0f, 0.0f, true);
@@ -571,7 +576,6 @@ struct MANGOS_DLL_DECL boss_lich_king_tocAI : public ScriptedAI
         }
         if(type != POINT_MOTION_TYPE)
             return;
-
         if(WayPoint->id != id)
             return;
 
@@ -602,7 +606,6 @@ struct MANGOS_DLL_DECL npc_fizzlebang_tocAI : public ScriptedAI
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(m_uiGuid))
             return pCreature;
-
         return NULL;
     }
 
@@ -1398,7 +1401,6 @@ struct MANGOS_DLL_DECL npc_tirion_tocAI : public ScriptedAI
                 m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                 if (m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_10MAN_HEROIC || m_pInstance->GetData(TYPE_DIFFICULTY) == RAID_DIFFICULTY_25MAN_HEROIC)
                     DoScriptText(-1713566, m_creature);
-
                 UpdateTimer = 60000;
                 m_pInstance->SetData(TYPE_EVENT,6020);
                 break;
@@ -1447,7 +1449,6 @@ struct MANGOS_DLL_DECL npc_garrosh_tocAI : public ScriptedAI
     {
         if (!m_pInstance)
             return;
-
         if (m_pInstance->GetData(TYPE_EVENT_NPC) != NPC_GARROSH)
             return;
 
@@ -1491,9 +1492,7 @@ struct MANGOS_DLL_DECL npc_garrosh_tocAI : public ScriptedAI
                 break;
             }
         }
-        else
-            UpdateTimer -= diff;
-
+        else UpdateTimer -= diff;
         m_pInstance->SetData(TYPE_EVENT_TIMER, UpdateTimer);
     }
 };
@@ -1528,7 +1527,6 @@ struct MANGOS_DLL_DECL npc_rinn_tocAI : public ScriptedAI
     {
         if (!m_pInstance)
             return;
-
         if (m_pInstance->GetData(TYPE_EVENT_NPC) != NPC_RINN)
             return;
 
@@ -1541,7 +1539,6 @@ struct MANGOS_DLL_DECL npc_rinn_tocAI : public ScriptedAI
             case 130:
                 if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_TIRION))
                    DoScriptText(-1713537, pTemp);
-
                 UpdateTimer = 3000;
                 m_pInstance->SetData(TYPE_EVENT,140);
                 break;
@@ -1571,7 +1568,6 @@ struct MANGOS_DLL_DECL npc_rinn_tocAI : public ScriptedAI
                 UpdateTimer = 7000;
                 if (Creature* pBarrent = m_pInstance->GetSingleCreatureFromStorage(NPC_BARRENT))
                     pBarrent->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
                 m_pInstance->SetData(TYPE_EVENT,4030);
                 break;
             }

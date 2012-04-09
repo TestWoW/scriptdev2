@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -46,12 +46,6 @@ enum
     SPELL_SUMMON_SYTH_FROST     = 33539,                    // Spawns 19204
     SPELL_SUMMON_SYTH_SHADOW    = 33540,                    // Spawns 19206
 
-    // Npc entries
-    NPC_FIRE_ELEMENTAL          = 19203,
-    NPC_FROST_ELEMENTAL         = 19204,
-    NPC_ARCANE_ELEMENTAL        = 19205,
-    NPC_SHADOW_ELEMENTAL        = 19206,
-
     SPELL_FLAME_BUFFET          = 33526,
     SPELL_FLAME_BUFFET_H        = 38141,
     SPELL_ARCANE_BUFFET         = 33527,
@@ -71,26 +65,30 @@ struct MANGOS_DLL_DECL boss_darkweaver_sythAI : public ScriptedAI
     }
 
     bool m_bIsRegularMode;
-    uint32 m_uiFlameshockTimer;
-    uint32 m_uiArcaneshockTimer;
-    uint32 m_uiFrostshockTimer;
-    uint32 m_uiShadowshockTimer;
-    uint32 m_uiChainlightningTimer;
+    uint32 flameshock_timer;
+    uint32 arcaneshock_timer;
+    uint32 frostshock_timer;
+    uint32 shadowshock_timer;
+    uint32 chainlightning_timer;
 
-    float m_fHpCheck;
+    bool summon90;
+    bool summon50;
+    bool summon10;
 
     void Reset()
     {
-        m_uiFlameshockTimer     = 2000;
-        m_uiArcaneshockTimer    = 4000;
-        m_uiFrostshockTimer     = 6000;
-        m_uiShadowshockTimer    = 8000;
-        m_uiChainlightningTimer = 15000;
+        flameshock_timer = 2000;
+        arcaneshock_timer = 4000;
+        frostshock_timer = 6000;
+        shadowshock_timer = 8000;
+        chainlightning_timer = 15000;
 
-        m_fHpCheck              = 90.0f;
+        summon90 = false;
+        summon50 = false;
+        summon10 = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit *who)
     {
         switch(urand(0, 2))
         {
@@ -100,12 +98,12 @@ struct MANGOS_DLL_DECL boss_darkweaver_sythAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* Killer)
     {
         DoScriptText(SAY_DEATH, m_creature);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* victim)
     {
         if (urand(0, 1))
             return;
@@ -113,29 +111,12 @@ struct MANGOS_DLL_DECL boss_darkweaver_sythAI : public ScriptedAI
         DoScriptText(urand(0, 1) ? SAY_SLAY_1 : SAY_SLAY_2, m_creature);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature *summoned)
     {
-        switch (pSummoned->GetEntry())
-        {
-            case NPC_FIRE_ELEMENTAL:
-                pSummoned->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
-                break;
-            case NPC_FROST_ELEMENTAL:
-                pSummoned->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
-                break;
-            case NPC_ARCANE_ELEMENTAL:
-                pSummoned->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
-                break;
-            case NPC_SHADOW_ELEMENTAL:
-                pSummoned->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_SHADOW, true);
-                break;
-        }
-
-        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            pSummoned->AI()->AttackStart(pTarget);
+        if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+            summoned->AI()->AttackStart(target);
     }
 
-    // Wrapper to handle the elementals summon
     void SythSummoning()
     {
         DoScriptText(SAY_SUMMON, m_creature);
@@ -143,78 +124,74 @@ struct MANGOS_DLL_DECL boss_darkweaver_sythAI : public ScriptedAI
         if (m_creature->IsNonMeleeSpellCasted(false))
             m_creature->InterruptNonMeleeSpells(false);
 
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_ARCANE, CAST_TRIGGERED); //front
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_FIRE,   CAST_TRIGGERED); //back
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_FROST,  CAST_TRIGGERED); //left
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_SHADOW, CAST_TRIGGERED); //right
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_ARCANE, CAST_TRIGGERED);//front
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_FIRE,   CAST_TRIGGERED);//back
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_FROST,  CAST_TRIGGERED);//left
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_SYTH_SHADOW, CAST_TRIGGERED);//right
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 diff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        // Summon elementals at 90%, 50% and 10% health
-        if (m_creature->GetHealthPercent() < m_fHpCheck)
+        if (m_creature->GetHealthPercent() < 90.0f && !summon90)
         {
             SythSummoning();
-            m_fHpCheck -= 40.0f;
+            summon90 = true;
         }
 
-        if (m_uiFlameshockTimer < uiDiff)
+        if (m_creature->GetHealthPercent() < 50.0f && !summon50)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_FLAME_SHOCK) == CAST_OK)
-                    m_uiFlameshockTimer = urand(10000, 15000);
-            }
+            SythSummoning();
+            summon50 = true;
         }
-        else
-            m_uiFlameshockTimer -= uiDiff;
 
-        if (m_uiArcaneshockTimer < uiDiff)
+        if (m_creature->GetHealthPercent() < 10.0f && !summon10)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_ARCANE_SHOCK) == CAST_OK)
-                    m_uiArcaneshockTimer = urand(10000, 15000);
-            }
+            SythSummoning();
+            summon10 = true;
         }
-        else
-            m_uiArcaneshockTimer -= uiDiff;
 
-        if (m_uiFrostshockTimer < uiDiff)
+        if (flameshock_timer < diff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_FROST_SHOCK) == CAST_OK)
-                    m_uiFrostshockTimer = urand(10000, 15000);
-            }
-        }
-        else
-            m_uiFrostshockTimer -= uiDiff;
+            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+                DoCastSpellIfCan(target, SPELL_FLAME_SHOCK);
 
-        if (m_uiShadowshockTimer < uiDiff)
-        {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_SHOCK) == CAST_OK)
-                    m_uiShadowshockTimer = urand(10000, 15000);
-            }
-        }
-        else
-            m_uiShadowshockTimer -= uiDiff;
+            flameshock_timer = urand(10000, 15000);
+        } else flameshock_timer -= diff;
 
-        if (m_uiChainlightningTimer < uiDiff)
+        if (arcaneshock_timer < diff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_CHAIN_LIGHTNING) == CAST_OK)
-                    m_uiChainlightningTimer = 25000;
-            }
-        }
-        else
-            m_uiChainlightningTimer -= uiDiff;
+            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+                DoCastSpellIfCan(target,SPELL_ARCANE_SHOCK);
+
+            arcaneshock_timer = urand(10000, 15000);
+        } else arcaneshock_timer -= diff;
+
+        if (frostshock_timer < diff)
+        {
+            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+                DoCastSpellIfCan(target,SPELL_FROST_SHOCK);
+
+            frostshock_timer = urand(10000, 15000);
+        } else frostshock_timer -= diff;
+
+        if (shadowshock_timer < diff)
+        {
+            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+                DoCastSpellIfCan(target,SPELL_SHADOW_SHOCK);
+
+            shadowshock_timer = urand(10000, 15000);
+        } else shadowshock_timer -= diff;
+
+        if (chainlightning_timer < diff)
+        {
+            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
+                DoCastSpellIfCan(target,SPELL_CHAIN_LIGHTNING);
+
+            chainlightning_timer = 25000;
+        } else chainlightning_timer -= diff;
 
         DoMeleeAttackIfReady();
     }
@@ -241,6 +218,7 @@ struct MANGOS_DLL_DECL mob_syth_fireAI : public ScriptedAI
 
     void Reset()
     {
+        m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         flameshock_timer = 2500;
         flamebuffet_timer = 5000;
     }
@@ -290,6 +268,7 @@ struct MANGOS_DLL_DECL mob_syth_arcaneAI : public ScriptedAI
 
     void Reset()
     {
+        m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
         arcaneshock_timer = 2500;
         arcanebuffet_timer = 5000;
     }
@@ -338,6 +317,7 @@ struct MANGOS_DLL_DECL mob_syth_frostAI : public ScriptedAI
 
     void Reset()
     {
+        m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
         frostshock_timer = 2500;
         frostbuffet_timer = 5000;
     }
@@ -386,6 +366,7 @@ struct MANGOS_DLL_DECL mob_syth_shadowAI : public ScriptedAI
 
     void Reset()
     {
+        m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_SHADOW, true);
         shadowshock_timer = 2500;
         shadowbuffet_timer = 5000;
     }
