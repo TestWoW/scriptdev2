@@ -1,5 +1,5 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 MangosR2
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -80,21 +80,30 @@ struct MANGOS_DLL_DECL boss_nadoxAI : public ScriptedAI
         m_uiBroodPlagueTimer = 15000;
         m_uiBroodRageTimer = 20000;
         m_creature->SetRespawnDelay(DAY);
+
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_NADOX, NOT_STARTED);
+        {
+            m_pInstance->SetData(TYPE_NADOX,NOT_STARTED);
+        }
     }
 
     void JustReachedHome()
     {
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_NADOX, FAIL);
+        }
     }
 
     void Aggro(Unit* pWho)
     {
         DoScriptText(SAY_AGGRO, m_creature);
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_NADOX,IN_PROGRESS);
+            if (!m_bIsRegularMode)
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_RESPECT_YOUR_ELDERS, true);
+        }
     }
 
     void KilledUnit(Unit* pVictim)
@@ -221,10 +230,6 @@ struct MANGOS_DLL_DECL mob_nadox_guardianAI : public ScriptedAI
     bool m_bIsRegularMode;
 
     void Reset(){}
-
-    void JustDied(Unit* pKiller)
-    {
-    }
 
     void UpdateAI(const uint32 uiDiff)
     {

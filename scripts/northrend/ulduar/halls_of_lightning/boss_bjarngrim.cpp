@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -56,7 +56,7 @@ enum
 
     //OTHER SPELLS
     //SPELL_CHARGE_UP                         = 52098,      // only used when starting walk from one platform to the other
-    //SPELL_TEMPORARY_ELECTRICAL_CHARGE       = 52092,      // triggered part of above
+    SPELL_TEMPORARY_ELECTRICAL_CHARGE       = 52092,      // triggered part of above
 
     NPC_STORMFORGED_LIEUTENANT              = 29240,
     SPELL_ARC_WELD                          = 59085,
@@ -65,7 +65,9 @@ enum
 
     STANCE_DEFENSIVE                        = 0,
     STANCE_BERSERKER                        = 1,
-    STANCE_BATTLE                           = 2
+    STANCE_BATTLE                           = 2,
+
+    ACHIEV_LIGHTNING_STRUCK                 = 1834,
 };
 
 /*######
@@ -90,20 +92,23 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
     uint8 m_uiChargingStatus;
     uint8 m_uiStance;
 
-    uint32 m_uiCharge_Timer;
-    uint32 m_uiChangeStance_Timer;
+    uint32 m_uiChargeTimer;
+    uint32 m_uiChangeStanceTimer;
 
-    uint32 m_uiReflection_Timer;
-    uint32 m_uiKnockAway_Timer;
-    uint32 m_uiPummel_Timer;
-    uint32 m_uiIronform_Timer;
+    uint32 m_uiReflectionTimer;
+    uint32 m_uiKnockAwayTimer;
+    uint32 m_uiPummelTimer;
+    uint32 m_uiIronformTimer;
 
-    uint32 m_uiIntercept_Timer;
-    uint32 m_uiWhirlwind_Timer;
-    uint32 m_uiCleave_Timer;
+    uint32 m_uiInterceptTimer;
+    uint32 m_uiWhirlwindTimer;
+    uint32 m_uiCleaveTimer;
 
-    uint32 m_uiMortalStrike_Timer;
-    uint32 m_uiSlam_Timer;
+    uint32 m_uiMortalStrikeTimer;
+    uint32 m_uiSlamTimer;
+
+    uint32 m_uiAchievCheckTimer;
+
 
     ObjectGuid m_aStormforgedLieutenantGuid[2];             // TODO - not filled yet.
 
@@ -112,21 +117,23 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
         m_bIsChangingStance = false;
 
         m_uiChargingStatus = 0;
-        m_uiCharge_Timer = 1000;
+        m_uiChargeTimer = 1000;
 
-        m_uiChangeStance_Timer = urand(20000, 25000);
+        m_uiChangeStanceTimer = urand(20000, 25000);
 
-        m_uiReflection_Timer = 8000;
-        m_uiKnockAway_Timer = 20000;
-        m_uiPummel_Timer = 10000;
-        m_uiIronform_Timer = 25000;
+        m_uiReflectionTimer = 8000;
+        m_uiKnockAwayTimer = 20000;
+        m_uiPummelTimer = 10000;
+        m_uiIronformTimer = 25000;
 
-        m_uiIntercept_Timer = 5000;
-        m_uiWhirlwind_Timer = 10000;
-        m_uiCleave_Timer = 8000;
+        m_uiInterceptTimer = 5000;
+        m_uiWhirlwindTimer = 10000;
+        m_uiCleaveTimer = 8000;
 
-        m_uiMortalStrike_Timer = 8000;
-        m_uiSlam_Timer = 10000;
+        m_uiMortalStrikeTimer = 8000;
+        m_uiSlamTimer = 10000;
+
+        m_uiAchievCheckTimer = 0;
 
         for(uint8 i = 0; i < 2; ++i)
         {
@@ -152,7 +159,10 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_BJARNGRIM, IN_PROGRESS);
+            m_pInstance->SetData(TYPE_STRUCK, FAIL);
+        }
     }
 
     void KilledUnit(Unit* pVictim)
@@ -179,8 +189,22 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (!m_bIsRegularMode)
+        {
+            if (m_uiAchievCheckTimer < uiDiff)
+            {
+                if (m_creature->HasAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE))
+                    m_pInstance->SetData(TYPE_STRUCK, DONE);
+                else
+                    m_pInstance->SetData(TYPE_STRUCK, FAIL);
+
+                m_uiAchievCheckTimer = 500;
+            }
+            else m_uiAchievCheckTimer -= uiDiff;
+        }
+
         // Change stance
-        if (m_uiChangeStance_Timer < uiDiff)
+        if (m_uiChangeStanceTimer < uiDiff)
         {
             //wait for current spell to finish before change stance
             if (m_creature->IsNonMeleeSpellCasted(false))
@@ -212,96 +236,96 @@ struct MANGOS_DLL_DECL boss_bjarngrimAI : public ScriptedAI
                     break;
             }
 
-            m_uiChangeStance_Timer = urand(20000, 25000);
+            m_uiChangeStanceTimer = urand(20000, 25000);
             return;
         }
         else
-            m_uiChangeStance_Timer -= uiDiff;
+            m_uiChangeStanceTimer -= uiDiff;
 
         switch(m_uiStance)
         {
             case STANCE_DEFENSIVE:
             {
-                if (m_uiReflection_Timer < uiDiff)
+                if (m_uiReflectionTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature, SPELL_SPELL_REFLECTION);
-                    m_uiReflection_Timer = urand(8000, 9000);
+                    m_uiReflectionTimer = urand(8000, 9000);
                 }
                 else
-                    m_uiReflection_Timer -= uiDiff;
+                    m_uiReflectionTimer -= uiDiff;
 
-                if (m_uiKnockAway_Timer < uiDiff)
+                if (m_uiKnockAwayTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature, SPELL_KNOCK_AWAY);
-                    m_uiKnockAway_Timer = urand(20000, 21000);
+                    m_uiKnockAwayTimer = urand(20000, 21000);
                 }
                 else
-                    m_uiKnockAway_Timer -= uiDiff;
+                    m_uiKnockAwayTimer -= uiDiff;
 
-                if (m_uiPummel_Timer < uiDiff)
+                if (m_uiPummelTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL);
-                    m_uiPummel_Timer = urand(10000, 11000);
+                    m_uiPummelTimer = urand(10000, 11000);
                 }
                 else
-                    m_uiPummel_Timer -= uiDiff;
+                    m_uiPummelTimer -= uiDiff;
 
-                if (m_uiIronform_Timer < uiDiff)
+                if (m_uiIronformTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature, SPELL_IRONFORM);
-                    m_uiIronform_Timer = urand(25000, 26000);
+                    m_uiIronformTimer = urand(25000, 26000);
                 }
                 else
-                    m_uiIronform_Timer -= uiDiff;
+                    m_uiIronformTimer -= uiDiff;
 
                 break;
             }
             case STANCE_BERSERKER:
             {
-                if (m_uiIntercept_Timer < uiDiff)
+                if (m_uiInterceptTimer < uiDiff)
                 {
                     //not much point is this, better random target and more often?
                     DoCastSpellIfCan(m_creature->getVictim(), SPELL_INTERCEPT);
-                    m_uiIntercept_Timer = urand(45000, 46000);
+                    m_uiInterceptTimer = urand(45000, 46000);
                 }
                 else
-                    m_uiIntercept_Timer -= uiDiff;
+                    m_uiInterceptTimer -= uiDiff;
 
-                if (m_uiWhirlwind_Timer < uiDiff)
+                if (m_uiWhirlwindTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature, SPELL_WHIRLWIND);
-                    m_uiWhirlwind_Timer = urand(10000, 11000);
+                    m_uiWhirlwindTimer = urand(10000, 11000);
                 }
                 else
-                    m_uiWhirlwind_Timer -= uiDiff;
+                    m_uiWhirlwindTimer -= uiDiff;
 
-                if (m_uiCleave_Timer < uiDiff)
+                if (m_uiCleaveTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
-                    m_uiCleave_Timer = urand(8000, 9000);
+                    m_uiCleaveTimer = urand(8000, 9000);
                 }
                 else
-                    m_uiCleave_Timer -= uiDiff;
+                    m_uiCleaveTimer -= uiDiff;
 
                 break;
             }
             case STANCE_BATTLE:
             {
-                if (m_uiMortalStrike_Timer < uiDiff)
+                if (m_uiMortalStrikeTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE);
-                    m_uiMortalStrike_Timer = urand(20000, 21000);
+                    m_uiMortalStrikeTimer = urand(20000, 21000);
                 }
                 else
-                    m_uiMortalStrike_Timer -= uiDiff;
+                    m_uiMortalStrikeTimer -= uiDiff;
 
-                if (m_uiSlam_Timer < uiDiff)
+                if (m_uiSlamTimer < uiDiff)
                 {
                     DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLAM);
-                    m_uiSlam_Timer = urand(15000, 16000);
+                    m_uiSlamTimer = urand(15000, 16000);
                 }
                 else
-                    m_uiSlam_Timer -= uiDiff;
+                    m_uiSlamTimer -= uiDiff;
 
                 break;
             }
@@ -327,13 +351,13 @@ struct MANGOS_DLL_DECL mob_stormforged_lieutenantAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     bool m_bIsRegularMode;
 
-    uint32 m_uiArcWeld_Timer;
-    uint32 m_uiRenewSteel_Timer;
+    uint32 m_uiArcWeldTimer;
+    uint32 m_uiRenewSteelTimer;
 
     void Reset()
     {
-        m_uiArcWeld_Timer = urand(20000, 21000);
-        m_uiRenewSteel_Timer = urand(10000, 11000);
+        m_uiArcWeldTimer = urand(20000, 21000);
+        m_uiRenewSteelTimer = urand(10000, 11000);
     }
 
     void Aggro(Unit* pWho)
@@ -354,15 +378,15 @@ struct MANGOS_DLL_DECL mob_stormforged_lieutenantAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_uiArcWeld_Timer < uiDiff)
+        if (m_uiArcWeldTimer < uiDiff)
         {
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARC_WELD);
-            m_uiArcWeld_Timer = urand(20000, 21000);
+            m_uiArcWeldTimer = urand(20000, 21000);
         }
         else
-            m_uiArcWeld_Timer -= uiDiff;
+            m_uiArcWeldTimer -= uiDiff;
 
-        if (m_uiRenewSteel_Timer < uiDiff)
+        if (m_uiRenewSteelTimer < uiDiff)
         {
             if (m_pInstance)
             {
@@ -372,10 +396,10 @@ struct MANGOS_DLL_DECL mob_stormforged_lieutenantAI : public ScriptedAI
                         DoCastSpellIfCan(pBjarngrim, m_bIsRegularMode ? SPELL_RENEW_STEEL_N : SPELL_RENEW_STEEL_H);
                 }
             }
-            m_uiRenewSteel_Timer = urand(10000, 14000);
+            m_uiRenewSteelTimer = urand(10000, 14000);
         }
         else
-            m_uiRenewSteel_Timer -= uiDiff;
+            m_uiRenewSteelTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }

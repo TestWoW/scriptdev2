@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -137,11 +137,12 @@ struct MANGOS_DLL_DECL mob_vh_dragonsAI : public ScriptedAI
         m_uiBackstab_Timer = 7100;
         m_uiBlink_Timer = 7000;
 
-        if (creatureEntry == NPC_KEEPER || creatureEntry == NPC_GUARDIAN)
+        if (creatureEntry == NPC_KEEPER
+            || creatureEntry == NPC_GUARDIAN)
         {
             SetCombatMovement(false);
             m_creature->GetMotionMaster()->MoveRandom();
-        }
+        };
 
     }
 
@@ -777,7 +778,7 @@ struct MANGOS_DLL_DECL npc_sinclariAI : public ScriptedAI
                 else if ( m_uiRiftPortalCount == 6
                          || m_uiRiftPortalCount == 12)
                 {
-                    if(m_uiRiftPortalCount == 6 && m_pInstance->GetData(TYPE_PORTAL6) != DONE || m_uiRiftPortalCount == 12 && m_pInstance->GetData(TYPE_PORTAL12) != DONE)
+                    if((m_uiRiftPortalCount == 6 && m_pInstance->GetData(TYPE_PORTAL6) != DONE) || (m_uiRiftPortalCount == 12 && m_pInstance->GetData(TYPE_PORTAL12) != DONE))
                     {
                         if (Creature* pTemp = m_creature->SummonCreature(NPC_PORTAL, PortalLoc[0].x, PortalLoc[0].y, PortalLoc[0].z, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
                         {
@@ -1024,6 +1025,7 @@ struct MANGOS_DLL_DECL npc_azure_saboteurAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         if (m_bIsActiving)
+        {
             if (m_uiDisruption_Timer < uiDiff)
             {
                 if (m_uiDisruptionCounter < 3) 
@@ -1053,6 +1055,7 @@ struct MANGOS_DLL_DECL npc_azure_saboteurAI : public ScriptedAI
                 m_uiDisruption_Timer = 1000;
             }
             else m_uiDisruption_Timer -= uiDiff;
+        }
     }
 };
 

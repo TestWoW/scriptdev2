@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -21,7 +21,6 @@ enum
     TYPE_PORTAL6            = 9,
     TYPE_PORTAL12           = 10,
 
-
     WORLD_STATE_VH          = 3816,
     WORLD_STATE_VH_PRISON   = 3815,
     WORLD_STATE_VH_PORTALS  = 3810,
@@ -32,6 +31,8 @@ enum
 
     TYPE_DISRUPTIONS        = 101,
     TYPE_LASTBOSS_ID        = 102,
+    TYPE_ACHIEV_ZURAMAT     = 103,
+    TYPE_ACHIEV_ICHORON     = 104,
 
     DATA_EREKEM             = 23,
     DATA_MORAGG             = 24,
@@ -84,7 +85,11 @@ enum
 
     EMOTE_GUARDIAN_PORTAL       = -1608005,
     EMOTE_DRAGONFLIGHT_PORTAL   = -1608006,
-    EMOTE_KEEPER_PORTAL         = -1608007
+    EMOTE_KEEPER_PORTAL         = -1608007,
+
+    ACHIEV_VOID_DANCE           = 7587,
+    ACHIEV_DEHYDRATATION        = 7320,
+    ACHIEV_DEFENSELESS          = 6803,
 };
 
 struct Locations
@@ -179,6 +184,43 @@ static Locations DragonsWP[]=
     {1869.393f, 803.902f, 38.768f}, // 24
     {1859.843f, 804.222f, 44.008f}, // 25
     {1829.64f,  804.194f, 44.355f}, // 26
+};
+
+class MANGOS_DLL_DECL instance_violet_hold : public ScriptedInstance
+{
+    public:
+        instance_violet_hold(Map* pMap);
+        void Initialize();
+
+        void Clear();
+        void InitWorldState(bool Enable);
+        void OnPlayerEnter(Player* pPlayer);
+        bool IsEncounterInProgress() const;
+        void OnCreatureCreate(Creature* pCreature);
+        void OnObjectCreate(GameObject* pGo);
+
+        void SetData(uint32 uiType, uint32 uiData);
+        uint32 GetData(uint32 uiType);
+
+        bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
+
+        const char* Save() { return m_strInstData.c_str(); }
+        void Load(const char* chrIn);
+
+    private:
+        uint32 m_auiEncounter[MAX_ENCOUNTER+1];
+        std::string m_strInstData;
+
+        bool bIsInBoss;
+        bool m_bCriteriaDanceWithVoidFailed;
+        bool m_bCriteriaDeshidratationFailed;
+
+        uint8 m_uiLastBossID;
+        uint8 m_uiLastBossIDConst;
+        uint8 m_uiRiftPortalCount;
+        uint32 m_uiShieldPercent;
+        uint32 m_uiDisruptions;
+        int8 m_uiPortalTime;
 };
 
 #endif

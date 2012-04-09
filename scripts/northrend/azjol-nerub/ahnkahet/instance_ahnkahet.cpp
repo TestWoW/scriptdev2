@@ -1,5 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
- * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +16,7 @@
 
 /* ScriptData
 SDName: instance_ahnkahet
-SD%Complete: 0
+SD%Complete: 80%
 SDComment:
 SDCategory: Ahn'kahet
 EndScriptData */
@@ -26,7 +25,6 @@ EndScriptData */
 #include "ahnkahet.h"
 
 instance_ahnkahet::instance_ahnkahet(Map* pMap) : ScriptedInstance(pMap),
-    m_bRespectElders(false),
     m_uiDevicesActivated(0)
 {
     Initialize();
@@ -34,6 +32,9 @@ instance_ahnkahet::instance_ahnkahet(Map* pMap) : ScriptedInstance(pMap),
 void instance_ahnkahet::Initialize()
 {
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+
+    for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS; ++i)
+        m_abAchievCriteria[i] = false;
 }
 
 void instance_ahnkahet::OnCreatureCreate(Creature* pCreature)
@@ -44,15 +45,32 @@ void instance_ahnkahet::OnCreatureCreate(Creature* pCreature)
         case NPC_JEDOGA_SHADOWSEEKER:
         case NPC_TALDARAM:
             break;
-        case NPC_AHNKAHAR_GUARDIAN_EGG:
-            m_GuardianEggList.push_back(pCreature->GetObjectGuid());
+        case NPC_TWILIGHT_INITIATE:
+            m_lTwilightInitiate.push_back(pCreature->GetObjectGuid());
             break;
-        case NPC_AHNKAHAR_SWARM_EGG:
-            m_SwarmerEggList.push_back(pCreature->GetObjectGuid());
-            break;
+        default:
+            return;
     }
     m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
 }
+	
+void instance_ahnkahet::OnCreatureDeath(Creature *pCreature)	
+{
+    switch(pCreature->GetEntry())
+    {
+    case NPC_AHNKAHAR_GUARDIAN:
+        if (GetData(TYPE_NADOX) == IN_PROGRESS)
+            SetSpecialAchievementCriteria(TYPE_RESPECT_YOUR_ELDERS, false);
+        break;
+    case NPC_TWILIGHT_VOLUNTEER:
+        if (GetData(TYPE_JEDOGA) == IN_PROGRESS)
+            SetSpecialAchievementCriteria(TYPE_VOLUNTEER_WORK, false);
+        break;
+    default:
+        break;
+    }
+}	
+
 void instance_ahnkahet::OnObjectCreate(GameObject* pGo)
 {
      switch(pGo->GetEntry())
@@ -73,6 +91,8 @@ void instance_ahnkahet::OnObjectCreate(GameObject* pGo)
             if (m_auiEncounter[TYPE_TALDARAM] != NOT_STARTED)
                 DoUseDoorOrButton(GO_VORTEX);
             break;
+        default:
+            return;
     }
     m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
 }
@@ -82,10 +102,6 @@ void instance_ahnkahet::SetData(uint32 uiType, uint32 uiData)
     {
         case TYPE_NADOX:
             m_auiEncounter[uiType] = uiData;
-            if (uiData == IN_PROGRESS)
-                m_bRespectElders = true;
-            if (uiData == SPECIAL)
-                m_bRespectElders = false;
             break;
         case TYPE_TALDARAM:
             if (uiData == SPECIAL)
@@ -139,40 +155,6 @@ void instance_ahnkahet::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-ObjectGuid instance_ahnkahet::SelectRandomGuardianEggGuid()
-{
-    if (m_GuardianEggList.empty())
-        return ObjectGuid();
-
-    std::list<ObjectGuid>::iterator iter = m_GuardianEggList.begin();
-    advance(iter, urand(0, m_GuardianEggList.size()-1));
-
-    return *iter;
-}
-
-ObjectGuid instance_ahnkahet::SelectRandomSwarmerEggGuid()
-{
-    if (m_SwarmerEggList.empty())
-        return ObjectGuid();
-
-    std::list<ObjectGuid>::iterator iter = m_SwarmerEggList.begin();
-    advance(iter, urand(0, m_SwarmerEggList.size()-1));
-
-    return *iter;
-}
-
-bool instance_ahnkahet::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
-{
-    switch (uiCriteriaId)
-    {
-        case ACHIEV_CRIT_RESPECT_ELDERS:
-            return m_bRespectElders;
-
-        default:
-            return false;
-    }
-}
-
 void instance_ahnkahet::Load(const char* chrIn)
 {
     if (!chrIn)
@@ -194,7 +176,6 @@ void instance_ahnkahet::Load(const char* chrIn)
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }
-
 uint32 instance_ahnkahet::GetData(uint32 uiType)
 {
     switch(uiType)
@@ -211,6 +192,25 @@ uint32 instance_ahnkahet::GetData(uint32 uiType)
             return m_auiEncounter[4];
     }
     return 0;
+}
+ 
+bool instance_ahnkahet::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+{
+    switch (uiCriteriaId)
+    {
+        case ACHIEV_CRITERIA_VOLUNTEER_WORK:
+            return m_abAchievCriteria[TYPE_VOLUNTEER_WORK];
+        case ACHIEV_CRITERIA_RESPECT_YOUR_ELDERS:
+            return m_abAchievCriteria[TYPE_RESPECT_YOUR_ELDERS];
+        default:
+            return 0;
+    }
+}
+
+void instance_ahnkahet::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
+{
+    if (uiType < MAX_SPECIAL_ACHIEV_CRITS)
+        m_abAchievCriteria[uiType] = bIsMet;
 }
 
 InstanceData* GetInstanceData_instance_ahnkahet(Map* pMap)

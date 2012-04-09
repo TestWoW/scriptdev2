@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -47,7 +47,9 @@ enum
 
     SPELL_PULSING_SHOCKWAVE_N           = 52961,
     SPELL_PULSING_SHOCKWAVE_H           = 59836,
-    SPELL_PULSING_SHOCKWAVE_AURA        = 59414
+    SPELL_PULSING_SHOCKWAVE_AURA        = 59414,
+
+    ACHIEV_TIMELY_DEATH                 = 1867,
 };
 
 /*######
@@ -72,6 +74,8 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
     uint32 m_uiLightningNova_Timer;
     uint32 m_uiPulsingShockwave_Timer;
     uint32 m_uiResumePulsingShockwave_Timer;
+    uint32 m_uiAchievCheckTimer;
+    uint32 m_uiEncounterTimer;
 
     uint32 m_uiHealthAmountModifier;
 
@@ -83,6 +87,8 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
         m_uiLightningNova_Timer = 20000;
         m_uiPulsingShockwave_Timer = 2000;
         m_uiResumePulsingShockwave_Timer = 15000;
+        m_uiAchievCheckTimer = 0;
+        m_uiEncounterTimer = 0;
 
         m_uiHealthAmountModifier = 1;
 
@@ -95,7 +101,10 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_LOKEN, IN_PROGRESS);
+            m_pInstance->SetData(TYPE_TIMELY, DONE);
+        }
     }
 
     void JustDied(Unit* pKiller)
@@ -121,6 +130,20 @@ struct MANGOS_DLL_DECL boss_lokenAI : public ScriptedAI
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (!m_bIsRegularMode)
+        {
+            if (m_uiAchievCheckTimer < uiDiff)
+            {
+                if (m_uiEncounterTimer > 120000)
+                    m_pInstance->SetData(TYPE_TIMELY, FAIL);
+
+                m_uiAchievCheckTimer = 500;
+            }
+            else m_uiAchievCheckTimer -= uiDiff;
+        }
+
+        m_uiEncounterTimer += uiDiff;
 
         if (m_bIsAura)
         {
