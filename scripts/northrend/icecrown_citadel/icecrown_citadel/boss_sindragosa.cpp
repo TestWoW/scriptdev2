@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,17 +16,8 @@
 
 /* ScriptData
 SDName: boss_sindragosa
-<<<<<<< HEAD
 SD%Complete: 
 SDComment: 
-=======
-SD%Complete: 99%
-SDComment:  by michalpolko with special thanks to:
-            mangosR2 team and all who are supporting us with feedback, testing and fixes
-            TrinityCore for some info about spells IDs
-            everybody whom I forgot to mention here ;)
-
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 SDCategory: Icecrown Citadel
 EndScriptData */
 
@@ -48,12 +39,8 @@ enum BossSpells
     SPELL_PERMEATING_CHILL      = 70109,
     SPELL_UNCHAINED_MAGIC       = 69762,
     SPELL_INSTABILITY           = 69766,
-<<<<<<< HEAD
 
     SPELL_FROST_INFUSION        = 72292,
-=======
-    SPELL_BACKLASH              = 69770, // deals dmg basing on Instability stacks
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
     // Phase 2
 
@@ -80,19 +67,12 @@ enum BossSpells
 
     GO_ICE_BLOCK                = 201722,
 
-<<<<<<< HEAD
     // Rimefang
     SPELL_FROST_AURA_RIME       = 71387,
     SPELL_ICY_BLAST             = 71376,
     SPELL_FROST_BREATH_RIME     = 71386,
 
     // Spinestalker
-=======
-// Rimefang
-    SPELL_FROST_AURA_1          = 70084,
-    SPELL_ICY_BLAST             = 71376,
-// Spinestalker
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     SPELL_BELLOWING_ROAR        = 36922,
     SPELL_CLEAVE_SPINESTALKER   = 40505,
     SPELL_TAIL_SWEEP            = 71369
@@ -137,18 +117,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 {
     boss_sindragosaAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-<<<<<<< HEAD
         Reset();
     }
 
     bool m_bAchievFail;
 
-=======
-        pCreature->SetSpeedRate(MOVE_RUN, 1.2f);
-        Reset();
-    }
-
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     uint32 m_uiPhase;
     uint32 m_uiPhaseTimer;
     uint32 m_uiBerserkTimer;
@@ -161,17 +134,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
     uint32 m_uiFrostBeaconTimer;
     uint32 m_uiIceTombTimer;
     uint32 m_uiFrostBombTimer;
-<<<<<<< HEAD
     uint32 m_uiCheckTimer;
 
     void Reset()
     {
         m_bAchievFail               = false;
-=======
-
-    void Reset()
-    {
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
         m_uiPhase                   = PHASE_GROUND;
         m_uiPhaseTimer              = 45000;
         m_uiBerserkTimer            = 10 * MINUTE * IN_MILLISECONDS;
@@ -180,7 +147,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         m_uiFrostBreathTimer        = 5000;
         m_uiIcyGripTimer            = 35000;
         m_uiUnchainedMagicTimer     = urand(15000, 30000);
-<<<<<<< HEAD
         m_uiCheckTimer              = 1000;
 
         m_uiFlyingTimer             = 60000; // debug code
@@ -197,16 +163,11 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         SetCombatMovement(true);
         m_creature->SetLevitate(false);
         m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
-=======
-
-        m_uiFlyingTimer             = 60000; // debug code
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void Aggro(Unit *pWho)
     {
         if (m_pInstance)
-<<<<<<< HEAD
             m_pInstance->SetData(TYPE_SINDRAGOSA, IN_PROGRESS);
 
         DoCastSpellIfCan(m_creature, SPELL_FROST_AURA, CAST_TRIGGERED);
@@ -278,38 +239,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 }
             }
         }
-=======
-            m_pInstance->SetData(TYPE_SINDRAGOSA, FAIL);
-
-        SetCombatMovement(true);
-        m_creature->SetLevitate(false);
-        m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
-    }
-
-    void Aggro(Unit *pWho)
-    {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_SINDRAGOSA, IN_PROGRESS);
-
-        DoCastSpellIfCan(m_creature, SPELL_FROST_AURA, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, SPELL_PERMEATING_CHILL, CAST_TRIGGERED);
-
-        DoScriptText(SAY_AGGRO, m_creature);
-    }
-
-    void KilledUnit(Unit *pVictim)
-    {
-        if (pVictim->GetTypeId() == TYPEID_PLAYER)
-            DoScriptText(SAY_SLAY_1 - urand(0, 1), m_creature);
-    }
-
-    void JustDied(Unit *pKiller)
-    {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_SINDRAGOSA, DONE);
-
-        DoScriptText(SAY_DEATH, m_creature);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void MovementInform(uint32 uiMovementType, uint32 uiData)
@@ -319,7 +248,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
         if (uiData == POINT_AIR)
         {
-<<<<<<< HEAD
             m_creature->SetSpeedRate(MOVE_RUN, 0);
             m_creature->SetSpeedRate(MOVE_WALK, 0);
             m_uiPhase = PHASE_AIR;
@@ -341,23 +269,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
             m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
             m_creature->SetSpeedRate(MOVE_WALK, 1.2f);
-=======
-            m_uiPhase = PHASE_AIR;
-
-            int max = m_bIs25Man ? 5 : 2;
-            if (m_bIs25Man && m_bIsHeroic)
-                max = 6;
-
-            DoMark(max);
-
-            // set timers
-            m_uiIceTombTimer    = 5500;
-            m_uiFrostBombTimer  = 12000;
-            m_uiPhaseTimer      = 35000;
-        }
-        else if (uiData == POINT_LAND)
-        {
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
             m_uiPhase = PHASE_GROUND;
             SetCombatMovement(true);
             m_creature->SetLevitate(false);
@@ -376,10 +287,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         z = SindragosaLoc[0].z;
 
         m_creature->CastSpell(x, y, z, SPELL_FROST_BOMB, false);
-<<<<<<< HEAD
         m_creature->SummonCreature(NPC_FROST_BOMB, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 20000);
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void DoMark(uint32 count)
@@ -397,7 +305,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             {
                 continue;
             }
-<<<<<<< HEAD
 
             if (Unit *pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
                 targetUnitList.push_back(pUnit);
@@ -419,39 +326,13 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             }
         }
 
-=======
-
-            if (Unit *pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
-                targetUnitList.push_back(pUnit);
-        }
-
-        // random targets
-        while (targetUnitList.size() > count)
-        {
-            uint32 poz = urand(0, targetUnitList.size()-1);
-            for (std::list<Unit*>::iterator itr = targetUnitList.begin(); itr != targetUnitList.end(); ++itr, --poz)
-            {
-                if (!*itr) continue;
-
-                if (!poz)
-                {
-                    targetUnitList.erase(itr);
-                    break;
-                }
-            }
-        }
-
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
         // cast
         for (std::list<Unit*>::iterator itr = targetUnitList.begin(); itr != targetUnitList.end(); ++itr)
         {
             if (Unit *pTarget = (*itr))
                 m_creature->CastSpell(pTarget, SPELL_FROST_BEACON, true);
         }
-<<<<<<< HEAD
         m_uiIceTombTimer = 5500;
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -471,7 +352,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
         else
             m_uiBerserkTimer -= uiDiff;
 
-<<<<<<< HEAD
         if (!m_bAchievFail)
         {
             if (m_uiCheckTimer < uiDiff)
@@ -482,8 +362,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
             else m_uiCheckTimer -= uiDiff;
         }
 
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
         switch(m_uiPhase)
         {
             case PHASE_GROUND:
@@ -496,11 +374,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     m_uiPhase = PHASE_THREE;
                     DoScriptText(SAY_PHASE_3, m_creature);
                     m_uiFrostBeaconTimer = 10000;
-<<<<<<< HEAD
                     m_uiIceTombTimer = 50000;
-=======
-                    m_uiIceTombTimer = 15000;
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                     return;
                 }
 
@@ -527,11 +401,8 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 {
                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BREATH) == CAST_OK)
                         m_uiFrostBreathTimer = urand(15000, 20000);
-<<<<<<< HEAD
                     if (m_uiPhaseTimer < 5000)
                         m_uiPhaseTimer = 5000;
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                 }
                 else
                     m_uiFrostBreathTimer -= uiDiff;
@@ -540,7 +411,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 if (m_uiUnchainedMagicTimer <= uiDiff)
                 {
                     if (DoCastSpellIfCan(m_creature, SPELL_UNCHAINED_MAGIC) == CAST_OK)
-<<<<<<< HEAD
                     {
                         m_uiUnchainedMagicTimer = urand(40000, 60000);
                         DoScriptText(SAY_UNCHAINED_MAGIC, m_creature);
@@ -585,42 +455,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     }
                 }
                 else
-=======
-                    {
-                        m_uiUnchainedMagicTimer = urand(40000, 60000);
-                        DoScriptText(SAY_UNCHAINED_MAGIC, m_creature);
-                    }
-                }
-                else
-                    m_uiUnchainedMagicTimer -= uiDiff;
-
-                // Icy Grip and Blistering Cold
-                if (m_uiIcyGripTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_ICY_GRIP) == CAST_OK)
-                    {
-                        m_uiIcyGripTimer = 70000;
-                        DoScriptText(SAY_BLISTERING_COLD, m_creature);
-                    }
-                }
-                else
-                    m_uiIcyGripTimer -= uiDiff;
-
-                // Phase 2 (air)
-                if (m_uiPhaseTimer <= uiDiff)
-                {
-                    m_uiPhaseTimer = 35000;
-                    m_uiPhase = PHASE_FLYING;
-                    DoScriptText(SAY_TAKEOFF, m_creature);
-
-                    // fly to the air point
-                    SetCombatMovement(false);
-                    m_creature->SetLevitate(true);
-                    m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
-                    m_creature->GetMotionMaster()->MovePoint(POINT_AIR, SindragosaLoc[1].x, SindragosaLoc[1].y, SindragosaLoc[1].z, false);
-                }
-                else
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                     m_uiPhaseTimer -= uiDiff;
 
                 break;
@@ -660,7 +494,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 // Phase One (ground)
                 if (m_uiPhaseTimer <= uiDiff)
                 {
-<<<<<<< HEAD
                     m_uiPhase               = PHASE_FLYING;
                     m_uiPhaseTimer          = 110000;
                     m_creature->SetSpeedRate(MOVE_RUN, 1.2f);
@@ -668,13 +501,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
 
                     // fly to the ground point
                     m_creature->GetMotionMaster()->MovePoint(POINT_LAND, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z);
-=======
-                    m_uiPhase = PHASE_FLYING;
-                    m_uiPhaseTimer = 42000;
-
-                    // fly to the ground point
-                    m_creature->GetMotionMaster()->MovePoint(POINT_LAND, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z, false);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                 }
                 else
                     m_uiPhaseTimer -= uiDiff;
@@ -687,7 +513,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                 if (m_uiFrostBeaconTimer <= uiDiff)
                 {
                     if (Unit *pVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, SPELL_FROST_BEACON, SELECT_FLAG_PLAYER))
-<<<<<<< HEAD
                     {
                         if (DoCastSpellIfCan(pVictim, SPELL_FROST_BEACON) == CAST_OK)
                         {
@@ -757,68 +582,6 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     {
                         m_uiIcyGripTimer = 75000;
                         DoScriptText(SAY_BLISTERING_COLD, m_creature);
-=======
-                    {
-                        if (DoCastSpellIfCan(pVictim, SPELL_FROST_BEACON) == CAST_OK)
-                            m_uiFrostBeaconTimer = 10000;
-                    }
-                }
-                else
-                    m_uiFrostBeaconTimer -= uiDiff;
-
-                // Ice Tomb
-                if (m_uiIceTombTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_ICE_TOMB) == CAST_OK)
-                        m_uiIceTombTimer = 10000;
-                }
-                else
-                    m_uiIceTombTimer -= uiDiff;
-
-                // Cleave
-                if (m_uiCleaveTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
-                        m_uiCleaveTimer = urand(5000, 15000);
-                }
-                else
-                    m_uiCleaveTimer -= uiDiff;
-
-                // Tail Smash
-                if (m_uiTailSmashTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_TAIL_SMASH) == CAST_OK)
-                        m_uiTailSmashTimer = urand(10000, 20000);
-                }
-                else
-                    m_uiTailSmashTimer -= uiDiff;
-
-                // Frost Breath
-                if (m_uiFrostBreathTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BREATH) == CAST_OK)
-                        m_uiFrostBreathTimer = urand(15000, 20000);
-                }
-                else
-                    m_uiFrostBreathTimer -= uiDiff;
-
-                // Unchained Magic
-                if (m_uiUnchainedMagicTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_UNCHAINED_MAGIC) == CAST_OK)
-                        m_uiUnchainedMagicTimer = urand(40000, 60000);
-                }
-                else
-                    m_uiUnchainedMagicTimer -= uiDiff;
-
-                // Icy Grip and Blistering Cold
-                if (m_uiIcyGripTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_ICY_GRIP) == CAST_OK)
-                    {
-                        DoScriptText(SAY_BLISTERING_COLD, m_creature);
-                        m_uiIcyGripTimer = 70000;
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                     }
                 }
                 else
@@ -843,18 +606,11 @@ struct MANGOS_DLL_DECL mob_ice_tombAI : public ScriptedAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         SetCombatMovement(false);
-<<<<<<< HEAD
         m_uiCheckTimer = 1000;
         m_creature->SetRespawnDelay(7 * DAY * IN_MILLISECONDS);
     }
 
     ScriptedInstance *m_pInstance;
-=======
-        m_uiCheckTimer = 30000;
-        m_creature->SetRespawnDelay(7 * DAY * IN_MILLISECONDS);
-    }
-
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     uint32 m_uiCheckTimer;
 
     void Reset(){}
@@ -951,7 +707,6 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public ScriptedAI
 
     void Reset()
     {
-<<<<<<< HEAD
         if(!m_pInstance)
             return;
 
@@ -960,22 +715,11 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public ScriptedAI
 
         m_uiFrostBreathTimer = 10000;
         m_uiIcyBlastTimer = 8000;
-=======
-        if(!pInstance)
-            return;
-
-        resetTimers();
-        m_creature->SetRespawnDelay(30*MINUTE);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void MoveInLineOfSight(Unit* pWho)
     {
-<<<<<<< HEAD
         if (!m_pInstance || !pWho)
-=======
-        if (!pInstance || !pWho)
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
             return;
 
         if (pWho->GetTypeId() != TYPEID_PLAYER)
@@ -992,37 +736,24 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-<<<<<<< HEAD
     void Aggro(Unit *pWho)
     {
         if (!m_pInstance)
             return;
 
         pBrother = m_pInstance->GetSingleCreatureFromStorage(NPC_SPINESTALKER);
-=======
-    void Aggro(Unit *who)
-    {
-        if(!pInstance)
-            return;
-
-        pBrother = pInstance->GetSingleCreatureFromStorage(NPC_SPINESTALKER);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
         if (pBrother && !pBrother->isAlive())
             pBrother->Respawn();
 
         if (pBrother)
             pBrother->SetInCombatWithZone();
-<<<<<<< HEAD
 
         DoCastSpellIfCan(m_creature, SPELL_FROST_AURA_RIME, CAST_TRIGGERED);
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void JustDied(Unit *pKiller)
     {
-<<<<<<< HEAD
         if(!m_pInstance)
             return;
 
@@ -1034,14 +765,6 @@ struct MANGOS_DLL_DECL mob_rimefangAI : public ScriptedAI
         {
             Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true);
             if (pSindr)
-=======
-        if(!pInstance)
-            return;
-
-        if (pBrother && !pBrother->isAlive() && pInstance->GetData(TYPE_SINDRAGOSA) != DONE)
-        {
-            if (Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true))
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                 pSindr->SetCreatorGuid(ObjectGuid());
         }
     }
@@ -1104,7 +827,6 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public ScriptedAI
 
     void Reset()
     {
-<<<<<<< HEAD
         if(!m_pInstance)
             return;
 
@@ -1114,13 +836,6 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public ScriptedAI
         m_uiBellowingRoarTimer  = 15000;
         m_uiCleaveTimer         = urand(6000, 10000);
         m_uiTailSweepTimer      = 10000;
-=======
-        if(!pInstance)
-            return;
-
-        resetTimers();
-        m_creature->SetRespawnDelay(30*MINUTE);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void MoveInLineOfSight(Unit* pWho)
@@ -1142,50 +857,30 @@ struct MANGOS_DLL_DECL mob_spinestalkerAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-<<<<<<< HEAD
     void Aggro(Unit *pWho)
     {
         if(!m_pInstance)
             return;
 
         pBrother = m_pInstance->GetSingleCreatureFromStorage(NPC_RIMEFANG);
-=======
-    void Aggro(Unit *who)
-    {
-        if(!pInstance)
-            return;
-
-        pBrother = pInstance->GetSingleCreatureFromStorage(NPC_RIMEFANG);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
         if (pBrother && !pBrother->isAlive())
             pBrother->Respawn();
 
         if (pBrother)
-<<<<<<< HEAD
            pBrother->SetInCombatWithZone();
-=======
-            pBrother->SetInCombatWithZone();
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void JustDied(Unit *pKiller)
     {
         if (!m_pInstance)
             return;
-<<<<<<< HEAD
         if (m_pInstance->GetData(TYPE_SINDRAGOSA) == DONE)
             return;
         if (pBrother && !pBrother->isAlive())
         {
             Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true);
             if (pSindr)
-=======
-
-        if (pBrother && !pBrother->isAlive() && pInstance->GetData(TYPE_SINDRAGOSA) != DONE)
-        {
-            if (Creature* pSindr = m_creature->SummonCreature(NPC_SINDRAGOSA, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z, 3.17f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, HOUR*IN_MILLISECONDS, true))
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                 pSindr->SetCreatorGuid(ObjectGuid());
         }
     }

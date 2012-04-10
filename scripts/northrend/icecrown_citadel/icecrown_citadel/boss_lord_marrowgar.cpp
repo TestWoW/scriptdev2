@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,40 +17,14 @@
 /* ScriptData
 SDName: boss_lord_marrowgar
 SD%Complete: 99%
-<<<<<<< HEAD
 SDComment:  hack in script included for not correctly working Cold Flame spell.
             also not sure if spell for marking impaled targets is for this boss, so not implemented.
-=======
-SDComment:  by michalpolko with special thanks to:
-            mangosR2 team and all who are supporting us with feedback, testing and fixes
-            TrinityCore for some info about spells IDs
-            everybody whom I forgot to mention here ;)
-
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 SDCategory: Icecrown Citadel
 EndScriptData */
 
 #include "precompiled.h"
 #include "icecrown_citadel.h"
 
-<<<<<<< HEAD
-=======
-// talks
-enum
-{
-    SAY_INTRO                   = -1631001,
-    SAY_AGGRO                   = -1631002,
-    SAY_BONE_STORM              = -1631003,
-    SAY_BONE_SPIKE_1            = -1631004,
-    SAY_BONE_SPIKE_2            = -1631005,
-    SAY_BONE_SPIKE_3            = -1631006,
-    SAY_SLAY_1                  = -1631007,
-    SAY_SLAY_2                  = -1631008,
-    SAY_DEATH                   = -1631009,
-    SAY_BERSERK                 = -1631010,
-};
-
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 // spells
 enum
 {
@@ -83,7 +57,6 @@ enum
 
     SPELL_IMPALED                           = 69065,
     SPELL_VEHICLE_HARDCODED                 = 46598,
-<<<<<<< HEAD
 
     // phases
     PHASE_NORMAL                            = 1,
@@ -111,20 +84,6 @@ enum
     SAY_SLAY_2                  = -1631008,
     SAY_DEATH                   = -1631009,
     SAY_BERSERK                 = -1631010,
-=======
-
-    // phases
-    PHASE_NORMAL                            = 1,
-    PHASE_BONE_STORM_CHARGE                 = 2,
-    PHASE_BONE_STORM_CHARGING               = 3,
-    PHASE_BONE_STORM_COLDFLAME              = 4,
-
-    // others
-    POINT_CHARGE                            = 1,
-
-    MAX_CHARGES_NORMAL                      = 4,
-    MAX_CHARGES_HEROIC                      = 5,
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 };
 
 /*####
@@ -153,10 +112,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
     uint32 m_uiBoneStormTimer;
     uint32 m_uiBoneStormChargeTimer;
     uint32 m_uiBoneStormColdflameTimer;
-<<<<<<< HEAD
     uint32 m_uiDebugTimer;
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
     void Reset()
     {
@@ -205,12 +161,9 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
 
     void KilledUnit(Unit* pVictim)
     {
-<<<<<<< HEAD
         if (pVictim->GetTypeId() != TYPEID_PLAYER)
             return;
 
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
         DoScriptText(SAY_SLAY_1 - urand(0, 1),m_creature,pVictim);
     }
 
@@ -232,7 +185,6 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
             pSummoned->SetInCombatWithZone();
             pSummoned->CastSpell(pSummoned, SPELL_COLDFLAME_AURA, true);
             pSummoned->SetSpeedRate(MOVE_WALK, 2.0f); // should be via DB
-<<<<<<< HEAD
             pSummoned->GetMotionMaster()->MovePoint(0, x, y, z);
         }
     }
@@ -280,34 +232,6 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
             std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
             std::advance(i, urand(0, lPotentialTargets.size() - 1));
             return m_creature->GetMap()->GetUnit(*i);
-=======
-            pSummoned->GetMotionMaster()->MovePoint(0, x, y, z, false);
-        }
-    }
-
-    // hacky way
-    void DoSummonSingleColdFlame()
-    {
-        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-        {
-            float summon_x, summon_y, summon_z, ang;
-            ang = m_creature->GetAngle(pTarget);
-            m_creature->GetNearPoint(m_creature, summon_x, summon_y, summon_z, m_creature->GetObjectBoundingRadius(), 10.0f, ang);
-
-            m_creature->SummonCreature(NPC_COLDFLAME, summon_x, summon_y, summon_z, ang, TEMPSUMMON_TIMED_DESPAWN, 12000);
-        }
-    }
-
-    void MovementInform(uint32 uiType, uint32 uiPointId)
-    {
-        if (uiType != POINT_MOTION_TYPE)
-            return;
-
-        if (uiPointId == POINT_CHARGE)
-        {
-            m_uiPhase = PHASE_BONE_STORM_COLDFLAME;
-            ++m_uiChargesCount;
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
         }
         else
             return NULL;
@@ -336,7 +260,6 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
             {
                 // Coldflame (regular)
                 if (m_uiColdflameTimer <= uiDiff)
-<<<<<<< HEAD
                 {
                     //if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_COLDFLAME) == CAST_OK)
                     DoSummonSingleColdFlame();
@@ -360,15 +283,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                     }
                     else
                         m_uiBoneSpikeTimer -= uiDiff;
-=======
-                {
-                    //if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_COLDFLAME) == CAST_OK)
-                    DoSummonSingleColdFlame();
-                    m_uiColdflameTimer = 5000;
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                 }
-                else
-                    m_uiColdflameTimer -= uiDiff;
 
                 // Bone Storm
                 if (m_uiBoneStormTimer <= uiDiff)
@@ -388,11 +303,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                 // Bone Slice
                 if (m_uiBoneSliceTimer <= uiDiff)
                 {
-<<<<<<< HEAD
                     if (DoCastSpellIfCan(m_creature->getVictim(), m_bIs25Man ? SPELL_BONE_SLICE_25 : SPELL_BONE_SLICE_10) == CAST_OK)
-=======
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BONE_SLICE_10) == CAST_OK)
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                         m_uiBoneSliceTimer = 1000;
                 }
                 else
@@ -407,24 +318,15 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                 // next charge to random enemy
                 if (m_uiBoneStormChargeTimer <= uiDiff)
                 {
-<<<<<<< HEAD
                     if (Unit *pTarget = SelectTargetForCharge())
-=======
-                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                     {
                         float x, y, z;
                         pTarget->GetPosition(x, y, z);
                         m_creature->GetMotionMaster()->MovePoint(POINT_CHARGE, x, y, z);
                         m_uiBoneStormChargeTimer = 3000;
-<<<<<<< HEAD
                         m_uiDebugTimer = 30000;
                     }
                     m_uiPhase = PHASE_BONE_STORM_CHARGING;
-=======
-                        m_uiPhase = PHASE_BONE_STORM_CHARGING;
-                    }
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                 }
                 else
                     m_uiBoneStormChargeTimer -= uiDiff;
@@ -433,15 +335,12 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
             }
             case PHASE_BONE_STORM_CHARGING: // waiting to arrive at target position
             {
-<<<<<<< HEAD
                 if (m_uiDebugTimer < uiDiff)
                 {
                     m_uiDebugTimer = 30000;
                     m_uiPhase = PHASE_NORMAL;
                 }
                 else m_uiDebugTimer -= uiDiff;
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                 break;
             }
             case PHASE_BONE_STORM_COLDFLAME:
@@ -476,21 +375,13 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
         }
 
         // Bone Spike - on heroic in every phase
-<<<<<<< HEAD
         if (m_bIsHeroic && m_uiPhase != PHASE_NORMAL)
-=======
-        if (m_bIsHeroic || m_uiPhase == PHASE_NORMAL)
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
         {
             if (m_uiBoneSpikeTimer <= uiDiff)
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_BONE_SPIKE_STORM_10) == CAST_OK)
                 {
-<<<<<<< HEAD
                     m_uiBoneSpikeTimer = 30000;
-=======
-                    m_uiBoneSpikeTimer = urand(20000, 30000);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
                     DoScriptText(SAY_BONE_SPIKE_1 - urand(0, 2), m_creature);
                 }
             }
@@ -505,15 +396,11 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
 ####*/
 struct MANGOS_DLL_DECL mob_coldflameAI : public ScriptedAI
 {
-<<<<<<< HEAD
     mob_coldflameAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
-=======
-    mob_coldflameAI(Creature *pCreature) : ScriptedAI(pCreature){}
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     void Reset(){}
     void AttackStart(Unit *who){}
     void UpdateAI(const uint32 uiDiff){}
@@ -526,7 +413,6 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
 {
     mob_bone_spikeAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-<<<<<<< HEAD
         m_pInstance = ((instance_icecrown_citadel*)pCreature->GetInstanceData());
         m_uiAchievTimer = 8000;
         m_bEmerged = false;
@@ -543,19 +429,7 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
     {
         m_uiAchievTimer = 8000;
     }
-=======
-        m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
-        m_victimGuid.Clear();
-        m_bEmerged = false;
-        SetCombatMovement(false);
-    }
 
-    ScriptedInstance* m_pInstance;
-    bool m_bEmerged;
-    ObjectGuid m_victimGuid;
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
-
-    void Reset(){}
     void AttackStart(Unit *pWho){}
 
     void JustDied(Unit *Killer)
@@ -563,13 +437,8 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
         if (Unit *pCreator = m_creature->GetCreator())
         {
             pCreator->RemoveAurasDueToSpell(SPELL_IMPALED);
-<<<<<<< HEAD
         }
         m_creature->ForcedDespawn();
-=======
-            m_creature->ForcedDespawn();
-        }
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -582,13 +451,10 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
             m_creature->HandleEmote(EMOTE_ONESHOT_EMERGE);
             m_bEmerged = true;
         }
-<<<<<<< HEAD
 
         if (m_uiAchievTimer < uiDiff)
             m_pInstance->SetSpecialAchievementCriteria(TYPE_BONED, false);
         else m_uiAchievTimer -= uiDiff;
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
 };
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 -2012 by /dev/rsa for ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2010 -2011 by /dev/rsa for ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -9,7 +9,6 @@
 
 enum
 {
-<<<<<<< HEAD
     TYPE_TELEPORT                       = 0,
     TYPE_MARROWGAR                      = 1,
     TYPE_DEATHWHISPER                   = 2,
@@ -23,21 +22,6 @@ enum
     TYPE_VALITHRIA                      = 10,
     TYPE_SINDRAGOSA                     = 11,
     TYPE_LICH_KING                      = 12,
-=======
-    TYPE_TELEPORT               = 0,
-    TYPE_MARROWGAR              = 1,
-    TYPE_DEATHWHISPER           = 2,
-    TYPE_FLIGHT_WAR             = 3,
-    TYPE_SAURFANG               = 4,
-    TYPE_FESTERGUT              = 5,
-    TYPE_ROTFACE                = 6,
-    TYPE_PUTRICIDE              = 7,
-    TYPE_BLOOD_COUNCIL          = 8,
-    TYPE_LANATHEL               = 9,
-    TYPE_VALITHRIA              = 10,
-    TYPE_SINDRAGOSA             = 11,
-    TYPE_LICH_KING              = 13,
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     MAX_ENCOUNTERS,
 
     TYPE_FROSTMOURNE_ROOM,
@@ -234,94 +218,11 @@ enum
 
     MAX_SPECIAL_ACHIEV_CRITS            = 14,
 
-<<<<<<< HEAD
     // Lord Marrowgar
     CRITERIA_BONED_10N                  = 12775,
     CRITERIA_BONED_25N                  = 12962,
     CRITERIA_BONED_10H                  = 13393,
     CRITERIA_BONED_25H                  = 13394,
-=======
-    NPC_LORD_MARROWGAR          = 36612,
-    NPC_LADY_DEATHWHISPER       = 36855,
-    NPC_DEATHBRINGER_SAURFANG   = 37813,
-    NPC_FESTERGUT               = 36626,
-    NPC_ROTFACE                 = 36627,
-    NPC_PROFESSOR_PUTRICIDE     = 36678,
-    NPC_TALDARAM                = 37973,
-    NPC_VALANAR                 = 37970,
-    NPC_KELESETH                = 37972,
-    NPC_LANATHEL                = 37955,
-    NPC_VALITHRIA               = 36789,
-    NPC_VALITHRIA_QUEST         = 38589,
-    NPC_SINDRAGOSA              = 36853,
-    NPC_LICH_KING               = 36597,
-
-    NPC_LANATHEL_INTRO          = 38004,
-    NPC_BLOOD_ORB_CONTROL       = 38008,
-
-    NPC_MURADIN                 = 36948,
-
-    NPC_TIRION                  = 38995,
-    NPC_MENETHIL                = 38579,
-
-    NPC_FROSTMOURNE_TRIGGER     = 38584,
-    NPC_FROSTMOURNE_HOLDER      = 27880,
-
-    NPC_STINKY                  = 37025,
-    NPC_PRECIOUS                = 37217,
-
-    NPC_RIMEFANG                = 37533,
-    NPC_SPINESTALKER            = 37534,
-
-    NPC_COMBAT_TRIGGER          = 38752,
-
-    GO_TELEPORT_GOSSIP_MESSAGE  = 99323,
-    TELEPORT_GOSSIP_MESSAGE     = 99322,
-
-    GO_ICEWALL_1                = 201911,
-    GO_ICEWALL_2                = 201910,
-
-    GO_MARROWGAR_DOOR           = 201857,
-
-    GO_ORATORY_DOOR             = 201563,
-    GO_DEATHWHISPER_ELEVATOR    = 202220, //5653
-
-    GO_SAURFANG_DOOR            = 201825,
-
-    GO_GAS_RELEASE_VALVE        = 201616, //72479
-
-    GO_ORANGE_PLAGUE            = 201371, //72536
-    GO_GREEN_PLAGUE             = 201370, //72537
-
-    GO_SCIENTIST_DOOR_GREEN     = 201614, //72530
-    GO_SCIENTIST_DOOR_ORANGE    = 201613, //72531
-    GO_SCIENTIST_DOOR_COLLISION = 201612,
-    GO_SCIENTIST_DOOR           = 201372, //72541
-
-    GO_BLOODWING_DOOR           = 201920, //72532
-    GO_CRIMSON_HALL_DOOR        = 201376, //72532
-    GO_COUNCIL_DOOR_1           = 201377, //72533
-    GO_COUNCIL_DOOR_2           = 201378, //72534
-
-    GO_BLOODPRINCE_DOOR         = 201746,
-    GO_ICECROWN_GRATE           = 201755,
-
-    GO_FROSTWING_DOOR           = 201919,
-    GO_GREEN_DRAGON_DOOR_1      = 201375, //1202
-    GO_GREEN_DRAGON_DOOR_2      = 201374, //1200
-    GO_VALITHRIA_DOOR_1         = 201381, //1618
-    GO_VALITHRIA_DOOR_2         = 201382, //1482
-    GO_VALITHRIA_DOOR_3         = 201383, //1335
-    GO_VALITHRIA_DOOR_4         = 201380, //1558
-
-    GO_SINDRAGOSA_DOOR_1        = 201369, //1619
-    GO_SINDRAGOSA_DOOR_2        = 201379,
-
-    GO_SINDRAGOSA_ENTRANCE      = 201373,
-    GO_SINDRAGOSA_ICE_WALL      = 202396,
-
-    GO_FROZENTRONE_TR           = 202223, //72061
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
     // Lady Deathwhisper
     CRITERIA_FULL_HOUSE_10N             = 12776,
@@ -391,11 +292,7 @@ enum
     CRITERIA_NECK_DEEP_IN_VILE_25H      = 13164,
 };
 
-<<<<<<< HEAD
 class MANGOS_DLL_DECL instance_icecrown_citadel : public ScriptedInstance
-=======
-class MANGOS_DLL_DECL instance_icecrown_spire : public ScriptedInstance
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 {
 public:
     instance_icecrown_citadel(Map* pMap);
@@ -406,7 +303,6 @@ public:
     void OnObjectCreate(GameObject* pGo);
     void OnCreatureCreate(Creature* pCreature);
 
-<<<<<<< HEAD
     bool IsEncounterInProgress() const;
     bool IsRaidWiped();
 
@@ -414,20 +310,14 @@ public:
     void DoCloseDoor(ObjectGuid guid);
     void DoOpenDoor(uint32 entry);
     void DoCloseDoor(uint32 entry);
-=======
-    bool IsEncounterInProgress();
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
     void SetData(uint32 uiType, uint32 uiData);
     uint32 GetData(uint32 uiType);
 
     const char* Save() { return strSaveData.c_str(); }
     void Load(const char* chrIn);
-<<<<<<< HEAD
     void SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet);
     bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/);
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
 private:
 
@@ -446,62 +336,6 @@ private:
 };
 
 struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
-<<<<<<< HEAD
-=======
-{
-    base_icc_bossAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
-        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
-        m_bIs25Man = (m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_NORMAL || m_uiMapDifficulty == RAID_DIFFICULTY_25MAN_HEROIC);
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    Difficulty m_uiMapDifficulty;
-    bool m_bIsHeroic;
-    bool m_bIs25Man;
-
-    void Reset(){}
-    void UpdateAI(const uint32 uiDiff){}
-
-    Unit* SelectRandomRangedTarget(Unit *pSource)
-    {
-        Unit *pResult = NULL;
-        std::list<Unit*> lTargets;
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-
-        for (ThreatList::const_iterator i = tList.begin();i != tList.end(); ++i)
-        {
-            if (!(*i)->getUnitGuid().IsPlayer())
-                continue;
-
-            if (Unit* pTmp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
-                lTargets.push_back(pTmp);
-        }
-
-        if (!lTargets.empty())
-        {
-            uint8 max = m_bIs25Man ? 8 : 3;
-            std::list<Unit*>::iterator iter;
-
-            lTargets.sort(ObjectDistanceOrderReversed(pSource));
-            iter = lTargets.begin();
-
-            if (max >= lTargets.size())
-                max = lTargets.size() - 1;
-
-            std::advance(iter, urand(0, max));
-            pResult = (*iter);
-        }
-
-        return pResult;
-    }
-};
-
-enum AchievementCriteriaIds
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 {
     base_icc_bossAI(Creature* pCreature) : ScriptedAI(pCreature)
     {

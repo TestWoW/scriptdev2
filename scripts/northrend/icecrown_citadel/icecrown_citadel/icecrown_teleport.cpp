@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -66,10 +66,7 @@ bool GOGossipSelect_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo, uin
 
     if(action >= 0 && action < PORTALS_COUNT)
         pPlayer->TeleportTo(PortalLoc[action].map_num, PortalLoc[action].x, PortalLoc[action].y, PortalLoc[action].z, PortalLoc[action].o);
-<<<<<<< HEAD
 
-=======
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     if (PortalLoc[action].spellID != 0 )
         pPlayer->_AddAura(PortalLoc[action].spellID, 2000);
 
@@ -98,7 +95,6 @@ bool GOGossipHello_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo)
 
 bool GOHello_go_plague_sigil(Player *player, GameObject* pGo)
 {
-<<<<<<< HEAD
     instance_icecrown_citadel* pInstance = (instance_icecrown_citadel*)pGo->GetInstanceData();
 
     if(!pInstance)
@@ -110,40 +106,19 @@ bool GOHello_go_plague_sigil(Player *player, GameObject* pGo)
         pInstance->DoOpenDoor(GO_SCIENTIST_DOOR_ORANGE);
         pInstance->DoOpenDoor(GO_SCIENTIST_DOOR_GREEN);
         pInstance->DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
-=======
-    instance_icecrown_spire* pInstance = (instance_icecrown_spire*)pGo->GetInstanceData();
-
-    if(!pInstance)
-        return false;
-
-    if (pInstance->GetData(TYPE_FESTERGUT) == DONE &&
-        pInstance->GetData(TYPE_ROTFACE) == DONE)
-    {
-        pInstance->DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE);
-        pInstance->DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN);
-        pInstance->DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
     }
     return true;
 }
 
 bool GOHello_go_bloodwing_sigil(Player *player, GameObject* pGo)
 {
-<<<<<<< HEAD
     instance_icecrown_citadel* pInstance = (instance_icecrown_citadel*)pGo->GetInstanceData();
-=======
-    instance_icecrown_spire* pInstance = (instance_icecrown_spire*)pGo->GetInstanceData();
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
     if(!pInstance)
         return false;
 
     if (pInstance->GetData(TYPE_SAURFANG) == DONE)
-<<<<<<< HEAD
         pInstance->DoOpenDoor(GO_BLOODWING_DOOR);
-=======
-        pInstance->DoUseDoorOrButton(GO_BLOODWING_DOOR);
->>>>>>> e3b95eb1e7415dbb8299d1f81b998dcf2748a4e5
 
     return true;
 }
@@ -154,7 +129,7 @@ bool GOHello_go_frostwing_sigil(Player *player, GameObject* pGo)
     if(!pInstance) return false;
 
     if (pInstance->GetData(TYPE_SAURFANG) == DONE)
-        pInstance->DoUseDoorOrButton(GO_FROSTWING_DOOR);
+        pInstance->DoOpenDoor(GO_FROSTWING_DOOR);
 
     return true;
 }
