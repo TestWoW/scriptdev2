@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -15,9 +15,10 @@
  */
 
 /* ScriptData
-SDName: boss_northrend_beasts
-SDComment: Timers
-SDAuthor: Walkum
+SDName: boss_anubarak_trial
+SD%Complete: 70%
+SDComment: by /dev/rsa
+SDCategory:
 EndScriptData */
 
 #include "precompiled.h"
@@ -252,7 +253,7 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
                             m_uiFrostSphereOneTimer = 40000;
                         }
                         else
-                           m_uiFrostSphereOneTimer -= uiDiff;
+                            m_uiFrostSphereOneTimer -= uiDiff;
 
                         if (m_uiPoundTimer <= uiDiff)
                         {   
@@ -260,7 +261,7 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
                                 m_uiPoundTimer = 20000;
                         }
                         else
-                           m_uiPoundTimer -= uiDiff;
+                            m_uiPoundTimer -= uiDiff;
 
                         if (m_uiColdTimer <= uiDiff)
                         {
@@ -299,7 +300,6 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
                             m_uiSubmergeAnubTimer -= uiDiff;
 
                         break;
-
                     case 1: 
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -320,14 +320,13 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
 
                         NextStep(2000);
                         break;
-
                     case 2:
                         if (m_uiPursuingTimer <= uiDiff)
                         {
                             float x, y, z;
                             m_creature->GetPosition(x, y, z);
 
-                            m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000);
+                            m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_MANUAL_DESPAWN, 60000);
                             m_uiPursuingTimer = 90000;
                         }
                         else
@@ -362,7 +361,7 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
                             m_uiFrostSphereTwoTimer = 30000;
                         }
                         else
-                           m_uiFrostSphereTwoTimer -= uiDiff;
+                            m_uiFrostSphereTwoTimer -= uiDiff;
 
                         if (m_uiSummonScarabTimer <= uiDiff)
                         {
@@ -392,7 +391,6 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
                             m_uiSubmergePhaseTimer -= uiDiff;
 
                         break;
-
                     case 3:
                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -417,7 +415,6 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
 
                         m_uiEventStep = 0;
                         break;
-
                     case 4: 
                         m_creature->CastSpell(m_creature, SPELL_LEECHING_SWARM, false);
                         DoScriptText(SAY_LOW_HEALTH, m_creature);
@@ -425,7 +422,6 @@ struct MANGOS_DLL_DECL boss_anubarak_trialAI : public BSWScriptedAI
                         m_uiEventStep = 5;
                         NextStep(3000);
                         break;
-
                     case 5: 
                         if (m_uiPoundTimer <= uiDiff)
                         {
@@ -665,7 +661,7 @@ struct MANGOS_DLL_DECL mob_nerubian_borrowerAI : public BSWScriptedAI
                 m_uiShadowStrikeTimer -= uiDiff;
         }
 
-        /*if (m_creature->GetHealthPercent() < 20.0f && !m_bIsSubmerged && !m_creature->HasAura(SPELL_PERMAFROST))
+        if (m_creature->GetHealthPercent() < 20.0f && !m_bIsSubmerged && !hasAura(SPELL_PERMAFROST, m_creature))
         {
             m_creature->CastSpell(m_creature, SPELL_SUBMERGE_BURROWER, false);
             m_creature->RemoveAllAuras();
@@ -694,7 +690,7 @@ struct MANGOS_DLL_DECL mob_nerubian_borrowerAI : public BSWScriptedAI
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             DoScriptText(EMOTE_OUT_OF_THE_GROUND, m_creature);
             m_bIsSubmerged = false;
-        }*/
+        }
 
         DoMeleeAttackIfReady();
     }
@@ -870,7 +866,7 @@ struct MANGOS_DLL_DECL mob_anubarak_spikeAI : public BSWScriptedAI
 
                 float x, y, z;
                 m_creature->GetPosition(x, y, z);
-                m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000);
+                m_creature->SummonCreature(NPC_SPIKE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
             }
 
             m_uiImpaleTimer = 500;
@@ -887,7 +883,7 @@ struct MANGOS_DLL_DECL mob_anubarak_spikeAI : public BSWScriptedAI
 
                 float x, y, z;
                 m_creature->GetPosition(x, y, z);
-                m_creature->SummonCreature(NPC_SPIKE, x + urand(5.0f, 10.0f), y + urand(5.0f, 10.0f), z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000);
+                m_creature->SummonCreature(NPC_SPIKE, x + urand(5.0f, 10.0f), y + urand(5.0f, 10.0f), z, 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
             }
             m_uiPermafrostTimer = 250;
         }

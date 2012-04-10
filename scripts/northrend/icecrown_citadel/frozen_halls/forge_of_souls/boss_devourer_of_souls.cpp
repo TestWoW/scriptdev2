@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -26,29 +26,26 @@ EndScriptData */
 
 enum
 {
-    SAY_MALE_1_AGGRO            = -1632010,
-    SAY_FEMALE_AGGRO            = -1632011,
-    SAY_MALE_1_SLAY_1           = -1632012,
-    SAY_FEMALE_SLAY_1           = -1632013,
-    SAY_MALE_2_SLAY_1           = -1632014,
-    SAY_MALE_1_SLAY_2           = -1632015,
-    SAY_FEMALE_SLAY_2           = -1632016,
-    SAY_MALE_2_SLAY_2           = -1632017,
-    SAY_MALE_1_DEATH            = -1632018,
-    SAY_FEMALE_DEATH            = -1632019,
-    SAY_MALE_2_DEATH            = -1632020,
-    SAY_MALE_1_SOUL_ATTACK      = -1632023,
-    SAY_FEMALE_SOUL_ATTACK      = -1632024,
-    SAY_MALE_2_SOUL_ATTACK      = -1632025,
-    SAY_MALE_1_DARK_GLARE       = -1632027,
-    SAY_FEMALE_DARK_GLARE       = -1632028,
+    SAY_MALE_1_AGGRO            = -1632007,
+    SAY_FEMALE_AGGRO            = -1632008,
+    SAY_MALE_1_SLAY_1           = -1632009,
+    SAY_FEMALE_SLAY_1           = -1632010,
+    SAY_MALE_2_SLAY_1           = -1632011,
+    SAY_MALE_1_SLAY_2           = -1632012,
+    SAY_FEMALE_SLAY_2           = -1632013,
+    SAY_MALE_2_SLAY_2           = -1632014,
+    SAY_MALE_1_DEATH            = -1632015,
+    SAY_FEMALE_DEATH            = -1632016,
+    SAY_MALE_2_DEATH            = -1632017,
+    SAY_MALE_1_SOUL_ATTACK      = -1632018,
+    SAY_FEMALE_SOUL_ATTACK      = -1632019,
+    SAY_MALE_2_SOUL_ATTACK      = -1632020,
+    SAY_MALE_1_DARK_GLARE       = -1632021,
+    SAY_FEMALE_DARK_GLARE       = -1632022,
 
-    SAY_JAINA_FS09_EXTRO        = -1632029,
-    SAY_SYLVANA_FS07_EXTRO      = -1632030,
-
-    EMOTE_MIRRORED_SOUL         = -1632021,
-    EMOTE_UNLEASH_SOULS         = -1632022,
-    EMOTE_WAILING_SOULS         = -1632026,
+    EMOTE_MIRRORED_SOUL         = -1632023,
+    EMOTE_UNLEASH_SOULS         = -1632024,
+    EMOTE_WAILING_SOULS         = -1632025,
 
     FACE_NORMAL                 = 0,
     FACE_WAILING                = 1,
@@ -96,7 +93,6 @@ struct MANGOS_DLL_DECL boss_devourer_of_soulsAI : public ScriptedAI
 
     instance_forge_of_souls* m_pInstance;
     uint8 m_uiFace;
-    uint32 TeamInInstance;
     bool m_bIsRegularMode;
 
     uint32 m_uiPhantomBlastTimer;
@@ -108,27 +104,9 @@ struct MANGOS_DLL_DECL boss_devourer_of_soulsAI : public ScriptedAI
 
     GUIDList m_lWellGuids;
 
-    uint32 GetFaction()
-    {
-        uint32 faction = 0;
-        Map *map = m_creature->GetMap();
-        if (map->IsDungeon())
-        {
-            Map::PlayerList const &PlayerList = map->GetPlayers();
-
-            if (!PlayerList.isEmpty())
-            {
-                if (Player* pPlayer = PlayerList.begin()->getSource())
-                    faction = pPlayer->GetTeam();
-            }
-        }
-        return faction;
-    }
-
     void Reset()
     {
         m_uiFace = FACE_NORMAL;
-        TeamInInstance = GetFaction();
 
         m_uiPhantomBlastTimer = urand(5000, 10000);
         m_uiWellTimer = urand(10000, 15000);
@@ -167,12 +145,6 @@ struct MANGOS_DLL_DECL boss_devourer_of_soulsAI : public ScriptedAI
                 pWell->ForcedDespawn();
         }
         m_lWellGuids.clear();
-
-        if(TeamInInstance == ALLIANCE)
-            m_creature->SummonCreature(NPC_JAINA_END, 5606.34033f, 2436.32129f, 705.9351f, 0.89f, TEMPSUMMON_DEAD_DESPAWN, 0);
-
-        if(TeamInInstance == HORDE)
-            m_creature->SummonCreature(NPC_SILVANA_END, 5606.34033f, 2436.32129f, 705.9351f, 0.89f, TEMPSUMMON_DEAD_DESPAWN, 0);
     }
 
     void JustReachedHome()
@@ -346,187 +318,9 @@ struct MANGOS_DLL_DECL boss_devourer_of_soulsAI : public ScriptedAI
     }
 };
 
-struct MANGOS_DLL_DECL npc_sylvanas_jaina_fos_endAI: public ScriptedAI
-{
-    npc_sylvanas_jaina_fos_endAI(Creature *pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        lSlavesList.clear();
-        m_lGuards.clear();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    uint32 m_uiSpeech_Timer;
-    uint8 m_uiOutro_Phase;
-    bool m_bIsOutro;
-    uint32 creatureEntry;
-    uint32 TeamInInstance;
-
-    GUIDList m_lGuards;
-
-    std::list<Creature*> lSlavesList;
-
-    uint32 GetFaction()
-    {
-        uint32 faction = 0;
-        Map *map = m_creature->GetMap();
-        if (map->IsDungeon())
-        {
-            Map::PlayerList const &PlayerList = map->GetPlayers();
-
-            if (!PlayerList.isEmpty())
-            {
-                if (Player* pPlayer = PlayerList.begin()->getSource())
-                    faction = pPlayer->GetTeam();
-            }
-        }
-        return faction;
-    }
-
-    void Reset()
-    {
-        lSlavesList.clear();
-        m_lGuards.clear();
-        m_uiOutro_Phase     = 0;
-        m_uiSpeech_Timer    = 1000;
-        m_bIsOutro          = true;
-        TeamInInstance = GetFaction();
-        creatureEntry = m_creature->GetEntry();
-    }
-
-    void SummonChampions()
-    {
-        for (uint8 i = 0; i < sizeof(aEventEndLocations)/sizeof(sExtroEventNpcLocations); ++i)
-        {
-            Creature *pTemp = m_creature->SummonCreature(TeamInInstance == HORDE ? aEventEndLocations[i].uiEntryHorde : aEventEndLocations[i].uiEntryAlliance, aEventEndLocations[i].fSpawnX, aEventEndLocations[i].fSpawnY, aEventEndLocations[i].fSpawnZ, aEventEndLocations[i].fStartO, TEMPSUMMON_DEAD_DESPAWN, 0);
-            if (pTemp)
-            {
-                pTemp->SetWalk(false);
-                pTemp->GetMotionMaster()->MovePoint(0, aEventEndLocations[i].fEndX, aEventEndLocations[i].fEndY, aEventEndLocations[i].fEndZ);
-                m_lGuards.push_back(pTemp->GetObjectGuid());
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (m_bIsOutro)
-        {
-            if(m_uiSpeech_Timer < uiDiff)
-            {
-                switch(m_uiOutro_Phase)
-                {
-                case 0:
-                    if (TeamInInstance == ALLIANCE)
-                    {
-                        switch (creatureEntry)
-                        {
-                        case NPC_JAINA_END:
-                            if(Creature* pJaina = m_pInstance->GetSingleCreatureFromStorage(NPC_JAINA_END))
-                            {
-                                pJaina->SetWalk(false);
-                                pJaina->GetMotionMaster()->MovePoint(0, 5653.337f, 2496.407f, 708.829f);
-                                pJaina->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                                pJaina->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                                SummonChampions();
-                            }
-                            break;
-                        }
-                    }
-                    if (TeamInInstance == HORDE)
-                    {
-                        switch (creatureEntry)
-                        {
-                            case NPC_SILVANA_END:
-                            if(Creature* pSylvanas = m_pInstance->GetSingleCreatureFromStorage(NPC_SILVANA_END))
-                            {
-                                pSylvanas->SetWalk(false);
-                                pSylvanas->GetMotionMaster()->MovePoint(0, 5653.337f, 2496.407f, 708.829f);
-                                pSylvanas->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                                pSylvanas->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                                SummonChampions();
-                            }
-                            break;
-                        }
-                    }
-                    ++m_uiOutro_Phase;
-                    m_uiSpeech_Timer = 10000;
-                    break;
-                case 1:
-                    if (TeamInInstance == ALLIANCE)
-                    {
-                        switch (creatureEntry)
-                        {
-                        case NPC_JAINA_END:
-                            if(Creature* pJaina = m_pInstance->GetSingleCreatureFromStorage(NPC_JAINA_END))
-                            {
-                                DoScriptText(SAY_JAINA_FS09_EXTRO, pJaina);
-                            }
-                            break;
-                        }
-                    }
-                    if (TeamInInstance == HORDE)
-                    {
-                        switch (creatureEntry)
-                        {
-                            case NPC_SILVANA_END:
-                            if(Creature* pSylvanas = m_pInstance->GetSingleCreatureFromStorage(NPC_SILVANA_END))
-                            {
-                                DoScriptText(SAY_SYLVANA_FS07_EXTRO, pSylvanas);
-                            }
-                            break;
-                        }
-                    }
-                    ++m_uiOutro_Phase;
-                    m_uiSpeech_Timer = 6000;
-                    break;
-                case 2:
-                    if (TeamInInstance == ALLIANCE)
-                    {
-                        switch (creatureEntry)
-                        {
-                        case NPC_JAINA_END:
-                            if(Creature* pJaina = m_pInstance->GetSingleCreatureFromStorage(NPC_JAINA_END))
-                            {
-                                pJaina->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                            }
-                            break;
-                        }
-                    }
-                    if (TeamInInstance == HORDE)
-                    {
-                        switch (creatureEntry)
-                        {
-                            case NPC_SILVANA_END:
-                            if(Creature* pSylvanas = m_pInstance->GetSingleCreatureFromStorage(NPC_SILVANA_END))
-                            {
-                                pSylvanas->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                            }
-                            break;
-                        }
-                    }
-                    ++m_uiOutro_Phase;
-                    m_uiSpeech_Timer = 6000;
-                    break;
-
-                default:
-                    m_uiSpeech_Timer = 100000;
-                }
-            }else m_uiSpeech_Timer -= uiDiff;
-        }
-    }
-};
-
 CreatureAI* GetAI_boss_devourer_of_souls(Creature* pCreature)
 {
     return new boss_devourer_of_soulsAI(pCreature);
-}
-
-CreatureAI* GetAI_npc_sylvanas_jaina_fos_end(Creature* pCreature)
-{
-    return new npc_sylvanas_jaina_fos_endAI(pCreature);
 }
 
 void AddSC_boss_devourer_of_souls()
@@ -536,10 +330,5 @@ void AddSC_boss_devourer_of_souls()
     pNewScript = new Script;
     pNewScript->Name = "boss_devourer_of_souls";
     pNewScript->GetAI = &GetAI_boss_devourer_of_souls;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_sylvanas_jaina_fos_end";
-    pNewScript->GetAI = &GetAI_npc_sylvanas_jaina_fos_end;
     pNewScript->RegisterSelf();
 }

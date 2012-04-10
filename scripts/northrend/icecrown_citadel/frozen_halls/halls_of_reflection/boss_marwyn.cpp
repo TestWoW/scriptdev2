@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: boss_marwyn
-SD%Complete: 100%
-SDComment: full fixed by walkum
+SD%Complete: 60%
+SDComment:
 SDAuthor: /dev/rsa, changed by MaxXx2021 aka Mioka
 SDCategory: Halls of Reflection
 EndScriptData */
@@ -55,14 +55,8 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
     bool m_bIsCall;
     uint32 m_uiSummonTimer;
 
-    uint32 m_uiObliterateTimer;
-    uint32 m_uiSharedSufferingTimer;
-    uint32 m_uiWellOfCorruptionTimer;
-    uint32 m_uiCorruptedFleshTimer;
-    uint32 m_uiBerserkTimer;
-
     uint32 m_uiLocNo;
-    ObjectGuid m_uiSummonGUID[16];
+    GUIDVector m_uiSummonGUID;
     uint32 m_uiCheckSummon;
 
     uint8 SummonCount;
@@ -72,26 +66,18 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
     void Reset()
     {
         SummonCount = 0;
+        m_uiCheckSummon = 0;
         m_bIsCall = false;
         m_uiSummonTimer = 15000;
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetVisibility(VISIBILITY_OFF);
-
-        m_uiObliterateTimer = urand(8000, 12000);
-        m_uiSharedSufferingTimer = urand(15000, 20000);
-        m_uiWellOfCorruptionTimer = urand(25000, 30000);
-        m_uiCorruptedFleshTimer = urand(10000, 16000);
-        m_uiBerserkTimer = 180000;
-
-        for (uint32 i = 0; i < 16; i++)
-            m_uiSummonGUID[i].Clear();
     }
 
     void Summon()
     {
          m_uiLocNo = 14;
 
-         for(uint8 i = 0; i < 14; i++)
+         for(uint8 i = 0; i < 16; i++)
          {
             switch(urand(0,3))
             {
@@ -133,7 +119,7 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
 
              if(Creature* Summon = m_creature->SummonCreature(pSummon, SpawnLoc[m_uiLocNo].x, SpawnLoc[m_uiLocNo].y, SpawnLoc[m_uiLocNo].z, SpawnLoc[m_uiLocNo].o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000))
              {
-                m_uiSummonGUID[i] = Summon->GetObjectGuid();
+                m_uiSummonGUID.push_back(Summon->GetObjectGuid());
                 Summon->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 Summon->setFaction(974);
              }
@@ -143,27 +129,27 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
 
     void CallFallSoldier()
     {
-        for(uint8 i = 0; i < 4; i++)
+        for (uint8 i = 0; i < 4 && m_uiSummonGUID.size(); i++)
         {
-            if(Creature* Summon = m_pInstance->instance->GetCreature(m_uiSummonGUID[m_uiCheckSummon]))
+            if (Creature* Summon = m_pInstance->instance->GetCreature(m_uiSummonGUID.back()))
             {
                Summon->setFaction(14);
                Summon->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                Summon->SetInCombatWithZone();
             }
-            m_uiCheckSummon++;
+            m_uiSummonGUID.pop_back();
         }
     }
 
     void JustDied(Unit* pKiller)
     {
-        if(m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_MARWYN, DONE);
-            m_pInstance->SetData(TYPE_PHASE, 3);
-        }
+      if(m_pInstance)
+      {
+         m_pInstance->SetData(TYPE_MARWYN, DONE);
+         m_pInstance->SetData(TYPE_PHASE, 3);
+      }
 
-        DoScriptText(SAY_MARWYN_DEATH, m_creature);
+      DoScriptText(SAY_MARWYN_DEATH, m_creature);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -226,55 +212,12 @@ struct MANGOS_DLL_DECL boss_marwynAI : public BSWScriptedAI
         if(!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_uiObliterateTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_OBLITERATE) == CAST_OK)
-                m_uiObliterateTimer = urand(8000, 12000);
-        }
-        else
-            m_uiObliterateTimer -= uiDiff;
+        timedCast(SPELL_OBLITERATE, uiDiff);
+        timedCast(SPELL_WELL_OF_CORRUPTION, uiDiff);
+        timedCast(SPELL_SHARED_SUFFERING, uiDiff);
+        timedCast(SPELL_CORRUPTED_FLESH, uiDiff);
 
-        if (m_uiWellOfCorruptionTimer <= uiDiff)
-        {
-            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_WELL_OF_CORRUPTION) == CAST_OK)
-                    m_uiWellOfCorruptionTimer = urand(15000, 20000);
-            }
-        }
-        else
-            m_uiWellOfCorruptionTimer -= uiDiff;
-
-        if (m_uiSharedSufferingTimer <= uiDiff)
-        {
-            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_SHARED_SUFFERING) == CAST_OK)
-                    DoScriptText(SAY_MARWYN_SP01, m_creature);
-
-                    m_uiSharedSufferingTimer = urand(25000, 30000);
-            }
-        }
-        else
-            m_uiSharedSufferingTimer -= uiDiff;
-
-        if (m_uiCorruptedFleshTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_CORRUPTED_FLESH) == CAST_OK)
-                DoScriptText(SAY_MARWYN_SP02, m_creature);
-
-                m_uiCorruptedFleshTimer = urand(10000, 16000);
-        }
-        else
-            m_uiCorruptedFleshTimer -= uiDiff;
-
-        if (m_uiBerserkTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                m_uiBerserkTimer = 180000;
-        }
-        else
-            m_uiBerserkTimer -= uiDiff;
+        timedCast(SPELL_BERSERK, uiDiff);
 
         DoMeleeAttackIfReady();
     }
@@ -287,10 +230,10 @@ CreatureAI* GetAI_boss_marwyn(Creature* pCreature)
 
 void AddSC_boss_marwyn()
 {
-    Script *pNewScript;
+    Script *newscript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_marwyn";
-    pNewScript->GetAI = &GetAI_boss_marwyn;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_marwyn";
+    newscript->GetAI = &GetAI_boss_marwyn;
+    newscript->RegisterSelf();
 }

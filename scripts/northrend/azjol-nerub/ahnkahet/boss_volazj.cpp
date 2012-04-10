@@ -1,4 +1,5 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+ * Copyright (C) 2011 - 2012 MangosR2 <http://github.com/mangosR2/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -90,8 +91,6 @@ enum
     PHASE_INSANITY_1                = 2,  // Wait five seconds until cast is complete, set unattackable
     PHASE_INSANITY_2                = 3, 
     PHASE_INSANITY_3                = 4, 
-
-    ACHIEV_FAST_DEMISE              = 1862,
 };
 struct Locations
 {
@@ -122,12 +121,12 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
 {
     boss_volazjAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_ahnkahet*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_ahnkahet* m_pInstance;
     bool m_bIsRegularMode;
     uint8 m_uiPhase;
     ObjectGuid m_uiLastShiverTargetGUID;
@@ -138,7 +137,6 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
     uint32 m_uiShadowBoltTimer;
     uint32 m_uiShiverTimer;
     uint32 m_uiCheckTimer;
-    uint32 m_uiAchievTimer;
 
     //Insanity
     uint32 m_uiInsanityCastTimer;
@@ -153,7 +151,6 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
         m_uiShiverTimer = 18000;
         m_uiCheckTimer = 1000;
         m_uiShiverJumpTimer = 0;
-        m_uiAchievTimer = 0;
 
         m_creature->SetRespawnDelay(DAY);
 
@@ -198,15 +195,10 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
         DoScriptText(urand(0, 1) ? SAY_DEATH_1 : SAY_DEATH_2, m_creature);
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VOLAZJ, DONE);
-
-        if (!m_bIsRegularMode && m_uiAchievTimer < 180000)
-            m_pInstance->DoCompleteAchievement(ACHIEV_FAST_DEMISE);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        m_uiAchievTimer += uiDiff;
-
         if(m_uiPhase == PHASE_FIGHT)
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -281,23 +273,6 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
         {
             m_creature->RemoveAurasDueToSpell(SPELL_INSANITY_CHANNEL);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-        Map* pMap = m_creature->GetMap();
-        if (pMap)
-        {
-            Map::PlayerList const &lPlayers = pMap->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-            {
-                Unit *pTarget = itr->getSource();
-                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE);
-                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_1);
-                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_2);
-                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_3);
-                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_4);
-                pTarget->RemoveAurasDueToSpell(SPELL_INSANITY_PHASE_5);
-            }
-        }
-
             SetCombatMovement(true);
             m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
             m_uiPhase = PHASE_FIGHT;
@@ -314,19 +289,21 @@ struct MANGOS_DLL_DECL boss_volazjAI : public ScriptedAI
 
     }
 };
+
 /*######
 ## mob_twisted_visage
 ######*/
+
 struct MANGOS_DLL_DECL mob_twisted_visageAI : public ScriptedAI
 {
     mob_twisted_visageAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_ahnkahet*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_ahnkahet* m_pInstance;
     bool m_bIsRegularMode;
 
     void Reset()
@@ -361,20 +338,22 @@ struct MANGOS_DLL_DECL mob_twisted_visageAI : public ScriptedAI
 
     }
 };
+
 /*######
 ## mob_ancient_void
 ######*/
+
 struct MANGOS_DLL_DECL mob_ancient_voidAI : public ScriptedAI
 {
     mob_ancient_voidAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = (instance_ahnkahet*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         defaultsize = m_creature->GetFloatValue(OBJECT_FIELD_SCALE_X);
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_ahnkahet* m_pInstance;
     bool m_bIsRegularMode;
     uint8 m_uiPhase;
     float defaultsize;
@@ -508,6 +487,7 @@ CreatureAI* GetAI_mob_twisted_visage(Creature* pCreature)
 {
     return new mob_twisted_visageAI(pCreature);
 }
+
 CreatureAI* GetAI_mob_ancient_void(Creature* pCreature)
 {
     return new mob_ancient_voidAI(pCreature);

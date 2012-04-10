@@ -45,13 +45,10 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
         Initialize();
     };
 
-    uint32 m_uiAchievTimer;
     uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
 
     std::string strSaveData;
     bool m_bIsRegularMode;
-    bool m_bCriteriaEregosKillFailed;
-    bool m_bCriteriaEregosKillHFailed;
 
     void Initialize()
     {
@@ -60,21 +57,16 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
 
         m_auiEncounter[TYPE_ROBOTS] = 10;
         m_auiEncounter[TYPE_UROM_PHASE] = 0;
-        m_uiAchievTimer = 0;
     }
 
     void OnObjectCreate(GameObject* pGo)
     {
         switch(pGo->GetEntry())
         {
-            case GO_DRAGON_CAGE_DOOR_1:
-                break;
-            case GO_DRAGON_CAGE_DOOR_2:
-                break;
-            case GO_DRAGON_CAGE_DOOR_3:
+            case GO_DRAGON_CAGE_DOOR:
                 break;
 
-            default:
+           default:
                 return;
         }
         m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
@@ -86,30 +78,17 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
         {
             case NPC_VAROS:
                 pCreature->SetActiveObjectState(true);
-            case NPC_TRIGGER:
-            case NPC_ETERNOS:
-            case NPC_VERDISA:
-            case NPC_BELGAR:
+                break;
             case NPC_DRAKOS:
             case NPC_UROM:
             case NPC_EREGOS:
+            case NPC_BELGARISTRASZ:
+            case NPC_VERDISA:
+            case NPC_ETERNOS:
             case NPC_BALGAR_IMAGE:
                 break;
         }
         m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
-    }
-
-    bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
-    {
-        switch (uiCriteriaId)
-        {
-            case ACHIEV_EREGOS_KILL:
-                return !m_bCriteriaEregosKillFailed;
-            case ACHIEV_EREGOS_KILL_H:
-                return !m_bCriteriaEregosKillFailed;
-            default:
-                return 0;
-        }
     }
 
     void SetData(uint32 type, uint32 data)
@@ -147,13 +126,6 @@ struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
                 m_auiEncounter[type] = data;
                 data = NOT_STARTED;
                 break;
-            case TYPE_ACHIEV_EREGOS_KILL:
-                m_bCriteriaEregosKillFailed = (data == FAIL);
-                return;
-            case TYPE_ACHIEV_EREGOS_KILL_H:
-                m_bCriteriaEregosKillHFailed = (data == FAIL);
-                return;
-
         }
 
         if (data == DONE)

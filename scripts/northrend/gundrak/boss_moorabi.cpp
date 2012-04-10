@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2010 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -91,22 +91,13 @@ struct MANGOS_DLL_DECL boss_moorabiAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_MOJO_FRENZY);
         m_creature->SetInCombatWithZone();
         if (m_pInstance)
-        {
             m_pInstance->SetData(TYPE_MOORABI, IN_PROGRESS);
-            if (!m_bIsRegularMode)
-                m_pInstance->SetData(TYPE_ACHIEV_MOORABI, IN_PROGRESS);
-        }
     }
-
-    void JustReachedHome()
+     void JustReachedHome()
     {
         if(m_pInstance)
-        {
             m_pInstance->SetData(TYPE_MOORABI, NOT_STARTED);
-            m_pInstance->SetData(TYPE_ACHIEV_MOORABI, FAIL);
-        }
     }
-
     void KilledUnit(Unit* pVictim)
     {
         switch(urand(0, 2))
@@ -123,6 +114,12 @@ struct MANGOS_DLL_DECL boss_moorabiAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MOORABI, DONE);
+
+        if (!m_bIsRegularMode)
+        if (m_bMammothPhase)
+            return;
+        else
+            m_pInstance->DoCompleteAchievement(2040);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -133,7 +130,6 @@ struct MANGOS_DLL_DECL boss_moorabiAI : public ScriptedAI
         if (m_creature->HasAura(SPELL_TRANSFORMATION) && !m_bMammothPhase)
         {
             DoScriptText(EMOTE_TRANSFORMED, m_creature);
-            m_pInstance->SetData(TYPE_ACHIEV_MOORABI, FAIL);
             m_bMammothPhase = true;
         }
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -934,9 +934,9 @@ struct MANGOS_DLL_DECL boss_kaelthasAI : public ScriptedAI
                                 m_creature->MonsterMoveWithSpeed(afGravityPos[0], afGravityPos[1], afGravityPos[2], 28.f);
 
                                 // 1) Kael'thas will portal the whole raid right into his body
-                                std::vector<ObjectGuid> vGuids;
-                                m_creature->FillGuidsListFromThreatList(vGuids);
-                                for (std::vector<ObjectGuid>::const_iterator i = vGuids.begin();i != vGuids.end(); ++i)
+                                GUIDVector vGuids;
+                                m_creature->FillGuidsListFromThreatList(vGuids.getSource());
+                                for (GUIDVector::const_iterator i = vGuids.begin();i != vGuids.end(); ++i)
                                 {
                                     Unit* pUnit = m_creature->GetMap()->GetUnit(*i);
 
@@ -959,9 +959,9 @@ struct MANGOS_DLL_DECL boss_kaelthasAI : public ScriptedAI
                                 DoScriptText(urand(0, 1) ? SAY_GRAVITYLAPSE1 : SAY_GRAVITYLAPSE2, m_creature);
 
                                 // 2) At that point he will put a Gravity Lapse debuff on everyone
-                                std::vector<ObjectGuid> vGuids;
-                                m_creature->FillGuidsListFromThreatList(vGuids);
-                                for (std::vector<ObjectGuid>::const_iterator i = vGuids.begin();i != vGuids.end(); ++i)
+                                GUIDVector vGuids;
+                                m_creature->FillGuidsListFromThreatList(vGuids.getSource());
+                                for (GUIDVector::const_iterator i = vGuids.begin();i != vGuids.end(); ++i)
                                 {
                                     if (Unit* pUnit = m_creature->GetMap()->GetUnit(*i))
                                     {

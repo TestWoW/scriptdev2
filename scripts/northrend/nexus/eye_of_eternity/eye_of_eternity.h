@@ -5,8 +5,6 @@ enum
 {
     MAX_ENCOUNTER               = 1,
 
-    TYPE_DIFFICULTY             = 101,
-
     TYPE_MALYGOS                = 1,
 
     NPC_MALYGOS                 = 28859,

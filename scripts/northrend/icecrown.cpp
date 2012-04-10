@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -53,7 +53,6 @@ struct MANGOS_DLL_DECL npc_melee_targetAI : public ScriptedAI
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
     {
-
         if (uiDamage > m_creature->GetHealth())
             uiDamage = 0;
         m_uiEvade_Timer = 5000;
@@ -68,6 +67,7 @@ struct MANGOS_DLL_DECL npc_melee_targetAI : public ScriptedAI
                 pPlayer->KilledMonsterCredit(33341);
         }
     }
+
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -119,21 +119,21 @@ struct MANGOS_DLL_DECL npc_ranged_targetAI : public ScriptedAI
     {
         switch(pSpell->Id)
         {
-        case 64342:
-            if (!m_creature->HasAura(62719))
-            {
-                if (Player* pPlayer = pCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    pPlayer->KilledMonsterCredit(33339);
-                return;
-            }
-        case 63010:
-            if (SpellAuraHolderPtr holder = m_creature->GetSpellAuraHolder(62719))
-            {
-                if (holder->ModStackAmount(-1))
-                    m_creature->RemoveSpellAuraHolder(holder, AURA_REMOVE_BY_SHIELD_BREAK);
+            case 64342:
+                if (!m_creature->HasAura(62719))
+                {
+                    if (Player* pPlayer = pCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        pPlayer->KilledMonsterCredit(33339);
+                    return;
+                }
+            case 63010:
+                if (SpellAuraHolderPtr holder = m_creature->GetSpellAuraHolder(62719))
+                {
+                    if (holder->ModStackAmount(-1))
+                        m_creature->RemoveSpellAuraHolder(holder, AURA_REMOVE_BY_SHIELD_BREAK);
 
-                m_uiDefend_Timer = 5000;
-            }
+                    m_uiDefend_Timer = 5000;
+                }
         }
     }
 
@@ -200,19 +200,20 @@ struct MANGOS_DLL_DECL npc_charge_targetAI : public ScriptedAI
     {
         switch(pSpell->Id)
         {
-        case 63010:
-            if (!m_creature->HasAura(64100))
-            {
-                if (Player* pPlayer = pCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    pPlayer->KilledMonsterCredit(33340);
-                return;
-            }
-        case 64342:
-            if (m_creature->HasAura(64100))
-            {
-                m_creature->RemoveAurasDueToSpell(64100);
-                m_uiDefend_Timer = 5000;
-            }
+            case 63010:
+                if (!m_creature->HasAura(64100))
+                {
+                    if (Player* pPlayer = pCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
+                        pPlayer->KilledMonsterCredit(33340);
+                    return;
+                }
+            case 64342:
+                if (m_creature->HasAura(64100))
+                {
+                    m_creature->RemoveAurasDueToSpell(64100);
+                    m_uiDefend_Timer = 5000;
+                }
+
         }
     }
 
@@ -226,8 +227,10 @@ struct MANGOS_DLL_DECL npc_charge_targetAI : public ScriptedAI
         }
         else
             m_uiDefend_Timer -= uiDiff;
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
         if (m_uiEvade_Timer < uiDiff)
         {
             m_uiEvade_Timer = 5000;
@@ -583,7 +586,7 @@ CreatureAI* GetAI_npc_champions(Creature* pCreature)
 void AddSC_icecrown()
 {
     Script* pNewScript;
-	
+
     pNewScript = new Script;
     pNewScript->Name = "npc_melee_target";
     pNewScript->GetAI = &GetAI_npc_melee_target;

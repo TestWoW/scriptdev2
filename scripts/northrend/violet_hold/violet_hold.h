@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
@@ -21,6 +21,7 @@ enum
     TYPE_PORTAL6            = 9,
     TYPE_PORTAL12           = 10,
 
+
     WORLD_STATE_VH          = 3816,
     WORLD_STATE_VH_PRISON   = 3815,
     WORLD_STATE_VH_PORTALS  = 3810,
@@ -31,8 +32,6 @@ enum
 
     TYPE_DISRUPTIONS        = 101,
     TYPE_LASTBOSS_ID        = 102,
-    TYPE_ACHIEV_ZURAMAT     = 103,
-    TYPE_ACHIEV_ICHORON     = 104,
 
     DATA_EREKEM             = 23,
     DATA_MORAGG             = 24,
@@ -85,11 +84,7 @@ enum
 
     EMOTE_GUARDIAN_PORTAL       = -1608005,
     EMOTE_DRAGONFLIGHT_PORTAL   = -1608006,
-    EMOTE_KEEPER_PORTAL         = -1608007,
-
-    ACHIEV_VOID_DANCE           = 7587,
-    ACHIEV_DEHYDRATATION        = 7320,
-    ACHIEV_DEFENSELESS          = 6803,
+    EMOTE_KEEPER_PORTAL         = -1608007
 };
 
 struct Locations
