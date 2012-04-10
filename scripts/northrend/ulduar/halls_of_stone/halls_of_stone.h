@@ -13,15 +13,19 @@ enum
     TYPE_MAIDEN             = 1,
     TYPE_KRYSTALLUS         = 2,
     TYPE_SJONNIR            = 3,
-
-    // NPC_BRANN            = 28070,
+    TYPE_GOOD_GRIEF         = 4,
+    TYPE_BRANN              = 5,
 
     NPC_KADDRAK             = 30898,
     NPC_ABEDNEUM            = 30899,
     NPC_MARNAK              = 30897,
     NPC_TRIBUNAL_OF_AGES    = 28234,
     NPC_WORLDTRIGGER        = 22515,
+    NPC_BRANN               = 28070,
+    NPC_BRANN_EVENT         = 24575,
+    NPC_BRANN_OUTRO         = 24577,
     NPC_SJONNIR             = 27978,
+    NPC_MALFORMED_OOZE      = 28165,
 
     GO_DOOR_MAIDEN          = 191292,
     GO_DOOR_TRIBUNAL        = 191294,                       // possibly closed during event?
@@ -45,7 +49,11 @@ enum
     FACE_ABEDNEUM           = 1,
     FACE_KADDRAK            = 2,
 
+    // Achiev Criterias
     ACHIEV_START_MAIDEN_ID  = 20383,
+    ACHIEV_GOOD_GRIEF       = 7143,
+    ACHIEV_BRANN            = 7590,
+    ACHIEV_SJONNIR_OOZE     = 7593,
 };
 
 struct Face
@@ -67,10 +75,13 @@ class MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
         void Initialize();
 
         void OnCreatureCreate(Creature* pCreature);
+        void OnCreatureDeath(Creature* pCreature);
         void OnObjectCreate(GameObject* pGo);
 
         void SetData(uint32 uiType, uint32 uiData);
         uint32 GetData(uint32 uiType);
+
+        bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
 
         const char* Save() { return m_strInstData.c_str(); }
         void Load(const char* chrIn);
@@ -93,6 +104,10 @@ class MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
         GUIDList m_lMarnakGUIDs;
         GUIDList m_lTribunalGUIDs;
         GUIDList m_lWorldtriggerGUIDs;
+
+        bool m_bGoodGriefFailed;
+        bool m_bBrannFailed;
+        uint32 m_uiOozesKilled;
 };
 
 #endif

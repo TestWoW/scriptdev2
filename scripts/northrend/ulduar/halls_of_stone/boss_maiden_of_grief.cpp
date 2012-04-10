@@ -66,6 +66,7 @@ struct MANGOS_DLL_DECL boss_maiden_of_griefAI : public ScriptedAI
     uint32 m_uiShockTimer;
     uint32 m_uiPillarTimer;
     uint32 m_uiPartingSorrowTimer;
+    uint32 m_uiAchievTimer;
 
     void Reset()
     {
@@ -73,6 +74,7 @@ struct MANGOS_DLL_DECL boss_maiden_of_griefAI : public ScriptedAI
         m_uiShockTimer = 10000;
         m_uiPillarTimer = 15000;
         m_uiPartingSorrowTimer = 12000;
+        m_uiAchievTimer = 0;
     }
 
     void Aggro(Unit* pWho)
@@ -80,7 +82,10 @@ struct MANGOS_DLL_DECL boss_maiden_of_griefAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
 
         if(m_pInstance)
+        {
             m_pInstance->SetData(TYPE_MAIDEN, IN_PROGRESS);
+            m_pInstance->SetData(TYPE_GOOD_GRIEF, IN_PROGRESS);
+        }
     }
 
     void JustReachedHome()
@@ -112,6 +117,11 @@ struct MANGOS_DLL_DECL boss_maiden_of_griefAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        ++m_uiAchievTimer;
+
+        if (m_uiAchievTimer > 60000)
+            m_pInstance->SetData(TYPE_GOOD_GRIEF, FAIL);
 
         if (m_uiPartingSorrowTimer < uiDiff)
         {

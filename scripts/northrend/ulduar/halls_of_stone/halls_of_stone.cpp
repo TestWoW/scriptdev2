@@ -202,6 +202,21 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
         npc_escortAI::AttackStart(pWho);
     }
 
+    void CheckAchiev(Unit *pCreature)
+    {
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+        if (!pPlayers.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            {
+                Unit *pTarget = itr->getSource();
+                if (pTarget)
+                    pCreature->CastSpell(pTarget, SPELL_ACHIEVEMENT_CHECK, true);
+            }
+        }
+    }
+
     void ContinueEvent()
     {
         if (!m_pInstance || m_pInstance->GetData(TYPE_TRIBUNAL) != IN_PROGRESS)
@@ -269,6 +284,13 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
         }
     }
 
+    void DamageTaken(Unit *pDealer, uint32 &uiDamage)
+    {
+        if (uiDamage)
+            if (m_pInstance)
+                m_pInstance->SetData(TYPE_BRANN, FAIL);
+    }
+
     void JustSummoned(Creature* pSummoned)
     {
         m_luiDwarfGUIDs.push_back(pSummoned->GetObjectGuid());
@@ -286,6 +308,8 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                 case 0:
                     // TODO, this is wrong, must be "using or similar"
                     m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
+                    if (m_pInstance)
+                        m_pInstance->SetData(TYPE_BRANN, IN_PROGRESS);
                     m_uiPhaseTimer = 1500;
                     break;
                 case 1:
@@ -428,6 +452,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                 // End Event
                 case 29:
                     DoScriptText(SAY_EVENT_END_01, m_creature);
+                    CheckAchiev(m_creature);
                     m_creature->SetStandState(UNIT_STAND_STATE_STAND);// TODO TODO
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_TRIBUNAL, SPECIAL); // Kill remaining npcs
@@ -536,6 +561,18 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
                         m_pInstance->DoUseDoorOrButton(GO_TRIBUNAL_FLOOR);
                         m_pInstance->SetData(TYPE_TRIBUNAL, DONE);
                     }
+
+                    Map* pMap = m_creature->GetMap();
+                    Map::PlayerList const& pPlayers = pMap->GetPlayers();
+                    if (!pPlayers.isEmpty())
+                    {
+                        for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+                        {
+                            Player *pPlayer = itr->getSource();
+                            m_creature->CastSpell(pPlayer, SPELL_ACHIEVEMENT_CHECK, true);
+                        }
+                    }
+
 
                     // Should cast spell 59046 (doesn't exist in client dbc), criterias are ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET
 

@@ -45,6 +45,8 @@ enum
 
 instance_halls_of_stone::instance_halls_of_stone(Map* pMap) : ScriptedInstance(pMap)
 {
+    m_bGoodGriefFailed = false;
+    m_uiOozesKilled = 0;
     Initialize();
 }
 
@@ -57,13 +59,25 @@ void instance_halls_of_stone::OnCreatureCreate(Creature* pCreature)
 {
     switch(pCreature->GetEntry())
     {
-        case NPC_KADDRAK:          m_lKaddrakGUIDs.push_back(pCreature->GetObjectGuid());      break;
-        case NPC_ABEDNEUM:         m_lAbedneumGUIDs.push_back(pCreature->GetObjectGuid());     break;
-        case NPC_MARNAK:           m_lMarnakGUIDs.push_back(pCreature->GetObjectGuid());       break;
-        case NPC_TRIBUNAL_OF_AGES: m_lTribunalGUIDs.push_back(pCreature->GetObjectGuid());     break;
-        case NPC_WORLDTRIGGER:     m_lWorldtriggerGUIDs.push_back(pCreature->GetObjectGuid()); break;
+        case NPC_KADDRAK:          //m_lKaddrakGUIDs.push_back(pCreature->GetObjectGuid());      break;
+        case NPC_ABEDNEUM:         //m_lAbedneumGUIDs.push_back(pCreature->GetObjectGuid());     break;
+        case NPC_MARNAK:           //m_lMarnakGUIDs.push_back(pCreature->GetObjectGuid());       break;
+        case NPC_TRIBUNAL_OF_AGES: //m_lTribunalGUIDs.push_back(pCreature->GetObjectGuid());     break;
+        case NPC_WORLDTRIGGER:     //m_lWorldtriggerGUIDs.push_back(pCreature->GetObjectGuid()); break;
+        case NPC_BRANN:
         case NPC_SJONNIR:
-            m_mNpcEntryGuidStore[NPC_SJONNIR] = pCreature->GetObjectGuid();
+        case NPC_MALFORMED_OOZE:
+            m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
+            break;
+    }
+}
+
+void instance_halls_of_stone::OnCreatureDeath(Creature* pCreature)
+{
+    switch(pCreature->GetEntry())
+    {
+        case NPC_MALFORMED_OOZE:
+            ++m_uiOozesKilled;
             break;
     }
 }
@@ -149,7 +163,14 @@ void instance_halls_of_stone::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_SJONNIR:
             m_auiEncounter[uiType] = uiData;
+            if (uiData == IN_PROGRESS)
+                m_uiOozesKilled = 0;
             DoUseDoorOrButton(GO_DOOR_SJONNIR);
+            break;
+        case TYPE_GOOD_GRIEF:
+            m_bGoodGriefFailed = (uiData == FAIL);
+        case TYPE_BRANN:
+            m_bBrannFailed = (uiData == FAIL);
             break;
     }
 
@@ -370,6 +391,24 @@ void instance_halls_of_stone::ProcessFace(uint8 uiFace)
             return;
     }
 }
+
+bool instance_halls_of_stone::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+{
+    if (instance->IsRegularDifficulty())
+        return false;
+
+    switch (uiCriteriaId)
+    {
+        case ACHIEV_GOOD_GRIEF:
+            return !m_bGoodGriefFailed;
+        case ACHIEV_BRANN:
+            return !m_bBrannFailed;
+        case ACHIEV_SJONNIR_OOZE:
+            return m_uiOozesKilled >= 5;
+        default:
+            return false;
+    }
+};
 
 InstanceData* GetInstanceData_instance_halls_of_stone(Map* pMap)
 {
