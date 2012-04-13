@@ -253,12 +253,12 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
             break;
         case GO_SCIENTIST_DOOR_GREEN:
             if (m_auiEncounter[TYPE_ROTFACE] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
+                pGo->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
         case GO_SCIENTIST_DOOR_ORANGE:
             if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
+                pGo->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
         case GO_SCIENTIST_DOOR_COLLISION:
@@ -268,6 +268,16 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
             break;
         case GO_SCIENTIST_DOOR:
             if (m_auiEncounter[TYPE_FESTERGUT] == DONE && m_auiEncounter[TYPE_ROTFACE] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
+            break;
+        case GO_ORANGE_TUBES:
+            if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
+            break;
+        case GO_GREEN_TUBES:
+            if (m_auiEncounter[TYPE_ROTFACE] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
@@ -432,9 +442,17 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
 
             if (uiData == DONE)
             {
+                DoUseDoorOrButton(GO_ORANGE_TUBES);
                 if (m_auiEncounter[TYPE_ROTFACE] == DONE)
+<<<<<<< HEAD
                 {
                     DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
+=======
+                {                    
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE, 0, true);
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN, 0, true);
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
+>>>>>>> 9922ce8e63c7f140926df3e3d35c77520668f55f
                 }
                 DoOpenDoor(GO_SCIENTIST_DOOR_ORANGE);
             }
@@ -451,9 +469,16 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
 
             if (uiData == DONE)
             {
+                DoUseDoorOrButton(GO_GREEN_TUBES);
                 if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
                 {
+<<<<<<< HEAD
                     DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
+=======
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN, 0, true);
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE, 0, true);
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
+>>>>>>> 9922ce8e63c7f140926df3e3d35c77520668f55f
                 }
                 DoOpenDoor(GO_SCIENTIST_DOOR_GREEN);
             }

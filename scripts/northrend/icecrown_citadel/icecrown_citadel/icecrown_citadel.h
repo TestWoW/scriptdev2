@@ -218,11 +218,97 @@ enum
 
     MAX_SPECIAL_ACHIEV_CRITS            = 14,
 
+<<<<<<< HEAD
     // Lord Marrowgar
     CRITERIA_BONED_10N                  = 12775,
     CRITERIA_BONED_25N                  = 12962,
     CRITERIA_BONED_10H                  = 13393,
     CRITERIA_BONED_25H                  = 13394,
+=======
+    NPC_LORD_MARROWGAR          = 36612,
+    NPC_LADY_DEATHWHISPER       = 36855,
+    NPC_DEATHBRINGER_SAURFANG   = 37813,
+    NPC_FESTERGUT               = 36626,
+    NPC_ROTFACE                 = 36627,
+    NPC_PROFESSOR_PUTRICIDE     = 36678,
+    NPC_TALDARAM                = 37973,
+    NPC_VALANAR                 = 37970,
+    NPC_KELESETH                = 37972,
+    NPC_LANATHEL                = 37955,
+    NPC_VALITHRIA               = 36789,
+    NPC_VALITHRIA_QUEST         = 38589,
+    NPC_SINDRAGOSA              = 36853,
+    NPC_LICH_KING               = 36597,
+
+    NPC_LANATHEL_INTRO          = 38004,
+    NPC_BLOOD_ORB_CONTROL       = 38008,
+
+    NPC_MURADIN                 = 36948,
+
+    NPC_TIRION                  = 38995,
+    NPC_MENETHIL                = 38579,
+
+    NPC_FROSTMOURNE_TRIGGER     = 38584,
+    NPC_FROSTMOURNE_HOLDER      = 27880,
+
+    NPC_STINKY                  = 37025,
+    NPC_PRECIOUS                = 37217,
+
+    NPC_RIMEFANG                = 37533,
+    NPC_SPINESTALKER            = 37534,
+
+    NPC_COMBAT_TRIGGER          = 38752,
+
+    GO_TELEPORT_GOSSIP_MESSAGE  = 99323,
+    TELEPORT_GOSSIP_MESSAGE     = 99322,
+
+    GO_ICEWALL_1                = 201911,
+    GO_ICEWALL_2                = 201910,
+
+    GO_MARROWGAR_DOOR           = 201857,
+
+    GO_ORATORY_DOOR             = 201563,
+    GO_DEATHWHISPER_ELEVATOR    = 202220, //5653
+
+    GO_SAURFANG_DOOR            = 201825,
+
+    GO_GAS_RELEASE_VALVE        = 201616, //72479
+
+    GO_ORANGE_PLAGUE            = 201371, //72536
+    GO_GREEN_PLAGUE             = 201370, //72537
+
+    GO_SCIENTIST_DOOR_GREEN     = 201614, //72530
+    GO_SCIENTIST_DOOR_ORANGE    = 201613, //72531
+    GO_SCIENTIST_DOOR_COLLISION = 201612,
+    GO_SCIENTIST_DOOR           = 201372, //72541
+
+    GO_ORANGE_TUBES             = 201617,
+    GO_GREEN_TUBES              = 201618,
+
+    GO_BLOODWING_DOOR           = 201920, //72532
+    GO_CRIMSON_HALL_DOOR        = 201376, //72532
+    GO_COUNCIL_DOOR_1           = 201377, //72533
+    GO_COUNCIL_DOOR_2           = 201378, //72534
+
+    GO_BLOODPRINCE_DOOR         = 201746,
+    GO_ICECROWN_GRATE           = 201755,
+
+    GO_FROSTWING_DOOR           = 201919,
+    GO_GREEN_DRAGON_DOOR_1      = 201375, //1202
+    GO_GREEN_DRAGON_DOOR_2      = 201374, //1200
+    GO_VALITHRIA_DOOR_1         = 201381, //1618
+    GO_VALITHRIA_DOOR_2         = 201382, //1482
+    GO_VALITHRIA_DOOR_3         = 201383, //1335
+    GO_VALITHRIA_DOOR_4         = 201380, //1558
+
+    GO_SINDRAGOSA_DOOR_1        = 201369, //1619
+    GO_SINDRAGOSA_DOOR_2        = 201379,
+
+    GO_SINDRAGOSA_ENTRANCE      = 201373,
+    GO_SINDRAGOSA_ICE_WALL      = 202396,
+
+    GO_FROZENTRONE_TR           = 202223, //72061
+>>>>>>> 9922ce8e63c7f140926df3e3d35c77520668f55f
 
     // Lady Deathwhisper
     CRITERIA_FULL_HOUSE_10N             = 12776,
