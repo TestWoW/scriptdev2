@@ -251,23 +251,33 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
-        case GO_SCIENTIST_DOOR_GREEN:
+        /*case GO_SCIENTIST_DOOR_GREEN:
             if (m_auiEncounter[TYPE_ROTFACE] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
+                pGo->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
         case GO_SCIENTIST_DOOR_ORANGE:
             if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
+                pGo->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
         case GO_SCIENTIST_DOOR_COLLISION:
             if (m_auiEncounter[TYPE_FESTERGUT] == DONE && m_auiEncounter[TYPE_ROTFACE] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
-            break;
+            break;*/
         case GO_SCIENTIST_DOOR:
             if (m_auiEncounter[TYPE_FESTERGUT] == DONE && m_auiEncounter[TYPE_ROTFACE] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
+            break;
+        case GO_ORANGE_TUBES:
+            if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
+            break;
+        case GO_GREEN_TUBES:
+            if (m_auiEncounter[TYPE_ROTFACE] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
@@ -432,11 +442,13 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
 
             if (uiData == DONE)
             {
-                if (m_auiEncounter[TYPE_ROTFACE] == DONE)
+                DoOpenDoor(GO_ORANGE_TUBES);
+                /*if (m_auiEncounter[TYPE_ROTFACE] == DONE)
                 {
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE, 0, true);
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN, 0, true);
                     DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
-                }
-                DoOpenDoor(GO_SCIENTIST_DOOR_ORANGE);
+                }*/
             }
             if (uiData == IN_PROGRESS)
             {
@@ -451,11 +463,13 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
 
             if (uiData == DONE)
             {
-                if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
+                DoOpenDoor(GO_GREEN_TUBES);
+                /*if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
                 {
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE, 0, true);
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN, 0, true);
                     DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
-                }
-                DoOpenDoor(GO_SCIENTIST_DOOR_GREEN);
+                }*/
             }
             if (uiData == IN_PROGRESS)
             {
@@ -715,25 +729,21 @@ bool instance_icecrown_citadel::CheckAchievementCriteriaMeet(uint32 uiCriteriaId
             return true;
         else
             return false;
-        break;
     case CRITERIA_ONCE_BITTEN_TWICE_SHY_25N:
         if (!pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_25MAN_NORMAL || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC))
             return true;
         else
             return false;
-        break;
     case CRITERIA_ONCE_BITTEN_TWICE_SHY_10V:
         if (pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_10MAN_NORMAL || Difficulty == RAID_DIFFICULTY_10MAN_HEROIC))
             return true;
         else
             return false;
-        break;
     case CRITERIA_ONCE_BITTEN_TWICE_SHY_25V:
         if (pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_25MAN_NORMAL || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC))
             return true;
         else
             return false;
-        break;
     case CRITERIA_PORTAL_JOCKEY_10N:
     case CRITERIA_PORTAL_JOCKEY_25N:
     case CRITERIA_PORTAL_JOCKEY_10H:
