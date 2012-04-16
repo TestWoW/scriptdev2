@@ -295,100 +295,7 @@ enum
     CRITERIA_NECK_DEEP_IN_VILE_25H      = 13164,
 };
 
-<<<<<<< HEAD
 class MANGOS_DLL_DECL instance_icecrown_citadel : public ScriptedInstance
-=======
-enum AchievementCriteriaIds
-{
-    // Lord Marrowgar
-    CRITERIA_BONED_10N                      = 12775,
-    CRITERIA_BONED_25N                      = 12962,
-    CRITERIA_BONED_10H                      = 13393,
-    CRITERIA_BONED_25H                      = 13394,
-
-    // Lady Deathwhisper
-    CRITERIA_FULL_HOUSE_10N                 = 12776,
-    CRITERIA_FULL_HOUSE_25N                 = 12997,
-    CRITERIA_FULL_HOUSE_10H                 = 12995,
-    CRITERIA_FULL_HOUSE_25H                 = 12998,
-
-    // Gunship Battle
-    CRITERIA_IM_ON_A_BOAT_10N               = 12777,
-    CRITERIA_IM_ON_A_BOAT_25N               = 13080,
-    CRITERIA_IM_ON_A_BOAT_10H               = 13079,
-    CRITERIA_IM_ON_A_BOAT_25H               = 13081,
-
-    // Deathbringer Saurfang
-    CRITERIA_IVE_GONE_AND_MADE_A_MESS_10N   = 12778,
-    CRITERIA_IVE_GONE_AND_MADE_A_MESS_25N   = 13036,
-    CRITERIA_IVE_GONE_AND_MADE_A_MESS_10H   = 13035,
-    CRITERIA_IVE_GONE_AND_MADE_A_MESS_25H   = 13037,
-
-    // Festergut
-    CRITERIA_FLU_SHOT_SHORTAGE_10N          = 12977,
-    CRITERIA_FLU_SHOT_SHORTAGE_25N          = 12982,
-    CRITERIA_FLU_SHOT_SHORTAGE_10H          = 12986,
-    CRITERIA_FLU_SHOT_SHORTAGE_25H          = 12967,
-
-    // Rotface
-    CRITERIA_DANCES_WITH_OOZES_10N          = 12984,
-    CRITERIA_DANCES_WITH_OOZES_25N          = 12966,
-    CRITERIA_DANCES_WITH_OOZES_10H          = 12985,
-    CRITERIA_DANCES_WITH_OOZES_25H          = 12983,
-
-    // Professor Putricide
-    CRITERIA_NAUSEA_10N                     = 12987,
-    CRITERIA_NAUSEA_25N                     = 12968,
-    CRITERIA_NAUSEA_10H                     = 12988,
-    CRITERIA_NAUSEA_25H                     = 12981,
-
-    // Blood Prince Council
-    CRITERIA_ORB_WHISPERER_10N              = 13033,
-    CRITERIA_ORB_WHISPERER_25N              = 12969,
-    CRITERIA_ORB_WHISPERER_10H              = 13034,
-    CRITERIA_ORB_WHISPERER_25H              = 13032,
-
-    // Blood-Queen Lana'thel
-    CRITERIA_KILL_LANA_THEL_10M             = 13340,
-    CRITERIA_KILL_LANA_THEL_25M             = 13360,
-
-    // Valithria Dreamwalker
-    CRITERIA_PORTAL_JOCKEY_10N              = 12978,
-    CRITERIA_PORTAL_JOCKEY_25N              = 12971,
-    CRITERIA_PORTAL_JOCKEY_10H              = 12979,
-    CRITERIA_PORTAL_JOCKEY_25H              = 12980,
-
-    // Sindragosa
-    CRITERIA_ALL_YOU_CAN_EAT_10N            = 12822,
-    CRITERIA_ALL_YOU_CAN_EAT_25N            = 12972,
-    CRITERIA_ALL_YOU_CAN_EAT_10V            = 12996,
-    CRITERIA_ALL_YOU_CAN_EAT_25V            = 12989,
-
-    // Lich King - Been Waiting a Long Time For This
-    CRITERIA_BEEN_WAITING_A_LONG_TIME_10N   = 13246,
-    CRITERIA_BEEN_WAITING_A_LONG_TIME_25N   = 13244,
-    CRITERIA_BEEN_WAITING_A_LONG_TIME_10H   = 13247,
-    CRITERIA_BEEN_WAITING_A_LONG_TIME_25H   = 13245,
-};
-
-enum Achievements
-{
-    ACHIEVE_BONED                           = 0,
-    ACHIEVE_FULL_HOUSE                      = 1,
-    ACHIEVE_IM_ON_A_BOAT                    = 2,
-    ACHIEVE_IVE_GONE_AND_MADE_A_MESS        = 3,
-    ACHIEVE_FLU_SHOT_SHORTAGE               = 4,
-    ACHIEVE_DANCES_WITH_OOZES               = 5,
-    ACHIEVE_NAUSEA                          = 6,
-    ACHIEVE_ORB_WHISPERER                   = 7,
-    ACHIEVE_PORTAL_JOCKEY                   = 8,
-    ACHIEVE_ALL_YOU_CAN_EAT                 = 9,
-    ACHIEVE_BEEN_WAITING_A_LONG_TIME        = 10,
-    ACHIEVE_MAX_COUNT                       = 11,
-};
-
-class MANGOS_DLL_DECL instance_icecrown_spire : public ScriptedInstance
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
 {
 public:
     instance_icecrown_citadel(Map* pMap);
@@ -399,7 +306,6 @@ public:
     void OnObjectCreate(GameObject* pGo);
     void OnCreatureCreate(Creature* pCreature);
 
-<<<<<<< HEAD
     bool IsEncounterInProgress() const;
     bool IsRaidWiped();
 
@@ -407,12 +313,6 @@ public:
     void DoCloseDoor(ObjectGuid guid);
     void DoOpenDoor(uint32 entry);
     void DoCloseDoor(uint32 entry);
-=======
-    bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
-    void SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet);
-
-    bool IsEncounterInProgress();
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
 
     void SetData(uint32 uiType, uint32 uiData);
     uint32 GetData(uint32 uiType);
@@ -432,19 +332,6 @@ private:
     //Creatures GUID
     uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
 
-<<<<<<< HEAD
-=======
-    bool m_bAchievCriteria[ACHIEVE_MAX_COUNT];
-
-    uint32 m_uiCouncilInvocation;
-
-    uint32 m_auiEvent;
-    uint32 m_auiEventTimer;
-    uint32 m_uiDirection;
-
-    uint32 m_uiStinkystate;
-    uint32 m_uiPreciousstate;
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
     uint32 m_uiGunshipArmoryA_ID;
     uint32 m_uiGunshipArmoryH_ID;
     uint32 m_uiValithriaCache;
@@ -519,7 +406,6 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
         return pResult;
     }
 
-<<<<<<< HEAD
     void DoRemoveAuraFromAll(uint32 auraId)
     {
         if (auraId == 0)
@@ -539,7 +425,5 @@ struct MANGOS_DLL_DECL base_icc_bossAI : public ScriptedAI
     }
 };
 
-=======
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
 #endif
 

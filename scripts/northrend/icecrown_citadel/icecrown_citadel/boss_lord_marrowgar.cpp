@@ -93,14 +93,12 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
 {
     boss_lord_marrowgarAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (instance_icecrown_spire*)pCreature->GetInstanceData();
         m_bSaidIntro = false;
         m_uiMaxCharges = m_bIsHeroic ? MAX_CHARGES_HEROIC : MAX_CHARGES_NORMAL;
 
         Reset();
     }
 
-    instance_icecrown_spire* m_pInstance;
     bool m_bSaidIntro;
 
     uint8 m_uiPhase;
@@ -133,8 +131,6 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
         m_uiChargesCount            = 0;
 
         m_creature->SetSpeedRate(MOVE_RUN, 1.0f);
-        if (m_pInstance)
-            m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_BONED, true);
     }
 
     void MoveInLineOfSight(Unit* pWho)
@@ -151,10 +147,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
     void JustReachedHome()
     {
         if (m_pInstance)
-        {
             m_pInstance->SetData(TYPE_MARROWGAR, FAIL);
-            m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_BONED, false);
-        }
     }
 
     void Aggro(Unit* pWho)
@@ -420,38 +413,23 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
 {
     mob_bone_spikeAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-<<<<<<< HEAD
         m_pInstance = ((instance_icecrown_citadel*)pCreature->GetInstanceData());
         m_uiAchievTimer = 8000;
-=======
-        m_pInstance = ((instance_icecrown_spire*)pCreature->GetInstanceData());
-        m_victimGuid.Clear();
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
         m_bEmerged = false;
         SetCombatMovement(false);
         m_victimGuid.Clear();
     }
 
-<<<<<<< HEAD
     instance_icecrown_citadel* m_pInstance;
-=======
-    instance_icecrown_spire* m_pInstance;
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
     bool m_bEmerged;
     uint32 m_uiAchievTimer;
     ObjectGuid m_victimGuid;
-    uint32 m_uiEmpaledTime;
 
     void Reset()
     {
-<<<<<<< HEAD
         m_uiAchievTimer = 8000;
     }
 
-=======
-        m_uiEmpaledTime = 0;
-    }
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
     void AttackStart(Unit *pWho){}
 
     void JustDied(Unit *Killer)
@@ -460,23 +438,13 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
         {
             pCreator->RemoveAurasDueToSpell(SPELL_IMPALED);
         }
-<<<<<<< HEAD
         m_creature->ForcedDespawn();
-=======
-
-        if (m_pInstance && m_uiEmpaledTime > 8000)
-            m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_BONED, false);
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-<<<<<<< HEAD
         if (m_pInstance->GetData(TYPE_MARROWGAR) != IN_PROGRESS)
             JustDied(m_creature);
-=======
-        m_uiEmpaledTime += uiDiff;
->>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
 
         if (!m_bEmerged)
         {
