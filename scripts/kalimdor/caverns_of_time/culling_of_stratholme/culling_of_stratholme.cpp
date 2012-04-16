@@ -836,7 +836,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                {
                    DoScriptText(SAY_EPOCH_AGGRO, pEpoch);
                    m_creature->AI()->AttackStart(pEpoch);
-                   pEpoch->AI()->AttackStart(m_creature);
+                   //pEpoch->AI()->AttackStart(m_creature);
                    pEpoch->setFaction(14);
                }
                m_pInstance->SetData(TYPE_PHASE, 5);
