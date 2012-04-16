@@ -102,13 +102,22 @@ void instance_halls_of_stone::OnObjectCreate(GameObject* pGo)
             return;
         case GO_DOOR_TO_TRIBUNAL:
         case GO_DOOR_MAIDEN:
+            if (m_auiEncounter[TYPE_KRYSTALLUS] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
         case GO_DOOR_SJONNIR:
+            if (m_auiEncounter[TYPE_TRIBUNAL] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
         case GO_DOOR_TRIBUNAL:
+        case GO_DOOR_TRIBUNAL_2:
+            if (m_auiEncounter[TYPE_MAIDEN] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
         case GO_TRIBUNAL_CONSOLE:
         case GO_TRIBUNAL_FLOOR:
         case GO_SJONNIR_CONSOLE:
             break;
-
         default:
             return;
     }
@@ -156,9 +165,13 @@ void instance_halls_of_stone::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[uiType] = uiData;
             if (uiData == IN_PROGRESS)
                 DoStartTimedAchievement(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEV_START_MAIDEN_ID);
+            if (uiData == DONE)
+                DoUseDoorOrButton(GO_DOOR_TRIBUNAL_2);
             break;
         case TYPE_KRYSTALLUS:
             m_auiEncounter[uiType] = uiData;
+            if (uiData == DONE)
+                DoUseDoorOrButton(GO_DOOR_MAIDEN);
             break;
         case TYPE_SJONNIR:
             m_auiEncounter[uiType] = uiData;

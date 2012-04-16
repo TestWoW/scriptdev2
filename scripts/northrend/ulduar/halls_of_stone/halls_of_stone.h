@@ -29,6 +29,7 @@ enum
 
     GO_DOOR_MAIDEN          = 191292,
     GO_DOOR_TRIBUNAL        = 191294,                       // possibly closed during event?
+    GO_DOOR_TRIBUNAL_2      = 191293,
     GO_DOOR_TO_TRIBUNAL     = 191295,
     GO_DOOR_SJONNIR         = 191296,
 
@@ -54,6 +55,8 @@ enum
     ACHIEV_GOOD_GRIEF       = 7143,
     ACHIEV_BRANN            = 7590,
     ACHIEV_SJONNIR_OOZE     = 7593,
+
+    ACHIEV_SPANKIN_NEW      = 2154,
 };
 
 struct Face

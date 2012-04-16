@@ -145,6 +145,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
 
     uint32 m_uiStep;
     uint32 m_uiPhaseTimer;
+    bool m_bSpankinNewAchievFailed;
 
     GUIDList m_luiDwarfGUIDs;
 
@@ -155,6 +156,7 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
             m_bIsLowHP = false;
             m_bIsBattle = false;
             m_bHasContinued = false;
+            m_bSpankinNewAchievFailed = false;
 
             m_uiStep = 0;
             m_uiPhaseTimer = 0;
@@ -210,9 +212,12 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
         {
             for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
             {
-                Unit *pTarget = itr->getSource();
-                if (pTarget)
-                    pCreature->CastSpell(pTarget, SPELL_ACHIEVEMENT_CHECK, true);
+                if (Player* pPlayer = itr->getSource())
+                {
+                    pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEVEMENT_CHECK);
+                    if(!m_bSpankinNewAchievFailed)
+                        pPlayer->CompletedAchievement(ACHIEV_SPANKIN_NEW);
+                }
             }
         }
     }
@@ -286,9 +291,8 @@ struct MANGOS_DLL_DECL npc_brann_hosAI : public npc_escortAI
 
     void DamageTaken(Unit *pDealer, uint32 &uiDamage)
     {
-        if (uiDamage)
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_BRANN, FAIL);
+        if(m_pInstance)
+            m_bSpankinNewAchievFailed = true;
     }
 
     void JustSummoned(Creature* pSummoned)
