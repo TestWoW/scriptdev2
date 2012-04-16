@@ -275,6 +275,37 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
         }
     }
 
+    Unit* SelectRandomPlayer(float range)
+    {
+        Map* pMap = m_creature->GetMap();
+        Map::PlayerList const &playerlist = pMap->GetPlayers();
+        if (playerlist.isEmpty())
+            return NULL;
+
+        std::vector<Unit*> list;
+        list.clear();
+
+        for (Map::PlayerList::const_iterator i = playerlist.begin(); i != playerlist.end(); ++i)
+        {
+            if (Player* player = i->getSource())
+            {
+                if (player->isGameMaster())
+                    continue;
+
+                if (!player->IsInMap(m_creature))
+                    continue;
+
+                if (player->isAlive() && player->IsWithinDistInMap(m_creature, range))
+                    list.push_back((Unit*)player);
+            }
+        }
+
+        if (list.empty())
+            return NULL;
+        else
+            return list[urand(0, list.size() - 1)];
+    }
+
     void JustSummoned(Creature *pCreature)
     {
         if (!m_pInstance || !pCreature)
@@ -288,6 +319,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
             pCreature->AddThreat(m_creature, 100000);
             pCreature->GetMotionMaster()->MoveChase(m_creature);
         }
+<<<<<<< HEAD
 
         mobsGUIDList.push_back(pCreature->GetObjectGuid());
     }
@@ -346,6 +378,13 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
         }
 
         return m_bIsEnrage ? 3000 : 15000 + urand(min, max);
+=======
+        else
+        {
+            if (Unit *pTarget = SelectRandomPlayer(500))
+                pCreature->AI()->AttackStart(pTarget);
+        }
+>>>>>>> 28529bea3e7d1b69fd04a3f89b58736df82cd89c
     }
 
     void UpdateAI(const uint32 uiDiff)
