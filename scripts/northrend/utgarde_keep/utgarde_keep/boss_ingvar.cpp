@@ -96,6 +96,7 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
 
     bool m_bIsResurrected;
     bool m_bIsFakingDeath;
+    bool m_bFirst;
 
     uint32 m_uiCleaveTimer;
     uint32 m_uiSmashTimer;
@@ -106,6 +107,7 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
     {
         m_bIsResurrected = false;
         m_bIsFakingDeath = false;
+        m_bFirst         = true;
 
         m_uiCleaveTimer = urand(5000, 7000);
         m_uiSmashTimer = urand(8000, 15000);
@@ -119,8 +121,10 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
         if (pWho->GetEntry() == NPC_ANNHYLDE)
             return;
 
-        // ToDo: it shouldn't yell this aggro text after removing the feign death aura
-        DoScriptText(SAY_AGGRO_FIRST, m_creature);
+        if (m_bFirst)
+        {
+            DoScriptText(SAY_AGGRO_FIRST, m_creature);
+        }
     }
 
     void DamageTaken(Unit* pDealer, uint32& uiDamage)
@@ -143,8 +147,10 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
             DoCastSpellIfCan(m_creature, SPELL_SUMMON_BANSHEE, CAST_TRIGGERED);
             DoCastSpellIfCan(m_creature, SPELL_FEIGN_DEATH, CAST_TRIGGERED);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            SetCombatMovement(false);
 
             m_bIsFakingDeath = true;
+            m_bFirst = false;
         }
     }
 
@@ -172,21 +178,38 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
             case NPC_ANNHYLDE:
                 // This is not blizzlike - npc should be summoned above the boss and should move slower
                 pSummoned->CastSpell(pSummoned, SPELL_ASTRAL_TELEPORT, false);
+                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pSummoned->SetLevitate(true);
                 pSummoned->GetMotionMaster()->MovePoint(POINT_ID_ANNHYLDE, pSummoned->GetPositionX(), pSummoned->GetPositionY(), pSummoned->GetPositionZ() + 15.0f);
                 break;
 
             case NPC_GROUND_VISUAL:
                 pSummoned->CastSpell(pSummoned, SPELL_SCOURGE_RES_BUBBLE, false);
+                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 // npc doesn't despawn on time
                 pSummoned->ForcedDespawn(8000);
                 break;
         }
     }
 
+    void KillCreditIngvar()
+    {
+        Map *map = m_creature->GetMap();
+        Map::PlayerList const& players = map->GetPlayers();
+        if (!players.isEmpty() && map->IsDungeon())
+        {
+            for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if(Player* pPlayer = itr->getSource())
+                    pPlayer->KilledMonsterCredit(23980, m_creature->GetObjectGuid());
+            }
+        }
+    }
+
     void JustDied(Unit* pKiller)
     {
         DoScriptText(SAY_DEATH_SECOND, m_creature);
+        KillCreditIngvar();
     }
 
     void KilledUnit(Unit* pVictim)
@@ -316,7 +339,6 @@ struct MANGOS_DLL_DECL npc_annhyldeAI : public ScriptedAI
         if (uiMotionType != POINT_MOTION_TYPE || uiPointId != POINT_ID_ANNHYLDE)
             return;
 
-        DoScriptText(SAY_ANNHYLDE_REZ, m_creature);
         m_uiResurrectTimer = 3000;
     }
 
@@ -332,11 +354,15 @@ struct MANGOS_DLL_DECL npc_annhyldeAI : public ScriptedAI
                 switch (m_uiResurrectPhase)
                 {
                     case 0:
+                        DoScriptText(SAY_ANNHYLDE_REZ, m_creature);
                         DoCastSpellIfCan(m_creature, SPELL_SCOURGE_RES_CHANNEL);
                         if (Creature* pIngvar = m_pInstance->GetSingleCreatureFromStorage(NPC_INGVAR))
                         {
                             if (pIngvar->HasAura(SPELL_SUMMON_BANSHEE))
+                            {
                                 pIngvar->RemoveAurasDueToSpell(SPELL_SUMMON_BANSHEE);
+                                pIngvar->CastSpell(pIngvar, SPELL_FEIGN_DEATH, true);
+                            }
                         }
                         m_uiResurrectTimer = 3000;
                         break;
@@ -345,13 +371,16 @@ struct MANGOS_DLL_DECL npc_annhyldeAI : public ScriptedAI
                         {
                             pIngvar->CastSpell(pIngvar, SPELL_SCOURGE_RES_SUMMON, true);
                             // Workaround - set Feign death again because it's removed by the previous casted spell
-                            pIngvar->CastSpell(pIngvar, SPELL_FEIGN_DEATH, true);
+                            //pIngvar->CastSpell(pIngvar, SPELL_FEIGN_DEATH, true);
                         }
                         m_uiResurrectTimer = 5000;
                         break;
                     case 2:
                         if (Creature* pIngvar = m_pInstance->GetSingleCreatureFromStorage(NPC_INGVAR))
+                        {
+                            pIngvar->RemoveAurasDueToSpell(SPELL_FEIGN_DEATH);
                             pIngvar->CastSpell(pIngvar, SPELL_SCOURGE_RES_HEAL, false);
+                        }
                         m_uiResurrectTimer = 3000;
                         break;
                     case 3:

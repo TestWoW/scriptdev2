@@ -73,6 +73,7 @@ struct MANGOS_DLL_DECL boss_svalaAI : public ScriptedAI
     {
         m_pInstance = (instance_pinnacle*)pCreature->GetInstanceData();
         m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_bIsIntroDone = false;
         Reset();
     }
