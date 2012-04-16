@@ -125,6 +125,14 @@ struct MANGOS_DLL_DECL boss_taldaramAI : public ScriptedAI
         }
     }
 
+    void MoveInLineOfSight(Unit *pWho)
+    {
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster() && m_creature->GetDistance2d(pWho) < 50.0f)
+        {
+            m_creature->AI()->AttackStart(pWho);
+        }
+    }
+
     void JustDied(Unit* pKiller)
     {
         DoScriptText(SAY_DEATH, m_creature);
