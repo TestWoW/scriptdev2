@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -15,10 +15,9 @@
  */
 
 /* ScriptData
-SDName: trial_of_the_crusader
-SD%Complete: 80%
-SDComment: by /dev/rsa
-SDCategory: Crusader Coliseum
+SDName: boss_twin_valkyr
+SDComment:
+SDAuthor: rsa, improved by Walkum
 EndScriptData */
 
 #include "precompiled.h"
@@ -51,8 +50,7 @@ enum BossSpells
     SPELL_EMPOWERED_LIGHT         = 65748,
 
     SPELL_BERSERK                 = 64238,
-    SPELL_REMOVE_TOUCH            = 68084,
-    SPELL_NONE                    = 0,
+    SPELL_CLEAR_TOUCH             = 68084,
 
     SPELL_UNLEASHED_DARK          = 65808,
     SPELL_UNLEASHED_LIGHT         = 65795,
@@ -136,6 +134,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
     uint32 m_uiSpecialAbilityTimer;
     uint32 m_uiLightTouchTimer;
     uint32 m_uiCheckTouchBuff;
+    uint32 m_uiHealthCheckTimer;
     uint32 m_uiOrbsTimer;
     uint32 m_uiNextSpell;
 
@@ -154,6 +153,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
         m_uiTwinSpikeLTimer        = 10000;
         m_uiSpecialAbilityTimer    = 45000;
         m_uiLightTouchTimer        = 15000;
+        m_uiHealthCheckTimer       = 1000;
         m_uiCheckTouchBuff         = 1000;
         m_uiOrbsTimer              = 2500;
 
@@ -163,6 +163,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
 
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetHealth(m_creature->GetMaxHealth());
+        m_pInstance->SetData(DATA_HEALTH_FJOLA, m_creature->GetMaxHealth());
     }
 
     void JustReachedHome()
@@ -181,12 +182,13 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
             return;
 
         DoScriptText(SAY_DEATH, m_creature);
-        m_pInstance->SetData(TYPE_VALKIRIES, DONE);
-      
+
         if (pSister)
         {
             if (pSister->isAlive())
                 pKiller->DealDamage(pSister, pSister->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+            else
+                m_pInstance->SetData(TYPE_VALKIRIES, DONE);
         }
 
         m_pInstance->SetData(DATA_HEALTH_FJOLA, 0);
@@ -235,7 +237,12 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
             if (pDoneBy->HasAura(SPELL_LIGHT_ESSENCE))
                 uiDamage /= 2;
             else if (pDoneBy->HasAura(SPELL_DARK_ESSENCE))
-                uiDamage += uiDamage/2;
+            {
+                if (pDoneBy->HasAura(SPELL_EMPOWERED_DARK))
+                    uiDamage += uiDamage + uiDamage / 2;
+                else
+                    uiDamage += uiDamage/2;
+            }
         }
 
         m_pInstance->SetData(DATA_HEALTH_FJOLA, m_creature->GetHealth() >= uiDamage ? m_creature->GetHealth() - uiDamage : 0);
@@ -243,18 +250,22 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_pInstance) 
-            return;
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
         if (!pSister)
+        {
+            pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_DARKBANE);
             return;
+        }
 
-        if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_EYDIS) &&
-                                      m_pInstance->GetData(DATA_HEALTH_EYDIS) != 0)
+        if (m_uiHealthCheckTimer < uiDiff)
+        {
+            if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_EYDIS) && m_pInstance->GetData(DATA_HEALTH_EYDIS) != 0)
                 m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_EYDIS));
+            m_uiHealthCheckTimer = 1000;
+        }
+        else m_uiHealthCheckTimer -= uiDiff;
 
         if (!m_bAchievFailed)
         {
@@ -277,21 +288,21 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
                 {
                      Unit* pPlayer = itr->getSource();
 
-                     if (!pPlayer)
-                         continue;
-
-                     if (pPlayer->HasAura(SPELL_LIGHT_ESSENCE))
-                         pPlayer->RemoveAurasDueToSpell(SPELL_LIGHT_TOUCH);
-                }
+                     if (!pPlayer) 	
+                         continue;	
+                 	
+                     if (pPlayer->HasAura(SPELL_LIGHT_ESSENCE))  	
+                         pPlayer->RemoveAurasDueToSpell(SPELL_LIGHT_TOUCH); 	
+                }  	
                 m_uiCheckTouchBuff = 1000;
             }
-            else
+            else 	
                 m_uiCheckTouchBuff -= uiDiff;
         }
 
         if (m_uiOrbsTimer <= uiDiff)
         {
-            for (uint32 i = 33; i < 37; i++)
+            for (uint i = 33; i < 37; i++)
             {
                 m_creature->SummonCreature(NPC_UNLEASHED_LIGHT, SpawnLoc[i].x + urand(2.0f, 10.0f), SpawnLoc[i].y + urand(2.0f, 10.0f), SpawnLoc[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 20000);
                 if (m_bIs25Man)
@@ -335,6 +346,7 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
                         {
                             m_creature->SetLevitate(true);
                             m_creature->GetPosition(x, y, z);
+                            m_creature->GetMotionMaster()->Clear();
                             m_creature->GetMotionMaster()->MovePoint(0, x, y, z + 5.0f);
                             DoScriptText(EMOTE_LIGHT_VORTEX, m_creature);
                             DoScriptText(SAY_LIGHT_VORTEX, m_creature);
@@ -344,16 +356,18 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
                         break;
                     case LIGHT_PACT: // Pact
                         pSister->CastSpell(pSister, SPELL_TWIN_POWER, true);
-                        m_creature->_AddAura(SPELL_LIGHT_SHIELD, 14000);
+                        DoCastSpellIfCan(m_creature, SPELL_LIGHT_SHIELD, CAST_TRIGGERED);
                         if (DoCastSpellIfCan(m_creature, SPELL_TWIN_PACT_L) == CAST_OK)
                         {
                             m_creature->SetLevitate(true);
                             m_creature->GetPosition(x, y, z);
+                            m_creature->GetMotionMaster()->Clear();
                             m_creature->GetMotionMaster()->MovePoint(0, x, y, z + 5.0f);
                             DoScriptText(EMOTE_PACT, m_creature);
                             DoScriptText(SAY_PACT, m_creature);
                             m_uiPhase = PHASE_SPECIAL;
                             m_uiNextSpell = LIGHT_VORTEX;
+                            m_uiHealthCheckTimer = 16000;
                         }
                         break;
                     default:
@@ -364,8 +378,12 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
                 else
                     m_uiSpecialAbilityTimer -= uiDiff;
 
+                DoMeleeAttackIfReady();
                 break;
             case PHASE_SPECIAL:
+                m_uiSpecialAbilityTimer -= uiDiff;
+                m_uiHealthCheckTimer -= uiDiff;
+
                 if (m_creature->IsNonMeleeSpellCasted(true))
                     return;
 
@@ -373,12 +391,12 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
                 m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
                 m_uiPhase = PHASE_NORMAL;
-                m_uiSpecialAbilityTimer -= uiDiff;
+                m_pInstance->SetData(DATA_HEALTH_FJOLA, m_creature->GetHealth());
+                m_pInstance->SetData(DATA_HEALTH_EYDIS, m_creature->GetHealth());
                 break;
             default:
                 break;
         }
-        DoMeleeAttackIfReady();
     }
 };
 
@@ -413,6 +431,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
     uint32 m_uiSpecialAbilityTimer;
     uint32 m_uiDarkTouchTimer;
     uint32 m_uiCheckTouchBuff;
+    uint32 m_uiHealthCheckTimer;
     uint32 m_uiOrbsTimer;
     uint32 m_uiNextSpell;
 
@@ -433,6 +452,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
         m_uiTwinSpikeDTimer        = 10000;
         m_uiSpecialAbilityTimer    = 90000;
         m_uiDarkTouchTimer         = 5000;
+        m_uiHealthCheckTimer       = 1000;
         m_uiCheckTouchBuff         = 1000;
         m_uiOrbsTimer              = 2500;
 
@@ -440,6 +460,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
 
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetHealth(m_creature->GetMaxHealth());
+        m_pInstance->SetData(DATA_HEALTH_EYDIS, m_creature->GetMaxHealth());
     }
 
     void JustReachedHome()
@@ -458,12 +479,13 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
             return;
 
         DoScriptText(SAY_DEATH, m_creature);
-        m_pInstance->SetData(TYPE_VALKIRIES, DONE);
 
         if (pSister)
         {
             if (pSister->isAlive())
                 pKiller->DealDamage(pSister, pSister->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+            else
+                m_pInstance->SetData(TYPE_VALKIRIES, DONE);
         }
 
         m_pInstance->SetData(DATA_HEALTH_EYDIS, 0);
@@ -512,7 +534,12 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
             if (pDoneBy->HasAura(SPELL_DARK_ESSENCE))
                 uiDamage /= 2;
             else if (pDoneBy->HasAura(SPELL_LIGHT_ESSENCE))
-                uiDamage += uiDamage/2;
+            {
+                if (pDoneBy->HasAura(SPELL_EMPOWERED_LIGHT))
+                    uiDamage += uiDamage + uiDamage / 2;
+                else
+                    uiDamage += uiDamage/2;
+            }
         }
 
         m_pInstance->SetData(DATA_HEALTH_EYDIS, m_creature->GetHealth() >= uiDamage ? m_creature->GetHealth() - uiDamage : 0);
@@ -520,19 +547,22 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_pInstance) 
-            return;
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
         if (!pSister)
+        {
+            pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_LIGHTBANE);
             return;
+        }
 
-
-        if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_FJOLA) &&
-                                      m_pInstance->GetData(DATA_HEALTH_FJOLA) != 0)
+        if (m_uiHealthCheckTimer < uiDiff)
+        {
+            if (m_creature->GetHealth() > m_pInstance->GetData(DATA_HEALTH_FJOLA) && m_pInstance->GetData(DATA_HEALTH_FJOLA) != 0)
                 m_creature->SetHealth(m_pInstance->GetData(DATA_HEALTH_FJOLA));
+            m_uiHealthCheckTimer = 1000;
+        }
+        else m_uiHealthCheckTimer -= uiDiff;
 
         if (!m_bAchievFailed)
         {
@@ -555,15 +585,15 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
                 {
                      Unit* pPlayer = itr->getSource();
 
-                     if (!pPlayer)
-                         continue;
-
-                     if (pPlayer->HasAura(SPELL_DARK_ESSENCE))
-                         pPlayer->RemoveAurasDueToSpell(SPELL_DARK_TOUCH);
-                }
+                     if (!pPlayer) 	
+                         continue;	
+                 	
+                     if (pPlayer->HasAura(SPELL_DARK_ESSENCE))  	
+                         pPlayer->RemoveAurasDueToSpell(SPELL_DARK_TOUCH); 	
+                }  	
                 m_uiCheckTouchBuff = 1000;
             }
-            else
+            else 	
                 m_uiCheckTouchBuff -= uiDiff;
         }
 
@@ -613,6 +643,7 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
                         {
                             m_creature->SetLevitate(true);
                             m_creature->GetPosition(x, y, z);
+                            m_creature->GetMotionMaster()->Clear();
                             m_creature->GetMotionMaster()->MovePoint(0, x, y, z + 5.0f);
                             DoScriptText(EMOTE_DARK_VORTEX, m_creature);
                             DoScriptText(SAY_DARK_VORTEX, m_creature);
@@ -622,16 +653,18 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
                         break;
                     case DARK_PACT:
                         pSister->CastSpell(pSister, SPELL_TWIN_POWER, true);
-                        m_creature->_AddAura(SPELL_DARK_SHIELD, 14000);
+                        DoCastSpellIfCan(m_creature, SPELL_DARK_SHIELD, CAST_TRIGGERED);
                         if (DoCastSpellIfCan(m_creature, SPELL_TWIN_PACT_D) == CAST_OK)
                         {
                             m_creature->SetLevitate(true);
                             m_creature->GetPosition(x, y, z);
+                            m_creature->GetMotionMaster()->Clear();
                             m_creature->GetMotionMaster()->MovePoint(0, x, y, z + 5.0f);
                             DoScriptText(EMOTE_PACT, m_creature);
                             DoScriptText(SAY_PACT, m_creature);
                             m_uiPhase = PHASE_SPECIAL;
                             m_uiNextSpell = DARK_VORTEX;
+                            m_uiHealthCheckTimer = 16000;
                         }
                         break;
                     default:
@@ -642,21 +675,24 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
                 else
                     m_uiSpecialAbilityTimer -= uiDiff;
 
+                DoMeleeAttackIfReady();
                 break;
             case PHASE_SPECIAL:
+                m_uiSpecialAbilityTimer -= uiDiff;
+
                 if (m_creature->IsNonMeleeSpellCasted(true))
                     return;
 
-                //m_creature->SetLevitate(false);
+                m_creature->SetLevitate(false);
                 m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
                 m_uiPhase = PHASE_NORMAL;
-                m_uiSpecialAbilityTimer -= uiDiff;
+                m_pInstance->SetData(DATA_HEALTH_FJOLA, m_creature->GetHealth());
+                m_pInstance->SetData(DATA_HEALTH_EYDIS, m_creature->GetHealth());
                 break;
             default:
                 break;
         }
-        DoMeleeAttackIfReady();
     }
 };
 
@@ -710,18 +746,19 @@ CreatureAI* GetAI_mob_light_essence(Creature* pCreature)
     return new mob_light_essenceAI(pCreature);
 };
 
-bool GossipHello_mob_light_essence(Player *player, Creature* pCreature)
+bool GossipHello_mob_light_essence(Player *pPlayer, Creature* pCreature)
 {
     ScriptedInstance *pInstance = (ScriptedInstance *) pCreature->GetInstanceData();
 
     if (!pInstance) 
         return true;
 
-    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
-    player->RemoveAurasDueToSpell(SPELL_DARK_ESSENCE);
-    player->CastSpell(player,SPELL_LIGHT_ESSENCE, true);
-    player->RemoveAurasDueToSpell(SPELL_LIGHT_TOUCH);
-    player->CLOSE_GOSSIP_MENU();
+    pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+    pPlayer->RemoveAurasDueToSpell(SPELL_DARK_ESSENCE);
+    pPlayer->CastSpell(pPlayer,SPELL_LIGHT_ESSENCE, true);
+    pPlayer->CastSpell(pPlayer, SPELL_CLEAR_TOUCH, true);
+    //pPlayer->RemoveAurasDueToSpell(SPELL_LIGHT_TOUCH);
+    pPlayer->CLOSE_GOSSIP_MENU();
     return true;
 };
 
@@ -769,18 +806,19 @@ CreatureAI* GetAI_mob_dark_essence(Creature* pCreature)
     return new mob_dark_essenceAI(pCreature);
 };
 
-bool GossipHello_mob_dark_essence(Player *player, Creature* pCreature)
+bool GossipHello_mob_dark_essence(Player *pPlayer, Creature* pCreature)
 {
     ScriptedInstance *pInstance = (ScriptedInstance *) pCreature->GetInstanceData();
 
     if (!pInstance) 
         return true;
 
-    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
-    player->RemoveAurasDueToSpell(SPELL_LIGHT_ESSENCE);
-    player->CastSpell(player,SPELL_DARK_ESSENCE, false);
-    player->RemoveAurasDueToSpell(SPELL_DARK_TOUCH);
-    player->CLOSE_GOSSIP_MENU();
+    pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+    pPlayer->RemoveAurasDueToSpell(SPELL_LIGHT_ESSENCE);
+    pPlayer->CastSpell(pPlayer,SPELL_DARK_ESSENCE, true);
+    pPlayer->CastSpell(pPlayer, SPELL_CLEAR_TOUCH, true);
+    //pPlayer->RemoveAurasDueToSpell(SPELL_DARK_TOUCH);
+    pPlayer->CLOSE_GOSSIP_MENU();
     return true;
 }
 
@@ -823,27 +861,16 @@ struct MANGOS_DLL_DECL mob_unleashed_darkAI : public ScriptedAI
             Map::PlayerList const &lPlayers = pMap->GetPlayers();
             for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
             {
-                 Unit* pPlayer = itr->getSource();
+                Unit* pPlayer = itr->getSource();
 
-                 if (!pPlayer) 
-                     continue;
+                if (!pPlayer)
+                    continue;
 
-                 if (pPlayer->isAlive() && pPlayer->IsWithinDistInMap(m_creature, 4.0f))
-                 {
-                     if (pPlayer->HasAura(SPELL_DARK_ESSENCE))
-                     {
-                         if (pPlayer->HasAura(SPELL_EMPOWERED_LIGHT))
-                             pPlayer->RemoveAurasDueToSpell(SPELL_EMPOWERED_LIGHT);
-
-                         pPlayer->_AddAura(SPELL_EMPOWERED_DARK, 20000);
-                         m_creature->ForcedDespawn(300);
-                     }
-                     else
-                     {
-                         DoCastSpellIfCan(m_creature, SPELL_UNLEASHED_DARK, CAST_TRIGGERED);
-                         m_creature->ForcedDespawn(700);
-                     }
-                 }
+                if (pPlayer->isAlive() && pPlayer->IsWithinDistInMap(m_creature, 4.0f))
+                {
+                    DoCastSpellIfCan(m_creature, SPELL_UNLEASHED_DARK, CAST_TRIGGERED);
+                    m_creature->ForcedDespawn(700);
+                }
             }
             m_uiCheckTimer = 500;
         }
@@ -903,19 +930,8 @@ struct MANGOS_DLL_DECL mob_unleashed_lightAI : public ScriptedAI
 
                  if (pPlayer->isAlive() && pPlayer->IsWithinDistInMap(m_creature, 4.0f))
                  {
-                     if (pPlayer->HasAura(SPELL_LIGHT_ESSENCE))
-                     {
-                         if (pPlayer->HasAura(SPELL_EMPOWERED_DARK))
-                             pPlayer->RemoveAurasDueToSpell(SPELL_EMPOWERED_DARK);
-
-                         pPlayer->_AddAura(SPELL_EMPOWERED_LIGHT, 20000);
-                         m_creature->ForcedDespawn(300);
-                     }
-                     else
-                     {
-                         DoCastSpellIfCan(m_creature, SPELL_UNLEASHED_LIGHT, CAST_TRIGGERED);
-                         m_creature->ForcedDespawn(700);
-                     }
+                     DoCastSpellIfCan(m_creature, SPELL_UNLEASHED_LIGHT, CAST_TRIGGERED);
+                     m_creature->ForcedDespawn(700);
                  }
             }
             m_uiCheckTimer = 500;

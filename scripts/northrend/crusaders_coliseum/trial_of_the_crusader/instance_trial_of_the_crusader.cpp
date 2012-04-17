@@ -191,14 +191,14 @@ void instance_trial_of_the_crusader::SetData(uint32 uiType, uint32 uiData)
             if (Creature* pTirion = GetSingleCreatureFromStorage(NPC_TIRION))
             {
                 Map* pMap = pTirion->GetMap();
-                Map::PlayerList const& pPlayers = pMap->GetPlayers();
-                if (!pPlayers.isEmpty())
+                Map::PlayerList const& lPlayers = pMap->GetPlayers();
+
+                if (!lPlayers.isEmpty())
                 {
-                    for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+                    for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
                     {
-                        Unit *pTarget = itr->getSource();
-                        if (pTarget)
-                            pTirion->CastSpell(pTarget, 68184, true);
+                        if (Player* pPlayer = itr->getSource())
+                            pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 68184, 0, 0);
                     }
                 }
             }

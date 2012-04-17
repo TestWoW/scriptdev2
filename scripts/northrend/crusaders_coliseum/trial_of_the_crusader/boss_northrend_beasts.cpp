@@ -462,20 +462,17 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
         }
 
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
-            CheckAchiev();
-    }
-
-    void CheckAchiev()
-    {
-        Map* pMap = m_creature->GetMap();
-        Map::PlayerList const& pPlayers = pMap->GetPlayers();
-        if (!pPlayers.isEmpty())
         {
-            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            Map* pMap = m_creature->GetMap();
+            Map::PlayerList const& lPlayers = pMap->GetPlayers();
+
+            if (!lPlayers.isEmpty())
             {
-                Unit *pTarget = itr->getSource();
-                if (pTarget)
-                    m_creature->CastSpell(pTarget, SPELL_CHECK_ACHIEV, true);
+                for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                    if (Player* pPlayer = itr->getSource())
+                        pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_CHECK_ACHIEV, 0, 0);
+                }
             }
         }
     }
@@ -499,41 +496,44 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
         switch (m_uiPhase)
         {
         case PHASE_EMERGED:
-             if (m_uiAcidSpewTimer <= uiDiff)
-             {
-                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPEW) == CAST_OK)
-                     m_uiAcidSpewTimer = urand(15000, 30000);
-             }
-             else
-                 m_uiAcidSpewTimer -= uiDiff;
+            if (m_uiAcidSpewTimer <= uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPEW) == CAST_OK)
+                    m_uiAcidSpewTimer = urand(15000, 30000);
+            }
+            else
+                m_uiAcidSpewTimer -= uiDiff;
 
-             if (m_uiParalyticBiteTimer <= uiDiff)
-             {
-                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PARALYTIC_BITE) == CAST_OK)
-                     m_uiParalyticBiteTimer = urand(15000, 30000);
-             }
-             else
-                 m_uiParalyticBiteTimer -= uiDiff;
+            if (m_uiParalyticBiteTimer <= uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PARALYTIC_BITE) == CAST_OK)
+                    m_uiParalyticBiteTimer = urand(15000, 30000);
+            }
+            else
+                m_uiParalyticBiteTimer -= uiDiff;
 
-             if (m_uiSlimePoolTimer <= uiDiff)
-             {
-                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_POOL) == CAST_OK)
-                     m_uiSlimePoolTimer = 12000;
-             }
-             else
-                 m_uiSlimePoolTimer -= uiDiff;
+            if (m_uiSlimePoolTimer <= uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_POOL) == CAST_OK)
+                    m_uiSlimePoolTimer = 12000;
+            }
+            else
+                m_uiSlimePoolTimer -= uiDiff;
 
-             if (m_uiPhaseTimer <= uiDiff)
-             {
-                 m_creature->SetDisplayId(MODEL_ACIDMAW_STATIONARY);
-                 m_creature->SetSpeedRate(MOVE_WALK, 0);
-                 m_creature->SetSpeedRate(MOVE_RUN, 0);
-                 DoCastSpellIfCan(m_creature, SPELL_EMERGE);
-                 m_uiPhase = PHASE_SUBMERGED;
-                 m_uiPhaseTimer = 65000;
-             }
-             else
-                 m_uiPhaseTimer -= uiDiff;
+            if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) != SPECIAL)
+            {
+                if (m_uiPhaseTimer <= uiDiff)
+                {
+                    m_creature->SetDisplayId(MODEL_ACIDMAW_STATIONARY);
+                    m_creature->SetSpeedRate(MOVE_WALK, 0);
+                    m_creature->SetSpeedRate(MOVE_RUN, 0);
+                    DoCastSpellIfCan(m_creature, SPELL_EMERGE);
+                    m_uiPhase = PHASE_SUBMERGED;
+                    m_uiPhaseTimer = 65000;
+                }
+                else
+                    m_uiPhaseTimer -= uiDiff;
+            }
 
             break;
         case PHASE_SUBMERGED:
@@ -678,20 +678,17 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
         }
 
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
-            CheckAchiev();
-    }
-
-    void CheckAchiev()
-    {
-        Map* pMap = m_creature->GetMap();
-        Map::PlayerList const& pPlayers = pMap->GetPlayers();
-        if (!pPlayers.isEmpty())
         {
-            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+            Map* pMap = m_creature->GetMap();
+            Map::PlayerList const& lPlayers = pMap->GetPlayers();
+
+            if (!lPlayers.isEmpty())
             {
-                Unit *pTarget = itr->getSource();
-                if (pTarget)
-                    m_creature->CastSpell(pTarget, SPELL_CHECK_ACHIEV, true);
+                for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                {
+                    if (Player* pPlayer = itr->getSource())
+                        pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_CHECK_ACHIEV, 0, 0);
+                }
             }
         }
     }
@@ -715,42 +712,44 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
         switch (m_uiPhase)
         {
         case PHASE_EMERGED:
-             if (m_uiBurningBiteTimer <= uiDiff)
-             {
-                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BURNING_BITE) == CAST_OK)
-                     m_uiBurningBiteTimer = urand(15000, 30000);
-             }
-             else
-                 m_uiBurningBiteTimer -= uiDiff;
+            if (m_uiBurningBiteTimer <= uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BURNING_BITE) == CAST_OK)
+                    m_uiBurningBiteTimer = urand(15000, 30000);
+            }
+            else
+                m_uiBurningBiteTimer -= uiDiff;
 
-             if (m_uiMoltenSpewTimer <= uiDiff)
-             {
-                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MOLTEN_SPEW) == CAST_OK)
-                     m_uiMoltenSpewTimer = urand(15000, 30000);
-             }
-             else
-                 m_uiMoltenSpewTimer -= uiDiff;
+            if (m_uiMoltenSpewTimer <= uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MOLTEN_SPEW) == CAST_OK)
+                    m_uiMoltenSpewTimer = urand(15000, 30000);
+            }
+            else
+                m_uiMoltenSpewTimer -= uiDiff;
 
-             if (m_uiSlimePoolTimer <= uiDiff)
-             {
-                 if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_POOL) == CAST_OK)
-                     m_uiSlimePoolTimer = 12000;
-             }
-             else
-                 m_uiSlimePoolTimer -= uiDiff;
+            if (m_uiSlimePoolTimer <= uiDiff)
+            {
+                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_POOL) == CAST_OK)
+                    m_uiSlimePoolTimer = 12000;
+            }
+            else
+                m_uiSlimePoolTimer -= uiDiff;
 
-             if (m_uiPhaseTimer <= uiDiff)
-             {
-                 m_uiPhase = PHASE_SUBMERGED;
-                 DoCastSpellIfCan(m_creature, SPELL_EMERGE);
-                 m_creature->SetDisplayId(MODEL_DREADSCALE_STATIONARY);
-                 m_creature->SetSpeedRate(MOVE_WALK, 0);
-                 m_creature->SetSpeedRate(MOVE_RUN, 0);
-                 m_uiPhaseTimer = 65000;
-             }
-             else
-                 m_uiPhaseTimer -= uiDiff;
-
+            if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) != SPECIAL)
+            {
+                if (m_uiPhaseTimer <= uiDiff)
+                {
+                    m_uiPhase = PHASE_SUBMERGED;
+                    DoCastSpellIfCan(m_creature, SPELL_EMERGE);
+                    m_creature->SetDisplayId(MODEL_DREADSCALE_STATIONARY);
+                    m_creature->SetSpeedRate(MOVE_WALK, 0);
+                    m_creature->SetSpeedRate(MOVE_RUN, 0);
+                    m_uiPhaseTimer = 65000;
+                }
+            else
+                m_uiPhaseTimer -= uiDiff;
+            }
             break;
         case PHASE_SUBMERGED:
              if (m_uiFireSpitTimer <= uiDiff)
@@ -954,7 +953,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_MASSIVE_CRASH) == CAST_OK)
                 {
-                    pFocus = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+                    pFocus = SelectTargetForCharge();
                     DoScriptText(EMOTE_TRAMPLE, m_creature, pFocus);
                     m_creature->SetSpeedRate(MOVE_WALK, 6.0f);
                     m_creature->SetSpeedRate(MOVE_RUN, 6.0f);
@@ -989,6 +988,29 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
                 pFocus = NULL;
             }
         }
+    }
+
+    Unit* SelectTargetForCharge()
+    {
+        std::list<ObjectGuid> lPotentialTargets;
+        const ThreatList &threatList = m_creature->getThreatManager().getThreatList();
+        for (ThreatList::const_iterator itr = threatList.begin();itr != threatList.end(); ++itr)
+        {
+            if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+            {
+                if (pVictim->GetTypeId() == TYPEID_PLAYER)
+                    lPotentialTargets.push_back((*itr)->getUnitGuid());
+            }
+        }
+
+        if (!lPotentialTargets.empty())
+        {
+            std::list<ObjectGuid>::iterator i = lPotentialTargets.begin();
+            std::advance(i, urand(0, lPotentialTargets.size() - 1));
+            return m_creature->GetMap()->GetUnit(*i);
+        }
+        else
+            return NULL;
     }
 
     void CheckAchiev()
