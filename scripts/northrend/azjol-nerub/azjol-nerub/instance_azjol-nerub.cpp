@@ -41,19 +41,19 @@ struct MANGOS_DLL_DECL instance_azjol_nerub : public ScriptedInstance
         switch(pGo->GetEntry())
         {
             case GO_DOOR_KRIKTHIR:
-                if (m_auiEncounter[0] == DONE)
+                if (m_auiEncounter[TYPE_KRIKTHIR] == DONE)
                     pGo->SetGoState(GO_STATE_ACTIVE);
                 break;
             case GO_DOOR_ANUBARAK_1:
-                if (m_auiEncounter[2] == DONE || m_auiEncounter[2] == NOT_STARTED)
+                if (m_auiEncounter[TYPE_ANUBARAK] == DONE || m_auiEncounter[TYPE_ANUBARAK] == NOT_STARTED)
                     pGo->SetGoState(GO_STATE_ACTIVE);
                 break;
             case GO_DOOR_ANUBARAK_2:
-                if (m_auiEncounter[2] == DONE || m_auiEncounter[2] == NOT_STARTED)
+                if (m_auiEncounter[TYPE_ANUBARAK] == DONE || m_auiEncounter[TYPE_ANUBARAK] == NOT_STARTED)
                     pGo->SetGoState(GO_STATE_ACTIVE);
                 break;
             case GO_DOOR_ANUBARAK_3:
-                if (m_auiEncounter[2] == DONE || m_auiEncounter[2] == NOT_STARTED)
+                if (m_auiEncounter[TYPE_ANUBARAK] == DONE || m_auiEncounter[TYPE_ANUBARAK] == NOT_STARTED)
                     pGo->SetGoState(GO_STATE_ACTIVE);
                 break;
         }
@@ -77,16 +77,16 @@ struct MANGOS_DLL_DECL instance_azjol_nerub : public ScriptedInstance
         switch(uiType)
         {
             case TYPE_KRIKTHIR:
-                m_auiEncounter[0] = uiData;
+                m_auiEncounter[TYPE_KRIKTHIR] = uiData;
                 if (uiData == DONE)
                     if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_DOOR_KRIKTHIR))
                         pGo->SetGoState(GO_STATE_ACTIVE);
                 break;
             case TYPE_HADRONOX:
-                m_auiEncounter[1] = uiData;
+                m_auiEncounter[TYPE_HADRONOX] = uiData;
                 break;
             case TYPE_ANUBARAK:
-                m_auiEncounter[2] = uiData;
+                m_auiEncounter[TYPE_ANUBARAK] = uiData;
                 if (uiData == DONE || uiData == NOT_STARTED)
                 {
                     if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_DOOR_ANUBARAK_1))
