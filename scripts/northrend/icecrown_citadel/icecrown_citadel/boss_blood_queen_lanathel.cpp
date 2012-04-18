@@ -172,6 +172,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
                     m_creature->SetLevitate(true);
                     m_creature->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
 
+                    m_creature->GetMotionMaster()->Clear();
                     m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_AIR, QueenLocs[1].x, QueenLocs[1].y, QueenLocs[1].z);
                     m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
                 }
@@ -271,6 +272,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
         DoScriptText(SAY_DEATH,m_creature,killer);
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 0);
         m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+        m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MovePoint(3, m_creature->GetPositionX(), m_creature->GetPositionY(), QueenLocs[0].z);
         DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_OFF);
         DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_TANK);
@@ -407,6 +409,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
             if (m_uiPhaseTimer < uiDiff && m_creature->GetHealthPercent() >= 5)
             {
                 m_uiPhase = PHASE_MOVING_CENTER;
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_GROUND, QueenLocs[0].x, QueenLocs[0].y, QueenLocs[0].z);
                 SetCombatMovement(false);
                 m_uiPhaseTimer = 13000;

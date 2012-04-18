@@ -322,6 +322,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                     {
                         float x, y, z;
                         pTarget->GetPosition(x, y, z);
+                        m_creature->GetMotionMaster()->Clear();
                         m_creature->GetMotionMaster()->MovePoint(POINT_CHARGE, x, y, z);
                         m_uiBoneStormChargeTimer = 3000;
                         m_uiDebugTimer = 30000;
@@ -340,7 +341,9 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                     m_uiDebugTimer = 30000;
                     m_uiPhase = PHASE_NORMAL;
                 }
-                else m_uiDebugTimer -= uiDiff;
+                else
+                    m_uiDebugTimer -= uiDiff;
+
                 break;
             }
             case PHASE_BONE_STORM_COLDFLAME:

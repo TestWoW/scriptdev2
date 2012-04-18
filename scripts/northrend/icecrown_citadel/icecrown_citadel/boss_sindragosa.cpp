@@ -451,6 +451,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                         SetCombatMovement(false);
                         m_creature->SetLevitate(true);
                         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
+                        m_creature->GetMotionMaster()->Clear();
                         m_creature->GetMotionMaster()->MovePoint(POINT_AIR, SindragosaLoc[1].x, SindragosaLoc[1].y, SindragosaLoc[1].z);
                     }
                 }
@@ -500,6 +501,7 @@ struct MANGOS_DLL_DECL boss_sindragosaAI : public base_icc_bossAI
                     m_creature->SetSpeedRate(MOVE_WALK, 1.2f);
 
                     // fly to the ground point
+                    m_creature->GetMotionMaster()->Clear();
                     m_creature->GetMotionMaster()->MovePoint(POINT_LAND, SindragosaLoc[0].x, SindragosaLoc[0].y, SindragosaLoc[0].z);
                 }
                 else

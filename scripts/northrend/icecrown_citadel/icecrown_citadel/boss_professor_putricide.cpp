@@ -406,6 +406,7 @@ struct MANGOS_DLL_DECL boss_professor_putricideAI : public base_icc_bossAI
                         if (m_pInstance)
                             m_pInstance->SetData(TYPE_PUTRICIDE, SPECIAL);
 
+                        m_creature->GetMotionMaster()->Clear();
                         m_creature->GetMotionMaster()->MovePoint(POINT_PUTRICIDE_SPAWN, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z);
                         m_uiPhase = PHASE_RUNNING_ONE;
                         return;
@@ -506,6 +507,7 @@ struct MANGOS_DLL_DECL boss_professor_putricideAI : public base_icc_bossAI
                         if (m_pInstance)
                             m_pInstance->SetData(TYPE_PUTRICIDE, SPECIAL);
 
+                        m_creature->GetMotionMaster()->Clear();
                         m_creature->GetMotionMaster()->MovePoint(POINT_PUTRICIDE_SPAWN, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z);
                         m_uiPhase = PHASE_RUNNING_TWO;
                         return;

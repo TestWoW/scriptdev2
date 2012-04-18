@@ -341,12 +341,24 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
         m_uiEmpowermentFadeTimer = 30000;
         m_uiSphereTimer = urand(5000, 15000);
         m_uiBerserkTimer = 10 * MINUTE * IN_MILLISECONDS;
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetHealth(1);
     }
 
     void Aggro(Unit *pWho)
     {
         m_creature->CallForHelp(30.0f);
+    }
+
+    void MoveInLineOfSight(Unit* pWho)
+    {
+        if (pWho && pWho->IsWithinDistInMap(m_creature, 50.0f) &&
+            ((pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster()) ||
+            pWho->GetObjectGuid().IsPet()))
+        {
+            AttackStart(pWho);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }
     }
 
     void DamageTaken(Unit *pDealer, uint32 &uiDamage)

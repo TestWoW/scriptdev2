@@ -397,6 +397,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public base_icc_boss
                         {
                             m_creature->SetPower(m_powerBloodPower, 0);
                             m_pInstance->DoUseDoorOrButton(GO_SAURFANG_DOOR, 0, false);
+                            m_creature->GetMotionMaster()->Clear();
                             m_creature->GetMotionMaster()->MovePoint(0, fPositions[1][0], fPositions[1][1], fPositions[1][2]);
                             if (Creature *pTmp = GetMainNpc())
                             {
@@ -570,6 +571,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfang_eventAI : public base_icc_boss
                         {
                             m_creature->SetPower(m_powerBloodPower, 0);
                             m_pInstance->DoUseDoorOrButton(GO_SAURFANG_DOOR, 0, false);
+                            m_creature->GetMotionMaster()->Clear();
                             m_creature->GetMotionMaster()->MovePoint(0, fPositions[1][0], fPositions[1][1], fPositions[1][2]);
                             if (Creature *pTmp = GetMainNpc())
                             {

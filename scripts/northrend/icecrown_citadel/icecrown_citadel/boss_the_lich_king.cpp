@@ -372,10 +372,12 @@ struct MANGOS_DLL_DECL boss_tirion_iccAI : public base_icc_bossAI
                     {
                         if (Creature *pLichKing = m_pInstance->GetSingleCreatureFromStorage(NPC_LICH_KING))
                         {
+                            pLichKing->GetMotionMaster()->Clear();
                             pLichKing->GetMotionMaster()->MovePoint(0, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z);
                         }
                     }
                     DoCastSpellIfCan(m_creature, SPELL_PLAGUE_AVOIDANCE, CAST_TRIGGERED);
+                    m_creature->GetMotionMaster()->Clear();
                     m_creature->GetMotionMaster()->MovePoint(0, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z);
                     DoLichKingText(SAY_INTRO_1);
                     NextStep(14000);
@@ -2086,6 +2088,7 @@ struct MANGOS_DLL_DECL  mob_vile_spiritAI : public base_icc_bossAI
         m_creature->SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_UNK_2);
         m_creature->SetInCombatWithZone();
         m_creature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 15.0f, 0.0f);
+        m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MovePoint(1, m_creature->GetPositionX() + frand(-3.0f, 3.0f), m_creature->GetPositionY() + frand(-3.0f, 3.0f), m_creature->GetPositionZ());
         DoCastSpellIfCan(m_creature, SPELL_SPIRIT_BURST_AURA, CAST_TRIGGERED);
         Reset();
