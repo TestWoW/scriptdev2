@@ -116,48 +116,6 @@ bool instance_icecrown_citadel::IsRaidWiped()
     return true;
 }
 
-void instance_icecrown_citadel::DoOpenDoor(ObjectGuid guid)
-{
-    if (guid.IsEmpty())
-        return;
-
-    GameObject* pGo = instance->GetGameObject(guid);
-
-    if (pGo)
-        pGo->SetGoState(GO_STATE_ACTIVE);
-}
-
-void instance_icecrown_citadel::DoCloseDoor(ObjectGuid guid)
-{
-    if (guid.IsEmpty())
-        return;
-
-    GameObject* pGo = instance->GetGameObject(guid);
-
-    if (pGo)
-        pGo->SetGoState(GO_STATE_READY);
-}
-
-void instance_icecrown_citadel::DoOpenDoor(uint32 entry)
-{
-    EntryGuidMap::iterator find = m_mGoEntryGuidStore.find(entry);
-    if (find != m_mGoEntryGuidStore.end())
-    {
-        ObjectGuid guid = find->second;
-        DoOpenDoor(guid);
-    }
-}
-
-void instance_icecrown_citadel::DoCloseDoor(uint32 entry)
-{
-    EntryGuidMap::iterator find = m_mGoEntryGuidStore.find(entry);
-    if (find != m_mGoEntryGuidStore.end())
-    {
-        ObjectGuid guid = find->second;
-        DoCloseDoor(guid);
-    }
-}
-
 void instance_icecrown_citadel::OnCreatureCreate(Creature* pCreature)
 {
     switch(pCreature->GetEntry())
@@ -542,7 +500,7 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                 DoOpenDoor(GO_SINDRAGOSA_DOOR_1);
                 DoOpenDoor(GO_SINDRAGOSA_DOOR_2);
 
-                if (GameObject* pChest = GetSingleGameObjectFromStorage( m_uiValithriaCache))
+                if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiValithriaCache))
                 {
                     if (pChest && !pChest->isSpawned())
                         pChest->SetRespawnTime(7*DAY);
