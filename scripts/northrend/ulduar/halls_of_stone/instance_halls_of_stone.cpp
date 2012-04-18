@@ -170,8 +170,6 @@ void instance_halls_of_stone::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_KRYSTALLUS:
             m_auiEncounter[uiType] = uiData;
-            if (uiData == DONE)
-                DoUseDoorOrButton(GO_DOOR_MAIDEN);
             break;
         case TYPE_SJONNIR:
             m_auiEncounter[uiType] = uiData;
