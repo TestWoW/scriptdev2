@@ -45,6 +45,7 @@ enum BossSpells
     // Slime Spray
     SPELL_SLIME_SPRAY_SUMMON    = 70882,
     SPELL_SLIME_SPRAY           = 69508,
+    SPELL_SLIME_SPRAY_FACE      = 70881,
 
     // Ooze Flood
     SPELL_OOZE_FLOOD_PERIODIC   = 70069, // periodically trigger ooze flood
@@ -123,17 +124,15 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
     uint32 m_uiInfectionsRate;
     uint32 m_uiVileGasTimer;
     uint32 m_uiSlimeFlowTimer;
-    uint32 m_uiTurnTimer;
     uint32 m_uiBerserkTimer;
 
     void Reset()
     {
         m_uiSlimeSprayTimer = urand(17000, 23000);
         m_uiVileGasTimer = 20000;
-        //m_uiMutatedInfectionTimer = 50000;
-        //m_uiInfectionsRate = 1;
+        m_uiMutatedInfectionTimer = 50000;
+        m_uiInfectionsRate = 1;
         m_uiSlimeFlowTimer = 20000;
-        m_uiTurnTimer = 0;
         m_uiBerserkTimer = 10 * MINUTE * IN_MILLISECONDS;
     }
 
@@ -205,29 +204,18 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
         else
             m_uiBerserkTimer -= uiDiff;
 
-        if (m_uiTurnTimer > uiDiff)
-        {
-            Unit *pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_OOZE_SPRAY_STALKER);
-            if (pFocus)
-                m_creature->SetFacingToObject(pFocus);
-            else if (!pFocus)
-                m_creature->InterruptNonMeleeSpells(true);
-
-            m_uiTurnTimer -= uiDiff;
-            return;
-        }
-
         // Slime Spray
         if (m_uiSlimeSprayTimer <= uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY_SUMMON, CAST_TRIGGERED) == CAST_OK)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY_FACE, CAST_TRIGGERED) == CAST_OK)
                 {
-                    DoScriptText(SAY_SLIME_SPRAY, m_creature);
-                    m_uiSlimeSprayTimer = 20000;
-                    m_uiTurnTimer = 8000;
-                    return;
+                    if (DoCastSpellIfCan(m_creature, SPELL_SLIME_SPRAY) == CAST_OK)
+                    {
+                        DoScriptText(SAY_SLIME_SPRAY, m_creature);
+                        m_uiSlimeSprayTimer = 20000;
+                    }
                 }
             }
         }
@@ -236,7 +224,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
 
         // Mutated Infection - faster with time
         // implemented this instead of phases
-        /*if (m_uiInfectionsRate < 5)
+        if (m_uiInfectionsRate < 5)
         {
             if (m_uiMutatedInfectionTimer <= uiDiff)
             {
@@ -248,7 +236,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
             }
             else
                 m_uiMutatedInfectionTimer -= uiDiff;
-        }*/
+        }
 
         // Vile Gas
         if (m_bIsHeroic)
