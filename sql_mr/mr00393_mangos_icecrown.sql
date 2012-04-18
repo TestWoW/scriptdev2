@@ -1,7 +1,7 @@
 -- --------
 -- Entrance
 -- --------
-UPDATE `areatrigger_teleport` SET `required_level` = '80' WHERE `areatrigger_teleport`.`id` =5670;
+-- UPDATE `areatrigger_teleport` SET `required_level` = '80' WHERE `areatrigger_teleport`.`id` =5670;
 
 UPDATE `creature` SET `spawntimesecs` = 7200 WHERE `map` = 631 AND (`spawntimesecs` BETWEEN 200 AND 7100 );
 
@@ -21,7 +21,7 @@ DELETE FROM `locales_npc_text` WHERE `entry` = 99323;
 DELETE FROM `npc_text` WHERE `ID` = 99323;
 DELETE FROM `gameobject` WHERE `guid` IN (913334);
 
-UPDATE `instance_template` SET `ScriptName`='instance_icecrown_spire' WHERE `map`=631;
+UPDATE `instance_template` SET `ScriptName`='instance_icecrown_citadel' WHERE `map`=631;
 
 -- fix for ytdb data on frostwing door/puddle
 
