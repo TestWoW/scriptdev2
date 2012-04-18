@@ -328,6 +328,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
 
     bool m_bIsEmpowered;
     bool m_bIsSaidSpecial; // 1st spell cast after being empowered is followed by special say
+    bool m_bIsStarted;
     uint32 m_uiEmpowermentFadeTimer;
     uint32 m_uiInvocationSpellEntry;
     int32 m_iSayInvocationEntry;
@@ -338,6 +339,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
     {
         m_bIsEmpowered = false;
         m_bIsSaidSpecial = false;
+        m_bIsStarted = false;
         m_uiEmpowermentFadeTimer = 30000;
         m_uiSphereTimer = urand(5000, 15000);
         m_uiBerserkTimer = 10 * MINUTE * IN_MILLISECONDS;
@@ -354,10 +356,11 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
     {
         if (pWho && pWho->IsWithinDistInMap(m_creature, 50.0f) &&
             ((pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster()) ||
-            pWho->GetObjectGuid().IsPet()))
+            pWho->GetObjectGuid().IsPet()) && !m_bIsStarted)
         {
             AttackStart(pWho);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_bIsStarted = true;
         }
     }
 
