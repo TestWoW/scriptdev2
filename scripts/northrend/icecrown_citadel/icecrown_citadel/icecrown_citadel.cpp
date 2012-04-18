@@ -204,7 +204,7 @@ struct MANGOS_DLL_DECL mob_svalna_eventAI : public base_icc_bossAI
                     NextStep(12000);
                     break;
                 case 2:
-                    if (Unit* pCrok = m_pInstance->GetSingleCreatureFromStorage(NPC_CROK))
+                    /*if (Unit* pCrok = m_pInstance->GetSingleCreatureFromStorage(NPC_CROK))
                     {
                         DoScriptText(SAY_CROK_1, pCrok);
                         pCrok->GetMotionMaster()->MovePoint(0, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, SpawnLoc[0].o);
@@ -216,7 +216,7 @@ struct MANGOS_DLL_DECL mob_svalna_eventAI : public base_icc_bossAI
                     if (Unit* pGrondel = m_pInstance->GetSingleCreatureFromStorage(NPC_GRONDEL))
                         pGrondel->GetMotionMaster()->MovePoint(0, SpawnLoc[3].x, SpawnLoc[3].y, SpawnLoc[3].z, SpawnLoc[3].o);
                     if (Unit* pRupert = m_pInstance->GetSingleCreatureFromStorage(NPC_RUPERT))
-                        pRupert->GetMotionMaster()->MovePoint(0, SpawnLoc[4].x, SpawnLoc[4].y, SpawnLoc[4].z, SpawnLoc[4].o);
+                        pRupert->GetMotionMaster()->MovePoint(0, SpawnLoc[4].x, SpawnLoc[4].y, SpawnLoc[4].z, SpawnLoc[4].o);*/
                     NextStep();
                     break;
                 case 3:
@@ -825,7 +825,7 @@ CreatureAI* GetAI_mob_frost_giant(Creature* pCreature)
     return new mob_frost_giantAI(pCreature);
 }
 
-void AddSC_icecrown_spire()
+void AddSC_icecrown_citadel()
 {
     Script *pNewScript;
 
