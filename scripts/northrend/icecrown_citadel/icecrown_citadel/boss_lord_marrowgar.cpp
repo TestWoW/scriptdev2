@@ -420,13 +420,11 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
         m_uiAchievTimer = 8000;
         m_bEmerged = false;
         SetCombatMovement(false);
-        m_victimGuid.Clear();
     }
 
     instance_icecrown_citadel* m_pInstance;
     bool m_bEmerged;
     uint32 m_uiAchievTimer;
-    ObjectGuid m_victimGuid;
 
     void Reset()
     {
@@ -447,7 +445,10 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         if (m_pInstance->GetData(TYPE_MARROWGAR) != IN_PROGRESS)
-            JustDied(m_creature);
+        {
+            m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+            m_creature->ForcedDespawn();
+        }
 
         if (!m_bEmerged)
         {
@@ -457,7 +458,8 @@ struct MANGOS_DLL_DECL mob_bone_spikeAI : public ScriptedAI
 
         if (m_uiAchievTimer < uiDiff)
             m_pInstance->SetSpecialAchievementCriteria(TYPE_BONED, false);
-        else m_uiAchievTimer -= uiDiff;
+        else
+            m_uiAchievTimer -= uiDiff;
     }
 };
 
