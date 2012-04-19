@@ -1,7 +1,7 @@
 -- --------
 -- Entrance
 -- --------
---UPDATE `areatrigger_teleport` SET `required_level` = '80' WHERE `areatrigger_teleport`.`id` =5670;
+-- UPDATE `areatrigger_teleport` SET `required_level` = '80' WHERE `areatrigger_teleport`.`id` =5670;
 
 UPDATE `creature` SET `spawntimesecs` = 7200 WHERE `map` = 631 AND (`spawntimesecs` BETWEEN 200 AND 7100 );
 
@@ -600,7 +600,7 @@ DELETE FROM `creature_template_addon` WHERE (`entry`=37133);
 INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_pvp_state`, `emote`, `moveflags`) VALUES (37133, 0, 0, 0, 0, 333, 0);
 
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 36725;
-UPDATE `creature_template `SET `AIName` = '' WHERE `entry` = 37007;
+UPDATE `creature_template`SET `AIName` = '' WHERE `entry` = 37007;
 
 -- end of weird addon fix
 
