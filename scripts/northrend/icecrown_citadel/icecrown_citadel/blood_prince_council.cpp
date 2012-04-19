@@ -817,11 +817,11 @@ struct MANGOS_DLL_DECL mob_dark_nucleusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
+            m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+            
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
-            m_creature->ForcedDespawn();
 
         if (m_creature->GetDistance(m_creature->getVictim()) < 14.0f)
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_RESONANCE_BUFF);
