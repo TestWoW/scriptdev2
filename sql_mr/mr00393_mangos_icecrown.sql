@@ -1,7 +1,7 @@
 -- --------
 -- Entrance
 -- --------
-UPDATE `areatrigger_teleport` SET `required_level` = '80' WHERE `areatrigger_teleport`.`id` =5670;
+--UPDATE `areatrigger_teleport` SET `required_level` = '80' WHERE `areatrigger_teleport`.`id` =5670;
 
 UPDATE `creature` SET `spawntimesecs` = 7200 WHERE `map` = 631 AND (`spawntimesecs` BETWEEN 200 AND 7100 );
 
@@ -537,11 +537,6 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES
 (74318, 1, 36597),
 (74319, 1, 36597),
 (74320, 1, 36597);
-
--- Tirion gossip
-DELETE FROM `npc_gossip` WHERE npc_guid = 115781;
-INSERT INTO `npc_gossip` (`npc_guid`, `textid`) VALUES
-(115781, 15290);
 
 -- proc for Dark Hunger
 DELETE FROM `spell_proc_event` WHERE `entry` = 69383;
