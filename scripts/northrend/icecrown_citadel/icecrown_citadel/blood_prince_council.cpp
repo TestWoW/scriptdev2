@@ -354,9 +354,9 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
 
     void MoveInLineOfSight(Unit* pWho)
     {
-        if (pWho && pWho->IsWithinDistInMap(m_creature, 50.0f) &&
+        if (pWho && pWho->IsWithinDistInMap(m_creature, 40.0f) &&
             ((pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster()) ||
-            pWho->GetObjectGuid().IsPet()) && !m_bIsStarted)
+            pWho->GetObjectGuid().IsPet()) && !m_bIsStarted && !m_creature->HasAura(SPELL_FEIGN_DEATH))
         {
             AttackStart(pWho);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -771,6 +771,9 @@ struct MANGOS_DLL_DECL mob_shock_vortexAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         if (!m_bHasCast)
         {
             if (m_uiCastTimer <= uiDiff)
@@ -794,8 +797,11 @@ struct MANGOS_DLL_DECL mob_dark_nucleusAI : public ScriptedAI
 {
     mob_dark_nucleusAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
+
+    ScriptedInstance* m_pInstance;
 
     void Reset(){}
 
@@ -810,6 +816,9 @@ struct MANGOS_DLL_DECL mob_dark_nucleusAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
 
         if (m_creature->GetDistance(m_creature->getVictim()) < 14.0f)
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_RESONANCE_BUFF);
@@ -946,6 +955,9 @@ struct MANGOS_DLL_DECL mob_kinetic_bombAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
+            m_creature->ForcedDespawn();
+
         if (!m_bIsStarted)
         {
             if (m_uiStartTimer <= uiDiff)
