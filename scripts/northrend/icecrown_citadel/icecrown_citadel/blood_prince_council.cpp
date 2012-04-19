@@ -354,6 +354,9 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
 
     void MoveInLineOfSight(Unit* pWho)
     {
+        if (!m_creature->isAlive())
+            return;
+            
         if (pWho && pWho->IsWithinDistInMap(m_creature, 40.0f) &&
             ((pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster()) ||
             pWho->GetObjectGuid().IsPet()) && !m_bIsStarted && !m_creature->HasAura(SPELL_FEIGN_DEATH))
