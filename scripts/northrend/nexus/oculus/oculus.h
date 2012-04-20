@@ -34,6 +34,10 @@ enum
     DATA_UROM,
     DATA_EREGOS,
 
+    TYPE_RUBY_VOID,
+    TYPE_EMERALD_VOID,
+    TYPE_AMBER_VOID,
+
     NPC_ROBOT              = 27641,
     NPC_BALGAR_IMAGE       = 28012,
     NPC_VERDISA            = 27657,
@@ -43,6 +47,9 @@ enum
     NPC_VAROS              = 27447,
     NPC_UROM               = 27655,
     NPC_EREGOS             = 27656,
+    NPC_EMERALD_DRAGON     = 27692,
+    NPC_AMBER_DRAGON       = 27755,
+    NPC_RUBY_DRAGON        = 27756,
 
     GO_DRAGON_CAGE_DOOR    = 193995,
     GO_EREGOS_CACHE        = 191349,
@@ -57,13 +64,43 @@ enum
     // Yells after Drakos dies
     SAY_VAROS_INTRO                 = -1578020,
     SAY_BELGARISTRASZ_GREET         = -1578021,
+    SAY_VAROS_SPAWN                 = -1578029,
 
     // world states to show how many constructs are still alive
     WORLD_STATE_CONSTRUCTS          = 3524,
     WORLD_STATE_CONSTRUCTS_COUNT    = 3486,
 
     ACHIEV_START_EREGOS_ID          = 18153,            // eregos timed kill achiev
+    ACHIEV_CRITERIA_RUBY_VOID       = 7177,
+    ACHIEV_CRITERIA_EMERALD_VOID    = 7178,
+    ACHIEV_CRITERIA_AMBER_VOID      = 7179,
+};
 
+class MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
+{
+    public:
+        instance_oculus(Map* pMap);
+        ~instance_oculus() {}
+
+        void Initialize();
+        void OnObjectCreate(GameObject* pGo);
+        void OnCreatureCreate(Creature* pCreature);
+        void SetData(uint32 type, uint32 data);
+        uint32 GetData(uint32 type);
+        bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
+
+        void Load(const char* chrIn);
+        const char* Save() { return m_strInstData.c_str(); }
+    private:
+        std::string m_strInstData;
+        uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
+        uint32 m_auiEregosCache;
+
+        std::string strSaveData;
+        bool m_bIsRegularMode;
+        bool m_bRubyDrake;
+        bool m_bEmeraldDrake;
+        bool m_bAmberDrake;
 };
 
 #endif

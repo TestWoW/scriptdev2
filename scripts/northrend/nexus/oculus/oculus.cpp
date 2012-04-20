@@ -30,13 +30,6 @@ enum Spells
     SPELL_RED_SEAT                          = 49464,
 };
 
-enum NPC
-{
-    NPC_GREEN_DRAGON                        = 27692,
-    NPC_YELLOW_DRAGON                       = 27755,
-    NPC_RED_DRAGON                          = 27756,
-};
-
 struct MANGOS_DLL_DECL mob_oculus_dragonAI : public ScriptedAI
 {
     mob_oculus_dragonAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -56,13 +49,13 @@ struct MANGOS_DLL_DECL mob_oculus_dragonAI : public ScriptedAI
         StartTimer = 2000;
         switch (m_creature->GetEntry())
         {
-            case NPC_GREEN_DRAGON:
+            case NPC_EMERALD_DRAGON:
                 seatSpell = SPELL_GREEN_SEAT;
                 break;
-            case NPC_RED_DRAGON:
+            case NPC_RUBY_DRAGON:
                 seatSpell = SPELL_RED_SEAT;
                 break;
-            case NPC_YELLOW_DRAGON:
+            case NPC_AMBER_DRAGON:
                 seatSpell = SPELL_YELLOW_SEAT;
                 break;
             default:
@@ -203,22 +196,42 @@ CreatureAI* GetAI_npc_belgar_image(Creature* pCreature)
     return new npc_belgar_imageAI (pCreature);
 }
 
+
+/*###
+# Oculus Orb
+-####*/
+bool GOUse_go_oculus_portal(Player* pPlayer, GameObject* pGo)
+{
+    switch(pGo->GetEntry())
+    {
+        case GO_ORB_OF_NEXUS:
+            pPlayer->TeleportTo(571,3876.159912f,6984.439941f,106.32f,6.279f);
+            return true;
+    }
+    return false;
+}
+
 void AddSC_oculus()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "mob_oculus_dragon";
-    newscript->GetAI = &GetAI_mob_oculus_dragon;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_oculus_dragon";
+    pNewScript->GetAI = &GetAI_mob_oculus_dragon;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_oculus_robot";
-    newscript->GetAI = &GetAI_npc_oculus_robot;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_oculus_robot";
+    pNewScript->GetAI = &GetAI_npc_oculus_robot;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_belgar_image";
-    newscript->GetAI = &GetAI_npc_belgar_image;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_belgar_image";
+    pNewScript->GetAI = &GetAI_npc_belgar_image;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "go_oculus_portal";
+    pNewScript->pGOUse = GOUse_go_oculus_portal;
+    pNewScript->RegisterSelf();
 }

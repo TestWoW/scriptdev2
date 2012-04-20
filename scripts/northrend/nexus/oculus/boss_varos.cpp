@@ -451,20 +451,20 @@ CreatureAI* GetAI_npc_varos_beam_target(Creature* pCreature)
 
 void AddSC_boss_varos()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_varos";
-    newscript->GetAI = &GetAI_boss_varos;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_varos";
+    pNewScript->GetAI = &GetAI_boss_varos;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_varos_orb";
-    newscript->GetAI = &GetAI_npc_varos_orb;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_varos_orb";
+    pNewScript->GetAI = &GetAI_npc_varos_orb;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_varos_beam_target";
-    newscript->GetAI = &GetAI_npc_varos_beam_target;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_varos_beam_target";
+    pNewScript->GetAI = &GetAI_npc_varos_beam_target;
+    pNewScript->RegisterSelf();
 }

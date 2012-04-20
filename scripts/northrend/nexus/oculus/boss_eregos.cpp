@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "precompiled.h"
 #include "oculus.h"
+#include "Vehicle.h"
 
 enum Spells
 {
@@ -74,6 +75,7 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
     uint8 m_uiSummonCount;
 
     bool m_bIsMove;
+    bool m_bIsChecked;
 
     void Reset()
     {
@@ -81,14 +83,6 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
         if (m_pInstance)
         {
            m_pInstance->SetData(TYPE_EREGOS, NOT_STARTED);
-           if(m_pInstance->GetData(TYPE_UROM) == DONE)
-           {
-              m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-           }
-           else
-           {
-              m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-           }
         }
 
         m_creature->SetLevitate(true);
@@ -100,6 +94,7 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
         uiSummonTimer = 15000;
         m_uiSummonCount = 0;
         m_bIsMove = true;
+        m_bIsChecked = false;
     }
 
     void MoveInLineOfSight(Unit* pWho)
@@ -120,7 +115,15 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
     {
         DoScriptText(SAY_AGGRO, m_creature);
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_EREGOS, IN_PROGRESS);
+            /*if (!m_bIsRegularMode)
+            {
+                m_pInstance->SetData(TYPE_RUBY_VOID, IN_PROGRESS);
+                m_pInstance->SetData(TYPE_EMERALD_VOID, IN_PROGRESS);
+                m_pInstance->SetData(TYPE_AMBER_VOID, IN_PROGRESS);
+            }*/
+        }
     }
 
     void KilledUnit(Unit *victim)
@@ -136,11 +139,14 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
 
     void JustDied(Unit* killer)
     {
-        m_creature->GetMap()->CreatureRelocation(m_creature, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ()-100.0f, 0);
-        m_creature->MonsterMoveWithSpeed(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ()-100.0f, 26);
-            DoScriptText(SAY_DEATH, m_creature);
+        //m_creature->GetMap()->CreatureRelocation(m_creature, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ()-100.0f, 0);
+        //m_creature->MonsterMoveWithSpeed(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ()-100.0f, 26);
+        DoScriptText(SAY_DEATH, m_creature);
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_EREGOS, DONE);
+            KillCreditEregos();
+        }
     }
 
     void DamageTaken(Unit *done_by, uint32 &damage)
@@ -178,6 +184,51 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
         ScriptedAI::AttackStart(who);
     }
 
+    void KillCreditEregos()
+    {
+        Map *map = m_creature->GetMap();
+        Map::PlayerList const& players = map->GetPlayers();
+        if (!players.isEmpty() && map->IsDungeon())
+        {
+            for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if(Player* pPlayer = itr->getSource())
+                    pPlayer->KilledMonsterCredit(NPC_EREGOS, m_creature->GetObjectGuid());
+            }
+        }
+    }
+
+    void CheckAchievements()
+    {
+        if (!m_pInstance)
+            return;
+
+        /*Map *map = m_creature->GetMap();
+        Map::PlayerList const& players = map->GetPlayers();
+        if (!players.isEmpty())
+        {
+            for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if(Player* pPlayer = itr->getSource())
+                {
+                    VehicleKit* pVehicleKit = pPlayer->GetVehicle();
+
+                    if (!pVehicleKit)
+                        continue;
+
+                    uint32 DragonEntry = pVehicleKit->GetBase()->GetEntry();
+
+                    if (DragonEntry == NPC_RUBY_DRAGON)
+                        m_pInstance->SetData(TYPE_RUBY_VOID, FAIL);
+                    if (DragonEntry == NPC_EMERALD_DRAGON)
+                        m_pInstance->SetData(TYPE_EMERALD_VOID, FAIL);
+                    if (DragonEntry == NPC_AMBER_DRAGON)
+                        m_pInstance->SetData(TYPE_AMBER_VOID, FAIL);
+                }
+            }
+        }*/
+    }
+
     void SummonAnomalies()
     {
         ThreatList t_list = m_creature->getThreatManager().getThreatList();
@@ -196,6 +247,12 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (!m_bIsChecked)
+        {
+            CheckAchievements();
+            m_bIsChecked = true;
+        }
 
         if (m_creature->GetHealthPercent() < 50.0f && m_uiSummonCount == 0)
         {
@@ -306,15 +363,15 @@ CreatureAI* GetAI_npc_planar_anomaly(Creature* pCreature)
 
 void AddSC_boss_eregos()
 {
-    Script *newscript;
+    Script *pNewScript;
 
-    newscript = new Script;
-    newscript->Name = "boss_eregos";
-    newscript->GetAI = &GetAI_boss_eregos;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "boss_eregos";
+    pNewScript->GetAI = &GetAI_boss_eregos;
+    pNewScript->RegisterSelf();
 
-    newscript = new Script;
-    newscript->Name = "npc_planar_anomaly";
-    newscript->GetAI = &GetAI_npc_planar_anomaly;
-    newscript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "npc_planar_anomaly";
+    pNewScript->GetAI = &GetAI_npc_planar_anomaly;
+    pNewScript->RegisterSelf();
 }
