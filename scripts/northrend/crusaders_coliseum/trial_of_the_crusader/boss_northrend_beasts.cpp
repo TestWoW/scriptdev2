@@ -156,7 +156,7 @@ struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetInCombatWithZone();
 
-        SnoboldsCount = m_bIs25Man? 5 : 4;
+        SnoboldsCount = m_bIs25Man ? 5 : 4;
 
         pFocus = NULL;
 
@@ -855,7 +855,6 @@ struct MANGOS_DLL_DECL mob_slime_poolAI : public ScriptedAI
         m_uiIncreaseSizeTimer = 0;
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->SetInCombatWithZone();
         DoCastSpellIfCan(m_creature, SPELL_SLIME_POOL_AURA, CAST_TRIGGERED);
         DoCastSpellIfCan(m_creature, SPELL_AUTO_GROW, CAST_TRIGGERED);
@@ -980,7 +979,6 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
 
                 if (m_creature->getVictim())
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 m_creature->SetSpeedRate(MOVE_WALK, 3.0f);
                 m_creature->SetSpeedRate(MOVE_RUN, 3.0f);
                 SetCombatMovement(true);
@@ -988,6 +986,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
                 pFocus = NULL;
             }
         }
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
     Unit* SelectTargetForCharge()
