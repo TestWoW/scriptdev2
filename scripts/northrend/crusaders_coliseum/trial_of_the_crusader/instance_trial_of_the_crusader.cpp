@@ -204,7 +204,7 @@ void instance_trial_of_the_crusader::SetData(uint32 uiType, uint32 uiData)
         if (uiData == DONE)
         {
             if (Creature* pTirion = GetSingleCreatureFromStorage(NPC_TIRION))
-<<<<<<< HEAD
+//<<<<<<< HEAD
             {
                 Map* pMap = pTirion->GetMap();
                 Map::PlayerList const& lPlayers = pMap->GetPlayers();
@@ -218,9 +218,9 @@ void instance_trial_of_the_crusader::SetData(uint32 uiType, uint32 uiData)
                     }
                 }
             }
-=======
+/*=======
                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEV_FACTION_CHAMPIONS_DEFEAT);
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
+>>>>>>> 646140f9a30397c365fa502673f52897c3be977e*/
 
             uint32 uiCacheEntry = GO_CRUSADERS_CACHE_10;
 
