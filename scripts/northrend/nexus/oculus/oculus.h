@@ -34,15 +34,20 @@ enum
     DATA_UROM,
     DATA_EREGOS,
 
+<<<<<<< HEAD
     TYPE_RUBY_VOID,
     TYPE_EMERALD_VOID,
     TYPE_AMBER_VOID,
+=======
+    NPC_TRIGGER            = 11364,
+
+    NPC_ETERNOS            = 27659,
+    NPC_BELGAR             = 27658,
+    NPC_VERDISA            = 27657,
+>>>>>>> 646140f9a30397c365fa502673f52897c3be977e
 
     NPC_ROBOT              = 27641,
     NPC_BALGAR_IMAGE       = 28012,
-    NPC_VERDISA            = 27657,
-    NPC_BELGARISTRASZ      = 27658,
-    NPC_ETERNOS            = 27659,
     NPC_DRAKOS             = 27654,
     NPC_VAROS              = 27447,
     NPC_UROM               = 27655,
@@ -51,7 +56,13 @@ enum
     NPC_AMBER_DRAGON       = 27755,
     NPC_RUBY_DRAGON        = 27756,
 
-    GO_DRAGON_CAGE_DOOR    = 193995,
+    NPC_GREEN_DRAGON       = 27692,
+    NPC_YELLOW_DRAGON      = 27755,
+    NPC_RED_DRAGON         = 27756,
+
+    GO_DRAGON_CAGE_DOOR_1  = 193992,
+    GO_DRAGON_CAGE_DOOR_2  = 193993,
+    GO_DRAGON_CAGE_DOOR_3  = 193995,
     GO_EREGOS_CACHE        = 191349,
     GO_EREGOS_CACHE_H      = 193603,
     GO_SPOTLIGHT           = 191351,
@@ -70,6 +81,7 @@ enum
     WORLD_STATE_CONSTRUCTS          = 3524,
     WORLD_STATE_CONSTRUCTS_COUNT    = 3486,
 
+    // Achievements
     ACHIEV_START_EREGOS_ID          = 18153,            // eregos timed kill achiev
     ACHIEV_CRITERIA_RUBY_VOID       = 7177,
     ACHIEV_CRITERIA_EMERALD_VOID    = 7178,
@@ -96,11 +108,48 @@ class MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
         uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
         uint32 m_auiEregosCache;
 
+<<<<<<< HEAD
         std::string strSaveData;
         bool m_bIsRegularMode;
         bool m_bRubyDrake;
         bool m_bEmeraldDrake;
         bool m_bAmberDrake;
+=======
+    ACHIEV_CRITERIA_RUBY_VOID       = 7323,
+    ACHIEV_CRITERIA_EMERALD_VOID    = 7324,
+    ACHIEV_CRITERIA_AMBER_VOID      = 7325,
+
+    ACHIEV_RUBY_VOID                = 0,
+    ACHIEV_EMERALD_VOID             = 1,
+    ACHIEV_AMBER_VOID               = 2,
+    ACHIEV_COUNT                    = 3,
+};
+
+struct MANGOS_DLL_DECL instance_oculus : public ScriptedInstance
+{
+    public:
+        instance_oculus(Map* pMap);
+        void Initialize();
+
+        void OnObjectCreate(GameObject* pGo);
+        void OnCreatureCreate(Creature* pCreature);
+
+        bool CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/);
+        void SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet);
+
+        void SetData(uint32 type, uint32 data);
+        uint32 GetData(uint32 type);
+
+        const char* Save();
+        void Load(const char* chrIn);
+
+    private:
+        uint32 m_auiEncounter[MAX_ENCOUNTERS+1];
+
+        std::string strSaveData;
+        bool m_bIsRegularMode;
+        bool m_bAchievCriteria[ACHIEV_COUNT];
+>>>>>>> 646140f9a30397c365fa502673f52897c3be977e
 };
 
 #endif

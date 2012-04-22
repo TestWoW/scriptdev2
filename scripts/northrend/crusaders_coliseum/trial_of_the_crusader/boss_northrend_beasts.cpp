@@ -82,7 +82,6 @@ enum BossSpells
     SPELL_SLIME_POOL            = 66883,
     SPELL_SLIME_POOL_AURA       = 66882,
     SPELL_SLIME_POOL_VISUAL     = 63084,
-    SPELL_CHECK_ACHIEV          = 68523,
 
     // Icehowl
     SPELL_FEROCIOUS_BUTT        = 66770,
@@ -453,6 +452,9 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
         if (!m_pInstance) 
             return;
 
+        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
+            m_pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEV_NOT_ONE_BUT_TWO_JORMUNGARS);
+
         if (Creature* pDreadscale = m_pInstance->GetSingleCreatureFromStorage(NPC_DREADSCALE))
         {
             if (!pDreadscale->isAlive())
@@ -460,6 +462,7 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
             else
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_SPECIAL);
         }
+/*<<<<<<< HEAD
 
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
         {
@@ -475,6 +478,8 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
                 }
             }
         }
+=======
+>>>>>>> 646140f9a30397c365fa502673f52897c3be977e*/
     }
 
     void JustReachedHome()
@@ -604,8 +609,8 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL)
         {
-            ++m_uiAchievTimer;
-            if (m_uiAchievTimer < uiDiff)
+            m_uiAchievTimer -= uiDiff;
+            if (m_uiAchievTimer <= uiDiff)
                 m_bAchievFailed = true;
         }
 
@@ -668,6 +673,9 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
     {
         if (!m_pInstance) 
             return;
+
+        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
+            m_pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEV_NOT_ONE_BUT_TWO_JORMUNGARS);
             
         if (Creature *pSister = m_pInstance->GetSingleCreatureFromStorage(NPC_ACIDMAW))
         {
@@ -676,6 +684,7 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
             else 
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_SPECIAL);
         }
+/*<<<<<<< HEAD
 
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
         {
@@ -691,6 +700,8 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
                 }
             }
         }
+=======
+>>>>>>> 646140f9a30397c365fa502673f52897c3be977e*/
     }
 
     void JustReachedHome()
@@ -818,8 +829,8 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL)
         {
-            ++m_uiAchievTimer;
-            if (m_uiAchievTimer < uiDiff)
+            m_uiAchievTimer -= uiDiff;
+            if (m_uiAchievTimer <= uiDiff)
                 m_bAchievFailed = true;
         }
 
@@ -897,10 +908,12 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     boss_icehowlAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = ((instance_trial_of_the_crusader*)pCreature->GetInstanceData());
+        m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
         Reset();
     }
 
     instance_trial_of_the_crusader* m_pInstance;
+    Difficulty m_uiMapDifficulty;
 
     uint32 m_uiFerociousButtTimer;
     uint32 m_uiArcticBreathTimer;
@@ -909,11 +922,9 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     uint32 m_uiWaitTimer;
     uint32 m_uiPhaseTimer;
     uint32 m_uiPhase;
-    uint32 m_uiCheckTimer;
 
     float fPosX, fPosY, fPosZ;
     Unit *pFocus;
-    bool m_bAchievFailed;
 
     std::list<Creature*> vassalsEntryList;
 
@@ -927,14 +938,11 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
         m_uiWhirlTimer                 = 20000;
         m_uiMassiveCrashTimer          = 30000;
         m_uiPhase                      = PHASE_NORMAL;
-        m_uiCheckTimer                 = 0; // if not vassals at encounter start only check once.
 
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetSpeedRate(MOVE_WALK, 3.0f);
         m_creature->SetSpeedRate(MOVE_RUN, 3.0f);
-
-        m_bAchievFailed                = false;
 
         pFocus = NULL;
 
@@ -1012,31 +1020,24 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
             return NULL;
     }
 
-    void CheckAchiev()
+    void JustDied(Unit* pKiller)
     {
+        if (!m_pInstance)
+            return;
+
+        // Find required NPC as achievement criteria
         vassalsEntryList.clear();
         GetCreatureListWithEntryInGrid(vassalsEntryList, m_creature, NPC_SNOBOLD_VASSAL, 250.0f);
 
         if (vassalsEntryList.empty())
-        {
             m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, false);
-            m_bAchievFailed = true;
-            return;
-        }
-
-        if (vassalsEntryList.size()-1 >= 2)
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, true);
         else
         {
-            m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, false);
-            m_bAchievFailed = true;
+            if(m_uiMapDifficulty == RAID_DIFFICULTY_10MAN_HEROIC || m_uiMapDifficulty == RAID_DIFFICULTY_10MAN_NORMAL)
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, vassalsEntryList.size() >= 2);
+            else
+                m_pInstance->SetSpecialAchievementCriteria(TYPE_UPPER_BACK_PAIN, vassalsEntryList.size() >= 4);
         }
-    }
-
-    void JustDied(Unit* pKiller)
-    {
-        if (!m_pInstance) 
-            return;
 
         m_pInstance->SetData(TYPE_NORTHREND_BEASTS, ICEHOWL_DONE);
     }
@@ -1061,17 +1062,6 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        if (!m_bAchievFailed)
-        {
-            if (m_uiCheckTimer < uiDiff)
-            {
-                CheckAchiev();
-                m_uiCheckTimer = 500;
-            }
-            else
-                m_uiCheckTimer -= uiDiff;
-        }
 
         switch (m_uiPhase)
         {

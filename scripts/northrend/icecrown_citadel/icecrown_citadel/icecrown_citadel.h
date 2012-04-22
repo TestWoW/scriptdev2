@@ -221,6 +221,143 @@ enum
 
     MAX_SPECIAL_ACHIEV_CRITS            = 14,
 
+<<<<<<< HEAD
+=======
+    NPC_LORD_MARROWGAR          = 36612,
+    NPC_LADY_DEATHWHISPER       = 36855,
+    NPC_DEATHBRINGER_SAURFANG   = 37813,
+    NPC_FESTERGUT               = 36626,
+    NPC_ROTFACE                 = 36627,
+    NPC_PROFESSOR_PUTRICIDE     = 36678,
+    NPC_TALDARAM                = 37973,
+    NPC_VALANAR                 = 37970,
+    NPC_KELESETH                = 37972,
+    NPC_LANATHEL                = 37955,
+    NPC_VALITHRIA               = 36789,
+    NPC_VALITHRIA_QUEST         = 38589,
+    NPC_SINDRAGOSA              = 36853,
+    NPC_LICH_KING               = 36597,
+
+    NPC_LANATHEL_INTRO          = 38004,
+    NPC_BLOOD_ORB_CONTROL       = 38008,
+
+    NPC_MURADIN                 = 36948,
+
+    NPC_TIRION                  = 38995,
+    NPC_MENETHIL                = 38579,
+
+    NPC_FROSTMOURNE_TRIGGER     = 38584,
+    NPC_FROSTMOURNE_HOLDER      = 27880,
+
+    NPC_STINKY                  = 37025,
+    NPC_PRECIOUS                = 37217,
+
+    NPC_RIMEFANG                = 37533,
+    NPC_SPINESTALKER            = 37534,
+
+    NPC_GREEN_DRAGON_COMBAT_TRIGGER = 38752,
+
+    GO_TELEPORT_GOSSIP_MESSAGE  = 99323,
+    TELEPORT_GOSSIP_MESSAGE     = 99322,
+
+    GO_ICEWALL_1                = 201911,
+    GO_ICEWALL_2                = 201910,
+
+    GO_MARROWGAR_DOOR           = 201857,
+
+    GO_ORATORY_DOOR             = 201563,
+    GO_DEATHWHISPER_ELEVATOR    = 202220, //5653
+
+    GO_SAURFANG_DOOR            = 201825,
+
+    GO_GAS_RELEASE_VALVE        = 201616, //72479
+
+    GO_ORANGE_PLAGUE            = 201371, //72536
+    GO_GREEN_PLAGUE             = 201370, //72537
+
+    GO_DRINK_ME_TABLE           = 201584,
+
+    GO_SCIENTIST_DOOR_GREEN     = 201614, //72530
+    GO_SCIENTIST_DOOR_ORANGE    = 201613, //72531
+    GO_SCIENTIST_DOOR_COLLISION = 201612,
+    GO_SCIENTIST_DOOR           = 201372, //72541
+
+    GO_ORANGE_TUBES             = 201617,
+    GO_GREEN_TUBES              = 201618,
+
+    GO_BLOODWING_DOOR           = 201920, //72532
+    GO_CRIMSON_HALL_DOOR        = 201376, //72532
+    GO_COUNCIL_DOOR_1           = 201377, //72533
+    GO_COUNCIL_DOOR_2           = 201378, //72534
+
+    GO_BLOODPRINCE_DOOR         = 201746,
+    GO_ICECROWN_GRATE           = 201755,
+
+    GO_FROSTWING_DOOR           = 201919,
+    GO_GREEN_DRAGON_DOOR_1      = 201375, //1202
+    GO_GREEN_DRAGON_DOOR_2      = 201374, //1200
+    GO_VALITHRIA_DOOR_1         = 201381, //1618
+    GO_VALITHRIA_DOOR_2         = 201382, //1482
+    GO_VALITHRIA_DOOR_3         = 201383, //1335
+    GO_VALITHRIA_DOOR_4         = 201380, //1558
+
+    GO_SINDRAGOSA_DOOR_1        = 201369, //1619
+    GO_SINDRAGOSA_DOOR_2        = 201379,
+
+    GO_SINDRAGOSA_ENTRANCE      = 201373,
+    GO_SINDRAGOSA_ICE_WALL      = 202396,
+
+    GO_FROZENTRONE_TR           = 202223, //72061
+
+    GO_SAURFANG_CACHE_10        = 202239,
+    GO_SAURFANG_CACHE_25        = 202240,
+    GO_SAURFANG_CACHE_10_H      = 202238,
+    GO_SAURFANG_CACHE_25_H      = 202241,
+
+    GO_GUNSHIP_ARMORY_A_10      = 201872, //
+    GO_GUNSHIP_ARMORY_A_25      = 201873, //
+    GO_GUNSHIP_ARMORY_A_10H     = 201874, //
+    GO_GUNSHIP_ARMORY_A_25H     = 201875, //
+
+    GO_GUNSHIP_ARMORY_H_10      = 202177, //
+    GO_GUNSHIP_ARMORY_H_25      = 202178, //
+    GO_GUNSHIP_ARMORY_H_10H     = 202179, //
+    GO_GUNSHIP_ARMORY_H_25H     = 202180, //
+
+    GO_DREAMWALKER_CACHE_10      = 201959, //
+    GO_DREAMWALKER_CACHE_25      = 202339, //
+    GO_DREAMWALKER_CACHE_10_H    = 202338, //
+    GO_DREAMWALKER_CACHE_25_H    = 202340, //
+
+    GO_PLAGUE_SIGIL             = 202182,
+    GO_FROSTWING_SIGIL          = 202181,
+    GO_BLOODWING_SIGIL          = 202183,
+
+    GO_ICESHARD_1               = 202142, //8304
+    GO_ICESHARD_2               = 202141, //8364
+    GO_ICESHARD_3               = 202143, //8310
+    GO_ICESHARD_4               = 202144, //9007
+
+    GO_FROSTY_WIND              = 202188, //
+    GO_FROSTY_EDGE              = 202189, //
+    GO_SNOW_EDGE                = 202190, //
+    GO_ARTHAS_PLATFORM          = 202161, //
+    GO_ARTHAS_PRECIPICE         = 202078, //
+
+    TYPE_EVENT_TIMER            = 99,
+    TYPE_EVENT                  = 100,
+    TYPE_EVENT_NPC              = 101,
+    MAP_NUM                     = 631,
+    DATA_DIRECTION              = 1001,
+    DATA_BLOOD_INVOCATION       = 1002,
+    DESPAWN_TIME                = 300000,
+    SPELL_SHADOWS_EDGE          = 71168,
+
+};
+
+enum AchievementCriteriaIds
+{
+>>>>>>> 646140f9a30397c365fa502673f52897c3be977e
     // Lord Marrowgar
     CRITERIA_BONED_10N                  = 12775,
     CRITERIA_BONED_25N                  = 12962,

@@ -114,6 +114,9 @@ enum BossSpells
     NPC_DREAM_PORTAL_PRE            = 38186,
     NPC_DREAM_PORTAL                = 37945,
     NPC_DREAM_CLOUD                 = 37985,
+
+    // Achievements
+    SPELL_ACHIEVEMENT_CREDIT        = 72706,
 };
 
 enum
@@ -221,7 +224,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
 
                 m_creature->SummonCreature(NPC_LICH_TRIGGER, SpawnLoc[9].x, SpawnLoc[9].y, SpawnLoc[9].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000);
 
-                if (Creature *pTmp = m_pInstance->GetSingleCreatureFromStorage(NPC_COMBAT_TRIGGER))
+                if (Creature *pTmp = m_pInstance->GetSingleCreatureFromStorage(NPC_GREEN_DRAGON_COMBAT_TRIGGER))
                 {
                     pTmp->SetInCombatWithZone();
                     m_bCombatStarted = true;
@@ -244,7 +247,7 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
         {
             m_pInstance->SetData(TYPE_VALITHRIA, FAIL);
 
-            if (Creature *pTrigger = m_pInstance->GetSingleCreatureFromStorage(NPC_COMBAT_TRIGGER))
+            if (Creature *pTrigger = m_pInstance->GetSingleCreatureFromStorage(NPC_GREEN_DRAGON_COMBAT_TRIGGER))
                 pTrigger->AI()->EnterEvadeMode();
         }
 
@@ -375,11 +378,23 @@ struct MANGOS_DLL_DECL boss_valithria_dreamwalkerAI : public base_icc_bossAI
             {
                 if (m_pInstance)
                 {
+<<<<<<< HEAD
                     if (Creature *pDummy = m_pInstance->GetSingleCreatureFromStorage(NPC_COMBAT_TRIGGER))
                     {
                         CheckAchiev(pDummy);
                         m_creature->DealDamage(pDummy, pDummy->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
                     }
+=======
+                    m_pInstance->SetData(TYPE_VALITHRIA, DONE);
+
+                    if (Creature *pDummy = m_pInstance->GetSingleCreatureFromStorage(NPC_GREEN_DRAGON_COMBAT_TRIGGER))
+                    {
+                        // Set Valithria credit
+                        pDummy->CastSpell(pDummy, SPELL_ACHIEVEMENT_CREDIT, true);
+                        pDummy->ForcedDespawn(1000);
+                    }
+                }
+>>>>>>> 646140f9a30397c365fa502673f52897c3be977e
 
                     m_pInstance->SetData(TYPE_VALITHRIA, DONE);
                 }

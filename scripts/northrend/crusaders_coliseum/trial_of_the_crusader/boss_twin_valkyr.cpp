@@ -125,10 +125,8 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
     Difficulty m_uiMapDifficulty;
     bool m_bIsHeroic;
     bool m_bIs25Man;
-    bool m_bAchievFailed;
     float x, y, z;
 
-    uint32 m_uiAchievTimer;
     uint32 m_uiPhase;
     uint32 m_uiTwinSpikeLTimer;
     uint32 m_uiSpecialAbilityTimer;
@@ -147,7 +145,6 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
 
         pSister = NULL;
 
-        m_uiAchievTimer            = 180000;
         m_uiPhase                  = PHASE_NORMAL;
         m_uiNextSpell              = urand(0,1);
         m_uiTwinSpikeLTimer        = 10000;
@@ -156,8 +153,6 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
         m_uiHealthCheckTimer       = 1000;
         m_uiCheckTouchBuff         = 1000;
         m_uiOrbsTimer              = 2500;
-
-        m_bAchievFailed            = false;
 
         SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_OFFHAND_1, EQUIP_RANGED_1);
 
@@ -266,17 +261,6 @@ struct MANGOS_DLL_DECL boss_fjolaAI : public ScriptedAI
             m_uiHealthCheckTimer = 1000;
         }
         else m_uiHealthCheckTimer -= uiDiff;
-
-        if (!m_bAchievFailed)
-        {
-            if (m_uiAchievTimer < uiDiff)
-            {
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, false);
-                m_bAchievFailed = true;
-            }
-            else
-                m_uiAchievTimer -= uiDiff;
-        }
 
         if (m_bIsHeroic)
         {
@@ -421,11 +405,8 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
-    bool m_bAchievFailed;
-
     float x, y, z;
 
-    uint32 m_uiAchievTimer;
     uint32 m_uiPhase;
     uint32 m_uiTwinSpikeDTimer;
     uint32 m_uiSpecialAbilityTimer;
@@ -444,9 +425,6 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
 
         pSister = NULL;
 
-        m_bAchievFailed            = false;
-
-        m_uiAchievTimer            = 180000;
         m_uiPhase                  = PHASE_NORMAL;
         m_uiNextSpell              = urand(2,3);
         m_uiTwinSpikeDTimer        = 10000;
@@ -563,17 +541,6 @@ struct MANGOS_DLL_DECL boss_eydisAI : public ScriptedAI
             m_uiHealthCheckTimer = 1000;
         }
         else m_uiHealthCheckTimer -= uiDiff;
-
-        if (!m_bAchievFailed)
-        {
-            if (m_uiAchievTimer < uiDiff)
-            {
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_SALT_AND_PEPPER, false);
-                m_bAchievFailed = true;
-            }
-            else
-                m_uiAchievTimer -= uiDiff;
-        }
 
         if (m_bIsHeroic)
         {
