@@ -32,11 +32,17 @@ EndScriptData */
 2 - Mage-Lord Urom
 3 - Ley-Guardian Eregos */
 
+enum
+{
+    SAY_VAROS_SPAWN        = -1578029,
+};
+
 instance_oculus::instance_oculus(Map* pMap) : ScriptedInstance(pMap)
 {
     m_bIsRegularMode = pMap->IsRegularDifficulty();
     Initialize();
-}
+};
+
 
 void instance_oculus::Initialize()
 {
@@ -45,25 +51,25 @@ void instance_oculus::Initialize()
 
     m_auiEncounter[TYPE_ROBOTS] = 10;
     m_auiEncounter[TYPE_UROM_PHASE] = 0;
-    m_bRubyDrake = true;
-    m_bEmeraldDrake = true;
-    m_bAmberDrake = true;
-
-    m_auiEregosCache = m_bIsRegularMode ? GO_EREGOS_CACHE_H : GO_EREGOS_CACHE;
+    for (uint8 i = 0; i < ACHIEV_COUNT; ++i)
+        m_bAchievCriteria[i] = false;
 }
 
 void instance_oculus::OnObjectCreate(GameObject* pGo)
 {
     switch(pGo->GetEntry())
     {
-        case GO_DRAGON_CAGE_DOOR:
-        case GO_EREGOS_CACHE:
-        case GO_EREGOS_CACHE_H:
-            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
+        case GO_DRAGON_CAGE_DOOR_1:
             break;
-       default:
+        case GO_DRAGON_CAGE_DOOR_2:
+            break;
+        case GO_DRAGON_CAGE_DOOR_3:
+            break;
+        default:
             return;
     }
+
+    m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
 }
 
 void instance_oculus::OnCreatureCreate(Creature* pCreature)
@@ -72,57 +78,64 @@ void instance_oculus::OnCreatureCreate(Creature* pCreature)
     {
         case NPC_VAROS:
             pCreature->SetActiveObjectState(true);
-            break;
-        case NPC_EREGOS:
-            if (GetData(TYPE_UROM) == DONE)
-                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            else
-                pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            break;
-        case NPC_UROM:
-            if (GetData(TYPE_VAROS) == DONE)
-                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            else
-                pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            break;
-        case NPC_DRAKOS:
-        case NPC_BELGARISTRASZ:
-        case NPC_VERDISA:
+        case NPC_TRIGGER:
         case NPC_ETERNOS:
+        case NPC_VERDISA:
+        case NPC_BELGAR:
+        case NPC_DRAKOS:
+        case NPC_UROM:
+        case NPC_EREGOS:
         case NPC_BALGAR_IMAGE:
-        case NPC_RUBY_DRAGON:
-        case NPC_EMERALD_DRAGON:
-        case NPC_AMBER_DRAGON:
+            m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
     }
-    m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
 }
 
-void instance_oculus::SetData(uint32 uiType, uint32 uiData)
+bool instance_oculus::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
 {
-    switch(uiType)
+    switch (uiCriteriaId)
+    {
+        case ACHIEV_CRITERIA_RUBY_VOID:
+            return m_bAchievCriteria[ACHIEV_RUBY_VOID];
+        case ACHIEV_CRITERIA_EMERALD_VOID:
+            return m_bAchievCriteria[ACHIEV_EMERALD_VOID];
+        case ACHIEV_CRITERIA_AMBER_VOID:
+            return m_bAchievCriteria[ACHIEV_AMBER_VOID];
+        default:
+            return false;
+    }
+}
+
+void instance_oculus::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
+{
+    if (uiType < ACHIEV_COUNT)
+        m_bAchievCriteria[uiType] = bIsMet;
+}
+
+void instance_oculus::SetData(uint32 type, uint32 data)
+{
+    switch(type)
     {
         case TYPE_DRAKOS:
+            m_auiEncounter[type] = data;
+            if (data == IN_PROGRESS)
+                DoStartTimedAchievement(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, ACHIEV_START_EREGOS_ID);
+            break;
         case TYPE_VAROS:
         case TYPE_UROM:
-            m_auiEncounter[uiType] = uiData;
+            m_auiEncounter[type] = data;
             break;
         case TYPE_EREGOS:
-            m_auiEncounter[uiType] = uiData;
-            if (uiData == DONE)
+            m_auiEncounter[type] = data;
+            if (data == DONE)
             {
-                if (GameObject* pChest = GetSingleGameObjectFromStorage(m_auiEregosCache))
-                {
-                    if (pChest && !pChest->isSpawned())
-                        pChest->SetRespawnTime(1*DAY);
-                }
-                /*DoRespawnGameObject(m_bIsRegularMode ? GO_EREGOS_CACHE : GO_EREGOS_CACHE_H, HOUR);
-                DoRespawnGameObject(GO_SPOTLIGHT, HOUR);*/
+                DoRespawnGameObject(m_bIsRegularMode ? GO_EREGOS_CACHE : GO_EREGOS_CACHE_H, HOUR);
+                DoRespawnGameObject(GO_SPOTLIGHT, HOUR);
             }
             break;
         case TYPE_ROBOTS:
-            m_auiEncounter[uiType] = m_auiEncounter[uiType] - uiData;
-            if(m_auiEncounter[uiType] == 0)
+            m_auiEncounter[type] = m_auiEncounter[type] - data;
+            if(m_auiEncounter[type] == 0)
             {
                 if(Creature* pVaros = GetSingleCreatureFromStorage(NPC_VAROS))
                 {
@@ -132,29 +145,20 @@ void instance_oculus::SetData(uint32 uiType, uint32 uiData)
                     pVaros->RemoveAurasDueToSpell(50053);
                 }
             }
-            uiData = NOT_STARTED;
+            data = NOT_STARTED;
             break;
         case TYPE_UROM_PHASE:
-            m_auiEncounter[uiType] = uiData;
-            uiData = NOT_STARTED;
+            m_auiEncounter[type] = data;
+            data = NOT_STARTED;
             break;
-        case TYPE_RUBY_VOID:
-            m_bRubyDrake = (uiData == FAIL);
-            break;
-        case TYPE_EMERALD_VOID:
-            m_bEmeraldDrake = (uiData == FAIL);
-            break;
-        case TYPE_AMBER_VOID:
-            m_bAmberDrake = (uiData == FAIL);
-            break;
+        default:
+            return;
     }
 
-    if (uiData == DONE)
+    if (data == DONE)
     {
         OUT_SAVE_INST_DATA;
-
         std::ostringstream saveStream;
-
         for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
             saveStream << m_auiEncounter[i] << " ";
 
@@ -165,9 +169,9 @@ void instance_oculus::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-uint32 instance_oculus::GetData(uint32 uiType)
+uint32 instance_oculus::GetData(uint32 type)
 {
-    switch(uiType)
+    switch(type)
     {
         case TYPE_DRAKOS:
         case TYPE_VAROS:
@@ -175,26 +179,16 @@ uint32 instance_oculus::GetData(uint32 uiType)
         case TYPE_EREGOS:
         case TYPE_ROBOTS:
         case TYPE_UROM_PHASE:
-            return m_auiEncounter[uiType];
+            return m_auiEncounter[type];
         default:
             return 0;
     }
     return 0;
 }
 
-bool instance_oculus::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1)
+const char* instance_oculus::Save()
 {
-    switch(uiCriteriaId)
-    {
-        /*case ACHIEV_CRITERIA_RUBY_VOID:
-            return !m_bRubyDrake;
-        case ACHIEV_CRITERIA_EMERALD_VOID:
-            return !m_bEmeraldDrake;
-        case ACHIEV_CRITERIA_AMBER_VOID:
-            return !m_bAmberDrake;*/
-        default:
-            return false;
-    }
+    return strSaveData.c_str();
 }
 
 void instance_oculus::Load(const char* chrIn)
@@ -206,7 +200,6 @@ void instance_oculus::Load(const char* chrIn)
     }
 
     OUT_LOAD_INST_DATA(chrIn);
-
     std::istringstream loadStream(chrIn);
 
     for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
@@ -228,11 +221,31 @@ InstanceData* GetInstanceData_instance_oculus(Map* pMap)
     return new instance_oculus(pMap);
 }
 
+/*### 
+# Oculus Orb 
+-####*/ 
+bool GOUse_go_oculus_portal(Player* pPlayer, GameObject* pGo) 
+{ 
+    switch(pGo->GetEntry()) 
+    {
+        case GO_ORB_OF_NEXUS: 
+            pPlayer->TeleportTo(571,3876.159912f,6984.439941f,106.32f,6.279f); 
+            return true; 
+    } 
+    return false; 
+}
+
+
 void AddSC_instance_oculus()
 {
-    Script *pNewScript;
-    pNewScript = new Script;
-    pNewScript->Name = "instance_oculus";
-    pNewScript->GetInstanceData = &GetInstanceData_instance_oculus;
-    pNewScript->RegisterSelf();
+    Script *newscript;
+    newscript = new Script;
+    newscript->Name = "instance_oculus";
+    newscript->GetInstanceData = &GetInstanceData_instance_oculus;
+    newscript->RegisterSelf();
+
+    newscript = new Script; 
+    newscript->Name = "go_oculus_portal"; 
+    newscript->pGOUse = GOUse_go_oculus_portal; 
+    newscript->RegisterSelf();
 }

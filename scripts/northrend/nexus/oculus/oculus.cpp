@@ -49,13 +49,13 @@ struct MANGOS_DLL_DECL mob_oculus_dragonAI : public ScriptedAI
         StartTimer = 2000;
         switch (m_creature->GetEntry())
         {
-            case NPC_EMERALD_DRAGON:
+            case NPC_GREEN_DRAGON:
                 seatSpell = SPELL_GREEN_SEAT;
                 break;
-            case NPC_RUBY_DRAGON:
+            case NPC_RED_DRAGON:
                 seatSpell = SPELL_RED_SEAT;
                 break;
-            case NPC_AMBER_DRAGON:
+            case NPC_YELLOW_DRAGON:
                 seatSpell = SPELL_YELLOW_SEAT;
                 break;
             default:
@@ -196,42 +196,22 @@ CreatureAI* GetAI_npc_belgar_image(Creature* pCreature)
     return new npc_belgar_imageAI (pCreature);
 }
 
-
-/*###
-# Oculus Orb
--####*/
-bool GOUse_go_oculus_portal(Player* pPlayer, GameObject* pGo)
-{
-    switch(pGo->GetEntry())
-    {
-        case GO_ORB_OF_NEXUS:
-            pPlayer->TeleportTo(571,3876.159912f,6984.439941f,106.32f,6.279f);
-            return true;
-    }
-    return false;
-}
-
 void AddSC_oculus()
 {
-    Script *pNewScript;
+    Script *newscript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "mob_oculus_dragon";
-    pNewScript->GetAI = &GetAI_mob_oculus_dragon;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_oculus_dragon";
+    newscript->GetAI = &GetAI_mob_oculus_dragon;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_oculus_robot";
-    pNewScript->GetAI = &GetAI_npc_oculus_robot;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "npc_oculus_robot";
+    newscript->GetAI = &GetAI_npc_oculus_robot;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_belgar_image";
-    pNewScript->GetAI = &GetAI_npc_belgar_image;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "go_oculus_portal";
-    pNewScript->pGOUse = GOUse_go_oculus_portal;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "npc_belgar_image";
+    newscript->GetAI = &GetAI_npc_belgar_image;
+    newscript->RegisterSelf();
 }

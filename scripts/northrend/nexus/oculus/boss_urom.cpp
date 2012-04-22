@@ -370,10 +370,10 @@ CreatureAI* GetAI_boss_urom(Creature* pCreature)
 
 void AddSC_boss_urom()
 {
-    Script *pNewScript;
+    Script *newscript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_urom";
-    pNewScript->GetAI = &GetAI_boss_urom;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_urom";
+    newscript->GetAI = &GetAI_boss_urom;
+    newscript->RegisterSelf();
 }
