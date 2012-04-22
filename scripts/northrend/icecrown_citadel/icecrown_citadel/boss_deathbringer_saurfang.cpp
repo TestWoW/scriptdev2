@@ -73,7 +73,6 @@ enum
 
 enum
 {
-<<<<<<< HEAD
         // Blood Power
         SPELL_BLOOD_POWER                       = 72371,
         SPELL_BLOOD_LINK_BEAST                  = 72176, // proc aura for Blood Beasts
@@ -117,51 +116,6 @@ enum
 
         //summons
         NPC_BLOOD_BEAST                         = 38508,
-=======
-    // Intro
-    SPELL_GRIP_OF_AGONY                     = 70572,
-
-    // Blood Power
-    SPELL_BLOOD_POWER                       = 72371,
-    SPELL_BLOOD_LINK_BEAST                  = 72176, // proc aura for Blood Beasts
-    SPELL_BLOOD_LINK                        = 72202, // cast on Saurfang to give 1 Blood Power
-
-    // Mark of the Fallen Champion
-    SPELL_MARK_OF_FALLEN_CHAMPION           = 72256, // proc on melee hit, dmg to marked targets
-    SPELL_MARK_OF_FALLEN_CHAMPION_DEBUFF    = 72293, // proc on death - heal Saurfang
-    SPELL_REMOVE_MARKS                      = 72257,
-
-    // Rune of Blood
-    SPELL_RUNE_OF_BLOOD                     = 72408, // cast on self on aggro
-    SPELL_RUNE_OF_BLOOD_DEBUFF              = 72410,
-
-    // Blood Nova
-    SPELL_BLOOD_NOVA                        = 72378,
-
-    // Boiling Blood
-    SPELL_BOILING_BLOOD                     = 72385,
-
-    // Blood Beasts
-    SPELL_CALL_BLOOD_BEAST_1                = 72172,
-    SPELL_CALL_BLOOD_BEAST_2                = 72173,
-    SPELL_CALL_BLOOD_BEAST_3                = 72356,
-    SPELL_CALL_BLOOD_BEAST_4                = 72357,
-    SPELL_CALL_BLOOD_BEAST_5                = 72358,
-
-    SPELL_SCENT_OF_BLOOD                    = 72769,
-    SPELL_SCENT_OF_BLOOD_TRIGGERED          = 72771, // doesn't trigger, so cast in script...
-    SPELL_RESISTANT_SKIN                    = 72723,
-
-    // enrage
-    SPELL_BERSERK                           = 26662,
-    SPELL_FRENZY                            = 72737,
-
-    //summons
-    NPC_BLOOD_BEAST                         = 38508,
-
-    // Achievements
-    SPELL_ACHIEVEMENT_CREDIT                = 72928,
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
 };
 
 enum Equipment
@@ -1369,12 +1323,10 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
 {
     boss_deathbringer_saurfangAI(Creature* pCreature) : boss_deathbringer_saurfang_eventAI(pCreature)
     {
-        m_pInstance = ((instance_icecrown_spire*)pCreature->GetInstanceData());
         m_powerBloodPower = m_creature->getPowerType(); // don't call this function multiple times in script
         ResetFight();
     }
 
-    instance_icecrown_spire* m_pInstance;
     uint32 m_uiRuneOfBloodTimer;
     uint32 m_uiBoilingBloodTimer;
     uint32 m_uiBloodNovaTimer;
@@ -1382,12 +1334,8 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     uint32 m_uiScentOfBloodTimer;
     uint32 m_uiFrenzyTimer;
     uint32 m_uiBerserkTimer;
-<<<<<<< HEAD
     uint32 m_uiCheckTimer;
     uint32 m_uiMarksCount;
-=======
-    uint32 m_uiMarkOfFallenCount;
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
 
     bool m_bAchievFailed;
 
@@ -1409,17 +1357,12 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
 
         DoCastSpellIfCan(m_creature, SPELL_REMOVE_MARKS, CAST_TRIGGERED);
         m_creature->SetPower(m_powerBloodPower, 0);
-        m_uiMarkOfFallenCount = 0;
     }
 
     void Aggro(Unit *pWho)
     {
         if (m_pInstance)
-        {
             m_pInstance->SetData(TYPE_SAURFANG, IN_PROGRESS);
-            m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_IVE_GONE_AND_MADE_A_MESS, true);
-            m_uiMarkOfFallenCount = 0;
-        }
 
         DoScriptText(SAY_AGGRO, m_creature);
 
@@ -1433,10 +1376,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     void JustReachedHome()
     {
         if (m_pInstance)
-        {
             m_pInstance->SetData(TYPE_SAURFANG, FAIL);
-            m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_IVE_GONE_AND_MADE_A_MESS, false);
-        }
 
         m_creature->SetPower(m_powerBloodPower, 0);
         m_uiMarksCount = 0;
@@ -1445,28 +1385,8 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
     // used for unlocking bugged encounter
     void JustDied(Unit *pKiller)
     {
-<<<<<<< HEAD
         if (m_pInstance && m_pInstance->GetData(TYPE_SAURFANG) != DONE)
             m_pInstance->SetData(TYPE_SAURFANG, DONE);
-=======
-        if (m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_SAURFANG, DONE);
-            if (m_uiMarkOfFallenCount > (m_bIs25Man ? 5: 3))
-                m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_IVE_GONE_AND_MADE_A_MESS, false);
-        }
-
-        m_creature->CastSpell(m_creature, SPELL_ACHIEVEMENT_CREDIT, false);
-
-        DoScriptText(SAY_DEATH, m_creature);
-        DoCastSpellIfCan(m_creature, SPELL_REMOVE_MARKS, CAST_TRIGGERED);
-
-        if (Creature *pTmp = m_creature->GetMap()->GetCreature(m_guidEventNpcGuid))
-        {
-            if (npc_highlord_saurfang_iccAI *pTmpAI = dynamic_cast<npc_highlord_saurfang_iccAI*>(pTmp->AI()))
-                pTmpAI->DoContinueEvent();
-        }
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
     }
 
     void KilledUnit(Unit* pVictim)
@@ -1563,16 +1483,11 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
                 {
                     m_creature->SetPower(m_powerBloodPower, 0); // reset Blood Power
                     // decrease the buff
-                    m_creature->RemoveAurasDueToSpell(SPELL_BLOOD_POWER);
+                    m_creature->RemoveAurasDueToSpell(72371);
                     int32 power = m_creature->GetPower(m_powerBloodPower);
-                    m_creature->CastCustomSpell(m_creature, SPELL_BLOOD_POWER, &power, &power, NULL, true);
+                    m_creature->CastCustomSpell(m_creature, 72371, &power, &power, NULL, true);
                     DoScriptText(SAY_FALLENCHAMPION, m_creature);
-<<<<<<< HEAD
                     ++m_uiMarksCount;
-=======
-                    // count mark for achievement
-                    m_uiMarkOfFallenCount;
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
                 }
             }
         }

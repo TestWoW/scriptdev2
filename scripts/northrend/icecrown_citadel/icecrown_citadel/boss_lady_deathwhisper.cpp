@@ -35,15 +35,7 @@ enum BossSpells
         SPELL_SHADOW_BOLT                       = 71254,
         SPELL_FROSTBOLT                         = 71420,
         SPELL_FROSTBOLT_VOLLEY                  = 72905,
-<<<<<<< HEAD
         SPELL_BLIND                             = 43433,
-=======
-
-        // Cult Adherents
-        NPC_CULT_ADHERENT                       = 37949,
-        NPC_REANIMATED_ADHERENT                 = 38010,
-        NPC_DEFORMED_FANATIC                    = 38135,
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
 
         SPELL_FROST_FEVER                       = 71129,
         SPELL_SHROUD_OF_THE_OCCULT              = 70768,
@@ -54,13 +46,6 @@ enum BossSpells
         SPELL_DARK_MARTYRDOM                    = 70897,
         SPELL_ADHERENTS_DETERMINATION           = 71234,
 
-<<<<<<< HEAD
-=======
-        // Cult Fanatic
-        NPC_CULT_FANATIC                        = 37890,
-        NPC_REANIMATED_FANATIC                  = 38009,
-
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
         SPELL_SHADOW_CLEAVE                     = 70670,
         SPELL_NECROTIC_STRIKE                   = 70659,
         SPELL_VAMPIRIC_MIGHT                    = 70674,
@@ -71,10 +56,6 @@ enum BossSpells
         NPC_VENGEFUL_SHADE                      = 38222,
         SPELL_VENGEFUL_BLAST_AURA               = 71494, // must proc on melee hit
 
-<<<<<<< HEAD
-=======
-        // Achievement
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
         SPELL_ACHIEVEMENT_CREDIT                = 72827,
 };
 
@@ -230,11 +211,8 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
 {
     boss_lady_deathwhisperAI(Creature* pCreature) : boss_lady_deathwhisper_eventAI(pCreature)
     {
-        m_pInstance = ((instance_icecrown_spire*)pCreature->GetInstanceData());
         Reset();
     }
-
-    instance_icecrown_spire* m_pInstance;
 
     bool m_bIsPhaseOne;
     uint32 m_uiManaBarrierCheckTimer;
@@ -252,7 +230,6 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
     uint32 m_uiVengefulShadeTimer;
     uint32 m_uiCheckTimer;
     uint32 m_uiMindControlCount;
-    std::list<Creature*> SummonsEntryList;
 
     void Reset()
     {
@@ -291,10 +268,7 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
     void Aggro(Unit *pWho)
     {
         if (m_pInstance)
-        {
             m_pInstance->SetData(TYPE_DEATHWHISPER, IN_PROGRESS);
-            m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_FULL_HOUSE, true);
-        }
 
         // make sure that the event will not continue in the fight
         m_bIsEventFinished = true;
@@ -306,15 +280,11 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
     void JustReachedHome()
     {
         if (m_pInstance)
-        {
             m_pInstance->SetData(TYPE_DEATHWHISPER, FAIL);
-            m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_FULL_HOUSE, false);
-        }
     }
 
     void JustDied(Unit *pKiller)
     {
-<<<<<<< HEAD
         if (!m_pInstance)
             return;
 
@@ -333,39 +303,6 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
                         pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEVEMENT_CREDIT, 0, 0);
                 }
             }
-        }
-=======
-        if (m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_DEATHWHISPER, DONE);
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e
-
-            // Find required NPC as achievement criteria
-            SummonsEntryList.clear();
-            GetCreatureListWithEntryInGrid(SummonsEntryList, m_creature, NPC_CULT_ADHERENT, 250.0f);
-            if (SummonsEntryList.empty())
-                m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_FULL_HOUSE, false);
-
-            SummonsEntryList.clear();
-            GetCreatureListWithEntryInGrid(SummonsEntryList, m_creature, NPC_CULT_FANATIC, 250.0f);
-            if (SummonsEntryList.empty())
-                m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_FULL_HOUSE, false);
-            SummonsEntryList.clear();
-            GetCreatureListWithEntryInGrid(SummonsEntryList, m_creature, NPC_REANIMATED_FANATIC, 250.0f);
-            if (SummonsEntryList.empty())
-                m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_FULL_HOUSE, false);
-
-            SummonsEntryList.clear();
-            GetCreatureListWithEntryInGrid(SummonsEntryList, m_creature, NPC_REANIMATED_ADHERENT, 250.0f);
-            if (SummonsEntryList.empty())
-                m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_FULL_HOUSE, false);
-
-            SummonsEntryList.clear();
-            GetCreatureListWithEntryInGrid(SummonsEntryList, m_creature, NPC_DEFORMED_FANATIC, 250.0f);
-            if (SummonsEntryList.empty())
-                m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_FULL_HOUSE, false);
-
-            m_pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_ACHIEVEMENT_CREDIT);
         }
 
         DoScriptText(SAY_DEATH, m_creature);
