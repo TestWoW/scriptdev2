@@ -462,24 +462,6 @@ struct MANGOS_DLL_DECL boss_acidmawAI : public ScriptedAI
             else
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_SPECIAL);
         }
-/*<<<<<<< HEAD
-
-        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
-        {
-            Map* pMap = m_creature->GetMap();
-            Map::PlayerList const& lPlayers = pMap->GetPlayers();
-
-            if (!lPlayers.isEmpty())
-            {
-                for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                {
-                    if (Player* pPlayer = itr->getSource())
-                        pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_CHECK_ACHIEV, 0, 0);
-                }
-            }
-        }
-=======
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e*/
     }
 
     void JustReachedHome()
@@ -684,24 +666,6 @@ struct MANGOS_DLL_DECL boss_dreadscaleAI : public ScriptedAI
             else 
                 m_pInstance->SetData(TYPE_NORTHREND_BEASTS, SNAKES_SPECIAL);
         }
-/*<<<<<<< HEAD
-
-        if (m_pInstance->GetData(TYPE_NORTHREND_BEASTS) == SNAKES_SPECIAL && !m_bAchievFailed)
-        {
-            Map* pMap = m_creature->GetMap();
-            Map::PlayerList const& lPlayers = pMap->GetPlayers();
-
-            if (!lPlayers.isEmpty())
-            {
-                for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-                {
-                    if (Player* pPlayer = itr->getSource())
-                        pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_CHECK_ACHIEV, 0, 0);
-                }
-            }
-        }
-=======
->>>>>>> 646140f9a30397c365fa502673f52897c3be977e*/
     }
 
     void JustReachedHome()
