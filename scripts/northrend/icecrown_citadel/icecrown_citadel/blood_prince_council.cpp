@@ -492,12 +492,14 @@ struct MANGOS_DLL_DECL boss_valanar_iccAI : public base_blood_prince_council_bos
     }
 
     uint32 m_uiVortexTimer;
+    uint32 dietempfix;
 
     void Reset()
     {
         base_blood_prince_council_bossAI::Reset();
 
         m_uiVortexTimer = urand(5000, 10000);
+        dietempfix = 0;
     }
 
     void Aggro(Unit *pWho)
@@ -527,12 +529,19 @@ struct MANGOS_DLL_DECL boss_valanar_iccAI : public base_blood_prince_council_bos
 
     void JustDied(Unit *pKiller)
     {
-        base_blood_prince_council_bossAI::JustDied(pKiller);
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_BLOOD_COUNCIL, DONE);
-
-        DoScriptText(SAY_VALANAR_DEATH, m_creature);
+        if(dietempfix < 2 * MINUTE * IN_MILLISECONDS)
+        {
+            m_pInstance->GetSingleCreatureFromStorage(NPC_VALANAR)->Respawn();
+            Reset();
+        }
+        else
+        {
+            base_blood_prince_council_bossAI::JustDied(pKiller);
+            if (m_pInstance)
+                m_pInstance->SetData(TYPE_BLOOD_COUNCIL, DONE);
+            DoScriptText(SAY_VALANAR_DEATH, m_creature);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -572,6 +581,8 @@ struct MANGOS_DLL_DECL boss_valanar_iccAI : public base_blood_prince_council_bos
             m_uiVortexTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
+    
+        dietempfix += uiDiff;
     }
 };
 
@@ -592,6 +603,7 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
 
     uint32 m_uiShadowLanceTimer;
     bool m_bHasCastShadowPrison;
+    uint32 dietempfix;
 
     void Reset()
     {
@@ -599,6 +611,8 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
 
         m_bHasCastShadowPrison = false;
         m_uiShadowLanceTimer = 8000;
+
+        dietempfix = 0;
     }
 
     void KilledUnit(Unit *pVictim)
@@ -609,9 +623,17 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
 
     void JustDied(Unit *pKiller)
     {
-        base_blood_prince_council_bossAI::JustDied(pKiller);
+        if(dietempfix < 2 * MINUTE * IN_MILLISECONDS)
+        {
+            m_pInstance->GetSingleCreatureFromStorage(NPC_KELESETH)->Respawn();
+            Reset();
+        }
+        else
+        {
+            base_blood_prince_council_bossAI::JustDied(pKiller);
 
-        DoScriptText(SAY_KELESETH_DEATH, m_creature);
+            DoScriptText(SAY_KELESETH_DEATH, m_creature);
+        }
     }
 
     void JustSummoned(Creature *pSummoned)
@@ -660,6 +682,8 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
         }
         else
             m_uiShadowLanceTimer -= uiDiff;
+
+        dietempfix += uiDiff;
     }
 };
 
@@ -680,11 +704,15 @@ struct MANGOS_DLL_DECL boss_taldaram_iccAI : public base_blood_prince_council_bo
 
     uint32 m_uiSparksTimer;
 
+    uint32 dietempfix;
+
     void Reset()
     {
         base_blood_prince_council_bossAI::Reset();
 
         m_uiSparksTimer = urand(8000, 15000);
+
+        dietempfix = 0;
     }
 
     void KilledUnit(Unit *pVictim)
@@ -695,9 +723,17 @@ struct MANGOS_DLL_DECL boss_taldaram_iccAI : public base_blood_prince_council_bo
 
     void JustDied(Unit *pKiller)
     {
-        base_blood_prince_council_bossAI::JustDied(pKiller);
+        if(dietempfix < 2 * MINUTE * IN_MILLISECONDS)
+        {
+            m_pInstance->GetSingleCreatureFromStorage(NPC_TALDARAM)->Respawn();
+            Reset();
+        }
+        else
+        {
+            base_blood_prince_council_bossAI::JustDied(pKiller);
 
-        DoScriptText(SAY_TALDARAM_DEATH, m_creature);
+            DoScriptText(SAY_TALDARAM_DEATH, m_creature);
+        }
     }
 
     void JustSummoned(Creature *pSummoned)
@@ -739,6 +775,8 @@ struct MANGOS_DLL_DECL boss_taldaram_iccAI : public base_blood_prince_council_bo
             m_uiSparksTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
+
+        dietempfix += uiDiff;
     }
 };
 
