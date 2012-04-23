@@ -100,6 +100,9 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
     {
         if (!m_pInstance)
             return;
+            
+        if (m_bIsHeroic) // Temporal disable
+            return;
 
         if (DelayTimer < diff)
         {
