@@ -130,7 +130,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
     {
         m_uiSlimeSprayTimer = urand(17000, 23000);
         m_uiVileGasTimer = 20000;
-        m_uiMutatedInfectionTimer = 50000;
+        m_uiMutatedInfectionTimer = 100000;
         m_uiInfectionsRate = 1;
         m_uiSlimeFlowTimer = 20000;
         m_uiBerserkTimer = 10 * MINUTE * IN_MILLISECONDS;
@@ -230,7 +230,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
             {
                 if (DoCastSpellIfCan(m_creature, uiMutatedInfections[m_uiInfectionsRate], CAST_TRIGGERED) == CAST_OK)
                 {
-                    m_uiMutatedInfectionTimer = 50000;
+                    m_uiMutatedInfectionTimer = 100000;
                     ++m_uiInfectionsRate;
                 }
             }
