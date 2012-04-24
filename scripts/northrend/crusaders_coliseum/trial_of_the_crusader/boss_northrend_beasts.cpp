@@ -92,6 +92,7 @@ enum BossSpells
     SPELL_ADRENALINE            = 68667,
     SPELL_FROTHING_RAGE         = 66759,
     SPELL_STAGGERED_DAZE        = 66758,
+    SPELL_BERSERK               = 26662,
 };
 
 enum Models
@@ -294,7 +295,7 @@ struct MANGOS_DLL_DECL mob_snobold_vassalAI : public ScriptedAI
         m_uiHeadCrackTimer      = urand(10000, 30000);
 
         m_creature->SetInCombatWithZone();
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
     }
 
     void Aggro(Unit *pWho)
@@ -884,6 +885,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     uint32 m_uiWhirlTimer;
     uint32 m_uiMassiveCrashTimer;
     uint32 m_uiWaitTimer;
+    uint32 m_uiEnrageTimer;
     uint32 m_uiPhaseTimer;
     uint32 m_uiPhase;
 
@@ -901,6 +903,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
         m_uiArcticBreathTimer          = 25000;
         m_uiWhirlTimer                 = 20000;
         m_uiMassiveCrashTimer          = 30000;
+        m_uiEnrageTimer                = 3 * MINUTE* IN_MILLISECONDS;
         m_uiPhase                      = PHASE_NORMAL;
 
         m_creature->SetRespawnDelay(7*DAY);
@@ -951,15 +954,21 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
 
                 if (m_creature->getVictim())
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                m_creature->SetSpeedRate(MOVE_WALK, 3.0f);
-                m_creature->SetSpeedRate(MOVE_RUN, 3.0f);
+                m_creature->SetSpeedRate(MOVE_WALK, 2.5f);
+                m_creature->SetSpeedRate(MOVE_RUN, 2.5f);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 SetCombatMovement(true);
                 m_uiPhase = PHASE_NORMAL;
                 pFocus = NULL;
             }
         }
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
+
+    /*void SpellHitTarget(Unit *pTarget, SpellEntry *pSpell)
+    {
+        if (pSpell->Id == SPELL_TRAMPLE)
+            DoCastSpellIfCan(m_creature, SPELL_FROTHING_RAGE, CAST_TRIGGERED);
+    }*/
 
     Unit* SelectTargetForCharge()
     {
@@ -1026,6 +1035,14 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (m_uiEnrageTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                m_uiEnrageTimer = 3 * MINUTE * IN_MILLISECONDS;
+        }
+        else
+            m_uiEnrageTimer -= uiDiff;
 
         switch (m_uiPhase)
         {

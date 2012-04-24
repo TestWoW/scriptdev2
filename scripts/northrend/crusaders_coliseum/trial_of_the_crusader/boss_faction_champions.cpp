@@ -244,7 +244,7 @@ struct MANGOS_DLL_DECL boss_faction_championsAI : public BSWScriptedAI
         m_uiChangeTargetTimer = 6000;
         resetTimers();
         m_uiInsygniaTimer = urand(30*IN_MILLISECONDS, 60*IN_MILLISECONDS);
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
     }
 
     void Reset()

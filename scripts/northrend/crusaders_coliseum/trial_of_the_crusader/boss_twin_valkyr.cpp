@@ -680,7 +680,7 @@ struct MANGOS_DLL_DECL mob_light_essenceAI : public ScriptedAI
 
     void Reset() 
     {
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetWalk(true);
         SetCombatMovement(false);
     }
@@ -741,7 +741,7 @@ struct MANGOS_DLL_DECL mob_dark_essenceAI : public ScriptedAI
 
     void Reset() 
     {
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetWalk(true);
         SetCombatMovement(false);
     }

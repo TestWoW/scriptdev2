@@ -128,7 +128,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         m_uiNetherPortalTimer       = 20000;
         m_uiEnrageTimer             = 600000;
 
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
 
         mistressEntryList.clear();
     }
@@ -159,7 +159,7 @@ struct MANGOS_DLL_DECL boss_jaraxxusAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         m_pInstance->SetData(TYPE_JARAXXUS, DONE);
         m_pInstance->SetData(TYPE_EVENT,1999);
-        m_pInstance->SetData(TYPE_STAGE,0);
+        m_pInstance->SetData(TYPE_STAGE, STAGE_WAITING);
     }
 
     void Aggro(Unit* pWho)
@@ -298,7 +298,7 @@ struct MANGOS_DLL_DECL mob_legion_flameAI : public ScriptedAI
 
         m_creature->_AddAura(SPELL_LEGION_FLAME_AURA);
         m_creature->ForcedDespawn(60000);
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -399,7 +399,7 @@ struct MANGOS_DLL_DECL mob_fel_infernalAI : public ScriptedAI
         m_uiFelStreakTimer       = 20000,
 
         m_creature->SetInCombatWithZone();
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -477,7 +477,7 @@ struct MANGOS_DLL_DECL mob_nether_portalAI : public ScriptedAI
     void Reset()
     {
         m_creature->SetInCombatWithZone();
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
         SetCombatMovement(false);
 
         m_uiSummonMistressTimer = 18000;
@@ -536,7 +536,7 @@ struct MANGOS_DLL_DECL mob_mistress_of_painAI : public ScriptedAI
     void Reset()
     {
         m_creature->SetInCombatWithZone();
-        m_creature->SetRespawnDelay(DAY);
+        m_creature->SetRespawnDelay(7*DAY);
 
         m_uiShivanSlashTimer       = 10000;
         m_uiSpinningStrikeTimer    = 5000;

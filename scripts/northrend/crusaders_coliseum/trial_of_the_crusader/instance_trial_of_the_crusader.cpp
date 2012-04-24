@@ -43,7 +43,7 @@ void instance_trial_of_the_crusader::Initialize()
     SetSpecialAchievementCriteria(TYPE_INSANITY, true);
     SetSpecialAchievementCriteria(TYPE_IMMORTALITY, true);
 
-    m_auiEncounter[TYPE_STAGE] = 0;
+    m_auiEncounter[TYPE_STAGE] = STAGE_WAITING;
     m_auiEncounter[TYPE_COUNTER] = 50;
     m_auiEncounter[TYPE_DEATHS] = 0;
     m_auiEncounter[TYPE_EVENT] = 0;
@@ -399,16 +399,16 @@ uint32 instance_trial_of_the_crusader::GetData(uint32 uiType)
 {
     switch(uiType)
     {
-        case TYPE_STAGE:                return m_auiEncounter[0];
-        case TYPE_BEASTS:               return m_auiEncounter[1];
-        case TYPE_JARAXXUS:             return m_auiEncounter[2];
-        case TYPE_CRUSADERS:            return m_auiEncounter[3];
-        case TYPE_VALKIRIES:            return m_auiEncounter[4];
-        case TYPE_LICH_KING:            return m_auiEncounter[5];
-        case TYPE_ANUBARAK:             return m_auiEncounter[6];
-        case TYPE_COUNTER:              return m_auiEncounter[7];
-        case TYPE_DEATHS:               return m_auiEncounter[8];
-        case TYPE_EVENT:                return m_auiEncounter[9];
+        case TYPE_STAGE:                return m_auiEncounter[TYPE_STAGE];
+        case TYPE_BEASTS:               return m_auiEncounter[TYPE_BEASTS];
+        case TYPE_JARAXXUS:             return m_auiEncounter[TYPE_JARAXXUS];
+        case TYPE_CRUSADERS:            return m_auiEncounter[TYPE_CRUSADERS];
+        case TYPE_VALKIRIES:            return m_auiEncounter[TYPE_VALKIRIES];
+        case TYPE_LICH_KING:            return m_auiEncounter[TYPE_LICH_KING];
+        case TYPE_ANUBARAK:             return m_auiEncounter[TYPE_ANUBARAK];
+        case TYPE_COUNTER:              return m_auiEncounter[TYPE_COUNTER];
+        case TYPE_DEATHS:               return m_auiEncounter[TYPE_DEATHS];
+        case TYPE_EVENT:                return m_auiEncounter[TYPE_EVENT];
         case TYPE_DIFFICULTY:           return Difficulty;
         case TYPE_NORTHREND_BEASTS:     return m_auiNorthrendBeasts;
         case TYPE_EVENT_TIMER:          return m_auiEventTimer;
@@ -529,7 +529,7 @@ void instance_trial_of_the_crusader::Load(const char* strIn)
             m_auiEncounter[i] = NOT_STARTED;
     }
     m_auiEncounter[TYPE_EVENT] = 0;
-    m_auiEncounter[TYPE_STAGE] = 0;
+    m_auiEncounter[TYPE_STAGE] = STAGE_WAITING;
     SetData(TYPE_DEATHS, m_auiEncounter[TYPE_DEATHS]);  // Refresh achievement criteria
 
     OUT_LOAD_INST_DATA_COMPLETE;

@@ -33,6 +33,17 @@ enum
     TYPE_EVENT                  = 9,
     MAX_ENCOUNTERS              = 10,
 
+    STAGE_WAITING               = 0,
+    STAGE_GORMOK                = 1,
+    STAGE_SNAKES                = 2,
+    STAGE_ICEHOWL               = 3,
+    STAGE_JARAXXUS              = 4,
+    STAGE_CRUSADERS             = 5,
+    STAGE_VALKYRS               = 6,
+    STAGE_KING                  = 7,
+    STAGE_ANUB                  = 8,
+    STAGE_FINISH                = 9,
+
     TYPE_UPPER_BACK_PAIN        = 0,
     TYPE_THREE_SIXTY_PAIN_SPIKE = 1,
     TYPE_SKILL                  = 2,
