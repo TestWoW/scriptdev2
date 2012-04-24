@@ -62,7 +62,7 @@ struct MANGOS_DLL_DECL npc_cs_gnoulAI : public ScriptedAI
 
    void MoveToPoint(float X, float Y, float Z)
    {
-       m_creature->GetMotionMaster()->MovementExpired(false);
+       m_creature->GetMotionMaster()->Clear();
        m_creature->GetMotionMaster()->MovePoint(0, X, Y, Z);
    }
 
@@ -250,7 +250,7 @@ struct MANGOS_DLL_DECL npc_cs_necromancerAI : public ScriptedAI
 
    void MoveToPoint(float X, float Y, float Z)
    {
-       m_creature->GetMotionMaster()->MovementExpired(false);
+       m_creature->GetMotionMaster()->Clear();
        m_creature->GetMotionMaster()->MovePoint(0, X, Y, Z);
    }
 
@@ -438,7 +438,7 @@ struct MANGOS_DLL_DECL npc_cs_fieldAI : public ScriptedAI
 
    void MoveToPoint(float X, float Y, float Z)
    {
-       m_creature->GetMotionMaster()->MovementExpired(false);
+       m_creature->GetMotionMaster()->Clear();
        m_creature->GetMotionMaster()->MovePoint(0, X, Y, Z);
    }
 
@@ -636,7 +636,7 @@ struct MANGOS_DLL_DECL npc_cs_acolyteAI : public ScriptedAI
 
    void MoveToPoint(float X, float Y, float Z)
    {
-       m_creature->GetMotionMaster()->MovementExpired(false);
+       m_creature->GetMotionMaster()->Clear();
        m_creature->GetMotionMaster()->MovePoint(0, X, Y, Z);
    }
 
@@ -842,7 +842,7 @@ struct MANGOS_DLL_DECL npc_cs_butcherAI : public ScriptedAI
 
    void MoveToPoint(float X, float Y, float Z)
    {
-       m_creature->GetMotionMaster()->MovementExpired(false);
+       m_creature->GetMotionMaster()->Clear();
        m_creature->GetMotionMaster()->MovePoint(0, X, Y, Z);
    }
 
@@ -1010,11 +1010,14 @@ struct MANGOS_DLL_DECL npc_time_riftCSAI : public ScriptedAI
               if (Creature* pArthas = m_pInstance->GetSingleCreatureFromStorage(NPC_ARTHAS))
               {
                  Drakonian01 = m_creature->SummonCreature(NPC_INFINITE_ADVERSARY,(m_creature->GetPositionX()-2)+rand()%4, (m_creature->GetPositionY()-2)+rand()%4, m_creature->GetPositionZ(),3.229f,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,900000);
-                 Drakonian01->GetMotionMaster()->MovePoint(0, pArthas->GetPositionX(), pArthas->GetPositionY(), pArthas->GetPositionZ());
+                 if (Drakonian01)
+                    Drakonian01->GetMotionMaster()->MovePoint(0, pArthas->GetPositionX(), pArthas->GetPositionY(), pArthas->GetPositionZ());
                  Drakonian02 = m_creature->SummonCreature(NPC_INFINITE_HUNTER,(m_creature->GetPositionX()-2)+rand()%4, (m_creature->GetPositionY()-2)+rand()%4, m_creature->GetPositionZ(),3.229f,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,900000);
-                 Drakonian02->GetMotionMaster()->MovePoint(0, pArthas->GetPositionX(), pArthas->GetPositionY(), pArthas->GetPositionZ());
+                 if (Drakonian02)
+                     Drakonian02->GetMotionMaster()->MovePoint(0, pArthas->GetPositionX(), pArthas->GetPositionY(), pArthas->GetPositionZ());
                  Drakonian03 = m_creature->SummonCreature(NPC_INFINITE_AGENT,(m_creature->GetPositionX()-2)+rand()%4, (m_creature->GetPositionY()-2)+rand()%4, m_creature->GetPositionZ(),3.229f,TEMPSUMMON_TIMED_OR_DEAD_DESPAWN,900000);
-                 Drakonian03->GetMotionMaster()->MovePoint(0, pArthas->GetPositionX(), pArthas->GetPositionY(), pArthas->GetPositionZ());
+                 if (Drakonian03)
+                     Drakonian03->GetMotionMaster()->MovePoint(0, pArthas->GetPositionX(), pArthas->GetPositionY(), pArthas->GetPositionZ());
               }
               m_uiStepTimer = 3000;
               Step++;

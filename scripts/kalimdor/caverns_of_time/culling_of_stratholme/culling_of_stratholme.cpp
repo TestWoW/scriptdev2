@@ -282,6 +282,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
 
         if (m_pInstance->GetData(TYPE_PHASE) > 2 && m_pInstance->GetData(TYPE_PHASE) < 5)
         {
+            m_creature->GetMotionMaster()->Clear();
             m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, Last5X, Last5Y, Last5Z);
         }
     }
@@ -473,6 +474,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 m_creature->SetWalk(true);
                 DoScriptText(SAY_INTRO03, m_creature);
                 m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 1908.334f, 1315.354f, 149.551f);
                 if (Creature* pUther = m_pInstance->GetSingleCreatureFromStorage(NPC_UTHER))
                     pUther->GetMotionMaster()->MovePoint(0, 1903.600f, 1296.678f, 143.383f);
@@ -579,6 +581,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 JumpNextStep(4000);
                 break;
             case 1:
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2087.689f,1280.344f,140.73f);
                 DoScriptText(SAY_ENTER03, m_creature);
                 JumpNextStep(3000);
@@ -597,6 +600,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                     DoScriptText(SAY_ENTER05, pCrazyman);
                     pCrazyman->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
                     m_creature->SetGuidValue(UNIT_FIELD_TARGET, pCrazyman->GetObjectGuid());
+                    m_creature->GetMotionMaster()->Clear();
                     m_creature->GetMotionMaster()->MovePoint(0, 2092.154f,1276.645f,140.52f);
                 }
                 JumpNextStep(3000);
@@ -612,6 +616,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 break;
             case 6:
                 m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2091.179f,1278.065f,140.476f);
                 DoScriptText(SAY_ENTER06, m_creature);
                 JumpNextStep(3000);
@@ -648,10 +653,12 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 JumpNextStep(12000);
                 break;
             case 12:
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2084.584f,1278.331f,141.479f);
                 JumpNextStep(4000);
                 break;
             case 13:
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2087.414f,1279.293f,140.933f);
                 JumpNextStep(2000);
                 break;
@@ -765,6 +772,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 break;
             case 1:
                 DoScriptText(SAY_PHASE504, m_creature);
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2396.035f, 1206.942f, 134.038f);
                 JumpNextStep(3000);
                 break;
@@ -796,6 +804,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 break;
             case 6:
               SetRun(true);
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 2384.320f, 1202.779f, 134.040f);
               DoScriptText(SAY_PHASE507, m_creature);
               JumpNextStep(5000);
@@ -836,7 +845,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                {
                    DoScriptText(SAY_EPOCH_AGGRO, pEpoch);
                    m_creature->AI()->AttackStart(pEpoch);
-                   //pEpoch->AI()->AttackStart(m_creature);
+                   pEpoch->AI()->AttackStart(m_creature);
                    pEpoch->setFaction(14);
                }
                m_pInstance->SetData(TYPE_PHASE, 5);
@@ -855,11 +864,13 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
          {
              case 0:
                 m_creature->setFaction(35);
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2302.326f, 1491.386f, 128.362f);
                 if (Creature* pMalganis = m_pInstance->GetSingleCreatureFromStorage(NPC_MALGANIS))
                 {
                   DoScriptText(SAY_MALGANIS_ESCAPE01, Malganis);
                   pMalganis->InterruptNonMeleeSpells(false);
+                  pMalganis->GetMotionMaster()->Clear();
                   pMalganis->GetMotionMaster()->MovePoint(0, 2296.665f,1502.362f,128.362f);
                   m_creature->SetGuidValue(UNIT_FIELD_TARGET, Malganis->GetObjectGuid());
                   pMalganis->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
@@ -884,6 +895,7 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 if (Creature* pMalganis = m_pInstance->GetSingleCreatureFromStorage(NPC_MALGANIS))
                 {
                    Malganis->SetVisibility(VISIBILITY_OFF);
+                   m_creature->GetMotionMaster()->Clear();
                    m_creature->GetMotionMaster()->MovePoint(0, pMalganis->GetPositionX(), pMalganis->GetPositionY(), pMalganis->GetPositionZ());
                 }
                 m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
@@ -895,11 +907,13 @@ struct MANGOS_DLL_DECL npc_arthasAI : public npc_escortAI
                 JumpNextStep(6000);
                 break;
             case 6:
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2298.298f,1500.362f,128.362f);
                 DoScriptText(SAY_ARTHAS_OUTRO03, m_creature);
                 JumpNextStep(11000);
                 break;
             case 7:
+                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MovePoint(0, 2243.311f, 1476.025f, 132.352f);
 
                 if (!PlayerList.isEmpty())
@@ -1099,6 +1113,7 @@ struct MANGOS_DLL_DECL npc_utherAI : public npc_escortAI
                 {
                     pArthas->SetWalk(false);
                     pArthas->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
+                    pArthas->GetMotionMaster()->Clear();
                     pArthas->GetMotionMaster()->MovePoint(0, 1902.974f, 1291.635f, 143.337f);
                 }
                 break;
@@ -1468,6 +1483,7 @@ struct MANGOS_DLL_DECL npc_arthas_marineAI : public ScriptedAI
       m_creature->LoadCreatureAddon();
 
       m_creature->SetLootRecipient(NULL);
+      m_creature->GetMotionMaster()->Clear();
 
       if (m_creature->GetEntry() == NPC_MARINE_1)
           m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, Last1X, Last1Y, Last1Z);
@@ -1627,6 +1643,7 @@ uint32 m_uiStepTimer;
         m_creature->UpdateGroundPositionZ(fx, fy, fz);
 
         m_creature->SetWalk(false);
+        m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MovePoint(0, fx, fy, fz);
    }
 

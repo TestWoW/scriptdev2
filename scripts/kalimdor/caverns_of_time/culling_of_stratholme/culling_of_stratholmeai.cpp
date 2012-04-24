@@ -158,6 +158,7 @@ struct MANGOS_DLL_DECL npc_mikeAI : public ScriptedAI
               m_uiStepTimer = 5000;
               break;
            case 6:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1554.849f, 588.465f, 99.775f);
               m_uiStepTimer = 3000;
               break;
@@ -189,6 +190,7 @@ struct MANGOS_DLL_DECL npc_mikeAI : public ScriptedAI
            case 12:
               if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_MAL_CORICS))
                  DoScriptText(SAY_CORICKS08, pTemp);
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1549.609f, 575.544f, 100.052f);
               m_uiStepTimer = 2000;
               break;
@@ -278,14 +280,17 @@ struct MANGOS_DLL_DECL npc_rogerAI : public ScriptedAI
               m_uiStepTimer = 7000;
               break;
            case 1:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1590.055f, 615.727f, 99.795f);
               m_uiStepTimer = 6900;
               break;
            case 2:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1584.039f, 622.049f, 99.907f);
               m_uiStepTimer = 3900;
               break;
            case 3:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1578.787f, 623.924f, 99.855f);
               m_uiStepTimer = 2500;
               break;
@@ -294,6 +299,7 @@ struct MANGOS_DLL_DECL npc_rogerAI : public ScriptedAI
               m_uiStepTimer = 6000;
               break;
            case 5:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1579.393f, 624.018f, 99.886f);
               m_uiStepTimer = 2000;
               break;
@@ -302,6 +308,7 @@ struct MANGOS_DLL_DECL npc_rogerAI : public ScriptedAI
               m_uiStepTimer = 6000;
               break;
            case 7:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1579.387f, 623.198f, 99.837f);
               m_uiStepTimer = 1000;
               break;
@@ -310,10 +317,12 @@ struct MANGOS_DLL_DECL npc_rogerAI : public ScriptedAI
               m_uiStepTimer = 4000;
               break;
            case 9:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1575.576f, 619.935f, 99.422f);
               m_uiStepTimer = 2000;
               break;
            case 10:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1575.833f, 620.471f, 99.466f);
               m_uiStepTimer = 1000;
               break;
@@ -322,14 +331,17 @@ struct MANGOS_DLL_DECL npc_rogerAI : public ScriptedAI
               m_uiStepTimer = 6000;
               break;
            case 12:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1580.215f, 624.368f, 99.924f);
               m_uiStepTimer = 1900;
               break;
            case 13:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1587.471f, 618.181f, 99.850f);
               m_uiStepTimer = 3900;
               break;
            case 14:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1592.646f, 590.888f, 99.151f);
               m_uiStepTimer = 13000;
               break;
@@ -415,22 +427,27 @@ struct MANGOS_DLL_DECL npc_moriganAI : public ScriptedAI
               m_uiStepTimer = 2000;
               break;
            case 2:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1564.138f, 668.343f, 102.058f);
               m_uiStepTimer = 2000;
               break;
            case 3:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1567.956f, 667.776f, 102.094f);
               m_uiStepTimer = 1500;
               break;
            case 4:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1569.615f, 668.859f, 102.180f);
               m_uiStepTimer = 2000;
               break;
            case 5:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
               m_uiStepTimer = 1000;
               break;
            case 6:
+              m_creature->GetMotionMaster()->Clear();
               DoScriptText(SAY_MORIGAN03, m_creature);
               m_uiStepTimer = 3000;
               break;
@@ -465,14 +482,17 @@ struct MANGOS_DLL_DECL npc_moriganAI : public ScriptedAI
               m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
               if(Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_PERELLI))
                  pTemp->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1576.119f, 657.675f, 102.09f);
               m_uiStepTimer = 4900;
               break;
            case 13:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1586.040f, 646.113f, 100.910f);
               m_uiStepTimer = 5900;
               break;
            case 14:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1609.189f, 697.134f, 106.902f);
               m_uiStepTimer = 24900;
               break;
@@ -548,18 +568,22 @@ struct MANGOS_DLL_DECL npc_jenaAI : public ScriptedAI
         switch(m_uiStep)
         {
            case 0:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1605.546f, 744.869f, 114.731f);
               m_uiStepTimer = 1900;
               break;
            case 1:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1614.967f, 743.673f, 114.063f);
               m_uiStepTimer = 4900;
               break;
            case 2:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1623.848f, 729.251f, 112.410f);
               m_uiStepTimer = 6900;
               break;
            case 3:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1633.460f, 726.261f, 113.518f);
               m_uiStepTimer = 4000;
               break;
@@ -573,6 +597,7 @@ struct MANGOS_DLL_DECL npc_jenaAI : public ScriptedAI
               if(Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_MARTHA))
               {
                  pTemp->RemoveAurasDueToSpell(58925);
+                 pTemp->GetMotionMaster()->Clear();
                  pTemp->GetMotionMaster()->MovePoint(0, 1635.918f, 724.357f, 113.561f);
               }
               m_uiStepTimer = 1000;
@@ -580,6 +605,7 @@ struct MANGOS_DLL_DECL npc_jenaAI : public ScriptedAI
            case 6:
               if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_MARTHA))
               {
+                 pTemp->GetMotionMaster()->Clear();
                  pTemp->GetMotionMaster()->MovePoint(0, 1636.721f, 725.88f, 113.561f);
                  pTemp->SetGuidValue(UNIT_FIELD_TARGET, m_creature->GetObjectGuid());
               }
@@ -596,6 +622,7 @@ struct MANGOS_DLL_DECL npc_jenaAI : public ScriptedAI
               break;
            case 9:
               m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1629.278f, 727.894f, 112.636f);
               m_uiStepTimer = 1500;
               break;
@@ -606,6 +633,7 @@ struct MANGOS_DLL_DECL npc_jenaAI : public ScriptedAI
                  pTemp->GetMap()->CreatureRelocation(pTemp, 1640.089f, 725.766f, 113.561f, 4.77f);
                  pTemp->GetMotionMaster()->MovePoint(0,1640.089f, 725.766f, 113.561f);
               }
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1629.452f, 729.416f, 112.712f);
               m_uiStepTimer = 1000;
               break;
@@ -638,14 +666,17 @@ struct MANGOS_DLL_DECL npc_jenaAI : public ScriptedAI
                  pTemp->GetMotionMaster()->MovePoint(0, 1638.196f, 726.171f, 113.561f);
               }
               m_creature->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid());
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1615.590f, 719.509f, 110.311f);
               m_uiStepTimer = 2000;
               break;
            case 16:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1596.436f, 670.809f, 103.747f);
               m_uiStepTimer = 6900;
               break;
            case 17:
+              m_creature->GetMotionMaster()->Clear();
               m_creature->GetMotionMaster()->MovePoint(0, 1571.549f, 609.837f, 99.767f);
               m_uiStepTimer = 11000;
               break;
