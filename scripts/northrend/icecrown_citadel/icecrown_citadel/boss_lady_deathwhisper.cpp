@@ -416,14 +416,6 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
         else
             m_uiBerserkTimer -= uiDiff;
 
-        /*if (m_uiCheckTimer < uiDiff)
-        {
-            CheckAchiev();
-            m_uiCheckTimer = 1000;
-        }
-        else
-            m_uiCheckTimer -= uiDiff;*/
-
         if (m_uiDeathAndDecayTimer <= uiDiff)
         {
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
@@ -508,15 +500,14 @@ struct MANGOS_DLL_DECL boss_lady_deathwhisperAI : public boss_lady_deathwhisper_
                 }
                 else
                     m_uiSummonWaveTimer -= uiDiff;
-
-                if (m_uiFrostboltVolleyTimer <= uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_FROSTBOLT_VOLLEY) == CAST_OK)
-                        m_uiFrostboltVolleyTimer = urand(15000, 20000);
-                }
-                else
-                    m_uiFrostboltVolleyTimer -= uiDiff;
             }
+            if (m_uiFrostboltVolleyTimer <= uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_FROSTBOLT_VOLLEY) == CAST_OK)
+                    m_uiFrostboltVolleyTimer = urand(15000, 20000);
+            }
+            else
+                m_uiFrostboltVolleyTimer -= uiDiff;
 
             if (m_uiTouchOfInsignificanceTimer <= uiDiff)
             {
