@@ -201,7 +201,7 @@ struct MANGOS_DLL_DECL boss_ingvarAI : public ScriptedAI
             for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
                 if(Player* pPlayer = itr->getSource())
-                    pPlayer->KilledMonsterCredit(23980, m_creature->GetObjectGuid());
+                    pPlayer->KilledMonsterCredit(NPC_INGVAR, m_creature->GetObjectGuid());
             }
         }
     }

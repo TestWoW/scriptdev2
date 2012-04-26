@@ -210,10 +210,8 @@ struct MANGOS_DLL_DECL boss_anubarakAI : public ScriptedAI
                 if(m_creature->HasAura(SPELL_SUBMERGE))
                 {
                    m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE);
-                   m_creature->SetDisplayId(11686);       
-                   m_creature->StopMoving();
-                   m_creature->GetMotionMaster()->Clear();
-                   m_creature->GetMotionMaster()->MoveIdle();
+                   m_creature->SetDisplayId(11686);
+                   SetCombatMovement(false);
                 }
                 if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                     DoCast(pTarget, SPELL_IMPALE);
@@ -287,7 +285,6 @@ struct MANGOS_DLL_DECL boss_anubarakAI : public ScriptedAI
             {
                 uiPhase = 0;
                 m_creature->RemoveAurasDueToSpell(50142);
-                m_creature->GetMotionMaster()->Clear();
                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
             } else uiEmergeTimer -= diff;
         }
