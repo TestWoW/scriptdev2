@@ -1487,7 +1487,12 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public boss_deathbringer_s
                     int32 power = m_creature->GetPower(m_powerBloodPower);
                     m_creature->CastCustomSpell(m_creature, 72371, &power, &power, NULL, true);
                     DoScriptText(SAY_FALLENCHAMPION, m_creature);
+<<<<<<< HEAD
                     ++m_uiMarksCount;
+=======
+                    // count mark for achievement
+                    ++m_uiMarkOfFallenCount;
+>>>>>>> e13a7ed87eb0e956706915326a3d896f40101c95
                 }
             }
         }
