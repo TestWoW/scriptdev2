@@ -874,6 +874,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     {
         m_pInstance = ((instance_trial_of_the_crusader*)pCreature->GetInstanceData());
         m_uiMapDifficulty = pCreature->GetMap()->GetDifficulty();
+        m_bIsHeroic = m_uiMapDifficulty > RAID_DIFFICULTY_25MAN_NORMAL;
         Reset();
     }
 
@@ -888,6 +889,7 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
     uint32 m_uiEnrageTimer;
     uint32 m_uiPhaseTimer;
     uint32 m_uiPhase;
+    bool m_bIsHeroic;
 
     float fPosX, fPosY, fPosZ;
     Unit *pFocus;
