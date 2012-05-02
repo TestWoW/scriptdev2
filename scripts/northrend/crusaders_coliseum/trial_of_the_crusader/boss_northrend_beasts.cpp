@@ -1036,13 +1036,16 @@ struct MANGOS_DLL_DECL boss_icehowlAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_uiEnrageTimer < uiDiff)
+        if (m_bIsHeroic)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                m_uiEnrageTimer = 3 * MINUTE * IN_MILLISECONDS;
+            if (m_uiEnrageTimer < uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                    m_uiEnrageTimer = 3 * MINUTE * IN_MILLISECONDS;
+            }
+            else
+                m_uiEnrageTimer -= uiDiff;
         }
-        else
-            m_uiEnrageTimer -= uiDiff;
 
         switch (m_uiPhase)
         {
