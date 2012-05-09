@@ -224,7 +224,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
 
         // Mutated Infection - faster with time
         // implemented this instead of phases
-        if (m_uiInfectionsRate < 5)
+        /*if (m_uiInfectionsRate < 5)
         {
             if (m_uiMutatedInfectionTimer <= uiDiff)
             {
@@ -236,7 +236,7 @@ struct MANGOS_DLL_DECL boss_rotfaceAI : public base_icc_bossAI
             }
             else
                 m_uiMutatedInfectionTimer -= uiDiff;
-        }
+        }*/
 
         // Vile Gas
         if (m_bIsHeroic)
