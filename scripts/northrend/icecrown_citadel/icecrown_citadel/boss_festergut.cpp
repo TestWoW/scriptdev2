@@ -254,6 +254,8 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
                     {
                         DoScriptText(SAY_PUNGUENT_BLIGHT, m_creature);
                         DoScriptText(SAY_PUNGUENT_BLIGHT_EMOTE, m_creature);
+                        m_creature->RemoveAurasDueToSpell(SPELL_INHALED_BLIGHT_10);
+                        m_creature->RemoveAurasDueToSpell(SPELL_INHALED_BLIGHT_25);
                         m_uiInhaleBlightTimer = 35000;
                     }
 
