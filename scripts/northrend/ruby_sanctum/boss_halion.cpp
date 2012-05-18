@@ -315,217 +315,233 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
 
         switch (m_uiStage)
         {
-        case 0: //PHASE 1 PHYSICAL REALM
+            case 0: //PHASE 1 PHYSICAL REALM
 
-            // Tail Lash
-            if (m_uiTailLashTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
-                    m_uiTailLashTimer = urand(15000, 25000);
-            }
-            else m_uiTailLashTimer -= uiDiff;
-
-            // Cleave
-            if (m_uiCleaveTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
-                    m_uiCleaveTimer = urand(10000, 15000);
-            }
-            else m_uiCleaveTimer -= uiDiff;
-
-            // Flame Breath
-            if (m_uiFlameBreathTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
-                    m_uiFlameBreathTimer = urand(15000, 20000);
-            }
-            else m_uiFlameBreathTimer -= uiDiff;
-
-            // Fiery Combustion
-            if (m_uiFieryCombustionTimer < uiDiff)
-            {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                // Tail Lash
+                if (m_uiTailLashTimer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_FIERY_COMBUSTION) == CAST_OK)
-                        m_uiFieryCombustionTimer = 25000;
+                    if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
+                        m_uiTailLashTimer = urand(15000, 25000);
                 }
-            }
-            else m_uiFieryCombustionTimer -= uiDiff;
+                else m_uiTailLashTimer -= uiDiff;
 
-            // Meteor
-            if (m_uiMeteorTimer < uiDiff)
-            {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                // Cleave
+                if (m_uiCleaveTimer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_METEOR) == CAST_OK)
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                        m_uiCleaveTimer = urand(10000, 15000);
+                }
+                else m_uiCleaveTimer -= uiDiff;
+
+                // Flame Breath
+                if (m_uiFlameBreathTimer < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+                        m_uiFlameBreathTimer = urand(15000, 20000);
+                }
+                else m_uiFlameBreathTimer -= uiDiff;
+
+                // Fiery Combustion
+                if (m_uiFieryCombustionTimer < uiDiff)
+                {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                     {
-                        m_uiMeteorTimer = 25000;
-                        DoScriptText(SAY_HALION_SPECIAL_1, m_creature);
+                        if (DoCastSpellIfCan(pTarget, SPELL_FIERY_COMBUSTION) == CAST_OK)
+                            m_uiFieryCombustionTimer = 25000;
                     }
                 }
-            }
-            else m_uiMeteorTimer -= uiDiff;
+                else m_uiFieryCombustionTimer -= uiDiff;
 
-            if (m_creature->GetHealthPercent() < 75.0f)
-                m_uiStage = 1;
-            break;
-        case 1:
-            if (m_creature->IsNonMeleeSpellCasted(true))
-                return;
-
-            m_creature->AttackStop();
-            m_creature->InterruptNonMeleeSpells(true);
-            DoScriptText(SAY_HALION_PHASE_2,m_creature);
-            SetCombatMovement(false);
-            StartMovement(0);
-            m_uiStage = 2;
-            {
-            Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL);
-            if (!pControl)
-                pControl = m_creature->SummonCreature(NPC_HALION_CONTROL, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
-            else if (!pControl->isAlive())
-                pControl->Respawn();
-
-            pControl->SetActiveObjectState(true);
-            pControl->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            m_creature->SetInCombatWith(pControl);
-            pControl->SetInCombatWith(m_creature);
-            }
-            break;
-        case 2:
-            if (m_bMovementStarted)
-                return;
-
-            //m_creature->CastSpell(m_creature, SPELL_SUMMON_TWILIGHT_PORTAL, true);
-            if (GameObject* pGoPortal = m_creature->SummonGameobject(GO_HALION_PORTAL_1, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, 0))
-                  pGoPortal->SetPhaseMask(31,true);
-            if (GameObject* pGoRing = m_pInstance->GetSingleGameObjectFromStorage(GO_FLAME_RING))
-                  pGoRing->SetPhaseMask(65535,true);
-
-            m_uiStage = 3;
-            break;
-        case 3:
-            if (m_creature->IsNonMeleeSpellCasted(false))
-                return;
-            m_creature->SetActiveObjectState(true);
-            m_creature->CastSpell(m_creature, SPELL_START_PHASE2, true);
-            m_uiStage = 4;
-            break;
-        case 4:
-            if (!m_creature->IsNonMeleeSpellCasted(false))
-            {
-                if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
+                // Meteor
+                if (m_uiMeteorTimer < uiDiff)
                 {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_METEOR) == CAST_OK)
+                        {
+                            m_uiMeteorTimer = 25000;
+                            DoScriptText(SAY_HALION_SPECIAL_1, m_creature);
+                        }
+                    }
+                }
+                else m_uiMeteorTimer -= uiDiff;
+
+                if (m_creature->GetHealthPercent() < 75.0f)
+                    m_uiStage = 1;
+
+                break;
+
+            case 1:
+                if (m_creature->IsNonMeleeSpellCasted(true))
+                    return;
+
+                m_creature->AttackStop();
+                m_creature->InterruptNonMeleeSpells(true);
+                DoScriptText(SAY_HALION_PHASE_2,m_creature);
+                SetCombatMovement(false);
+                StartMovement(0);
+                m_uiStage = 2;
+                {
+                    Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL);
+                    if (!pControl)
+                        pControl = m_creature->SummonCreature(NPC_HALION_CONTROL, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
+                    else if (!pControl->isAlive())
+                        pControl->Respawn();
+
+                    pControl->SetActiveObjectState(true);
+                    pControl->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_creature->SetInCombatWith(pControl);
                     pControl->SetInCombatWith(m_creature);
                 }
-                Creature* pTwilight = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT);
-                if (!pTwilight)
-                    pTwilight = m_creature->SummonCreature(NPC_HALION_TWILIGHT, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 1000);
-                else if (!pTwilight->isAlive())
+
+                break;
+
+            case 2:
+                if (m_bMovementStarted)
+                    return;
+
+                //m_creature->CastSpell(m_creature, SPELL_SUMMON_TWILIGHT_PORTAL, true);
+                if (GameObject* pGoPortal = m_creature->SummonGameobject(GO_HALION_PORTAL_1, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, 0))
+                      pGoPortal->SetPhaseMask(31,true);
+                if (GameObject* pGoRing = m_pInstance->GetSingleGameObjectFromStorage(GO_FLAME_RING))
+                      pGoRing->SetPhaseMask(65535,true);
+
+                m_uiStage = 3;
+                break;
+
+            case 3:
+                if (m_creature->IsNonMeleeSpellCasted(false))
+                    return;
+                m_creature->SetActiveObjectState(true);
+                m_creature->CastSpell(m_creature, SPELL_START_PHASE2, true);
+                m_uiStage = 4;
+                break;
+
+            case 4:
+                if (!m_creature->IsNonMeleeSpellCasted(false))
+                {
+                    if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
+                    {
+                        m_creature->SetInCombatWith(pControl);
+                        pControl->SetInCombatWith(m_creature);
+                     }
+
+                    Creature* pTwilight = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT);
+                    if (!pTwilight)
+                        pTwilight = m_creature->SummonCreature(NPC_HALION_TWILIGHT, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 1000);
+                    else if (!pTwilight->isAlive())
+
                     pTwilight->Respawn();
-                pTwilight->SetCreatorGuid(ObjectGuid());
-                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                m_uiStage = 5;
-            }
-            break;
-        case 5: // HALION awaiting end battle in TWILIGHT REALM
-            if (m_pInstance->GetData(TYPE_HALION_EVENT) == IN_PROGRESS)
-            {
-                m_pInstance->SetData(TYPE_HALION_EVENT, SPECIAL);
-                m_creature->RemoveAurasDueToSpell(SPELL_START_PHASE2);
-                if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
-                {
-                    m_creature->SetInCombatWith(pControl);
-                    pControl->SetInCombatWith(m_creature);
+                    pTwilight->SetCreatorGuid(ObjectGuid());
+                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    m_uiStage = 5;
                 }
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                m_creature->SetHealth(m_creature->GetMaxHealth()/2);
-                m_creature->SetInCombatWithZone();
-                m_uiStage = 6;
-            }
-            break;
-        case 6: // Switch to phase 3
-            DoScriptText(SAY_HALION_PHASE_3,m_creature);
-            m_uiStage = 7;
-            break;
-        case 7:
-            if (m_creature->IsNonMeleeSpellCasted(false))
-                return;
 
-            if (m_creature->getVictim()->GetTypeId() != TYPEID_PLAYER)
-                return;
+                break;
 
-            SetCombatMovement(true);
-            m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-            m_uiStage = 8;
-            break;
-        case 8: //PHASE 3 BOTH REALMS
-            if (!m_creature->getVictim())
-            {
-                if (Creature* pClone = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT))
+            case 5: // HALION awaiting end battle in TWILIGHT REALM
+                if (m_pInstance->GetData(TYPE_HALION_EVENT) == IN_PROGRESS)
                 {
-                    pClone->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                }
-            }
-            else if (m_creature->getVictim())
-            {
-                if (Creature* pClone = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT))
-                {
-                    pClone->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                }
-            }
-            // Tail Lash
-            if (m_uiTailLashTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
-                    m_uiTailLashTimer = urand(15000, 25000);
-            }
-            else m_uiTailLashTimer -= uiDiff;
-
-            // Cleave
-            if (m_uiCleaveTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
-                    m_uiCleaveTimer = urand(10000, 15000);
-            }
-            else m_uiCleaveTimer -= uiDiff;
-
-            // Flame Breath
-            if (m_uiFlameBreathTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
-                    m_uiFlameBreathTimer = urand(15000, 20000);
-            }
-            else m_uiFlameBreathTimer -= uiDiff;
-
-            // Fiery Combustion
-            if (m_uiFieryCombustionTimer < uiDiff)
-            {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_FIERY_COMBUSTION, SELECT_FLAG_PLAYER))
-                {
-                    if (DoCastSpellIfCan(pTarget, SPELL_FIERY_COMBUSTION) == CAST_OK)
-                        m_uiFieryCombustionTimer = 25000;
-                }
-            }
-            else m_uiFieryCombustionTimer -= uiDiff;
-
-            // Meteor
-            if (m_uiMeteorTimer < uiDiff)
-            {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                {
-                    if (DoCastSpellIfCan(pTarget, SPELL_METEOR) == CAST_OK)
+                    m_pInstance->SetData(TYPE_HALION_EVENT, SPECIAL);
+                    m_creature->RemoveAurasDueToSpell(SPELL_START_PHASE2);
+                    if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
                     {
-                        m_uiMeteorTimer = 25000;
-                        DoScriptText(SAY_HALION_SPECIAL_1, m_creature);
+                        m_creature->SetInCombatWith(pControl);
+                        pControl->SetInCombatWith(m_creature);
+                    }
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                    m_creature->SetHealth(m_creature->GetMaxHealth()/2);
+                    m_creature->SetInCombatWithZone();
+                    m_uiStage = 6;
+                }
+
+                break;
+
+            case 6: // Switch to phase 3
+                DoScriptText(SAY_HALION_PHASE_3,m_creature);
+                m_uiStage = 7;
+                break;
+
+            case 7:
+                if (m_creature->IsNonMeleeSpellCasted(false))
+                    return;
+
+                if (m_creature->getVictim()->GetTypeId() != TYPEID_PLAYER)
+                    return;
+
+                SetCombatMovement(true);
+                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                m_uiStage = 8;
+                break;
+
+            case 8: //PHASE 3 BOTH REALMS
+                if (!m_creature->getVictim())
+                {
+                    if (Creature* pClone = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT))
+                    {
+                        pClone->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     }
                 }
-            }
-            else m_uiMeteorTimer -= uiDiff;
-            break;
-        default:
-            break;
+                else if (m_creature->getVictim())
+                {
+                    if (Creature* pClone = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT))
+                    {
+                        pClone->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                }
+                // Tail Lash
+                if (m_uiTailLashTimer < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
+                        m_uiTailLashTimer = urand(15000, 25000);
+                }
+                else m_uiTailLashTimer -= uiDiff;
+
+                // Cleave
+                if (m_uiCleaveTimer < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                        m_uiCleaveTimer = urand(10000, 15000);
+                }
+                else m_uiCleaveTimer -= uiDiff;
+
+                // Flame Breath
+                if (m_uiFlameBreathTimer < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+                        m_uiFlameBreathTimer = urand(15000, 20000);
+                }
+                else m_uiFlameBreathTimer -= uiDiff;
+
+                // Fiery Combustion
+                if (m_uiFieryCombustionTimer < uiDiff)
+                {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_FIERY_COMBUSTION, SELECT_FLAG_PLAYER))
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_FIERY_COMBUSTION) == CAST_OK)
+                            m_uiFieryCombustionTimer = 25000;
+                    }
+                }
+                else m_uiFieryCombustionTimer -= uiDiff;
+
+                // Meteor
+                if (m_uiMeteorTimer < uiDiff)
+                {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    {
+                       if (DoCastSpellIfCan(pTarget, SPELL_METEOR) == CAST_OK)
+                       {
+                           m_uiMeteorTimer = 25000;
+                           DoScriptText(SAY_HALION_SPECIAL_1, m_creature);
+                        }
+                    }
+                }
+                else m_uiMeteorTimer -= uiDiff;
+
+                break;
+
+            default:
+                break;
         }
 
         DoMeleeAttackIfReady();
@@ -686,117 +702,119 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
 
         switch (m_uiStage)
         {
-        case 0:
-            break;
-        case 1:           //SPAWNED - Twilight realm
+            case 0:
+                break;
+            case 1:           //SPAWNED - Twilight realm
 //                doCast(SPELL_TWILIGHT_DIVISION);
-            if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
-                m_creature->CastSpell(m_creature, SPELL_DUSK_SHROUD, true);
+                if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
+                    m_creature->CastSpell(m_creature, SPELL_DUSK_SHROUD, true);
 
-            // Tail Lash
-            if (m_uiTailLashTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
-                    m_uiTailLashTimer = urand(15000, 25000);
-            }
-            else m_uiTailLashTimer -= uiDiff;
-
-            // Cleave
-            if (m_uiCleaveTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
-                    m_uiCleaveTimer = urand(10000, 15000);
-            }
-            else m_uiCleaveTimer -= uiDiff;
-
-            // Dark Breath
-            if (m_uiDarkBreathTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_DARK_BREATH) == CAST_OK)
-                    m_uiDarkBreathTimer = urand(15000, 20000);
-            }
-            else m_uiDarkBreathTimer -= uiDiff;
-
-            // Soul Consumption
-            if (m_uiSoulConsumptionTimer < uiDiff)
-            {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SOUL_CONSUMPTION, SELECT_FLAG_PLAYER))
+                // Tail Lash
+                if (m_uiTailLashTimer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_SOUL_CONSUMPTION) == CAST_OK)
-                        m_uiSoulConsumptionTimer = 25000;
+                    if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
+                        m_uiTailLashTimer = urand(15000, 25000);
                 }
-            }
-            else m_uiSoulConsumptionTimer -= uiDiff;
+                else m_uiTailLashTimer -= uiDiff;
 
-            if (m_creature->GetHealthPercent() < 50.0f)
-                m_uiStage = 2;
-            break;
-        case 2:           //To two realms
-            m_pInstance->SetData(TYPE_HALION_EVENT, IN_PROGRESS);
-            DoScriptText(SAY_HALION_PHASE_3,m_creature);
-            if (GameObject *pGoPortal1 = m_creature->SummonGameobject(GO_HALION_PORTAL_3, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 0, 0))
-                pGoPortal1->SetPhaseMask(32,true);
-
-            if (GameObject *pGoPortal2 = m_creature->SummonGameobject(GO_HALION_PORTAL_3, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z, 0, 0))
-                pGoPortal2->SetPhaseMask(32,true);
-
-            m_uiStage = 3;
-            break;
-        case 3: //PHASE 3 BOTH REALMS
-            if (!m_creature->getVictim())
-            {
-                if (Creature* pReal = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_REAL))
+                // Cleave
+                if (m_uiCleaveTimer < uiDiff)
                 {
-                    pReal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                        m_uiCleaveTimer = urand(10000, 15000);
                 }
-            }
-            else if (m_creature->getVictim())
-            {
-                if (Creature* pReal = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_REAL))
+                else m_uiCleaveTimer -= uiDiff;
+
+                // Dark Breath
+                if (m_uiDarkBreathTimer < uiDiff)
                 {
-                    pReal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_DARK_BREATH) == CAST_OK)
+                        m_uiDarkBreathTimer = urand(15000, 20000);
                 }
-            }
-            if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
-                m_creature->CastSpell(m_creature, SPELL_DUSK_SHROUD, true);
+                else m_uiDarkBreathTimer -= uiDiff;
 
-            // Tail Lash
-            if (m_uiTailLashTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
-                    m_uiTailLashTimer = urand(15000, 25000);
-            }
-            else m_uiTailLashTimer -= uiDiff;
-
-            // Cleave
-            if (m_uiCleaveTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
-                    m_uiCleaveTimer = urand(10000, 15000);
-            }
-            else m_uiCleaveTimer -= uiDiff;
-
-            // Dark Breath
-            if (m_uiDarkBreathTimer < uiDiff)
-            {
-                if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_DARK_BREATH) == CAST_OK)
-                    m_uiDarkBreathTimer = urand(15000, 20000);
-            }
-            else m_uiDarkBreathTimer -= uiDiff;
-
-            // Soul Consumption
-            if (m_uiSoulConsumptionTimer < uiDiff)
-            {
-                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SOUL_CONSUMPTION, SELECT_FLAG_PLAYER))
+                // Soul Consumption
+                if (m_uiSoulConsumptionTimer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_SOUL_CONSUMPTION) == CAST_OK)
-                        m_uiSoulConsumptionTimer = 25000;
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SOUL_CONSUMPTION, SELECT_FLAG_PLAYER))
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_SOUL_CONSUMPTION) == CAST_OK)
+                            m_uiSoulConsumptionTimer = 25000;
+                    }
                 }
-            }
-            else m_uiSoulConsumptionTimer -= uiDiff;
-            break;
-        default:
-            break;
+                else m_uiSoulConsumptionTimer -= uiDiff;
+
+                if (m_creature->GetHealthPercent() < 50.0f)
+                    m_uiStage = 2;
+                break;
+
+            case 2:           //To two realms
+                m_pInstance->SetData(TYPE_HALION_EVENT, IN_PROGRESS);
+                DoScriptText(SAY_HALION_PHASE_3,m_creature);
+                if (GameObject *pGoPortal1 = m_creature->SummonGameobject(GO_HALION_PORTAL_3, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 0, 0))
+                    pGoPortal1->SetPhaseMask(32,true);
+
+                if (GameObject *pGoPortal2 = m_creature->SummonGameobject(GO_HALION_PORTAL_3, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z, 0, 0))
+                    pGoPortal2->SetPhaseMask(32,true);
+
+                m_uiStage = 3;
+                break;
+
+            case 3: //PHASE 3 BOTH REALMS
+                if (!m_creature->getVictim())
+                {
+                    if (Creature* pReal = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_REAL))
+                    {
+                        pReal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                }
+                else if (m_creature->getVictim())
+                {
+                    if (Creature* pReal = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_REAL))
+                    {
+                        pReal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
+                }
+                if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
+                    m_creature->CastSpell(m_creature, SPELL_DUSK_SHROUD, true);
+
+                // Tail Lash
+                if (m_uiTailLashTimer < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature, SPELL_TAIL_LASH) == CAST_OK)
+                        m_uiTailLashTimer = urand(15000, 25000);
+                }
+                else m_uiTailLashTimer -= uiDiff;
+
+                // Cleave
+                if (m_uiCleaveTimer < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                        m_uiCleaveTimer = urand(10000, 15000);
+                }
+                else m_uiCleaveTimer -= uiDiff;
+
+                // Dark Breath
+                if (m_uiDarkBreathTimer < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_DARK_BREATH) == CAST_OK)
+                        m_uiDarkBreathTimer = urand(15000, 20000);
+                }
+                else m_uiDarkBreathTimer -= uiDiff;
+
+                // Soul Consumption
+                if (m_uiSoulConsumptionTimer < uiDiff)
+                {
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SOUL_CONSUMPTION, SELECT_FLAG_PLAYER))
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_SOUL_CONSUMPTION) == CAST_OK)
+                            m_uiSoulConsumptionTimer = 25000;
+                    }
+                }
+                else m_uiSoulConsumptionTimer -= uiDiff;
+                break;
+            default:
+                break;
         }
 
         if (Creature* pReal = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_REAL))
@@ -1083,6 +1101,10 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
     uint32 m_lastBuffReal, m_lastBuffTwilight;
     bool m_detectplayers;
 
+    bool p_Twilight;
+    float p_RealHP;
+    float p_TwilightHP;
+
     void Reset()
     {
         if (!m_pInstance) return;
@@ -1098,6 +1120,10 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
         m_creature->SetActiveObjectState(true);
         m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
         m_pInstance->SetData(TYPE_HALION_EVENT, NOT_STARTED);
+
+        p_Twilight = false;
+        p_RealHP = 0;
+        p_TwilightHP = 0;
     }
 
     void AttackStart(Unit *who)
@@ -1146,8 +1172,18 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
             //pHalionReal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             pHalionTwilight->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-            float p_RealHP = (pHalionReal && pHalionReal->isAlive()) ? pHalionReal->GetHealthPercent() : 0.0f;
-            float p_TwilightHP = (pHalionTwilight && pHalionTwilight->isAlive()) ? pHalionTwilight->GetHealthPercent() : 0.0f;
+            // CORPOREALITY
+            if(!p_Twilight)
+            {
+                p_RealHP = (pHalionReal && pHalionReal->isAlive()) ? pHalionReal->GetHealthPercent() : 0.0f;
+                p_TwilightHP = (pHalionTwilight && pHalionTwilight->isAlive()) ? pHalionTwilight->GetHealthPercent() : 0.0f;
+            }
+            else
+            {
+                p_RealHP = p_RealHP - ((pHalionReal && pHalionReal->isAlive()) ? pHalionReal->GetHealthPercent() : 0.0f);
+                p_TwilightHP = p_TwilightHP - ((pHalionTwilight && pHalionTwilight->isAlive()) ? pHalionTwilight->GetHealthPercent() : 0.0f);
+            }
+            p_Twilight = p_RealHP && p_TwilightHP;
 
             float m_uiDiff = (p_RealHP - p_TwilightHP);
 
