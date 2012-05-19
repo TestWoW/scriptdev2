@@ -1155,12 +1155,15 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
         
             Map::PlayerList const &players = pMap->GetPlayers();
 
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            if(pMap)
             {
-                if(itr->getSource()->isAlive())
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
-                    wipe = false;
-                    break;
+                    if(itr->getSource()->isAlive())
+                    {
+                        wipe = false;
+                        break;
+                    }
                 }
             }
 
