@@ -60,6 +60,10 @@ enum
     SAY_SUMMON          = -1666204,
 };
 
+#define FLAMECALLTIME 10000
+#define CLEAVEARMORTIME 1000
+#define IMTIMIDATINGROARTIME 10000
+
 struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
 {
     boss_zarithrianAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -80,9 +84,9 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
         if(!pInstance)
             return;
 
-        m_uiCallFlamecallerTimer = 20000;
-        m_uiCleaveArmorTimer = 20000;
-        m_uiImtimidatingRoarTimer = 20000;
+        m_uiCallFlamecallerTimer = FLAMECALLTIME;
+        m_uiCleaveArmorTimer = CLEAVEARMORTIME;
+        m_uiImtimidatingRoarTimer = IMTIMIDATINGROARTIME;
         //m_uiStage = 0;
 
         if (m_creature->isAlive())
@@ -169,12 +173,13 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
         /** Summon Flamecaller **/
         if (m_uiCallFlamecallerTimer <= uiDiff)
         {
-            if(DoCastSpellIfCan(m_creature, SPELL_CALL_FLAMECALLER) == CAST_OK)
+            Creature *flamecaller1 = m_creature->SummonCreature(NPC_FLAMECALLER, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 2000);
+            Creature *flamecaller2 = m_creature->SummonCreature(NPC_FLAMECALLER, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 2000);
+
+            if(flamecaller1 && flamecaller2)
             {
-               // m_creature->SummonCreature(NPC_FLAMECALLER, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 0, );
-               // m_creature->SummonCreature(NPC_FLAMECALLER, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z, 0, );
                 DoScriptText(SAY_SUMMON,m_creature);
-                m_uiCallFlamecallerTimer = 20000;
+                m_uiCallFlamecallerTimer = FLAMECALLTIME;
             }
         }
         else m_uiCallFlamecallerTimer -= uiDiff;
@@ -184,7 +189,7 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
         {
             if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE_ARMOR) == CAST_OK)
             {
-                m_uiCleaveArmorTimer = 20000;
+                m_uiCleaveArmorTimer = CLEAVEARMORTIME;
             }
         }
         else m_uiCleaveArmorTimer -= uiDiff;
@@ -194,7 +199,7 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
         {
             if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_IMTIMIDATING_ROAR) == CAST_OK)
             {
-                m_uiImtimidatingRoarTimer = 20000;
+                m_uiImtimidatingRoarTimer = IMTIMIDATINGROARTIME;
             }
         }
         else m_uiImtimidatingRoarTimer -= uiDiff;
@@ -208,6 +213,9 @@ CreatureAI* GetAI_boss_zarithrian(Creature* pCreature)
     return new boss_zarithrianAI(pCreature);
 };
 
+#define LAVAGOUTTIME 1000
+#define BLASTNOVATIME 1000
+
 struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public ScriptedAI
 {
     mob_flamecaller_rubyAI(Creature *pCreature) : ScriptedAI(pCreature)
@@ -217,14 +225,20 @@ struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public ScriptedAI
     }
 
     ScriptedInstance *pInstance;
+    uint32 m_uiLavaGoutTimer;
+    uint32 m_uiBlastNovaTimer;
 
     void Reset()
     {
-        if(!pInstance) return;
+        if(!pInstance) 
+            return;
+
         m_creature->SetRespawnDelay(7*DAY);
+        m_uiLavaGoutTimer = LAVAGOUTTIME;
+        m_uiBlastNovaTimer = BLASTNOVATIME;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 uiDiff)
     {
 
         if (pInstance && pInstance->GetData(TYPE_ZARITHRIAN) != IN_PROGRESS)
@@ -232,6 +246,26 @@ struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public ScriptedAI
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        /** Lava Gout **/
+        if (m_uiLavaGoutTimer <= uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_LAVA_GOUT) == CAST_OK)
+            {
+                m_uiLavaGoutTimer = LAVAGOUTTIME;
+            }
+        }
+        else m_uiLavaGoutTimer -= uiDiff;
+
+        /** Blast Nova **/
+        if (m_uiBlastNovaTimer <= uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature, SPELL_BLAST_NOVA) == CAST_OK)
+            {
+                m_uiBlastNovaTimer = BLASTNOVATIME;
+            }
+        }
+        else m_uiBlastNovaTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
