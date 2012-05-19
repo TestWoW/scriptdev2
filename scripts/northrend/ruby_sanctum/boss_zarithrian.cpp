@@ -15,7 +15,7 @@
  */
 /* ScriptData
 SDName: boss_zarithrian
-SD%Complete: 50%
+SD%Complete: 90%
 SDComment: by /dev/rsa && notagain && ukulutl
 SDCategory: Ruby Sanctum
 EndScriptData */
@@ -60,9 +60,9 @@ enum
     SAY_SUMMON          = -1666204,
 };
 
-#define FLAMECALLTIME 10000
-#define CLEAVEARMORTIME 1000
-#define IMTIMIDATINGROARTIME 10000
+#define FLAMECALLTIME 25000
+#define CLEAVEARMORTIME 10000
+#define IMTIMIDATINGROARTIME 15000
 
 struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
 {
@@ -73,7 +73,6 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
     }
 
     ScriptedInstance *pInstance;
-    //uint32 m_uiStage;
     
     uint32 m_uiCallFlamecallerTimer;
     uint32 m_uiCleaveArmorTimer;
@@ -87,7 +86,6 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
         m_uiCallFlamecallerTimer = FLAMECALLTIME;
         m_uiCleaveArmorTimer = CLEAVEARMORTIME;
         m_uiImtimidatingRoarTimer = IMTIMIDATINGROARTIME;
-        //m_uiStage = 0;
 
         if (m_creature->isAlive())
         {
@@ -98,15 +96,14 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* pWho)
     {
-        /*if (m_uiStage) */
-            ScriptedAI::MoveInLineOfSight(pWho);
+        ScriptedAI::MoveInLineOfSight(pWho);
 
-        if (        pInstance->GetData(TYPE_XERESTRASZA) == DONE 
+        /*if (        pInstance->GetData(TYPE_XERESTRASZA) == DONE 
              &&     pInstance->GetData(TYPE_BALTHARUS) == DONE 
              &&     pInstance->GetData(TYPE_RAGEFIRE) == DONE
         ){   
-            //m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        }       
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }   */    
     }
 
     void KilledUnit(Unit* pVictim)
@@ -213,8 +210,8 @@ CreatureAI* GetAI_boss_zarithrian(Creature* pCreature)
     return new boss_zarithrianAI(pCreature);
 };
 
-#define LAVAGOUTTIME 1000
-#define BLASTNOVATIME 1000
+#define LAVAGOUTTIME 3000
+#define BLASTNOVATIME 10000
 
 struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public ScriptedAI
 {
@@ -247,16 +244,6 @@ struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        /** Lava Gout **/
-        if (m_uiLavaGoutTimer <= uiDiff)
-        {
-            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_LAVA_GOUT) == CAST_OK)
-            {
-                m_uiLavaGoutTimer = LAVAGOUTTIME;
-            }
-        }
-        else m_uiLavaGoutTimer -= uiDiff;
-
         /** Blast Nova **/
         if (m_uiBlastNovaTimer <= uiDiff)
         {
@@ -266,6 +253,16 @@ struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public ScriptedAI
             }
         }
         else m_uiBlastNovaTimer -= uiDiff;
+
+        /** Lava Gout **/
+        if (m_uiLavaGoutTimer <= uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_LAVA_GOUT) == CAST_OK)
+            {
+                m_uiLavaGoutTimer = LAVAGOUTTIME;
+            }
+        }
+        else m_uiLavaGoutTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
