@@ -1103,6 +1103,8 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     uint32 m_lastBuffReal, m_lastBuffTwilight;
     uint32 m_corporealityTimer;
+    uint32 m_chekwipe;
+    bool wipe;
 
     bool p_Last;
 
@@ -1120,7 +1122,9 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
         SetCombatMovement(false);
         m_lastBuffReal = 0;
         m_lastBuffTwilight = 0;
-        m_corporealityTimer = 5000;
+        m_corporealityTimer = 2000;
+        m_chekwipe = 5000;
+        wipe = false;
         m_creature->SetActiveObjectState(true);
         m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
         m_pInstance->SetData(TYPE_HALION_EVENT, NOT_STARTED);
@@ -1143,12 +1147,31 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        /*if (algo) // TODO: wipe
+        if(m_chekwipe <= uiDiff)
         {
-            m_pInstance->SetData(TYPE_HALION_EVENT, FAIL);
-            m_pInstance->SetData(TYPE_HALION, FAIL);
-            m_creature->ForcedDespawn();
-        }*/
+            wipe = true;
+
+            Map *pMap = m_creature->GetMap();
+        
+            Map::PlayerList const &players = pMap->GetPlayers();
+
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if(itr->getSource()->isAlive())
+                {
+                    wipe = false;
+                    break;
+                }
+            }
+
+            if (wipe) 
+            {
+                m_pInstance->SetData(TYPE_HALION_EVENT, FAIL);
+                m_pInstance->SetData(TYPE_HALION, FAIL);
+                m_creature->ForcedDespawn();
+            }
+        }
+        else m_chekwipe -= uiDiff;
 
         if (m_pInstance->GetData(TYPE_HALION_EVENT) != SPECIAL) return;
 
