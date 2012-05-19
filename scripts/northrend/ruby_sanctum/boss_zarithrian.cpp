@@ -15,8 +15,8 @@
  */
 /* ScriptData
 SDName: boss_zarithrian
-SD%Complete: 90%
-SDComment: by /dev/rsa && notagain
+SD%Complete: 50%
+SDComment: by /dev/rsa && notagain && ukulutl
 SDCategory: Ruby Sanctum
 EndScriptData */
 
@@ -47,8 +47,8 @@ enum Equipment
 static Locations SpawnLoc[]=
 {
     {3008.552734f, 530.471680f, 89.195290f},     // 0 - Zarithrian start point, o = 6,16
-    {3014.313477f, 486.453735f, 89.255096f},    // 1 - Mob spawn 1
-    {3025.324951f, 580.588501f, 88.593185f},    // 2 - Mob spawn 2
+    {3014.313477f, 486.453735f, 89.255096f},     // 1 - Mob spawn 1
+    {3025.324951f, 580.588501f, 88.593185f},     // 2 - Mob spawn 2
 };
 
 enum
@@ -60,79 +60,92 @@ enum
     SAY_SUMMON          = -1666204,
 };
 
-struct MANGOS_DLL_DECL boss_zarithrianAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL boss_zarithrianAI : public ScriptedAI
 {
-    boss_zarithrianAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    boss_zarithrianAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
 
     ScriptedInstance *pInstance;
+    //uint32 m_uiStage;
+    
+    uint32 m_uiCallFlamecallerTimer;
+    uint32 m_uiCleaveArmorTimer;
+    uint32 m_uiImtimidatingRoarTimer;
 
     void Reset()
     {
         if(!pInstance)
             return;
 
+        m_uiCallFlamecallerTimer = 20000;
+        m_uiCleaveArmorTimer = 20000;
+        m_uiImtimidatingRoarTimer = 20000;
+        //m_uiStage = 0;
+
         if (m_creature->isAlive())
         {
             pInstance->SetData(TYPE_ZARITHRIAN, NOT_STARTED);
-            resetTimers();
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            setStage(0);
+            //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
     }
 
     void MoveInLineOfSight(Unit* pWho)
     {
-        if (getStage())
+        /*if (m_uiStage) */
             ScriptedAI::MoveInLineOfSight(pWho);
 
-        if (!getStage() &&
-             pInstance->GetData(TYPE_XERESTRASZA) == DONE &&
-             pInstance->GetData(TYPE_BALTHARUS) == DONE &&
-             pInstance->GetData(TYPE_RAGEFIRE) == DONE)
-             {
-                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                 setStage(1);
-             };
+        if (        pInstance->GetData(TYPE_XERESTRASZA) == DONE 
+             &&     pInstance->GetData(TYPE_BALTHARUS) == DONE 
+             &&     pInstance->GetData(TYPE_RAGEFIRE) == DONE
+        ){   
+            //m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        }       
     }
 
     void KilledUnit(Unit* pVictim)
     {
-    switch (urand(0,1)) {
-        case 0:
-               DoScriptText(SAY_SLAY_1,m_creature,pVictim);
-               break;
-        case 1:
-               DoScriptText(SAY_SLAY_2,m_creature,pVictim);
-               break;
-        };
+        switch (urand(0,1))
+        {
+            case 0:
+                DoScriptText(SAY_SLAY_1,m_creature,pVictim);
+                break;
+
+            case 1:
+                DoScriptText(SAY_SLAY_2,m_creature,pVictim);
+                break;
+        }
     }
 
     void JustReachedHome()
     {
-        if (!pInstance) return;
+        if (!pInstance) 
+            return;
+
         pInstance->SetData(TYPE_ZARITHRIAN, FAIL);
     }
 
     void JustSummoned(Creature* summoned)
     {
-        if(!pInstance || !summoned) return;
+        if(!pInstance || !summoned) 
+            return;
 
         summoned->SetInCombatWithZone();
-        if (Unit* pTarget = doSelectRandomPlayerAtRange(60.0f))
+
+        /*if (Unit* pTarget = doSelectRandomPlayerAtRange(60.0f))
         {
             summoned->AddThreat(pTarget, 100.0f);
             summoned->GetMotionMaster()->MoveChase(pTarget);
-        }
+        }*/
 
     }
 
     void Aggro(Unit *who)
     {
-        if(!pInstance) return;
+        if(!pInstance) 
+            return;
 
         SetEquipmentSlots(false, EQUIP_MAIN, EQUIP_OFFHAND, EQUIP_RANGED);
         pInstance->SetData(TYPE_ZARITHRIAN, IN_PROGRESS);
@@ -141,31 +154,50 @@ struct MANGOS_DLL_DECL boss_zarithrianAI : public BSWScriptedAI
 
     void JustDied(Unit *killer)
     {
-        if(!pInstance) return;
+        if(!pInstance) 
+            return;
 
         pInstance->SetData(TYPE_ZARITHRIAN, DONE);
         DoScriptText(SAY_DEATH,m_creature);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (timedQuery(SPELL_CALL_FLAMECALLER, diff))
+        /** Summon Flamecaller **/
+        if (m_uiCallFlamecallerTimer <= uiDiff)
         {
-            doSummon(NPC_FLAMECALLER, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z);
-            doSummon(NPC_FLAMECALLER, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z);
-
-//            if (currentDifficulty == RAID_DIFFICULTY_25MAN_NORMAL
-//                || currentDifficulty == RAID_DIFFICULTY_25MAN_HEROIC)
-//                doCast(SPELL_CALL_FLAMECALLER);
-
-            DoScriptText(SAY_SUMMON,m_creature);
+            if(DoCastSpellIfCan(m_creature, SPELL_CALL_FLAMECALLER) == CAST_OK)
+            {
+               // m_creature->SummonCreature(NPC_FLAMECALLER, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 0, );
+               // m_creature->SummonCreature(NPC_FLAMECALLER, SpawnLoc[2].x, SpawnLoc[2].y, SpawnLoc[2].z, 0, );
+                DoScriptText(SAY_SUMMON,m_creature);
+                m_uiCallFlamecallerTimer = 20000;
+            }
         }
+        else m_uiCallFlamecallerTimer -= uiDiff;
 
-        timedCast(SPELL_CLEAVE_ARMOR, diff);
-        timedCast(SPELL_IMTIMIDATING_ROAR, diff);
+        /** Cleave Armor **/
+        if (m_uiCleaveArmorTimer <= uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE_ARMOR) == CAST_OK)
+            {
+                m_uiCleaveArmorTimer = 20000;
+            }
+        }
+        else m_uiCleaveArmorTimer -= uiDiff;
+
+        /** Imtimidating Roar **/
+        if (m_uiImtimidatingRoarTimer <= uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_IMTIMIDATING_ROAR) == CAST_OK)
+            {
+                m_uiImtimidatingRoarTimer = 20000;
+            }
+        }
+        else m_uiImtimidatingRoarTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
@@ -176,9 +208,9 @@ CreatureAI* GetAI_boss_zarithrian(Creature* pCreature)
     return new boss_zarithrianAI(pCreature);
 };
 
-struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public ScriptedAI
 {
-    mob_flamecaller_rubyAI(Creature *pCreature) : BSWScriptedAI(pCreature)
+    mob_flamecaller_rubyAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
         Reset();
@@ -189,7 +221,6 @@ struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public BSWScriptedAI
     void Reset()
     {
         if(!pInstance) return;
-        resetTimers();
         m_creature->SetRespawnDelay(7*DAY);
     }
 
@@ -201,8 +232,6 @@ struct MANGOS_DLL_DECL mob_flamecaller_rubyAI : public BSWScriptedAI
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        doCastAll(diff);
 
         DoMeleeAttackIfReady();
     }
