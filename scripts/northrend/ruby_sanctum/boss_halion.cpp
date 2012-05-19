@@ -1152,18 +1152,17 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
             wipe = true;
 
             Map *pMap = m_creature->GetMap();
+
+            if(!pMap) return;
         
             Map::PlayerList const &players = pMap->GetPlayers();
 
-            if(pMap)
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if(itr->getSource()->isAlive())
                 {
-                    if(itr->getSource()->isAlive())
-                    {
-                        wipe = false;
-                        break;
-                    }
+                    wipe = false;
+                    break;
                 }
             }
 
@@ -1173,6 +1172,8 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_HALION, FAIL);
                 m_creature->ForcedDespawn();
             }
+
+            m_chekwipe = 5000;
         }
         else m_chekwipe -= uiDiff;
 
