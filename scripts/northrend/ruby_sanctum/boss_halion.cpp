@@ -16,12 +16,12 @@
 
 /* ScriptData
 SDName: boss_halion
-SD%Complete: 80%
-SDComment: by notagain, corrected by /dev/rsa
+SD%Complete: 70%
+SDComment: by notagain, corrected by /dev/rsa && ukulutl
 SDCategory: Ruby Sanctum
 EndScriptData */
 
-// TODO: correct timers, Add twilight interorbs connection, sql spells, TESTING
+// TODO: correct timers, Add twilight interorbs connection, TESTING
 // Attention please! This script required some core modification.
 
 #include "precompiled.h"
@@ -201,7 +201,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             return
 
         ScriptedAI::JustReachedHome();
-
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_pInstance->SetData(TYPE_HALION, FAIL);
 
         m_creature->SetActiveObjectState(false);
@@ -235,10 +235,13 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                 m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
                 m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
                 DoScriptText(SAY_HALION_DEATH,m_creature);
+
                 if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
                        pGoPortal->Delete();
+
                 if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_2))
                        pGoPortal->Delete();
+
                 if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_3))
                        pGoPortal->Delete();
             }
@@ -317,6 +320,8 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
         {
             case 0: //PHASE 1 PHYSICAL REALM
 
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
                 // Tail Lash
                 if (m_uiTailLashTimer < uiDiff)
                 {
@@ -371,7 +376,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
 
                 break;
 
-            case 1:
+            case 1: 
                 if (m_creature->IsNonMeleeSpellCasted(true))
                     return;
 
@@ -381,8 +386,10 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                 SetCombatMovement(false);
                 StartMovement(0);
                 m_uiStage = 2;
+
                 {
                     Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL);
+
                     if (!pControl)
                         pControl = m_creature->SummonCreature(NPC_HALION_CONTROL, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
                     else if (!pControl->isAlive())
@@ -412,6 +419,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             case 3:
                 if (m_creature->IsNonMeleeSpellCasted(false))
                     return;
+
                 m_creature->SetActiveObjectState(true);
                 m_creature->CastSpell(m_creature, SPELL_START_PHASE2, true);
                 m_uiStage = 4;
@@ -424,14 +432,15 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                     {
                         m_creature->SetInCombatWith(pControl);
                         pControl->SetInCombatWith(m_creature);
-                     }
+                    }
 
                     Creature* pTwilight = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT);
+
                     if (!pTwilight)
                         pTwilight = m_creature->SummonCreature(NPC_HALION_TWILIGHT, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 1000);
                     else if (!pTwilight->isAlive())
+                        pTwilight->Respawn();
 
-                    pTwilight->Respawn();
                     pTwilight->SetCreatorGuid(ObjectGuid());
                     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     m_uiStage = 5;
@@ -444,11 +453,13 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                 {
                     m_pInstance->SetData(TYPE_HALION_EVENT, SPECIAL);
                     m_creature->RemoveAurasDueToSpell(SPELL_START_PHASE2);
+
                     if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
                     {
                         m_creature->SetInCombatWith(pControl);
                         pControl->SetInCombatWith(m_creature);
                     }
+
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     m_creature->SetHealth(m_creature->GetMaxHealth()/2);
                     m_creature->SetInCombatWithZone();
@@ -591,12 +602,15 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+
         if (Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
         {
             m_creature->SetInCombatWith(pControl);
             pControl->SetInCombatWith(m_creature);
         }
+
         Creature* pFocus = m_pInstance->GetSingleCreatureFromStorage(NPC_ORB_ROTATION_FOCUS);
+
         if (!pFocus)
              pFocus = m_creature->SummonCreature(NPC_ORB_ROTATION_FOCUS, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, TEMPSUMMON_MANUAL_DESPAWN, 1000);
         else if (!pFocus->isAlive())
@@ -699,13 +713,11 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-
         switch (m_uiStage)
         {
             case 0:
                 break;
             case 1:           //SPAWNED - Twilight realm
-//                doCast(SPELL_TWILIGHT_DIVISION);
                 if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
                     m_creature->CastSpell(m_creature, SPELL_DUSK_SHROUD, true);
 
@@ -751,6 +763,7 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
             case 2:           //To two realms
                 m_pInstance->SetData(TYPE_HALION_EVENT, IN_PROGRESS);
                 DoScriptText(SAY_HALION_PHASE_3,m_creature);
+
                 if (GameObject *pGoPortal1 = m_creature->SummonGameobject(GO_HALION_PORTAL_3, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 0, 0))
                     pGoPortal1->SetPhaseMask(32,true);
 
@@ -775,6 +788,7 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
                         pReal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     }
                 }
+
                 if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
                     m_creature->CastSpell(m_creature, SPELL_DUSK_SHROUD, true);
 
@@ -812,7 +826,9 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
                     }
                 }
                 else m_uiSoulConsumptionTimer -= uiDiff;
+
                 break;
+
             default:
                 break;
         }
@@ -871,38 +887,30 @@ struct MANGOS_DLL_DECL mob_halion_meteorAI : public ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_METEOR_STRIKE) == CAST_OK)
             {
-                /*if (m_bIsHeroic)
-                    m_creature->SummonCreature(NPC_LIVING_INFERNO, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(),0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);*/
-                //m_creature->RemoveAllAuras();
-
                 direction = 2.0f*M_PI_F*((float)urand(0,15)/16.0f);
                 radius = 0.0f;
+
                 for(uint8 i = 0; i < 10; ++i)
                 {
                     radius += 5.0f;
                     m_creature->GetNearPoint2D(x, y, radius, direction);
                     m_creature->SummonCreature(NPC_METEOR_STRIKE_1, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_TIMED_DESPAWN, 20000);
-                    /*if (m_bIsHeroic && m_bIs25Man && (i%4) == 0)
-                        m_creature->SummonCreature(NPC_LIVING_EMBER, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);*/
                     m_creature->GetNearPoint2D(x, y, radius, direction+M_PI_F);
                     m_creature->SummonCreature(NPC_METEOR_STRIKE_1, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_TIMED_DESPAWN, 20000);
-                    /*if (m_bIsHeroic && m_bIs25Man && (i%4) == 0)
-                        m_creature->SummonCreature(NPC_LIVING_EMBER, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);*/
                 }
+
                 direction += M_PI_F/4;
                 radius = 0.0f;
+
                 for(uint8 i = 0; i < 10; ++i)
                 {
                     radius += 5.0f;
                     m_creature->GetNearPoint2D(x, y, radius, direction);
                     m_creature->SummonCreature(NPC_METEOR_STRIKE_1, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_TIMED_DESPAWN, 20000);
-                    /*if (m_bIsHeroic && m_bIs25Man && (i%4) == 0)
-                        m_creature->SummonCreature(NPC_LIVING_EMBER, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);*/
                     m_creature->GetNearPoint2D(x, y, radius, direction+M_PI_F);
                     m_creature->SummonCreature(NPC_METEOR_STRIKE_1, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_TIMED_DESPAWN, 20000);
-                    /*if (m_bIsHeroic && m_bIs25Man && (i%4) == 0)
-                        m_creature->SummonCreature(NPC_LIVING_EMBER, x, y, m_creature->GetPositionZ(),0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);*/
                 }
+
                 m_creature->ForcedDespawn(10000);
                 m_bStrike = true;
                 m_uiWaitTimer = 1000;
@@ -991,11 +999,6 @@ struct MANGOS_DLL_DECL mob_living_emberAI : public ScriptedAI
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 m_creature->ForcedDespawn();
 
-            /*Creature *pInferno = GetClosestCreatureWithEntry(m_creature, NPC_LIVING_INFERNO, 15.0f);
-            if (pInferno)
-                m_creature->CastSpell(m_creature, SPELL_AWAKEN_FLAMES, true);
-            else if (!pInferno && m_creature->HasAura(SPELL_AWAKEN_FLAMES))
-                m_creature->RemoveAurasDueToSpell(SPELL_AWAKEN_FLAMES);*/
             SetCombatMovement(true);
             DoMeleeAttackIfReady();
 
@@ -1069,8 +1072,8 @@ CreatureAI* GetAI_mob_living_inferno(Creature* pCreature)
 struct HalionBuffLine
 {
     float uiDiff;                // Health uiDiff in percent
-    uint32 real, twilight;     // Buff pair
-    uint8 disp_corp;           // Displayed Corporeality
+    uint32 real, twilight;       // Buff pair
+    uint8 disp_corp;             // Displayed Corporeality
 };
 
 static HalionBuffLine Buff[]=
@@ -1089,9 +1092,9 @@ static HalionBuffLine Buff[]=
     {10.0f,  SPELL_CORPOREALITY_100I , SPELL_CORPOREALITY_100D , 100 },
 };
 
-struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
 {
-    mob_halion_controlAI(Creature* pCreature) : BSWScriptedAI(pCreature)
+    mob_halion_controlAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
@@ -1099,31 +1102,31 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
 
     ScriptedInstance* m_pInstance;
     uint32 m_lastBuffReal, m_lastBuffTwilight;
-    bool m_detectplayers;
+    uint32 m_corporealityTimer;
 
-    bool p_Twilight;
-    float p_RealHP;
-    float p_TwilightHP;
+    bool p_Last;
+
+    float p_RealDamage, p_TwilightDamage;
+    float p_LastHP;
 
     void Reset()
     {
-        if (!m_pInstance) return;
-        resetTimers();
-        m_detectplayers = true;
+        if (!m_pInstance) 
+           return;
+
         m_creature->SetDisplayId(11686);
         m_creature->SetPhaseMask(65535, true);
-//        m_creature->SetDisplayId(10045);
         m_creature->SetRespawnDelay(7*DAY);
         SetCombatMovement(false);
         m_lastBuffReal = 0;
         m_lastBuffTwilight = 0;
+        m_corporealityTimer = 5000;
         m_creature->SetActiveObjectState(true);
         m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
         m_pInstance->SetData(TYPE_HALION_EVENT, NOT_STARTED);
 
-        p_Twilight = false;
-        p_RealHP = 0;
-        p_TwilightHP = 0;
+        p_Last = false;
+        p_RealDamage = p_TwilightDamage = 0;
     }
 
     void AttackStart(Unit *who)
@@ -1140,52 +1143,49 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
         if (!m_pInstance)
             return;
 
-        if (timedQuery(SPELL_CORPOREALITY_EVEN, uiDiff))
+        /*if (algo) // TODO: wipe
         {
-            if (!doSelectRandomPlayerAtRange(80.0f))
+            m_pInstance->SetData(TYPE_HALION_EVENT, FAIL);
+            m_pInstance->SetData(TYPE_HALION, FAIL);
+            m_creature->ForcedDespawn();
+        }*/
+
+        if (m_pInstance->GetData(TYPE_HALION_EVENT) != SPECIAL) return;
+
+        Creature* pHalionReal = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_REAL);
+        Creature* pHalionTwilight = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT);
+
+        if (!pHalionTwilight || !pHalionReal)
+            return;
+
+        pHalionTwilight->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+        // calculate damage for corporeality
+        if (m_corporealityTimer <= uiDiff)
+        {
+            float p_RealHP = (pHalionReal && pHalionReal->isAlive()) ? pHalionReal->GetHealth() : 0.0f;
+            float p_TwilightHP = (pHalionTwilight && pHalionTwilight->isAlive()) ? pHalionTwilight->GetHealth() : 0.0f;        
+          
+            if(!p_Last)
             {
-                debug_log("ruby_sanctum: cannot detect players in range! ");
-                if (!m_detectplayers)
-                {
-                    m_pInstance->SetData(TYPE_HALION_EVENT, FAIL);
-                    m_pInstance->SetData(TYPE_HALION, FAIL);
-                    m_creature->ForcedDespawn();
-                }
-                else
-                {
-                    m_detectplayers = false;
-                }
+                p_LastHP = p_RealHP >= p_TwilightHP ? p_RealHP : p_TwilightHP;
+                p_Last = true;
             }
-            else
+
+            if(pHalionTwilight->isAlive() && pHalionReal->isAlive())
             {
-                m_detectplayers = true;
-            }
+                p_RealDamage = p_LastHP - p_RealHP;
+                p_TwilightDamage = p_LastHP - p_TwilightHP;
 
-            if (m_pInstance->GetData(TYPE_HALION_EVENT) != SPECIAL) return;
+                p_LastHP = p_RealHP >= p_TwilightHP ? p_TwilightHP - p_RealDamage : p_RealHP - p_TwilightDamage;
+                p_LastHP = p_LastHP > 0 ? p_LastHP : 1;
 
-            Creature* pHalionReal = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_REAL);
-            Creature* pHalionTwilight = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT);
-
-            if (!pHalionTwilight || !pHalionReal)
-                return;
-
-            //pHalionReal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            pHalionTwilight->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                pHalionReal->SetHealth(p_LastHP);
+                pHalionTwilight->SetHealth(p_LastHP);
+            }  
 
             // CORPOREALITY
-            if(!p_Twilight)
-            {
-                p_RealHP = (pHalionReal && pHalionReal->isAlive()) ? pHalionReal->GetHealthPercent() : 0.0f;
-                p_TwilightHP = (pHalionTwilight && pHalionTwilight->isAlive()) ? pHalionTwilight->GetHealthPercent() : 0.0f;
-            }
-            else
-            {
-                p_RealHP = p_RealHP - ((pHalionReal && pHalionReal->isAlive()) ? pHalionReal->GetHealthPercent() : 0.0f);
-                p_TwilightHP = p_TwilightHP - ((pHalionTwilight && pHalionTwilight->isAlive()) ? pHalionTwilight->GetHealthPercent() : 0.0f);
-            }
-            p_Twilight = p_RealHP && p_TwilightHP;
-
-            float m_uiDiff = (p_RealHP - p_TwilightHP);
+            float m_uiDiff = (p_RealDamage - p_TwilightDamage);
 
             uint8 buffnum;
             if (m_uiDiff <= Buff[0].uiDiff)
@@ -1206,7 +1206,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
                     }
                 }
             }
-
+/*
             if (!m_lastBuffReal || m_lastBuffReal != Buff[buffnum].real)
             {
                 if (m_lastBuffReal)
@@ -1231,7 +1231,10 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public BSWScriptedAI
 
             m_pInstance->SetData(TYPE_COUNTER, (uint32)Buff[buffnum].disp_corp);
 
+        }*/
+            m_corporealityTimer = 5000;
         }
+        else  m_corporealityTimer -= uiDiff; 
 
     }
 
@@ -1258,7 +1261,6 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
     void Reset()
     {
         m_creature->SetDisplayId(11686);
-//        m_creature->SetDisplayId(10045);
         m_creature->SetRespawnDelay(7*DAY);
         m_creature->SetPhaseMask(65535, true);
         SetCombatMovement(false);
@@ -1270,22 +1272,24 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         m_warning = false;
 
         Creature* pPulsar1 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N);
+
         if (!pPulsar1 )
         {
             float x,y;
             m_creature->GetNearPoint2D(x, y, FR_RADIUS, m_direction);
             pPulsar1 = m_creature->SummonCreature(NPC_SHADOW_PULSAR_N, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
-        } else if (!pPulsar1->isAlive())
-                    pPulsar1->Respawn();
+        } 
+        else if (!pPulsar1->isAlive()) pPulsar1->Respawn();
 
         Creature* pPulsar2 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_S);
+
         if (!pPulsar2)
         {
             float x,y;
             m_creature->GetNearPoint2D(x, y, FR_RADIUS, m_direction + M_PI_F);
             pPulsar2 = m_creature->SummonCreature(NPC_SHADOW_PULSAR_S, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
-        } else if (!pPulsar2->isAlive())
-                    pPulsar2->Respawn();
+        } 
+        else if (!pPulsar2->isAlive()) pPulsar2->Respawn();
     }
 
     void AttackStart(Unit *who)
@@ -1303,7 +1307,9 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         {
             m_direction = m_nextdirection;
             m_nextdirection = (m_direction - M_PI_F/64.0f);
+
             if (m_nextdirection < 0.0f ) m_nextdirection = m_nextdirection + 2.0f*M_PI_F;
+
             m_pInstance->SetData(DATA_ORB_DIRECTION, (uint32)(m_nextdirection*1000));
             m_pInstance->SetData(DATA_ORB_N, SPECIAL);
             m_pInstance->SetData(DATA_ORB_S, SPECIAL);
@@ -1323,7 +1329,8 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
             m_creature->SummonCreature(NPC_ORB_CARRIER, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
             m_timer = 30000;
             m_warning = false;
-        }   else m_timer -= uiDiff;
+        }   
+        else m_timer -= uiDiff;
     }
 };
 
@@ -1332,9 +1339,9 @@ CreatureAI* GetAI_mob_orb_rotation_focus(Creature* pCreature)
     return new mob_orb_rotation_focusAI(pCreature);
 };
 
-struct MANGOS_DLL_DECL mob_halion_orbAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_halion_orbAI : public ScriptedAI
 {
-    mob_halion_orbAI(Creature *pCreature) : BSWScriptedAI(pCreature)
+    mob_halion_orbAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
         Reset();
@@ -1350,21 +1357,26 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public BSWScriptedAI
 
     void Reset()
     {
-        if (!m_pInstance) return;
+        if (!m_pInstance) 
+            return;
+
         m_creature->SetRespawnDelay(7*DAY);
         SetCombatMovement(false);
         m_creature->SetPhaseMask(32, true);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
         if (m_creature->GetEntry() == NPC_SHADOW_PULSAR_N)
         {
             m_flag = DATA_ORB_N;
             m_delta = 0.0f;
-        } else if (m_creature->GetEntry() == NPC_SHADOW_PULSAR_S)
+        } 
+        else if (m_creature->GetEntry() == NPC_SHADOW_PULSAR_S)
         {
             m_flag = DATA_ORB_S;
             m_delta = M_PI_F;
-        };
+        }
+
         m_direction = 0.0f;
         m_uiNextPoint = 0;
         m_bMovementStarted = false;
@@ -1384,26 +1396,37 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public BSWScriptedAI
 
         if (type != POINT_MOTION_TYPE || !m_bMovementStarted) return;
 
-        if (id == m_uiNextPoint) {
-                m_creature->GetMotionMaster()->MovementExpired();
-                m_bMovementStarted = false;
-                m_pInstance->SetData(m_flag, DONE);
-                }
+        if (id == m_uiNextPoint) 
+        {
+            m_creature->GetMotionMaster()->MovementExpired();
+            m_bMovementStarted = false;
+            m_pInstance->SetData(m_flag, DONE);
+        }
     }
 
     void StartMovement(uint32 id)
     {
-        if (!m_pInstance) return;
+        if (!m_pInstance) 
+            return;
+
         m_uiNextPoint = id;
         float x,y;
         m_pInstance->SetData(m_flag, IN_PROGRESS);
         m_bMovementStarted = true;
         m_direction = ((float)m_pInstance->GetData(DATA_ORB_DIRECTION)/1000 + m_delta);
-        if (m_direction > 2.0f*M_PI_F) m_direction = m_direction - 2.0f*M_PI_F;
-        if (focus = m_pInstance->GetSingleCreatureFromStorage(NPC_ORB_ROTATION_FOCUS))
+
+        if (m_direction > 2.0f*M_PI_F)
+            m_direction = m_direction - 2.0f*M_PI_F;
+
+        if (focus = m_pInstance->GetSingleCreatureFromStorage(NPC_ORB_ROTATION_FOCUS))  
+        {        
             focus->GetNearPoint2D(x, y, FR_RADIUS, m_direction);
-            else m_creature->ForcedDespawn();
-//        debug_log("EventMGR: creature %u go to move point %u ",m_creature->GetEntry(),id);
+        }
+        else 
+        {
+            m_creature->ForcedDespawn();
+        }
+
         m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MovePoint(id, x, y,  m_creature->GetPositionZ());
     }
@@ -1413,12 +1436,8 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public BSWScriptedAI
         if (!m_pInstance || m_pInstance->GetData(TYPE_HALION) != IN_PROGRESS)
               m_creature->ForcedDespawn();
 
-        /*if (Unit* pTarget = doSelectRandomPlayerAtRange(2.0f))
-            doCast(SPELL_TWILIGHT_CUTTER, pTarget);*/
-
         if (!m_bMovementStarted && m_pInstance->GetData(m_flag) == SPECIAL)
         {
-//            debug_log("EventMGR: creature %u get direction %u ",m_creature->GetEntry(),m_pInstance->GetData(DATA_ORB_DIRECTION));
             StartMovement(1);
         }
 
@@ -1430,9 +1449,9 @@ CreatureAI* GetAI_mob_halion_orb(Creature* pCreature)
     return new mob_halion_orbAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_orb_carrierAI : public BSWScriptedAI
+struct MANGOS_DLL_DECL mob_orb_carrierAI : public ScriptedAI
 {
-    mob_orb_carrierAI(Creature *pCreature) : BSWScriptedAI(pCreature)
+    mob_orb_carrierAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = ((ScriptedInstance*)pCreature->GetInstanceData());
         Reset();
@@ -1443,7 +1462,6 @@ struct MANGOS_DLL_DECL mob_orb_carrierAI : public BSWScriptedAI
 
     void Reset()
     {
-//        m_creature->SetDisplayId(10045);
         m_creature->SetRespawnDelay(7*DAY);
         SetCombatMovement(false);
         m_creature->SetPhaseMask(32, true);
@@ -1465,11 +1483,12 @@ struct MANGOS_DLL_DECL mob_orb_carrierAI : public BSWScriptedAI
 
         if (type != POINT_MOTION_TYPE || !m_bMovementStarted) return;
 
-        if (id == 1) {
-                m_creature->GetMotionMaster()->MovementExpired();
-                m_bMovementStarted = false;
-                m_creature->ForcedDespawn();
-                }
+        if (id == 1) 
+        {
+            m_creature->GetMotionMaster()->MovementExpired();
+            m_bMovementStarted = false;
+            m_creature->ForcedDespawn();
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1477,17 +1496,18 @@ struct MANGOS_DLL_DECL mob_orb_carrierAI : public BSWScriptedAI
         if (!m_pInstance || m_pInstance->GetData(TYPE_HALION) != IN_PROGRESS)
               m_creature->ForcedDespawn();
 
-        /*if (Unit* pTarget = doSelectRandomPlayerAtRange(2.0f))
-            doCast(SPELL_TWILIGHT_CUTTER, pTarget);*/
-
         if (!m_bMovementStarted)
         {
             float x,y;
             float m_direction = ((float)m_pInstance->GetData(DATA_ORB_DIRECTION)/1000.0f + M_PI_F - M_PI_F/32.0f);
+
             if (m_direction > 2.0f*M_PI_F) m_direction = m_direction - 2.0f*M_PI_F;
+
             if (Creature* focus = m_pInstance->GetSingleCreatureFromStorage(NPC_ORB_ROTATION_FOCUS))
                 focus->GetNearPoint2D(x, y, FR_RADIUS, m_direction);
-            else m_creature->ForcedDespawn();
+            else 
+                m_creature->ForcedDespawn();
+
             m_creature->GetMotionMaster()->Clear();
             m_creature->GetMotionMaster()->MovePoint(1, x, y,  m_creature->GetPositionZ());
             m_bMovementStarted = true;
@@ -1605,16 +1625,22 @@ CreatureAI* GetAI_mob_fiery_combustion(Creature* pCreature)
 bool GOHello_go_halion_portal_twilight(Player *player, GameObject* pGo)
 {
     ScriptedInstance* m_pInstance = (ScriptedInstance*)pGo->GetInstanceData();
+
     if(!m_pInstance) return false;
+
     player->CastSpell(player,SPELL_TWILIGHT_ENTER,false);
+
     return true;
 }
 
 bool GOHello_go_halion_portal_real(Player *player, GameObject* pGo)
 {
     ScriptedInstance* m_pInstance = (ScriptedInstance*)pGo->GetInstanceData();
+
     if(!m_pInstance) return false;
+
     player->RemoveAurasDueToSpell(SPELL_TWILIGHT_ENTER);
+
     return true;
 }
 
