@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: boss_halion
-SD%Complete: 70%
+SD%Complete: 85%
 SDComment: by notagain, corrected by /dev/rsa && ukulutl
 SDCategory: Ruby Sanctum
 EndScriptData */
@@ -1111,6 +1111,8 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
     float p_RealDamage, p_TwilightDamage;
     float p_LastHP;
 
+    float p_RealCorp, p_TwilightCorp;
+
     void Reset()
     {
         if (!m_pInstance) 
@@ -1122,7 +1124,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
         SetCombatMovement(false);
         m_lastBuffReal = 0;
         m_lastBuffTwilight = 0;
-        m_corporealityTimer = 2000;
+        m_corporealityTimer = 5000;
         m_chekwipe = 5000;
         wipe = false;
         m_creature->SetActiveObjectState(true);
@@ -1131,6 +1133,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
 
         p_Last = false;
         p_RealDamage = p_TwilightDamage = 0;
+        p_RealCorp = p_TwilightCorp = 5000000;
     }
 
     void AttackStart(Unit *who)
@@ -1212,7 +1215,10 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
             }  
 
             // CORPOREALITY
-            float m_uiDiff = (p_RealDamage - p_TwilightDamage);
+            p_TwilightCorp -= p_TwilightDamage;
+            p_RealCorp -= p_RealDamage;
+
+            float m_uiDiff = ((p_TwilightCorp / 50000) - (p_RealCorp / 50000));
 
             uint8 buffnum;
             if (m_uiDiff <= Buff[0].uiDiff)
@@ -1233,14 +1239,14 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
                     }
                 }
             }
-/*
+          
             if (!m_lastBuffReal || m_lastBuffReal != Buff[buffnum].real)
             {
                 if (m_lastBuffReal)
                 {
-                    doRemove(m_lastBuffReal, pHalionReal);
+                    pHalionReal->RemoveAurasDueToSpell(m_lastBuffReal);                          
                 }
-                doCast(Buff[buffnum].real, pHalionReal);
+                pHalionReal->CastSpell(pHalionReal, Buff[buffnum].real, true);             
                 m_lastBuffReal = Buff[buffnum].real;
             }
 
@@ -1248,17 +1254,14 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
             {
                 if (m_lastBuffTwilight)
                 {
-                    doRemove(m_lastBuffTwilight, pHalionTwilight);
+                    pHalionTwilight->RemoveAurasDueToSpell(m_lastBuffTwilight);                                 
                 }
-                doCast(Buff[buffnum].twilight, pHalionTwilight);
+                pHalionTwilight->CastSpell(pHalionTwilight, Buff[buffnum].twilight, true);                      
                 m_lastBuffTwilight = Buff[buffnum].twilight;
             }
 
-            debug_log("ruby_sanctum: Buff num = %u, m_uiDiff = %d ", buffnum, m_uiDiff);
-
             m_pInstance->SetData(TYPE_COUNTER, (uint32)Buff[buffnum].disp_corp);
 
-        }*/
             m_corporealityTimer = 5000;
         }
         else  m_corporealityTimer -= uiDiff; 
