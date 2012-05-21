@@ -221,6 +221,33 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
         m_creature->SetActiveObjectState(false);
     }
 
+    void EndBattle()
+    {
+        Map *pMap = m_creature->GetMap();
+
+        if(pMap)
+        {
+            Map::PlayerList const &players = pMap->GetPlayers();
+
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if(itr->getSource()->HasAura(SPELL_TWILIGHT_ENTER))
+                {
+                    itr->getSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_ENTER);
+                }
+            }
+        }
+
+        if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
+            pGoPortal->Delete();
+
+        if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_2))
+            pGoPortal->Delete();
+
+        if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_3))
+            pGoPortal->Delete();
+    }
+
     void JustDied(Unit* pKiller)
     {
         if (!m_pInstance)
@@ -236,23 +263,13 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
                 DoScriptText(SAY_HALION_DEATH,m_creature);
 
-                if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
-                       pGoPortal->Delete();
-
-                if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_2))
-                       pGoPortal->Delete();
-
-                if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_3))
-                       pGoPortal->Delete();
+                EndBattle();
             }
             else
             {
                 m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
                 pKiller->DealDamage(pclone, pclone->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
             }
-            
-            if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_3))
-               pGoPortal->Delete();
         }
     }
 
@@ -677,6 +694,33 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
+    void EndBattle()
+    {
+        Map *pMap = m_creature->GetMap();
+
+        if(pMap)
+        {
+            Map::PlayerList const &players = pMap->GetPlayers();
+
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            {
+                if(itr->getSource()->HasAura(SPELL_TWILIGHT_ENTER))
+                {
+                    itr->getSource()->RemoveAurasDueToSpell(SPELL_TWILIGHT_ENTER);
+                }
+            }
+        }
+
+        if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
+            pGoPortal->Delete();
+
+        if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_2))
+            pGoPortal->Delete();
+
+        if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_3))
+            pGoPortal->Delete();
+    }
+
     void JustDied(Unit* pKiller)
     {
         if (!m_pInstance)
@@ -690,6 +734,8 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
                 pReal->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
                 m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
                 DoScriptText(SAY_HALION_DEATH, m_creature);
+
+                EndBattle();
             }
             else 
                 pKiller->DealDamage(pReal, pReal->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
