@@ -248,7 +248,11 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             else
             {
                 m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                pKiller->DealDamage(pclone, pclone->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
             }
+            
+            if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_3))
+               pGoPortal->Delete();
         }
     }
 
@@ -687,6 +691,8 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
                 m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
                 DoScriptText(SAY_HALION_DEATH, m_creature);
             }
+            else 
+                pKiller->DealDamage(pReal, pReal->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
         }
         m_creature->SetVisibility(VISIBILITY_OFF);
     }
