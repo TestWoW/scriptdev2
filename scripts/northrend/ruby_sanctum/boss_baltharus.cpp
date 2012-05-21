@@ -203,6 +203,8 @@ struct MANGOS_DLL_DECL boss_baltharusAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
+        if(m_bIsHeroic) DoCastSpellIfCan(m_creature, 47008);  // heroic mode disabled
+
         if (!m_bInCombat && !m_creature->IsNonMeleeSpellCasted(false))
             m_creature->CastSpell(pDummyTarget, SPELL_CHANNEL_SPELL, false);
 

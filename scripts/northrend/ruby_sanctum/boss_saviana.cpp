@@ -165,6 +165,8 @@ struct MANGOS_DLL_DECL boss_ragefireAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if(m_bIsHeroic) DoCastSpellIfCan(m_creature, 47008);  // heroic mode disabled
+
         switch (m_uiPhase)
         {
         case PHASE_GROUND:
