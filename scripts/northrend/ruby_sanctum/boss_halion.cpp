@@ -21,7 +21,7 @@ SDComment: by notagain, corrected by /dev/rsa && ukulutl
 SDCategory: Ruby Sanctum
 EndScriptData */
 
-// TODO: correct timers, Add twilight interorbs connection, TESTING
+// TODO: Add twilight interorbs connection, TESTING
 // Attention please! This script required some core modification.
 
 #include "precompiled.h"
@@ -407,7 +407,6 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                 if (m_bMovementStarted)
                     return;
 
-                //m_creature->CastSpell(m_creature, SPELL_SUMMON_TWILIGHT_PORTAL, true);
                 if (GameObject* pGoPortal = m_creature->SummonGameobject(GO_HALION_PORTAL_1, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, 0))
                       pGoPortal->SetPhaseMask(31,true);
                 if (GameObject* pGoRing = m_pInstance->GetSingleGameObjectFromStorage(GO_FLAME_RING))
@@ -796,6 +795,12 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
                     {
                         pReal->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     }
+                }
+
+                if(!m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_3))
+                {
+                    if (GameObject *pGoPortal1 = m_creature->SummonGameobject(GO_HALION_PORTAL_3, SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, 0, 0))
+                        pGoPortal1->SetPhaseMask(32,true);
                 }
 
                 if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
