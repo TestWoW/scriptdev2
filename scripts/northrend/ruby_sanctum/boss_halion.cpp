@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: boss_halion
-SD%Complete: 85%
+SD%Complete: 70%
 SDComment: by notagain, corrected by /dev/rsa && ukulutl
 SDCategory: Ruby Sanctum
 EndScriptData */
@@ -486,6 +486,9 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                 break;
 
             case 8: //PHASE 3 BOTH REALMS
+                if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
+                    pGoPortal->Delete();
+
                 if (!m_creature->getVictim())
                 {
                     if (Creature* pClone = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_TWILIGHT))
@@ -718,6 +721,12 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
             case 0:
                 break;
             case 1:           //SPAWNED - Twilight realm
+                if(!m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
+                {
+                    if (GameObject* pGoPortal = m_creature->SummonGameobject(GO_HALION_PORTAL_1, SpawnLoc[0].x, SpawnLoc[0].y, SpawnLoc[0].z, 0, 0))
+                        pGoPortal->SetPhaseMask(31,true);
+                }
+
                 if (!m_creature->HasAura(SPELL_DUSK_SHROUD))
                     m_creature->CastSpell(m_creature, SPELL_DUSK_SHROUD, true);
 
