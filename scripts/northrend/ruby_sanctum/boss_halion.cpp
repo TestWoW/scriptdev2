@@ -1344,8 +1344,6 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
     uint32 m_timer;
-    Creature* pPulsar1;
-    Creature* pPulsar2;
     float m_direction, m_nextdirection;
     bool m_warning;
 
@@ -1362,7 +1360,7 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         m_timer = 30000;
         m_warning = false;
 
-        /*Creature**/ pPulsar1 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N);
+        Creature* pPulsar1 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N);
 
         if (!pPulsar1 )
         {
@@ -1372,7 +1370,7 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         } 
         else if (!pPulsar1->isAlive()) pPulsar1->Respawn();
 
-        /*Creature* */pPulsar2 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_S);
+        Creature* pPulsar2 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_S);
 
         if (!pPulsar2)
         {
@@ -1418,14 +1416,6 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
             float x,y;
             m_creature->GetNearPoint2D(x, y, FR_RADIUS, m_nextdirection);
             m_creature->SummonCreature(NPC_ORB_CARRIER, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
-
-            // cast shadow cutter
-            pPulsar2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            pPulsar2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            pPulsar1->CastSpell(pPulsar2, SPELL_TWILIGHT_CUTTER, false);
-            pPulsar2->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            pPulsar2->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
             m_timer = 30000;
             m_warning = false;
         }   
@@ -1453,7 +1443,6 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public ScriptedAI
     bool m_bMovementStarted;
     Creature* focus;
     uint32 m_uiNextPoint;
-    uint32 m_cutter;
 
     void Reset()
     {
@@ -1481,7 +1470,6 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public ScriptedAI
         m_uiNextPoint = 0;
         m_bMovementStarted = false;
         m_pInstance->SetData(m_flag, DONE);
-        m_cutter = 30000;
         debug_log("EventMGR: creature %u assume m_flag %u ",m_creature->GetEntry(),m_flag);
     }
 
@@ -1541,12 +1529,6 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public ScriptedAI
         {
             StartMovement(1);
         }
-
-       /* if(m_cutter <= uiDiff)
-        {
-            m_creature->CastSpell(m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N), SPELL_TWILIGHT_CUTTER, true);
-        }
-        else m_cutter -= uiDiff;*/
 
     }
 };
