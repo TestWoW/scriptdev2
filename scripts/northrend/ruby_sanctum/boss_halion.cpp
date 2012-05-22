@@ -159,6 +159,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
         if (GameObject* pGoPortal = m_pInstance->GetSingleGameObjectFromStorage(GO_HALION_PORTAL_1))
                pGoPortal->Delete();
@@ -1169,7 +1170,6 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     uint32 m_lastBuffReal, m_lastBuffTwilight;
     uint32 m_corporealityTimer;
-    uint32 m_chekwipe;
     bool wipe;
 
     bool p_Last;
@@ -1191,7 +1191,6 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
         m_lastBuffReal = 0;
         m_lastBuffTwilight = 0;
         m_corporealityTimer = 5000;
-        m_chekwipe = 5000;
         wipe = false;
         m_creature->SetActiveObjectState(true);
         m_pInstance->SetData(TYPE_COUNTER, COUNTER_OFF);
@@ -1216,35 +1215,29 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        if(m_chekwipe <= uiDiff)
-        {
-            wipe = true;
+        wipe = true;
 
-            Map *pMap = m_creature->GetMap();
+        Map *pMap = m_creature->GetMap();
 
-            if(!pMap) return;
+        if(!pMap) return;
         
-            Map::PlayerList const &players = pMap->GetPlayers();
+        Map::PlayerList const &players = pMap->GetPlayers();
 
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        {
+            if(itr->getSource()->isAlive())
             {
-                if(itr->getSource()->isAlive())
-                {
-                    wipe = false;
-                    break;
-                }
+                wipe = false;
+                break;
             }
-
-            if (wipe) 
-            {
-                m_pInstance->SetData(TYPE_HALION_EVENT, FAIL);
-                m_pInstance->SetData(TYPE_HALION, FAIL);
-                m_creature->ForcedDespawn();
-            }
-
-            m_chekwipe = 5000;
         }
-        else m_chekwipe -= uiDiff;
+
+        if (wipe) 
+        {
+            m_pInstance->SetData(TYPE_HALION_EVENT, FAIL);
+            m_pInstance->SetData(TYPE_HALION, FAIL);
+            m_creature->ForcedDespawn();
+        }
 
         if (m_pInstance->GetData(TYPE_HALION_EVENT) != SPECIAL) return;
 
@@ -1351,6 +1344,8 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
     uint32 m_timer;
+    Creature* pPulsar1;
+    Creature* pPulsar2;
     float m_direction, m_nextdirection;
     bool m_warning;
 
@@ -1367,7 +1362,7 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         m_timer = 30000;
         m_warning = false;
 
-        Creature* pPulsar1 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N);
+        /*Creature**/ pPulsar1 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N);
 
         if (!pPulsar1 )
         {
@@ -1377,7 +1372,7 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         } 
         else if (!pPulsar1->isAlive()) pPulsar1->Respawn();
 
-        Creature* pPulsar2 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_S);
+        /*Creature* */pPulsar2 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_S);
 
         if (!pPulsar2)
         {
@@ -1423,6 +1418,14 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
             float x,y;
             m_creature->GetNearPoint2D(x, y, FR_RADIUS, m_nextdirection);
             m_creature->SummonCreature(NPC_ORB_CARRIER, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+
+            // cast shadow cutter
+            pPulsar2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pPulsar2->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            pPulsar1->CastSpell(pPulsar2, SPELL_TWILIGHT_CUTTER, false);
+            pPulsar2->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pPulsar2->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
             m_timer = 30000;
             m_warning = false;
         }   
@@ -1450,6 +1453,7 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public ScriptedAI
     bool m_bMovementStarted;
     Creature* focus;
     uint32 m_uiNextPoint;
+    uint32 m_cutter;
 
     void Reset()
     {
@@ -1477,6 +1481,7 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public ScriptedAI
         m_uiNextPoint = 0;
         m_bMovementStarted = false;
         m_pInstance->SetData(m_flag, DONE);
+        m_cutter = 30000;
         debug_log("EventMGR: creature %u assume m_flag %u ",m_creature->GetEntry(),m_flag);
     }
 
@@ -1536,6 +1541,12 @@ struct MANGOS_DLL_DECL mob_halion_orbAI : public ScriptedAI
         {
             StartMovement(1);
         }
+
+       /* if(m_cutter <= uiDiff)
+        {
+            m_creature->CastSpell(m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N), SPELL_TWILIGHT_CUTTER, true);
+        }
+        else m_cutter -= uiDiff;*/
 
     }
 };
