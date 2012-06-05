@@ -123,7 +123,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
         m_uiBerserkTimer            = 10 * MINUTE * IN_MILLISECONDS;
         m_uiBoneSliceTimer          = 10000;
         m_uiColdflameTimer          = 5000;
-        m_uiBoneSpikeTimer          = 12000;
+        m_uiBoneSpikeTimer          = 12300;
         m_uiBoneStormTimer          = 45000;
         m_uiBoneStormChargeTimer    = 3000;
         m_uiBoneStormColdflameTimer = 1000;
@@ -272,13 +272,30 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                 // don't count timer twice on heroic!
                 if (!m_bIsHeroic)
                 {
-                    if (m_uiBoneSpikeTimer <= uiDiff)
+                    // temporal
+                    if (m_uiBoneSpikeTimer - 300 <= uiDiff)
                     {
                             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                             {
                                 m_creature->CastSpell(pTarget, m_bIs25Man ? SPELL_BONE_SPIKE_25 : SPELL_BONE_SPIKE_10, false);
-                                m_uiBoneSpikeTimer = urand(20000, 30000);
+                                //m_uiBoneSpikeTimer = urand(20000, 30000);
                                 DoScriptText(SAY_BONE_SPIKE_1 - urand(0, 2), m_creature);
+                            }
+                    }
+
+                    if (m_uiBoneSpikeTimer <= uiDiff)
+                    {
+                            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                            {     	
+                                float x, y, z;
+
+                                pTarget->GetPosition(x, y, z);
+                                Creature *pSpike = pTarget->SummonCreature(38711, x, y, z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 2000);
+
+                                if (pSpike)
+                                    pTarget->CastSpell(pSpike, 46598, true);
+
+                                m_uiBoneSpikeTimer = urand(20300, 30300);
                             }
                     }
                     else
