@@ -285,7 +285,9 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
 
                     if (m_uiBoneSpikeTimer <= uiDiff)
                     {
-                            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                            uint32 spyke = m_bIs25Man ? 4 : 2;
+
+                            while (spyke) if(Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                             {     	
                                 float x, y, z;
 
@@ -296,6 +298,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                                     pTarget->CastSpell(pSpike, 46598, true);
 
                                 m_uiBoneSpikeTimer = urand(20300, 30300);
+                                --spyke;
                             }
                     }
                     else
