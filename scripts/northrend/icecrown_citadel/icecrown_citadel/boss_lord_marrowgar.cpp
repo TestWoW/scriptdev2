@@ -123,7 +123,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
         m_uiBerserkTimer            = 10 * MINUTE * IN_MILLISECONDS;
         m_uiBoneSliceTimer          = 10000;
         m_uiColdflameTimer          = 5000;
-        m_uiBoneSpikeTimer          = 12300;
+        m_uiBoneSpikeTimer          = 15000;
         m_uiBoneStormTimer          = 45000;
         m_uiBoneStormChargeTimer    = 3000;
         m_uiBoneStormColdflameTimer = 1000;
@@ -273,7 +273,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                 if (!m_bIsHeroic)
                 {
                     // temporal
-                    if (m_uiBoneSpikeTimer - 300 <= uiDiff)
+                    if (m_uiBoneSpikeTimer - 3000 <= uiDiff)
                     {
                             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                             {
@@ -297,7 +297,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                                 if (pSpike)
                                     pTarget->CastSpell(pSpike, 46598, true);
 
-                                m_uiBoneSpikeTimer = urand(20300, 30300);
+                                m_uiBoneSpikeTimer = urand(23000, 33000);
                                 --spyke;
                             }
                     }
