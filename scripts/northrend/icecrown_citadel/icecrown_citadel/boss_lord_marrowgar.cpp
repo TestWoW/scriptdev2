@@ -287,18 +287,21 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                     {
                             uint32 spyke = m_bIs25Man ? 4 : 2;
 
-                            while (spyke) if(Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                            {     	
-                                float x, y, z;
+                            if(Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                            {
+                                while (spyke) if(Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                                {     	
+                                    float x, y, z;
 
-                                pTarget->GetPosition(x, y, z);
-                                Creature *pSpike = pTarget->SummonCreature(38711, x, y, z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 2000);
+                                    pTarget->GetPosition(x, y, z);
+                                    Creature *pSpike = pTarget->SummonCreature(38711, x, y, z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 2000);
 
-                                if (pSpike)
-                                    pTarget->CastSpell(pSpike, 46598, true);
+                                    if (pSpike)
+                                        pTarget->CastSpell(pSpike, 46598, true);
 
-                                m_uiBoneSpikeTimer = urand(23000, 33000);
-                                --spyke;
+                                    m_uiBoneSpikeTimer = urand(23000, 33000);
+                                    --spyke;
+                                }
                             }
                     }
                     else
