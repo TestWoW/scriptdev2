@@ -161,6 +161,7 @@ void instance_ulduar::OnObjectCreate(GameObject *pGo)
         // doors & other
         // The siege
         case GO_SHIELD_WALL:
+            pGo->SetGoState(GO_STATE_READY);
             break;
         case GO_LEVIATHAN_GATE:
             if(m_auiEncounter[0] == DONE)
