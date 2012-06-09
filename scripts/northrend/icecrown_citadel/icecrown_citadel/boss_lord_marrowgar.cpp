@@ -272,8 +272,19 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                 // don't count timer twice on heroic!
                 if (!m_bIsHeroic)
                 {
+                    if (m_uiBoneSpikeTimer <= uiDiff)
+                    {
+                            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                            {
+                                m_creature->CastSpell(pTarget, m_bIs25Man ? SPELL_BONE_SPIKE_25 : SPELL_BONE_SPIKE_10, false);
+                                m_uiBoneSpikeTimer = urand(20000, 30000);
+                                DoScriptText(SAY_BONE_SPIKE_1 - urand(0, 2), m_creature);
+                            }
+                    }
+                    else
+                        m_uiBoneSpikeTimer -= uiDiff;
                     // temporal
-                    if (m_uiBoneSpikeTimer - 3000 <= uiDiff)
+                    /*if (m_uiBoneSpikeTimer - 3000 <= uiDiff)
                     {
                             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                             {
@@ -305,7 +316,7 @@ struct MANGOS_DLL_DECL boss_lord_marrowgarAI : public base_icc_bossAI
                             }
                     }
                     else
-                        m_uiBoneSpikeTimer -= uiDiff;
+                        m_uiBoneSpikeTimer -= uiDiff;*/
                 }
 
                 // Bone Storm
