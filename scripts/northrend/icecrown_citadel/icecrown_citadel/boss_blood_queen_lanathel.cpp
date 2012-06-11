@@ -206,6 +206,7 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LANATHEL, IN_PROGRESS);
 
+        DoCastSpellIfCan(m_creature, 70986, CAST_TRIGGERED); // temporal
         DoCastSpellIfCan(m_creature, SPELL_SHROUD_OF_SORROW, CAST_TRIGGERED);
         SetEquipmentSlots(false, EQUIP_MAIN, EQUIP_OFFHAND, EQUIP_RANGED);
 
