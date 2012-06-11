@@ -1813,99 +1813,97 @@ enum GargoyleSpells
     SPELL_GARGOYLE_STRIKE = 51963      // Don't know if this is the correct spell, it does about 700-800 damage points
 };
 
+#define GARGOYLE_STRIKE_RANGE 40.0f
+
 struct MANGOS_DLL_DECL npc_death_knight_gargoyle : public ScriptedAI
 {
     npc_death_knight_gargoyle(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        // "gargoyle flies into the area"
+        pCreature->NearTeleportTo(m_creature->GetPositionX()+5.0f, m_creature->GetPositionY()+5.0f, m_creature->GetPositionZ()+15.0f, m_creature->GetOrientation(), false);
+        m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX()-5.0f, m_creature->GetPositionY()-5.0f, m_creature->GetPositionZ()-14.0f);
+   
+        m_uiCreatorGuid = m_creature->GetCreatorGuid();
+
         Reset();
     }
-    uint32 m_uiGargoyleStrikeTimer;
+
     bool inCombat;
+    bool movement;
+    float angle;
+    ObjectGuid m_uiCreatorGuid;
+    uint32 m_uiStrikeTimer;
     Unit *owner;
 
-
-    void Reset() 
+    void Reset()
     {
-     owner = m_creature->GetOwner();
-     if (!owner) return;
+        m_uiStrikeTimer = 0;
 
-     m_creature->SetLevel(owner->getLevel());
-     m_creature->setFaction(owner->getFaction());
+        inCombat = false;
+        movement = false;
 
-     m_creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
-     m_creature->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-     m_creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 50331648);
-     m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 50331648);
-     m_creature->SetLevitate(true);
+        owner = m_creature->GetOwner();
 
-     inCombat = false;
-     m_uiGargoyleStrikeTimer = urand(3000, 5000);
-
-     float fPosX, fPosY, fPosZ;
-     owner->GetPosition(fPosX, fPosY, fPosZ);
-
-     m_creature->NearTeleportTo(fPosX, fPosY, fPosZ+10.0f, m_creature->GetAngle(owner));
-
-
-     if (owner && !m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+        if (owner && !m_creature->hasUnitState(UNIT_STAT_FOLLOW))
         {
+            angle = m_creature->GetAngle(owner);
             m_creature->GetMotionMaster()->Clear(false);
-            m_creature->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST + 3.0f, m_creature->GetAngle(owner));
+            m_creature->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST + 3.0f, angle);
         }
 
-      if(owner->IsPvP())
-                 m_creature->SetPvP(true);
-      if(owner->IsFFAPvP())
-                 m_creature->SetFFAPvP(true);
+        if(owner->IsPvP())
+            m_creature->SetPvP(true);
+        if(owner->IsFFAPvP())
+            m_creature->SetFFAPvP(true);
+
     }
 
     void EnterEvadeMode()
     {
-     if (m_creature->IsInEvadeMode() || !m_creature->isAlive())
-          return;
+        if (m_creature->IsInEvadeMode() || !m_creature->isAlive())
+             return;
 
-        inCombat = false;
+       inCombat = false;
 
-        m_creature->AttackStop();
-        m_creature->CombatStop(true);
-        if (owner && !m_creature->hasUnitState(UNIT_STAT_FOLLOW))
-        {
-            m_creature->GetMotionMaster()->Clear(false);
-            m_creature->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST + 3.0f, m_creature->GetAngle(owner));
-        }
+       m_creature->AttackStop();
+       m_creature->CombatStop(true);
+       if (owner && !m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+       {
+           angle = m_creature->GetAngle(owner);
+           m_creature->GetMotionMaster()->Clear(false);
+           m_creature->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST + 3.0f,angle);            
+       
+       }
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit *pWho)
     {
-      if (!pWho) return;
+        if (!pWho) 
+            return;
 
-      if (m_creature->Attack(pWho, true))
+        if (m_creature->Attack(pWho, true))
         {
             m_creature->clearUnitState(UNIT_STAT_FOLLOW);
             m_creature->SetInCombatWith(pWho);
             pWho->SetInCombatWith(m_creature);
             m_creature->AddThreat(pWho, 100.0f);
-            DoStartMovement(pWho, 10.0f);
+            DoStartMovement(pWho, 30.0f);
             SetCombatMovement(true);
             inCombat = true;
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff)
     {
-
-        if (!owner || !owner->IsInWorld())
-        {
+        if (!owner || !owner->isAlive()) 
             m_creature->ForcedDespawn();
-            return;
-        }
 
         if (!m_creature->getVictim())
             if (owner && owner->getVictim())
                 AttackStart(owner->getVictim());
 
         if (m_creature->getVictim() && m_creature->getVictim() != owner->getVictim())
-                AttackStart(owner->getVictim());
+            AttackStart(owner->getVictim());
 
         if (inCombat && !m_creature->getVictim())
         {
@@ -1913,14 +1911,25 @@ struct MANGOS_DLL_DECL npc_death_knight_gargoyle : public ScriptedAI
             return;
         }
 
-        if (!inCombat) return;
+        if (!inCombat) 
+            return;
 
-        if (m_uiGargoyleStrikeTimer <= uiDiff)
+        if (m_creature->IsWithinDistInMap(m_creature->getVictim(),30.0f))
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_GARGOYLE_STRIKE);
-            m_uiGargoyleStrikeTimer = urand(3000, 5000);
+            movement = false;
+            // Gargoyle Strike
+            if (m_uiStrikeTimer <= uiDiff)
+            {
+                DoCastSpellIfCan(owner->getVictim(), SPELL_GARGOYLE_STRIKE);
+                m_uiStrikeTimer = 2000;
+            }else m_uiStrikeTimer -= uiDiff;
         }
-        else m_uiGargoyleStrikeTimer -= uiDiff;
+        else
+            if (!movement) 
+            {
+                DoStartMovement(m_creature->getVictim(), 20.0f);
+                movement = true;
+            }
     }
 };
 
