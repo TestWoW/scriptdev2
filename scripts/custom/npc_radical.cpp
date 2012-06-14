@@ -1,4 +1,6 @@
 #include "precompiled.h"
+#include "sc_creature.h"
+#include "sc_gossip.h"
 #include <time.h>
 
 /*########

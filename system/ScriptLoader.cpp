@@ -3,7 +3,6 @@
 * Please see the included DOCS/LICENSE.TXT for more information */
 
 #include "precompiled.h"
-#include "../scripts/custom/npc_radical.cpp"
 
 // battlegrounds
 extern void AddSC_battleground();
