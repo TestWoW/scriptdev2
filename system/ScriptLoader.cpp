@@ -3,6 +3,7 @@
 * Please see the included DOCS/LICENSE.TXT for more information */
 
 #include "precompiled.h"
+#include "../scripts/custom/npc_radical.cpp"
 
 // battlegrounds
 extern void AddSC_battleground();
@@ -10,6 +11,7 @@ extern void AddSC_battlegroundSA();
 extern void AddSC_battlegroundIC();
 
 // custom
+extern void AddSC_npcs_radical();
 extern void AddSC_mob_teleguy();
 extern void AddSC_npc_arena_honor();
 
@@ -541,6 +543,7 @@ void AddScripts()
     AddSC_battlegroundIC();
 
     // custom
+    AddSC_npcs_radical();
     AddSC_mob_teleguy();
     AddSC_npc_arena_honor();
 
