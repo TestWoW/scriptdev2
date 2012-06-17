@@ -3,14 +3,6 @@
 #include "sc_gossip.h"
 #include <time.h>
 
-#include "WorldPacket.h"
-#include "ObjectMgr.h"
-#include "ObjectGuid.h"
-#include "ArenaTeam.h"
-#include "World.h"
-#include "Player.h"
-#include "World.h"
-
 /*########
 ## npc_logroneitor
 ## Radical custom npc 
