@@ -20,6 +20,19 @@
     return (timeinfo.tm_mon == 5 && timeinfo.tm_mday == 24);
 }  */  
 
+//creo que esta si va a funcionar
+/*bool is_birthday_date()
+{
+    time_t rawtime; 
+    struct tm * timeinfo; 
+
+    time ( &rawtime ); 
+    timeinfo = localtime ( &rawtime ); 
+
+    return (timeinfo.tm_mday == 24 && timeinfo.tm_mon==5);
+
+}*/
+
 bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
 {
     char const* GOSSIP_LONELY;
