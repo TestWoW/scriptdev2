@@ -259,6 +259,46 @@ bool GossipSelect_logroneitor_alliance(Player* pPlayer, Creature* pCreature, uin
 }
 
 /*########
+## npc_aucherus_teleporter
+## Radical custom npc
+######*/
+
+bool GossipHello_acherus_teleporter_up(Player* pPlayer, Creature* pCreature)
+{
+    char const* OPTION = "Quiero ir al piso de arriba";
+ 
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
+}
+
+bool GossipSelect_acherus_teleporter_up(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+
+    switch(uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        default:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->TeleportTo(0, 2402.718994, -5632.788534, 420.667847, pPlayer->GetOrientation());
+            break;
+    }
+}
+
+bool GossipHello_acherus_teleporter_down(Player* pPlayer, Creature* pCreature)
+{
+    char const* OPTION = "Quiero ir al piso de abajo";
+ 
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
+}
+
+bool GossipSelect_acherus_teleporter_down(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    pPlayer->CLOSE_GOSSIP_MENU();
+    pPlayer->TeleportTo(0, 2402.718994, -5632.788534, 377.022003, pPlayer->GetOrientation());
+}
+
+/*########
 ## boss_staff
 ## Radical custom BOSS
 ######*/
@@ -685,6 +725,18 @@ void AddSC_npcs_radical()
     pNewScript->Name = "logroneitor_alliance";
     pNewScript->pGossipHello = &GossipHello_logroneitor_alliance;
     pNewScript->pGossipSelect = &GossipSelect_logroneitor_alliance;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "teleport_acherus_up";
+    pNewScript->pGossipHello = &GossipHello_acherus_teleporter_up;
+    pNewScript->pGossipSelect = &GossipSelect_acherus_teleporter_up;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "teleport_acherus_down";
+    pNewScript->pGossipHello = &GossipHello_acherus_teleporter_down;
+    pNewScript->pGossipSelect = &GossipSelect_acherus_teleporter_down;
     pNewScript->RegisterSelf();
 
     /** BOSS STAFF **/
