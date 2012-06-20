@@ -404,10 +404,9 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
                     if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                     {
                         DoCastSpellIfCan(pTarget, HEAT_FLOOR);
-                        heatFloor = 6000;
                     }
 
-                    if(DoCastSpellIfCan(m_creature, HEAT_FLOOR) == CAST_OK) heatFloor = 6000;
+                    if(DoCastSpellIfCan(m_creature, HEAT_FLOOR) == CAST_OK) heatFloor = 3000;
                 }
                 else heatFloor -= uiDiff;
 
@@ -715,7 +714,7 @@ CreatureAI* GetAI_boss_hastur(Creature* pCreature)
 }
 
 // shyla
-/*
+
 enum shylasays
 {
     SHYLA_SAY_AGRO        = -2000030,
@@ -826,7 +825,7 @@ struct MANGOS_DLL_DECL boss_shyla : public ScriptedAI
 CreatureAI* GetAI_boss_shyla(Creature* pCreature)
 {
     return new boss_shyla(pCreature);
-}*/
+}
 
 void AddSC_npcs_radical()
 {
@@ -872,8 +871,8 @@ void AddSC_npcs_radical()
     pNewScript->GetAI = &GetAI_boss_hastur;
     pNewScript->RegisterSelf();
 
-/*    pNewScript = new Script;
+    pNewScript = new Script;
     pNewScript->Name = "boss_shyla";
     pNewScript->GetAI = &GetAI_boss_shyla;
-    pNewScript->RegisterSelf();*/
+    pNewScript->RegisterSelf();
 }
