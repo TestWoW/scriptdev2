@@ -21,10 +21,3 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000022', 'Volvere!!! y no os atendere!!!', '1', 'Dead Hastur'),
 ('-2000023', 'No mas SUSURROS', '1', 'HP low');
 
--- Shyla
-INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
-('-2000030', 'Vuestro fin se acerca', '1', 'agro shyla'),
-('-2000031', 'avisare a vuestros familiares de vuestra muerte', '1', 'kill shyla'),
-('-2000032', '', '1', 'Dead shyla'),
-('-2000033', 'O la reina en pena', '1', 'essence');
-
