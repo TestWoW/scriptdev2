@@ -601,7 +601,7 @@ enum Hastursays
     HASTUR_SAY_AGRO        = -2000020,
     HASTUR_SAY_KILL        = -2000021,
     HASTUR_SAY_DEAD        = -2000022,
-    HASTUR_SAY_BALL       = -2000023,
+    HASTUR_SAY_BALL       = -2000023
 };
 
 enum Hasturspells
@@ -713,6 +713,120 @@ CreatureAI* GetAI_boss_hastur(Creature* pCreature)
     return new boss_hastur(pCreature);
 }
 
+// shyla
+
+enum shylasays
+{
+    SHYLA_SAY_AGRO        = -2000030,
+    SHYLA_SAY_KILL        = -2000031,
+    SHYLA_SAY_DEAD        = -2000032,
+    SHYLA_SAY_ESSENCE     = -2000033
+};
+
+enum shylaspells
+{
+    FROST_BALL_VOLEY          = 72907,
+    MANA_BARRIER              = 70842,
+    DEATH_AND_DECAY           = 72110,
+    ESSENCE                   = 71533,
+    DELIRIUS_SLASH            = 72264
+};
+
+struct MANGOS_DLL_DECL boss_shyla : public ScriptedAI
+{
+    boss_shyla(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    uint32 frostBall;
+    uint32 deathAndDecay;
+    uint32 essence;
+    uint32 deliriusSlash;
+ 
+    void Reset()
+    {
+        frostBall = 15000;
+        deathAndDecay = 10000;
+        essence = 30000;
+        deliriusSlash = 20000;  
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+        DoScriptText(SHYLA_SAY_KILL, m_creature);
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+        DoScriptText(SHYLA_SAY_DEAD, m_creature);
+    }
+
+    void Aggro(Unit* pWho)
+    {
+        DoScriptText(SHYLA_SAY_AGRO, m_creature);
+        DoCastSpellIfCan(m_creature, MANA_BARRIER);
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if(frostBall < uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                DoCastSpellIfCan(pTarget, FROST_BALL_VOLEY);
+                frostBall = 15000;
+            }
+        }
+        else frostBall -= uiDiff;
+
+        if(deathAndDecay < uiDiff)
+        {
+            bool range = urand(1,0);
+            
+            if(range) if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                DoCastSpellIfCan(pTarget, DEATH_AND_DECAY);
+                deathAndDecay = 10000;
+            }
+            else if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            {
+                DoCastSpellIfCan(pTarget, DEATH_AND_DECAY);
+                deathAndDecay = 10000;
+            }
+        }
+        else deathAndDecay -= uiDiff;
+
+        if(essence < uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                DoScriptText(SHYLA_SAY_ESSENCE, m_creature);
+                DoCastSpellIfCan(pTarget, ESSENCE);
+                essence = 90000;
+            }
+        }
+        else essence -= uiDiff;
+        
+        if(deliriusSlash < uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                if (DoCastSpellIfCan(pTarget, DELIRIUS_SLASH) == CAST_OK)
+                    deliriusSlash = 20000;
+            }
+        }
+        else deliriusSlash -= uiDiff;
+
+        DoMeleeAttackIfReady();   
+    }
+};
+
+CreatureAI* GetAI_boss_shyla(Creature* pCreature)
+{
+    return new boss_shyla(pCreature);
+}
+
 void AddSC_npcs_radical()
 {
     Script* pNewScript;
@@ -755,5 +869,10 @@ void AddSC_npcs_radical()
     pNewScript = new Script;
     pNewScript->Name = "boss_hastur";
     pNewScript->GetAI = &GetAI_boss_hastur;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_shyla";
+    pNewScript->GetAI = &GetAI_boss_shyla;
     pNewScript->RegisterSelf();
 }
