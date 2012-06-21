@@ -25,6 +25,6 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000030', 'Vuestro fin se acerca', '1', 'agro shyla'),
 ('-2000031', 'avisare a vuestros familiares de vuestra muerte', '1', 'kill shyla'),
-('-2000032', '', '1', 'Dead shyla'),
+('-2000032', 'Me vengare!!', '1', 'Dead shyla'),
 ('-2000033', 'O la reina en pena', '1', 'essence');
 
