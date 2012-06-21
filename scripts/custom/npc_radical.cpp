@@ -268,7 +268,8 @@ bool GossipHello_acherus_teleporter_up(Player* pPlayer, Creature* pCreature)
     char const* OPTION = "Quiero ir al piso de arriba";
  
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
+
+    pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
 }
 
 bool GossipSelect_acherus_teleporter_up(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
@@ -289,7 +290,8 @@ bool GossipHello_acherus_teleporter_down(Player* pPlayer, Creature* pCreature)
     char const* OPTION = "Quiero ir al piso de abajo";
  
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
+
+    pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
 }
 
 bool GossipSelect_acherus_teleporter_down(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
@@ -489,7 +491,7 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
  
     void Reset()
     {
-        if(pet) pet->ForcedDespawn();
+        //if(pet) pet->ForcedDespawn();
         phase = 0;
  
         explosiveShot = 10000;
