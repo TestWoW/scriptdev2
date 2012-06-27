@@ -850,7 +850,7 @@ struct MANGOS_DLL_DECL mob_dark_nucleusAI : public ScriptedAI
     {
         DoResetThreat();
         m_creature->AddThreat(pDealer, 100000.0f);
-        m_creature->InterruptSpell(CURRENT_CHANNELED_SPELL);
+        m_creature->InterruptNonMeleeSpells(true);
     }
 
     void UpdateAI(const uint32 uiDiff)
