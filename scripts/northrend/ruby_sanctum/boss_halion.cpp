@@ -1276,7 +1276,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
             p_TwilightCorp -= p_TwilightDamage;
             p_RealCorp -= p_RealDamage;
 
-            float m_uiDiff = ((p_TwilightCorp / 111560) - (p_RealCorp / 111560));
+            float m_uiDiff = (p_RealCorp / 111560) - (p_TwilightCorp / 111560);
 
             uint8 buffnum;
             if (m_uiDiff <= Buff[0].uiDiff)
