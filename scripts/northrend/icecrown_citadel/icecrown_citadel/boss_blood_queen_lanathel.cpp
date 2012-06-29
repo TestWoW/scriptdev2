@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,38 +16,52 @@
 
 /* ScriptData
 SDName: boss_blood_queen_lanathel
-SD%Complete: 95%
-SDComment: by carlos93 && michalpolko
+SD%Complete: 99%
+SDComment:  by michalpolko with special thanks to:
+            mangosR2 team and all who are supporting us with feedback, testing and fixes
+            TrinityCore for some info about spells IDs
+            everybody whom I forgot to mention here ;)
+
 SDCategory: Icecrown Citadel
 EndScriptData */
-// Need to implement MC
+
 #include "precompiled.h"
 #include "icecrown_citadel.h"
 
 enum BossSpells
 {
-    SPELL_BERSERK                           = 47008,
-    SPELL_INCITE_TERROR                     = 73070,
-    SPELL_SHROUD_OF_SORROW                  = 72981,
-    SPELL_DELIRIOUS_SLASH_1                 = 71623,
-    SPELL_DELIRIOUS_SLASH_2                 = 72264,
-    SPELL_BLOOD_MIRROR_TANK                 = 70821,
-    SPELL_BLOOD_MIRROR_OFF                  = 70838,
-    SPELL_VAMPIRIC_BITE                     = 71726,
-    SPELL_ESSENCE_OF_BLOOD_QUEEN            = 70867,
-    SPELL_ESSENCE_OF_BLOOD_QUEEN_2          = 70871,
-    SPELL_FRENZIED_BLOODTHIRST              = 70877,
-    SPELL_UNCONTROLLABLE_FRENZY             = 70923,
-    SPELL_PACT_OF_DARKFALLEN                = 71336,
-    SPELL_SWARMING_SHADOWS                  = 71264,
-    SPELL_TWILIGHT_BLOODBOLT                = 71446,
-    SPELL_BLOODBOLT_WHIRL                   = 71772,
-    SPELL_PRESENCE_OF_DARKFALLEN            = 71952,
+    // all phases
+    SPELL_BERSERK                       = 26662,
+    SPELL_SHROUD_OF_SORROW              = 70986,
 
-    NPC_SWARMING_SHADOWS                    = 38163,
-    SPELL_SWARMING_SHADOWS_VISUAL           = 71267,
-    THIRST_QUENCHED_AURA                    = 72154,
-    SPELL_GUSHING_WOUND                     = 72132,
+    // phase ground
+    SPELL_BLOOD_MIRROR                  = 70445,
+    SPELL_BLOOD_MIRROR_LINKED           = 70451, // cast on the target receiving damage?
+ // SPELL_DELIRIOUS_SLASH               = 72261,
+    SPELL_DELIRIOUS_SLASH_1             = 71623, // effect
+    SPELL_DELIRIOUS_SLASH_2             = 72264, // with charge effect. cast on random target if offtank is not present?
+    SPELL_SWARMING_SHADOWS              = 71861,
+    SPELL_SWARMING_SHADOWS_TRIGGERED    = 71264, // triggered by previous
+    SPELL_SWARMING_SHADOWS_AURA         = 71267,
+    SPELL_PACT_OF_THE_DARKFALLEN        = 71336,
+ // SPELL_VAMPIRIC_BITE                 = 71837,
+    SPELL_VAMPIRIC_BITE_TRIGGERED       = 71726, // triggered spell with effects
+ // SPELL_VAMPIRIC_BITE_PLAYER          = 70946, // used by players
+    SPELL_TWILIGHT_BLOODBOLT            = 71445,
+ // SPELL_TWILIGHT_BLOODBOLT_TRIGGERED  = 71818, // spell dealing dmg
+ // SPELL_TWILIGHT_BLOODBOLT_VISUAL     = 72313, // dummy effect
+ // SPELL_TWILIGHT_BLOODBOLT_TRIGGERED1 = 71446, // one of the triggered spells
+ // SPELL_TWILIGHT_BLOODBOLT_TRIGGERED2 = 71818, // another of the triggered spells. same effects but other spell id...
+ // SPELL_PRESENCE_OF_DARKFALLEN        = 71952, // on heroic
+
+    // phase air
+    SPELL_INCITE_HORROR                 = 73070,
+    SPELL_BLOODBOLT_WHIRL               = 71772,
+
+    // others
+    NPC_SWARMING_SHADOWS                = 38163,
+
+    THIRST_QUENCHED_AURA                    = 72154
 };
 
 // talks
@@ -64,32 +78,23 @@ enum
     SAY_DEATH                   = -1631129,
 };
 
-enum
-{
-    PHASE_GROUND                = 0,
-    PHASE_MOVING_CENTER         = 1,
-    PHASE_FLYING                = 2,
-    PHASE_AIR                   = 3,
-
-    POINT_CENTER_GROUND         = 0,
-    POINT_CENTER_AIR            = 1,
-};
-
-enum Equipment
-{
-    EQUIP_MAIN           = 29996, // TODO: Need true id weapon.
-    EQUIP_OFFHAND        = EQUIP_NO_CHANGE,
-    EQUIP_RANGED         = EQUIP_NO_CHANGE,
-    EQUIP_DONE           = EQUIP_NO_CHANGE,
-};
-
 static Locations QueenLocs[]=
 {
     {4595.640137f, 2769.195557f, 400.137054f},  // 0 Phased
     {4595.904785f, 2769.315918f, 421.838623f},  // 1 Fly
 };
 
+#define PHASE_GROUND 1
+#define PHASE_RUNNING 2
+#define PHASE_AIR 3
+#define PHASE_FLYING 4
 
+#define POINT_CENTER_GROUND 1
+#define POINT_CENTER_AIR 2
+
+/**
+ * Queen Lana'thel
+ */
 struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 {
     boss_blood_queen_lanathelAI(Creature* pCreature) : base_icc_bossAI(pCreature)
@@ -98,59 +103,71 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
     }
 
     uint32 m_uiPhase;
-    uint32 m_uiPhaseTimer;
-    uint32 m_uiBiteTimer;
-    uint32 m_uiDeliriousSlashTimer;
-    uint32 m_uiPactTimer;
-    uint32 m_uiShadowsTimer;
-    uint32 m_uiTwilightTimer;
-    uint32 m_uiBloodboltWhirlTimer;
-    uint32 m_uiEnrageTimer;
-    uint32 m_uiBloodMirrorCheckTimer;
 
-    bool m_bBite;
+    uint32 m_uiBloodMirrorTimer;
+    uint32 m_uiEnrageTimer;
+    uint32 m_uiPhaseTimer;
+    uint32 m_uiVampiricBiteTimer;
+    uint32 m_uiBloodboltTimer;
+    uint32 m_uiPactTimer;
+    uint32 m_uiSwarmingShadowsTimer;
+    uint32 m_uiDeliriousSlashTimer;
+
+    bool m_bHasBitten;
 
     void Reset()
     {
-        m_bBite                     = false;
-        m_uiPhase                   = PHASE_GROUND;
-        m_uiPhaseTimer              = 2*MINUTE * IN_MILLISECONDS;
-        m_uiBiteTimer               = 15000;
-        m_uiPactTimer               = 15000;
-        m_uiShadowsTimer            = 30000;
-        m_uiTwilightTimer           = urand(12000, 17000);
-        m_uiDeliriousSlashTimer     = urand(15000, 20000);
-        m_uiBloodMirrorCheckTimer   = 1000;
-        m_uiEnrageTimer             = 5.5 * MINUTE * IN_MILLISECONDS; //5:30 min
+        m_uiPhase               = PHASE_GROUND;
 
-        m_creature->SetWalk(false);
-        m_creature->SetLevitate(false);
-        m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
+        m_bHasBitten            = false; // for Vampiric Bite
+
+        m_uiPhaseTimer          = 2 * MINUTE * IN_MILLISECONDS;
+        m_uiEnrageTimer         = (5 * MINUTE + 30) * IN_MILLISECONDS;
+        m_uiBloodMirrorTimer    = 0;
+        m_uiDeliriousSlashTimer = 20000;
+        m_uiVampiricBiteTimer   = 15000;
+        m_uiBloodboltTimer      = urand(15000, 20000);
+        m_uiPactTimer           = urand(20000, 25000);
+        m_uiSwarmingShadowsTimer= urand(30000, 35000);
     }
 
     void JustReachedHome()
     {
-        if (m_pInstance)
+        if(m_pInstance)
+        {
             m_pInstance->SetData(TYPE_LANATHEL, FAIL);
-
-        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_OFF);
-        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_TANK);
-        DoRemoveAuraFromAll(SPELL_ESSENCE_OF_BLOOD_QUEEN);
+            RemoveAurasFromAllPlayers();
+            m_creature->SetWalk(false);
+            m_creature->SetLevitate(false);
+            m_creature->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
+        }
     }
 
     void KilledUnit(Unit* pVictim)
     {
+        // entry missing in sd2 database
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        {
-            //DoScriptText(SAY_KILL, m_creature);  // Need to be implemented in BD
             m_creature->MonsterYell("Is that all you got?", 0);
-        }
+    }
 
-        if (pVictim && pVictim->HasAura(SPELL_BLOOD_MIRROR_OFF))
-           pVictim->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
+    void Aggro(Unit* pWho)
+    {
+        if (m_pInstance) 
+            m_pInstance->SetData(TYPE_LANATHEL, IN_PROGRESS);
 
-        if (pVictim && pVictim->HasAura(SPELL_BLOOD_MIRROR_TANK))
-           pVictim->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_TANK);
+        DoScriptText(SAY_AGGRO, m_creature);
+        DoCastSpellIfCan(m_creature, SPELL_SHROUD_OF_SORROW, CAST_TRIGGERED);
+    }
+
+    void JustDied(Unit *pKiller)
+    {
+        if(m_pInstance)
+	{
+            m_pInstance->SetData(TYPE_LANATHEL, DONE);
+	    RemoveAurasFromAllPlayers();
+	}
+
+        DoScriptText(SAY_DEATH, m_creature);
     }
 
     void MovementInform(uint32 uiMovementType, uint32 uiData)
@@ -160,20 +177,19 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
 
         if (uiData == POINT_CENTER_GROUND)
         {
-            if (m_uiPhase == PHASE_MOVING_CENTER)
+            if (m_uiPhase == PHASE_RUNNING)
             {
                 m_creature->GetMotionMaster()->Clear();
                 m_uiPhase = PHASE_AIR; // start counting timer for Bloodbolt Whirl immediately
 
-                if (DoCastSpellIfCan(m_creature, SPELL_INCITE_TERROR) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_INCITE_HORROR) == CAST_OK)
                 {
                     // fly up
                     m_creature->SetWalk(true);
                     m_creature->SetLevitate(true);
                     m_creature->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_UNK_2);
-                    
-                    m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_AIR, QueenLocs[1].x, QueenLocs[1].y, QueenLocs[1].z);
-                    m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
+
+                    m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_AIR, QueenLocs[1].x, QueenLocs[1].y, QueenLocs[1].z, false);
                 }
             }
             else
@@ -197,20 +213,9 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
             {
                 m_uiPhase = PHASE_AIR;
                 m_uiPhaseTimer = 7000;
+                DoScriptText(SAY_AIR_PHASE, m_creature);
             }
         }
-    }
-
-    void Aggro(Unit* pWho)
-    {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_LANATHEL, IN_PROGRESS);
-
-        DoCastSpellIfCan(m_creature, 70986, CAST_TRIGGERED); // temporal
-        DoCastSpellIfCan(m_creature, SPELL_SHROUD_OF_SORROW, CAST_TRIGGERED);
-        SetEquipmentSlots(false, EQUIP_MAIN, EQUIP_OFFHAND, EQUIP_RANGED);
-
-        DoScriptText(SAY_AGGRO,m_creature,pWho);
     }
 
     Unit* SelectClosestFriendlyTarget(Unit *pVictim)
@@ -223,10 +228,10 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
             const Map::PlayerList &players = m_pInstance->instance->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
-                if (!(*itr).getSource()->IsInWorld() ||                          // don't target not in world players
-                !(*itr).getSource()->isAlive() ||                                // don't target dead players
-                (*itr).getSource()->isGameMaster() ||                            // don't target GMs
-                (*itr).getSource()->GetObjectGuid() == pVictim->GetObjectGuid()) // don't target current victim
+                if (!(*itr).getSource()->IsInWorld() ||                              // don't target not in world players
+                    !(*itr).getSource()->isAlive() ||                                // don't target dead players
+                    (*itr).getSource()->isGameMaster() ||                            // don't target GMs
+                    (*itr).getSource()->GetObjectGuid() == pVictim->GetObjectGuid()) // don't target current victim
                     continue;
 
                 float dist = pVictim->GetDistance((*itr).getSource());
@@ -251,9 +256,9 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
             if (Unit *pVictim = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
             {
                 if (!pVictim->HasAuraOfDifficulty(70867) && // Essence of the Blood Queen
-                !pVictim->HasAuraOfDifficulty(70877) &&     // Frenzied Bloodthirst
-                !pVictim->HasAuraOfDifficulty(SPELL_BLOOD_MIRROR_OFF) &&     // Blood Mirror
-                !pVictim->HasAuraOfDifficulty(70923))       // Uncontrollable Frenzy
+                    !pVictim->HasAuraOfDifficulty(70877) && // Frenzied Bloodthirst
+                    !pVictim->HasAuraOfDifficulty(70445) && // Blood Mirror
+                    !pVictim->HasAuraOfDifficulty(70923))   // Uncontrollable Frenzy
                 {
                     return pVictim;
                 }
@@ -263,179 +268,198 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathelAI : public base_icc_bossAI
         return NULL;
     }
 
-    void JustDied(Unit *killer)
+    void RemoveAurasFromAllPlayers()
     {
-        if (!m_pInstance)
+         Map* pMap = m_creature->GetMap();
+         Map::PlayerList const &PlayerList = pMap->GetPlayers();
+
+         if (PlayerList.isEmpty())
             return;
 
-        m_pInstance->SetData(TYPE_LANATHEL, DONE);
-        DoScriptText(SAY_DEATH,m_creature,killer);
-        m_creature->SetUInt32Value(UNIT_FIELD_BYTES_0, 0);
-        m_creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
-        m_creature->GetMotionMaster()->Clear();
-        m_creature->GetMotionMaster()->MovePoint(3, m_creature->GetPositionX(), m_creature->GetPositionY(), QueenLocs[0].z);
-        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_OFF);
-        DoRemoveAuraFromAll(SPELL_BLOOD_MIRROR_TANK);
-        DoRemoveAuraFromAll(SPELL_ESSENCE_OF_BLOOD_QUEEN);
-     }
+         for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+         {
+            if (Player* pPlayer = i->getSource())
+            {
+                if (pPlayer->isAlive())
+                {
+                    // Additional checking for achiev
+                    pPlayer->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LANATHEL, 0);
 
+                    // Uncontrollable Frenzy
+                    pPlayer->RemoveAurasDueToSpell(70923);
+                    pPlayer->RemoveAurasDueToSpell(70924);
+
+                    // Frenzied Bloodthirst
+                    pPlayer->RemoveAurasDueToSpell(70877);
+                    pPlayer->RemoveAurasDueToSpell(71474);
+
+                    // Essence of The Blood Queen
+                    pPlayer->RemoveAurasDueToSpell(70867);
+                    pPlayer->RemoveAurasDueToSpell(70871);
+                }
+            }
+         }
+    }
 
     void UpdateAI(const uint32 uiDiff)
     {
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_uiBloodMirrorCheckTimer < uiDiff)
+        // Enrage
+        if (m_uiEnrageTimer <= uiDiff)
         {
-            if (Unit *pOff = SelectClosestFriendlyTarget(m_creature->getVictim()))
+            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
             {
-                if(m_creature->getVictim()->HasAura(SPELL_BLOOD_MIRROR_OFF))
-                    m_creature->getVictim()->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_OFF);
-
-                if(pOff->HasAura(SPELL_BLOOD_MIRROR_TANK))
-                    pOff->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR_TANK);
-
-                if (!m_creature->getVictim()->HasAura(SPELL_BLOOD_MIRROR_TANK))
-                {
-                    pOff->CastSpell(m_creature->getVictim(), SPELL_BLOOD_MIRROR_TANK, true);
-                    /*if (pOff->HasAura(SPELL_SHADOWS_EDGE) && !pOff->HasAura(SPELL_GUSHING_WOUND) && m_bIs25Man)
-                        pOff->CastSpell(pOff, SPELL_GUSHING_WOUND, true);*/
-                }
-                if (!pOff->HasAura(SPELL_BLOOD_MIRROR_OFF))
-                {
-                    m_creature->getVictim()->CastSpell(pOff, SPELL_BLOOD_MIRROR_OFF, true);
-                    /*if (m_creature->getVictim()->HasAura(SPELL_SHADOWS_EDGE) && !m_creature->getVictim()->HasAura(SPELL_GUSHING_WOUND) && m_bIs25Man)
-                        m_creature->getVictim()->CastSpell(m_creature->getVictim(), SPELL_GUSHING_WOUND, true);*/
-                }
-            }
-            m_uiBloodMirrorCheckTimer = 500;
-        }
-        else m_uiBloodMirrorCheckTimer -= uiDiff;
-
-        if (m_uiEnrageTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_TRIGGERED) == CAST_OK)
-            {
-                DoScriptText(SAY_BERSERK,m_creature);
-                m_uiEnrageTimer = 5.5 * MINUTE * IN_MILLISECONDS;
+                DoScriptText(SAY_BERSERK, m_creature);
+                m_uiEnrageTimer = (5 * MINUTE + 30) * IN_MILLISECONDS;
             }
         }
-        else m_uiEnrageTimer -= uiDiff;
+        else
+            m_uiEnrageTimer -= uiDiff;
 
         switch (m_uiPhase)
         {
-        case PHASE_GROUND:
-            if (m_uiTwilightTimer < uiDiff)
+            case PHASE_GROUND:
             {
-                if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
+                // phase change timer
+                if (m_uiPhaseTimer <= uiDiff)
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_TWILIGHT_BLOODBOLT) == CAST_OK)
-                        m_uiTwilightTimer = urand(12000, 17000);
+                    m_uiPhase = PHASE_RUNNING;
+                    SetCombatMovement(false);
+                    m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_GROUND, QueenLocs[0].x, QueenLocs[0].y, QueenLocs[0].z);
+                    m_uiPhaseTimer = 13000;
                 }
-            }
-            else m_uiTwilightTimer -= uiDiff;
+                else
+                    m_uiPhaseTimer -= uiDiff;
 
-            // Delirious Slash
-            if (m_uiDeliriousSlashTimer <= uiDiff)
-            {
-                /**
-                 * Spell that handles targeting - we can do this here.
-                 * if (DoCastSpellIfCan(m_creature, SPELL_DELIRIOUS_SLASH) == CAST_OK)
-                 */
-                if (Unit *pTarget = SelectClosestFriendlyTarget(m_creature->getVictim()))
+                // Blood Mirror
+                if (m_uiBloodMirrorTimer <= uiDiff)
                 {
-                    uint32 spell = SPELL_DELIRIOUS_SLASH_1;
-
-                    // if target is not in 5yd range then cast spell with charge effect
-                    if (!m_creature->IsWithinDist(pTarget, 5.0f))
-                        spell = SPELL_DELIRIOUS_SLASH_2;
-
-                    if (DoCastSpellIfCan(pTarget, spell) == CAST_OK)
-                        m_uiDeliriousSlashTimer = 15000;
-                }
-            }
-            else
-                m_uiDeliriousSlashTimer -= uiDiff;
-
-            /*if (m_uiDeliriousSlashTimer < uiDiff)
-            {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,2))
-                {
-                    if (DoCastSpellIfCan(pTarget, SPELL_DELIRIOUS_SLASH) == CAST_OK)
-                        m_uiDeliriousSlashTimer = urand(15000, 20000);
-                }
-            }
-            else m_uiDeliriousSlashTimer -= uiDiff;*/
-
-            if (m_uiPactTimer < uiDiff)
-            {
-                //if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
-                //{
-                    if (DoCastSpellIfCan(m_creature, SPELL_PACT_OF_DARKFALLEN) == CAST_OK)
+                    if (Unit *pVictim = SelectClosestFriendlyTarget(m_creature->getVictim()))
                     {
+                        pVictim->CastSpell(m_creature->getVictim(), SPELL_BLOOD_MIRROR, true);
+                        pVictim->CastSpell(pVictim, SPELL_BLOOD_MIRROR_LINKED, true);
+                        m_uiBloodMirrorTimer = 5000;
+                    }
+                }
+                else
+                    m_uiBloodMirrorTimer -= uiDiff;
+
+                // Delirious Slash
+                if (m_bIsHeroic)
+                {
+                    if (m_uiDeliriousSlashTimer <= uiDiff)
+                    {
+                        /**
+                         * Spell that handles targeting - we can do this here.
+                         * if (DoCastSpellIfCan(m_creature, SPELL_DELIRIOUS_SLASH) == CAST_OK)
+                         */
+                        if (Unit *pTarget = SelectClosestFriendlyTarget(m_creature->getVictim()))
+                        {
+                            uint32 spell = SPELL_DELIRIOUS_SLASH_1;
+
+                            // if target is not in 5yd range then cast spell with charge effect
+                            if (!m_creature->IsWithinDist(pTarget, 5.0f))
+                                spell = SPELL_DELIRIOUS_SLASH_2;
+
+                            if (DoCastSpellIfCan(pTarget, spell) == CAST_OK)
+                                m_uiDeliriousSlashTimer = 15000;
+                        }
+                    }
+                    else
+                        m_uiDeliriousSlashTimer -= uiDiff;
+                }
+
+                // Vampiric Bite
+                if (!m_bHasBitten)
+                {
+                    if (m_uiVampiricBiteTimer <= uiDiff)
+                    {
+                        /**
+                         * Spell handles targeting, but we can do this here.
+                         * if (DoCastSpellIfCan(m_creature, SPELL_VAMPIRIC_BITE) == CAST_OK)
+                         */
+                        if (Unit *pTarget = SelectVampiricBiteTarget())
+                        {
+                            if (DoCastSpellIfCan(pTarget, SPELL_VAMPIRIC_BITE_TRIGGERED) == CAST_OK)
+                            {
+                                m_bHasBitten = true;
+                                DoScriptText(SAY_BITE_1 - urand(0, 1), m_creature);
+                            }
+                        }
+                    }
+                    else
+                        m_uiVampiricBiteTimer -= uiDiff;
+                }
+
+                // Twilight Bloodbolt
+                if (m_uiBloodboltTimer <= uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_TWILIGHT_BLOODBOLT) == CAST_OK)
+                        m_uiBloodboltTimer = urand(15000, 20000);
+                }
+                else
+                    m_uiBloodboltTimer -= uiDiff;
+
+                // Pact of the Darkfallen
+                if (m_uiPactTimer <= uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_PACT_OF_THE_DARKFALLEN) == CAST_OK)
+                    {
+                        m_uiPactTimer = urand(20000, 25000);
                         DoScriptText(SAY_PACT, m_creature);
-                        m_uiPactTimer = 30000;
-                    }
-                //}
-            }
-            else m_uiPactTimer -= uiDiff;
-
-            if (m_uiShadowsTimer < uiDiff)
-            {
-                if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
-                {
-                    if (DoCastSpellIfCan(pTarget, SPELL_SWARMING_SHADOWS) == CAST_OK)
-                    {
-                        DoScriptText(SAY_SHADOWS,m_creature);
-                        m_uiShadowsTimer = 30000;
                     }
                 }
-            }
-            else m_uiShadowsTimer -= uiDiff;
+                else
+                    m_uiPactTimer -= uiDiff;
 
-            if (m_uiBiteTimer < uiDiff && !m_bBite)
-            {
-                if (Unit* pTarget = SelectVampiricBiteTarget())
+                // Swarming Shadows
+                if (m_uiSwarmingShadowsTimer <= uiDiff)
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_VAMPIRIC_BITE) == CAST_OK)
+                    /**
+                     * spell which handles picking targets
+                     * but we can use SelectAttackingTarget() here
+                     * if (DoCastSpellIfCan(m_creature, SPELL_SWARMING_SHADOWS) == CAST_OK)
+                     */
+                    if (Unit *pTarget = SelectRandomRangedTarget(m_creature))
                     {
-                        m_bBite = true;
-                        DoScriptText(SAY_BITE_1, m_creature);
+                        if (DoCastSpellIfCan(pTarget, SPELL_SWARMING_SHADOWS_TRIGGERED) == CAST_OK)
+                        {
+                            m_uiSwarmingShadowsTimer = urand(30000, 35000);
+                            DoScriptText(SAY_SHADOWS, m_creature);
+                        }
                     }
                 }
-            }
-            else m_uiBiteTimer -= uiDiff;
+                else
+                    m_uiSwarmingShadowsTimer -= uiDiff;
 
-            if (m_uiPhaseTimer < uiDiff && m_creature->GetHealthPercent() >= 5)
+                DoMeleeAttackIfReady();
+
+                break;
+            }
+            case PHASE_RUNNING:
+            case PHASE_FLYING:
             {
-                m_uiPhase = PHASE_MOVING_CENTER;
-                m_creature->GetMotionMaster()->Clear();
-                m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_GROUND, QueenLocs[0].x, QueenLocs[0].y, QueenLocs[0].z);
-                SetCombatMovement(false);
-                m_uiPhaseTimer = 13000;
+                // wait for arriving at the point
+                break;
             }
-            else m_uiPhaseTimer -= uiDiff;
-
-            DoMeleeAttackIfReady();
-            break;
-        case PHASE_MOVING_CENTER:
-            break;
-        case PHASE_FLYING:
-            m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
-            break;
-        case PHASE_AIR:
-            // phase change timer
-            if (m_uiPhaseTimer <= uiDiff)
+            case PHASE_AIR:
             {
-                m_uiPhase = PHASE_FLYING;
-                m_uiPhaseTimer = 2 * MINUTE * IN_MILLISECONDS - 13000; // substract the air phase duration
-                m_creature->GetMotionMaster()->Clear();
-                m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_GROUND, QueenLocs[0].x, QueenLocs[0].y, QueenLocs[0].z);
-            }
-            else
-                m_uiPhaseTimer -= uiDiff;
+                // phase change timer
+                if (m_uiPhaseTimer <= uiDiff)
+                {
+                    m_uiPhase = PHASE_FLYING;
+                    m_uiPhaseTimer = 2 * MINUTE * IN_MILLISECONDS - 13000; // substract the air phase duration
+                    m_creature->GetMotionMaster()->Clear();
+                    m_creature->GetMotionMaster()->MovePoint(POINT_CENTER_GROUND, QueenLocs[0].x, QueenLocs[0].y, QueenLocs[0].z);
+                }
+                else
+                    m_uiPhaseTimer -= uiDiff;
 
-            break;
+                break;
+            }
         }
     }
 };
@@ -445,49 +469,39 @@ CreatureAI* GetAI_boss_blood_queen_lanathel(Creature* pCreature)
     return new boss_blood_queen_lanathelAI(pCreature);
 }
 
+/**
+ * Swarming Shadows
+ */
 struct MANGOS_DLL_DECL mob_swarming_shadowsAI : public ScriptedAI
 {
     mob_swarming_shadowsAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_creature->SetVisibility(VISIBILITY_ON);
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    void Reset()
-    {
+        m_creature->SetDisplayId(11686);
         SetCombatMovement(false);
         m_creature->SetInCombatWithZone();
-        DoCastSpellIfCan(m_creature, SPELL_SWARMING_SHADOWS_VISUAL, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SWARMING_SHADOWS_AURA, CAST_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->HasAura(SPELL_SWARMING_SHADOWS_VISUAL))
-            DoCastSpellIfCan(m_creature, SPELL_SWARMING_SHADOWS_VISUAL, CAST_TRIGGERED);
-
-        m_creature->ForcedDespawn(30000);
-    }
+    void Reset(){}
+    void UpdateAI(const uint32 uiDiff){}
 };
 
 CreatureAI* GetAI_mob_swarming_shadows(Creature* pCreature)
 {
-     return new mob_swarming_shadowsAI (pCreature);
+    return new mob_swarming_shadowsAI(pCreature);
 }
 
 void AddSC_boss_blood_queen_lanathel()
 {
-    Script *pNewScript;
+    Script *newscript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_blood_queen_lanathel";
-    pNewScript->GetAI = &GetAI_boss_blood_queen_lanathel;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_blood_queen_lanathel";
+    newscript->GetAI = &GetAI_boss_blood_queen_lanathel;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "mob_swarming_shadows";
-    pNewScript->GetAI = &GetAI_mob_swarming_shadows;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_swarming_shadows";
+    newscript->GetAI = &GetAI_mob_swarming_shadows;
+    newscript->RegisterSelf();
 }
