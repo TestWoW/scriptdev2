@@ -270,6 +270,8 @@ bool GossipHello_acherus_teleporter_up(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
     pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+
+    return true;
 }
 
 bool GossipSelect_acherus_teleporter_up(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
@@ -283,6 +285,8 @@ bool GossipSelect_acherus_teleporter_up(Player* pPlayer, Creature* pCreature, ui
             pPlayer->TeleportTo(0, 2402.718994, -5632.788534, 420.667847, pPlayer->GetOrientation());
             break;
     }
+
+    return true;
 }
 
 bool GossipHello_acherus_teleporter_down(Player* pPlayer, Creature* pCreature)
@@ -292,12 +296,16 @@ bool GossipHello_acherus_teleporter_down(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
     pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+
+    return true;
 }
 
 bool GossipSelect_acherus_teleporter_down(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
 {
     pPlayer->CLOSE_GOSSIP_MENU();
     pPlayer->TeleportTo(0, 2402.718994, -5632.788534, 377.022003, pPlayer->GetOrientation());
+
+    return true;
 }
 
 /*########
@@ -312,7 +320,8 @@ enum Bergensays
     BERGEN_SAY_AGRO        = -2000010,
     BERGEN_SAY_KILL        = -2000011,
     BERGEN_SAY_DEAD        = -2000012,
-    BERGEN_SAY_WINGS       = -2000013
+    BERGEN_SAY_WINGS       = -2000013,
+    BERGEN_SAY_FLOOR       = -2000014
 };
 
 enum Bergenspells
@@ -331,7 +340,6 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
     boss_bergen(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
     char phase;
-    //Player *display;
 
     uint32 tailSlash;
     uint32 heatFloor;
@@ -344,7 +352,6 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
     void Reset()
     {
         phase = 0;
-        //display = sObjectMgr.GetPlayer(3);
  
         tailSlash     = 10000;
         heatFloor     = 20000;
@@ -353,11 +360,6 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
         painAgony     = 15000;
         fireWall      = 5000;
         magicWings    = 40000; 
-
-        /*if(display)
-            m_creature->CastSpell(m_creature, 45204, true, NULL, NULL, display->GetObjectGuid()); 
-        if(display)
-            m_creature->CastSpell(m_creature, 69837, true, NULL, NULL, display->GetObjectGuid());*/
     }
    
     void KilledUnit(Unit* pVictim)
@@ -399,12 +401,14 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
                 }
                 else tailSlash -= uiDiff;
 
+                if(heatFloor - 5000 < uiDiff) DoScriptText(BERGEN_SAY_FLOOR, m_creature);
+ 
                 if(heatFloor < uiDiff)
                 {
                     if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                     {
                         DoCastSpellIfCan(pTarget, HEAT_FLOOR);
-                        heatFloor = 6000;
+                        heatFloor = 15000;
                     }
 
                     if(DoCastSpellIfCan(m_creature, HEAT_FLOOR) == CAST_OK) heatFloor = 6000;
@@ -416,12 +420,6 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
                     if(DoCastSpellIfCan(m_creature, BONE_STORM) == CAST_OK) boneStorm = 120000;
                 }
                 else boneStorm -= uiDiff;
-
-                /*if(evilSpirits < uiDiff)
-                {
-                    if(DoCastSpellIfCan(m_creature, EVIL_SPIRITS ) == CAST_OK) evilSpirits = 60000;
-                }
-                else evilSpirits -= uiDiff;*/
 
                 if(painAgony < uiDiff)
                 {
@@ -495,10 +493,10 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
         //if(pet) pet->ForcedDespawn();
         phase = 0;
  
-        explosiveShot = 10000;
-        avengingWrath = 35000;
-        aimedShot = 6000;
-        divineStorm = 4000;
+        explosiveShot    = 10000;
+        avengingWrath    = 35000;
+        aimedShot        = 6000;
+        divineStorm      = 4000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -521,6 +519,8 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        m_creature->SetPower(m_creature->getPowerType(), 50000000); 
+
         switch(phase)
         {
             case 0:
@@ -529,7 +529,6 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
                 if(divineStorm < uiDiff)
                 {
                     if(DoCastSpellIfCan(m_creature, DIVINE_STORM) == CAST_OK) divineStorm = urand(4000, 8000);
-                    m_creature->SetPower(m_creature->getPowerType(), 50000000);
                 }
                 else divineStorm -= uiDiff;
 
@@ -549,6 +548,7 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
                     if(m_creature->HasAura(DIVINE_SHIELD))m_creature->RemoveAurasDueToSpell(DIVINE_SHIELD);
                     phase = 3;
                     DoScriptText(GORCRALL_SAY_PET_DEAD, m_creature);
+                    pet->ForcedDespawn();
                 }
 
                 break;
@@ -602,7 +602,7 @@ enum Hastursays
     HASTUR_SAY_AGRO        = -2000020,
     HASTUR_SAY_KILL        = -2000021,
     HASTUR_SAY_DEAD        = -2000022,
-    HASTUR_SAY_BALL       = -2000023
+    HASTUR_SAY_BALL        = -2000023
 };
 
 enum Hasturspells
@@ -626,11 +626,11 @@ struct MANGOS_DLL_DECL boss_hastur : public ScriptedAI
  
     void Reset()
     {
-        detonateMana = 20000;
-        jawsOfDeath = 10000;
-        cleave = 6000;
-        frostBomb = 15000;
-        snowBall = 30000;
+        detonateMana   = 20000;
+        jawsOfDeath    = 10000;
+        cleave         = 6000;
+        frostBomb      = 15000;
+        snowBall       = 30000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -715,7 +715,7 @@ CreatureAI* GetAI_boss_hastur(Creature* pCreature)
 }
 
 // shyla
-/*
+
 enum shylasays
 {
     SHYLA_SAY_AGRO        = -2000030,
@@ -744,10 +744,10 @@ struct MANGOS_DLL_DECL boss_shyla : public ScriptedAI
  
     void Reset()
     {
-        frostBall = 15000;
-        deathAndDecay = 10000;
-        essence = 30000;
-        deliriusSlash = 20000;  
+        frostBall        = 15000;
+        deathAndDecay    = 10000;
+        essence          = 30000;
+        deliriusSlash    = 20000;  
     }
    
     void KilledUnit(Unit* pVictim)
@@ -785,10 +785,13 @@ struct MANGOS_DLL_DECL boss_shyla : public ScriptedAI
         {
             bool range = urand(1,0);
             
-            if(range) if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            if(range) 
             {
-                DoCastSpellIfCan(pTarget, DEATH_AND_DECAY);
-                deathAndDecay = 10000;
+                if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                {
+                    DoCastSpellIfCan(pTarget, DEATH_AND_DECAY);
+                    deathAndDecay = 10000;
+                }
             }
             else if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
@@ -826,7 +829,167 @@ struct MANGOS_DLL_DECL boss_shyla : public ScriptedAI
 CreatureAI* GetAI_boss_shyla(Creature* pCreature)
 {
     return new boss_shyla(pCreature);
-}*/
+}
+
+// Ailin
+
+enum ailinsays
+{
+};
+
+enum ailinspells
+{
+};
+
+struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
+{
+    boss_ailin(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    void Reset()
+    {
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+    }
+};
+
+CreatureAI* GetAI_boss_ailin(Creature* pCreature)
+{
+    return new boss_ailin(pCreature);
+}
+
+// Gedeon
+
+enum gedeonsays
+{
+};
+
+enum gedeonspells
+{
+};
+
+struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
+{
+    boss_gedeon(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    void Reset()
+    {
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+    }
+};
+
+CreatureAI* GetAI_boss_gedeon(Creature* pCreature)
+{
+    return new boss_gedeon(pCreature);
+}
+
+// Douce
+
+enum doucesays
+{
+};
+
+enum doucespells
+{
+};
+
+struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
+{
+    boss_douce(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    void Reset()
+    {
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+    }
+};
+
+CreatureAI* GetAI_boss_douce(Creature* pCreature)
+{
+    return new boss_douce(pCreature);
+}
+
+// Raynar
+
+enum raynarsays
+{
+};
+
+enum raynarspells
+{
+};
+
+struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
+{
+    boss_raynar(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    void Reset()
+    {
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+    }
+};
+
+CreatureAI* GetAI_boss_raynar(Creature* pCreature)
+{
+    return new boss_douce(pCreature);
+}
 
 void AddSC_npcs_radical()
 {
@@ -872,8 +1035,28 @@ void AddSC_npcs_radical()
     pNewScript->GetAI = &GetAI_boss_hastur;
     pNewScript->RegisterSelf();
 
-/*    pNewScript = new Script;
+    pNewScript = new Script;
     pNewScript->Name = "boss_shyla";
     pNewScript->GetAI = &GetAI_boss_shyla;
-    pNewScript->RegisterSelf();*/
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_ailin";
+    pNewScript->GetAI = &GetAI_boss_ailin;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_gedeon";
+    pNewScript->GetAI = &GetAI_boss_gedeon;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_douce";
+    pNewScript->GetAI = &GetAI_boss_douce;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_raynar";
+    pNewScript->GetAI = &GetAI_boss_raynar;
+    pNewScript->RegisterSelf();
 }
