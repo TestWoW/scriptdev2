@@ -405,12 +405,6 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
  
                 if(heatFloor < uiDiff)
                 {
-                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                    {
-                        DoCastSpellIfCan(pTarget, HEAT_FLOOR);
-                        heatFloor = 15000;
-                    }
-
                     if(DoCastSpellIfCan(m_creature, HEAT_FLOOR) == CAST_OK) heatFloor = 6000;
                 }
                 else heatFloor -= uiDiff;
@@ -434,10 +428,14 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
 
                 if(magicWings < uiDiff)
                 {
-                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                     {
+                        DoCastSpellIfCan(m_creature->getVictim(), MAGIC_WINGS);
+
                         DoScriptText(BERGEN_SAY_WINGS, m_creature);
+
                         m_creature->AddThreat(pTarget, 100.0f);
+
                         magicWings = 40000;
                     }
                 }
@@ -490,8 +488,8 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
  
     void Reset()
     {
-        //if(pet) pet->ForcedDespawn();
         phase = 0;
+        pet = NULL;
  
         explosiveShot    = 10000;
         avengingWrath    = 35000;
@@ -562,6 +560,13 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
                     }
                 }
                 else avengingWrath -= uiDiff;
+
+                if(divineStorm < uiDiff)
+                {
+                    if(DoCastSpellIfCan(m_creature, DIVINE_STORM) == CAST_OK) divineStorm = urand(4000, 8000);
+                }
+                else divineStorm -= uiDiff;
+
                 break;
         } 
 
@@ -580,7 +585,7 @@ struct MANGOS_DLL_DECL boss_gorcrall : public ScriptedAI
         {
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
             {
-                DoCastSpellIfCan(pTarget, AIMED_SHOT);
+                DoCastSpellIfCan(pTarget, EXPLOSIVE_SHOT);
                 explosiveShot = 10000;
             } 
         }
@@ -863,6 +868,9 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
  
     void UpdateAI(const uint32 uiDiff)
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
     }
 };
 
@@ -925,8 +933,11 @@ struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
 {
     boss_douce(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    uint32 enrage;
+
     void Reset()
     {
+        enrage = 3 * MINUTE * IN_MILLISECONDS;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -943,6 +954,16 @@ struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
  
     void UpdateAI(const uint32 uiDiff)
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (enrage < uiDiff)
+        {
+            DoCastSpellIfCan(m_creature, 47008, CAST_TRIGGERED);
+        }
+        else enrage -= uiDiff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -988,7 +1009,7 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
 
 CreatureAI* GetAI_boss_raynar(Creature* pCreature)
 {
-    return new boss_douce(pCreature);
+    return new boss_raynar(pCreature);
 }
 
 void AddSC_npcs_radical()
