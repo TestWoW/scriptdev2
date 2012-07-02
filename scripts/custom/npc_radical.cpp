@@ -887,14 +887,20 @@ enum gedeonsays
 
 enum gedeonspells
 {
+    THUNDER_STORM = 60010
 };
 
 struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
 {
     boss_gedeon(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    uint32 thunderStorm;
+
     void Reset()
     {
+        m_creature->GetMotionMaster()->Clear();
+
+        thunderStorm = 5000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -911,6 +917,20 @@ struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
  
     void UpdateAI(const uint32 uiDiff)
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+ 
+        SetCombatMovement(false);
+
+        if(thunderStorm < uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature, THUNDER_STORM) == CAST_OK)
+            {
+                thunderStorm = 5000;
+            }
+        }
+        else thunderStorm -= uiDiff;
+        
     }
 };
 
@@ -923,6 +943,10 @@ CreatureAI* GetAI_boss_gedeon(Creature* pCreature)
 
 enum doucesays
 {
+    DOUCE_SAY_AGRO        = -2000040,
+    DOUCE_SAY_KILL        = -2000041,
+    DOUCE_SAY_DEAD        = -2000042,
+    DOUCE_SAY_BERSERK     = -2000043
 };
 
 enum doucespells
@@ -942,14 +966,17 @@ struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
    
     void KilledUnit(Unit* pVictim)
     {
+        DoScriptText(DOUCE_SAY_KILL, m_creature);
     }
 
     void JustDied(Unit* pKiller)
     {
+        DoScriptText(DOUCE_SAY_DEAD, m_creature);
     }
 
     void Aggro(Unit* pWho)
     {
+        DoScriptText(DOUCE_SAY_AGRO, m_creature);
     }
  
     void UpdateAI(const uint32 uiDiff)
@@ -959,7 +986,11 @@ struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
 
         if (enrage < uiDiff)
         {
-            DoCastSpellIfCan(m_creature, 47008, CAST_TRIGGERED);
+            if(DoCastSpellIfCan(m_creature, 47008, CAST_TRIGGERED) == CAST_OK)
+            {
+                DoScriptText(DOUCE_SAY_BERSERK, m_creature);
+                enrage = 3 * MINUTE * IN_MILLISECONDS;
+            }
         }
         else enrage -= uiDiff;
 

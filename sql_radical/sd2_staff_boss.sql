@@ -10,7 +10,7 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000000', 'Vamos a ownear oemanes', '1', 'agro Gorcrall'),
 ('-2000001', 'Hoyga se murio', '1', 'kill Gorcrall'),
-('-2000002', 'Bamos....', '1', 'Dead Gorcrall'),
+('-2000002', 'Que oe soy...', '1', 'Dead Gorcrall'),
 ('-2000003', 'Bergen muerdeles el trasero!', '1', 'pet call'),
 ('-2000004', 'HDP haveis matado a Bergen!', '1', 'pet Dead'),
 ('-2000005', 'ITS OVER 9000', '1', 'avenging wrath');
@@ -28,4 +28,11 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000031', 'avisare a vuestros familiares de vuestra muerte', '1', 'kill shyla'),
 ('-2000032', 'Me vengare!!', '1', 'Dead shyla'),
 ('-2000033', 'O la reina en pena', '1', 'essence');
+
+-- Douce
+INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
+('-2000040', 'Tengo mucha paciencia', '1', 'agro douce'),
+('-2000041', ':)', '1', 'kill douce'),
+('-2000042', ':(', '1', 'Dead douce'),
+('-2000043', 'Ya me canse', '1', 'cabreo');
 
