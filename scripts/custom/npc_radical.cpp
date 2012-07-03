@@ -898,7 +898,7 @@ struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
 
     void Reset()
     {
-        m_creature->GetMotionMaster()->Clear();
+        SetCombatMovement(false);
 
         thunderStorm = 5000;
     }
@@ -913,6 +913,7 @@ struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        SetCombatMovement(false);
     }
  
     void UpdateAI(const uint32 uiDiff)
