@@ -87,14 +87,14 @@ enum BossSpells
     SPELL_GAS_VARIABLE              = 70353,
     SPELL_GAS_VARIABLE_GAS          = 74119,
 
-    NPC_GREEN_ORANGE_OOZE_STALKER   = 37824, // casts orange and green visual spell and then summons add
-    NPC_GROWING_OOZE_PUDDLE         = 37690,
-    NPC_GROWING_OOZE_PUDDLE_TRIG    = 38234,
-    NPC_CHOKING_GAS_BOMB            = 38159,
-    NPC_VOLATILE_OOZE               = 37697,
+    //NPC_GREEN_ORANGE_OOZE_STALKER   = 37824, // casts orange and green visual spell and then summons add
+    //NPC_GROWING_OOZE_PUDDLE         = 37690,
+    //NPC_GROWING_OOZE_PUDDLE_TRIG    = 38234,
+    //NPC_CHOKING_GAS_BOMB            = 38159,
+    //NPC_VOLATILE_OOZE               = 37697,
     NPC_MUTATED_ABOMINATION_1       = 37672,
     NPC_MUTATED_ABOMINATION_2       = 38285,
-    NPC_MALLEABLE_GOO               = 38556,
+    //NPC_MALLEABLE_GOO               = 38556,
 
 /*
     SPELL_OOZE_GAS_PROTECTION     = 70812,

@@ -102,9 +102,9 @@ enum
     NPC_OOZE_SPRAY_STALKER              = 37986,
     NPC_ORANGE_GAS_STALKER              = 36659,
     NPC_MALLEABLE_GOO                   = 38556,
-    //NPC_GREEN_ORANGE_OOZE_STALKER       = 37824,
-    //NPC_GROWING_OOZE_PUDDLE             = 37690,
-    //NPC_GROWING_OOZE_PUDDLE_TRIG        = 38234,
+    NPC_GREEN_ORANGE_OOZE_STALKER       = 37824,
+    NPC_GROWING_OOZE_PUDDLE             = 37690,
+    NPC_GROWING_OOZE_PUDDLE_TRIG        = 38234,
     NPC_CHOKING_GAS_BOMB                = 38159,
     NPC_VOLATILE_OOZE                   = 37697,
     NPC_MUTATED_ABOMINATION             = 37672,
@@ -126,6 +126,8 @@ enum
 
     GO_ORANGE_PLAGUE                    = 201371, //72536
     GO_GREEN_PLAGUE                     = 201370, //72537
+
+    GO_DRINK_ME_TABLE                   = 201584,
 
     GO_SCIENTIST_DOOR_GREEN             = 201614, //72530
     GO_SCIENTIST_DOOR_ORANGE            = 201613, //72531
