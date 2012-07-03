@@ -45,6 +45,11 @@ void instance_pinnacle::OnObjectCreate(GameObject* pGo)
 {
     switch(pGo->GetEntry())
     {
+        case GO_SKADI_HARPOON_1:
+        case GO_SKADI_HARPOON_2:
+        case GO_SKADI_HARPOON_3:
+            pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
         case GO_DOOR_SKADI:
             if (m_auiEncounter[TYPE_SKADI] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
