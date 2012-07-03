@@ -17,6 +17,9 @@ enum
     GO_STASIS_GENERATOR             = 188593,
     GO_DOOR_SKADI                   = 192173,
     GO_DOOR_AFTER_YMIRON            = 192174,
+    GO_SKADI_HARPOON_1              = 192175,
+    GO_SKADI_HARPOON_2              = 192176,
+    GO_SKADI_HARPOON_3              = 192177,
 
     NPC_SCOURGE_HULK                = 26555,
 
