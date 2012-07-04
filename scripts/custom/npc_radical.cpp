@@ -405,7 +405,7 @@ struct MANGOS_DLL_DECL boss_bergen : public ScriptedAI
  
                 if(heatFloor < uiDiff)
                 {
-                    if(DoCastSpellIfCan(m_creature, HEAT_FLOOR) == CAST_OK) heatFloor = 6000;
+                    if(DoCastSpellIfCan(m_creature, HEAT_FLOOR) == CAST_OK) heatFloor = 20000;
                 }
                 else heatFloor -= uiDiff;
 
@@ -892,6 +892,7 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
             m_creature->SetHealthPercent(30.0f);
             DoScriptText(AILIN_SAY_PREDEAD, m_creature);
             endcombat = true;
+            DoMeleeAttackIfReady();
         }
         else DoScriptText(AILIN_SAY_DEAD, m_creature);
     }
