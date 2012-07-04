@@ -840,18 +840,44 @@ CreatureAI* GetAI_boss_shyla(Creature* pCreature)
 
 enum ailinsays
 {
+    AILIN_SAY_AGRO        = -2000050,
+    AILIN_SAY_KILL        = -2000051,
+    AILIN_SAY_PREDEAD     = -2000052,
+    AILIN_SAY_DEAD        = -2000053,
+    AILIN_SAY_SEDUCTION   = -2000054,
+    AILIN_SAY_AGRO2       = -2000055
 };
 
 enum ailinspells
 {
+    FLAME_BRATH           = 74528,
+    SEDUCTION             = 6358,
+    CREEPENG_PARALIZIS    = 43095,
+    MIRROR_IMAGE          = 55342,
+    SOUL_STONE            = 20763
 };
 
 struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
 {
     boss_ailin(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    bool endcombat;
+    bool revive;
+
+    uint32 flameBreath;
+    uint32 seduction;
+    uint32 creepengParalizis;
+    uint32 mirrorImage;
+
     void Reset()
     {
+        endcombat   = false;
+        revive      = true;
+
+        flameBreath        = 20000;
+        seduction          = 12000;
+        creepengParalizis  = 35000;
+        mirrorImage        = 35000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -860,10 +886,20 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        if(!endcombat)
+        {
+            //m_creature->SetDeathState(STATE_ALIVE);
+            m_creature->SetHealthPercent(30.0f);
+            DoScriptText(AILIN_SAY_PREDEAD, m_creature);
+            endcombat = true;
+        }
+        else DoScriptText(AILIN_SAY_DEAD, m_creature);
     }
 
     void Aggro(Unit* pWho)
     {
+        DoScriptText(AILIN_SAY_AGRO, m_creature);
+        DoScriptText(AILIN_SAY_AGRO2, m_creature);
     }
  
     void UpdateAI(const uint32 uiDiff)
@@ -871,6 +907,46 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if(revive && m_creature->GetHealthPercent() < 20.0f)
+        {
+            if (DoCastSpellIfCan(m_creature, SOUL_STONE) == CAST_OK) revive = false;
+        }
+        
+        if(flameBreath < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, FLAME_BRATH) == CAST_OK)
+                flameBreath = 20000;
+        }
+        else flameBreath -= uiDiff;
+
+        if(seduction < uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                if (DoCastSpellIfCan(pTarget, SEDUCTION) == CAST_OK)
+                {
+                    seduction = 12000;
+                    DoScriptText(AILIN_SAY_SEDUCTION, m_creature);
+                }
+            }            
+        }
+        else seduction -= uiDiff;    
+
+        if(creepengParalizis < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, CREEPENG_PARALIZIS) == CAST_OK)
+                creepengParalizis = 35000;
+        }
+        else creepengParalizis -= uiDiff;    
+
+        if(mirrorImage < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, MIRROR_IMAGE) == CAST_OK)
+                mirrorImage = 35000;
+        }
+        else mirrorImage -= uiDiff;  
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1004,6 +1080,46 @@ CreatureAI* GetAI_boss_douce(Creature* pCreature)
     return new boss_douce(pCreature);
 }
 
+// Aerom
+
+enum aeromsays
+{
+};
+
+enum aeromspells
+{
+};
+
+struct MANGOS_DLL_DECL boss_aerom : public ScriptedAI
+{
+    boss_aerom(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    void Reset()
+    {
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+    }
+};
+
+CreatureAI* GetAI_boss_aerom(Creature* pCreature)
+{
+    return new boss_aerom(pCreature);
+}
+
 // Raynar
 
 enum raynarsays
@@ -1111,5 +1227,10 @@ void AddSC_npcs_radical()
     pNewScript = new Script;
     pNewScript->Name = "boss_raynar";
     pNewScript->GetAI = &GetAI_boss_raynar;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_aerom";
+    pNewScript->GetAI = &GetAI_boss_aerom;
     pNewScript->RegisterSelf();
 }

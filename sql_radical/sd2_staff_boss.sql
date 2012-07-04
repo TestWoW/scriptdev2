@@ -36,3 +36,12 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000042', ':(', '1', 'Dead douce'),
 ('-2000043', 'Ya me canse', '1', 'cabreo');
 
+-- Ailin
+INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
+('-2000050', 'No, no puede ser. ¿Habeis matado a Bergen? Nooooooooooooooo', '1', 'agro ailin'),
+('-2000051', '', '1', 'kill ailin'),
+('-2000052', '¿A donde vais? Esto aún no ha terminado', '1', 'pre dead ailin'),
+('-2000053', 'Hice lo que pude.Pero no es el final. Ya nos volveremos a encontrar', '1', 'Dead ailin'),
+('-2000054', 'Os quiero enamorar', '1', 'seduccion'),
+('-2000055', 'Ailin llora', '2', 'agro2');
+
