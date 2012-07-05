@@ -888,7 +888,7 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
     {
         if(!endcombat)
         {
-            //m_creature->SetDeathState(STATE_ALIVE);
+            m_creature->SetDeathState(ALIVE);
             m_creature->SetHealthPercent(30.0f);
             DoScriptText(AILIN_SAY_PREDEAD, m_creature);
             endcombat = true;
@@ -1085,18 +1085,50 @@ CreatureAI* GetAI_boss_douce(Creature* pCreature)
 
 enum aeromsays
 {
+    AEROM_SAY_AGRO        = -2000070,
+    AEROM_SAY_KILL        = -2000071,
+    AEROM_SAY_DEAD        = -2000072
 };
 
 enum aeromspells
 {
+    BLADESTORM       = 46924,
+    REPELLING_WAVE   = 74509,
+    HEROISM          = 32182,
+    PSICHICK_SCREAM  = 8122,
+    BLOOD_BEAST      = 72173,
+    SPELL_REFLECTION = 23920,
+    RENEW            = 62441,
+    CHAIN_LIGHTING   = 62131
 };
 
 struct MANGOS_DLL_DECL boss_aerom : public ScriptedAI
 {
     boss_aerom(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    bool heroism;
+
+    uint32 bladestorm;
+    uint32 repellingwave;
+    uint32 scream;
+    uint32 beast;
+    uint32 reflection;
+    uint32 renew;
+    uint32 chain;
+
     void Reset()
     {
+        if(!m_creature->HasAura(15473)) m_creature->CastSpell(m_creature, 15473, false);
+        
+        heroism = true;
+
+        bladestorm  = 20000;
+        repellingwave = 56000;
+        scream        = 15000;
+        beast = 35000;
+        reflection = 10000;
+        renew = 8000;
+        chain = 13000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -1105,14 +1137,79 @@ struct MANGOS_DLL_DECL boss_aerom : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        DoScriptText(AEROM_SAY_DEAD, m_creature);
     }
 
     void Aggro(Unit* pWho)
     {
+        if(!m_creature->HasAura(15473)) m_creature->CastSpell(m_creature, 15473, false);
+        DoScriptText(AEROM_SAY_AGRO, m_creature);
     }
  
     void UpdateAI(const uint32 uiDiff)
     {
+
+        if(heroism && m_creature->GetHealthPercent() < 70.0f)
+        {
+            m_creature->CastSpell(m_creature, HEROISM, false);
+            heroism = false;
+        }
+
+        if(bladestorm < uiDiff)
+        {
+            m_creature->CastSpell(m_creature, BLADESTORM, true);
+            bladestorm  = 20000;
+        }
+        else bladestorm -= uiDiff;
+
+        if(repellingwave < uiDiff)
+        {
+            m_creature->CastSpell(m_creature, REPELLING_WAVE, false);
+            repellingwave = 56000;
+        }
+        else repellingwave -= uiDiff;
+ 
+        if(scream < uiDiff)
+        {
+            m_creature->CastSpell(m_creature, PSICHICK_SCREAM, false);
+            scream = 15000;
+        }
+        else scream -= uiDiff;
+
+        if(beast < uiDiff)
+        {
+            m_creature->CastSpell(m_creature, BLOOD_BEAST, true);
+            beast = 35000;
+        }
+        else beast -= uiDiff;
+
+        if(reflection < uiDiff)
+        {
+            m_creature->CastSpell(m_creature, SPELL_REFLECTION, true);
+            reflection = 10000;
+        }
+        else reflection -= uiDiff;
+
+        if(renew < uiDiff)
+        {
+            m_creature->CastSpell(m_creature, RENEW, true);
+            renew = 8000;
+        }
+        else renew -= uiDiff;
+
+        if(chain < uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                if (DoCastSpellIfCan(pTarget, CHAIN_LIGHTING) == CAST_OK)
+                {
+                    chain = 13000;
+                }
+            }  
+        }
+        else chain -= uiDiff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1159,6 +1256,98 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
 CreatureAI* GetAI_boss_raynar(Creature* pCreature)
 {
     return new boss_raynar(pCreature);
+}
+
+// Blend
+
+enum blendsays
+{
+    BLEND_SAY_AGRO        = -2000060,
+    BLEND_SAY_KILL        = -2000061,
+    BLEND_SAY_DEAD        = -2000062,
+    BLEND_SAY_BAN         = -2000063   
+};
+
+enum blendspells
+{
+    FROSTBALL_VOLLEY      = 72905,
+    SLIME_SPRAY           = 69508,
+    SCHORCH               = 63474,
+    BLIZZARD              = 28560
+};
+
+struct MANGOS_DLL_DECL boss_blend : public ScriptedAI
+{
+    boss_blend(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    uint32 frostball;
+    uint32 slime;
+    uint32 schorch;
+    uint32 blizzard;
+
+    void Reset()
+    {
+        frostball  = 15000;
+        slime      = 20000;
+        schorch    = 32000;
+        blizzard   = 17000;
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+        DoScriptText(BLEND_SAY_KILL, m_creature);
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+        DoScriptText(BLEND_SAY_DEAD, m_creature);
+    }
+
+    void Aggro(Unit* pWho)
+    {
+        DoScriptText(BLEND_SAY_AGRO, m_creature);
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if(frostball < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, FROSTBALL_VOLLEY) == CAST_OK) frostball = 15000;
+        }
+        else frostball -= uiDiff;
+
+        if(slime < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SLIME_SPRAY) == CAST_OK) slime = 20000;
+        }
+        else slime -= uiDiff;
+
+        if(schorch < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SCHORCH) == CAST_OK) 
+            {
+                schorch = 32000;
+                DoScriptText(BLEND_SAY_BAN, m_creature);
+            }
+        }
+        else schorch -= uiDiff;
+
+        if(blizzard < uiDiff)
+        {
+             if (DoCastSpellIfCan(m_creature, BLIZZARD) == CAST_OK) blizzard = 17000;
+        }
+        else blizzard -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_boss_blend(Creature* pCreature)
+{
+    return new boss_blend(pCreature);
 }
 
 void AddSC_npcs_radical()
@@ -1226,12 +1415,17 @@ void AddSC_npcs_radical()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
+    pNewScript->Name = "boss_aerom";
+    pNewScript->GetAI = &GetAI_boss_aerom;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
     pNewScript->Name = "boss_raynar";
     pNewScript->GetAI = &GetAI_boss_raynar;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "boss_aerom";
-    pNewScript->GetAI = &GetAI_boss_aerom;
+    pNewScript->Name = "boss_blend";
+    pNewScript->GetAI = &GetAI_boss_blend;
     pNewScript->RegisterSelf();
 }

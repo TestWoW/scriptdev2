@@ -45,3 +45,16 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000054', 'Os quiero enamorar', '1', 'seduccion'),
 ('-2000055', 'Ailin llora', '2', 'agro2');
 
+-- Blend
+INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
+('-2000060', '¡Soy Blend la mezcladora. Preparaos para sufrir como nunca lo habéis hecho!', '1', 'agro blend'),
+('-2000061', '¡30 días para ti, otros 30 para ti y para él!', '1', 'kill blend'),
+('-2000062', 'El resto te lo dejo a ti... Ray...', '1', 'Dead blend'),
+('-2000063', '¡Os banearé injustamente!. ¡Hahahaha!', '1', 'algo, no se que');
+
+-- AEROM
+INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
+('-2000070', 'Habéis llegado hasta aquí, me pregunto qué habrá sido de los demás. \nPor vuestras caras deduzco que no venís en son de paz, así que preparaos para morir.', '1', 'agro aerom'),
+('-2000071', '', '1', 'kill aerom'),
+('-2000072', 'Sé quienes sois, no habrá apelación posible para vosotros. Muahahaha.', '1', 'Dead aerom');
+
