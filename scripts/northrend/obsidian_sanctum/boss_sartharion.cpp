@@ -385,6 +385,7 @@ struct MANGOS_DLL_DECL boss_sartharionAI : public ScriptedAI
             pTene->CastSpell(pTene, SPELL_POWER_OF_TENEBRON, false);
             pTene->SetLevitate(true);
             pTene->SetWalk(false);
+            pTene->setFaction(m_creature->getFaction());
             pTene->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             pTene->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aTene[0].m_fX, m_aTene[0].m_fY, m_aTene[0].m_fZ);
         }
@@ -396,6 +397,7 @@ struct MANGOS_DLL_DECL boss_sartharionAI : public ScriptedAI
             pShad->CastSpell(pShad, SPELL_POWER_OF_SHADRON, false);
             pShad->SetLevitate(true);
             pShad->SetWalk(false);
+            pShad->setFaction(m_creature->getFaction());
             pShad->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             pShad->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aShad[0].m_fX, m_aShad[0].m_fY, m_aShad[0].m_fZ);
         }
@@ -407,6 +409,7 @@ struct MANGOS_DLL_DECL boss_sartharionAI : public ScriptedAI
             pVesp->CastSpell(pVesp, SPELL_POWER_OF_VESPERON, false);
             pVesp->SetLevitate(true);
             pVesp->SetWalk(false);
+            pVesp->setFaction(m_creature->getFaction());
             pVesp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             pVesp->GetMotionMaster()->MovePoint(POINT_ID_INIT, m_aVesp[0].m_fX, m_aVesp[0].m_fY, m_aVesp[0].m_fZ);
         }
@@ -964,7 +967,7 @@ struct MANGOS_DLL_DECL dummy_dragonAI : public ScriptedAI
 
             //By using SetRespawnTime() we will actually "spawn" the object with our defined time.
             //Once time is up, portal will disappear again.
-            
+
             pPortal->SetRespawnTime(iPortalRespawnTime);
             pPortal->Refresh();
 
@@ -1024,7 +1027,7 @@ struct MANGOS_DLL_DECL dummy_dragonAI : public ScriptedAI
             {
                 m_pInstance->SetData(TYPE_TENEBRON, DONE);
                 iTextId = SAY_TENEBRON_DEATH;
-                
+
                 if (!m_pInstance->m_lEggsGUIDList.empty())
                     for (GUIDList::iterator itr = m_pInstance->m_lEggsGUIDList.begin(); itr != m_pInstance->m_lEggsGUIDList.end(); ++itr)
                         if (Creature* pEgg = m_pInstance->instance->GetCreature(*itr))
