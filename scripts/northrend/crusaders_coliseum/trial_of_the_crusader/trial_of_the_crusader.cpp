@@ -65,7 +65,7 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
     bool m_bIsHeroic;
     bool m_bIs25Man;
 
-    //uint32 DelayTimer;
+    uint32 DelayTimer;
 
     uint32 m_uiHeroicTimer;
 
@@ -77,7 +77,7 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
         m_uiHeroicTimer = 120000;
 
         m_pInstance->SetData(TYPE_STAGE, STAGE_WAITING);
-        //DelayTimer = 0;
+        DelayTimer = 0;
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
         if (Creature *pHorde = GetClosestCreatureWithEntry(m_creature, NPC_THRALL, 300.0f))
@@ -98,8 +98,8 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        //if (DelayTimer < uiDiff)
-        //{
+        if (DelayTimer < uiDiff)
+        {
             switch (m_pInstance->GetData(TYPE_STAGE))
             {
                 case STAGE_WAITING:
@@ -228,8 +228,8 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                     //m_creature->ForcedDespawn();
                     break;
             }
-        //}
-        //else DelayTimer -= uiDiff;
+        }
+        else DelayTimer -= uiDiff;
     }
 };
 
