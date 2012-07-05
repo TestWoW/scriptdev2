@@ -1148,6 +1148,8 @@ struct MANGOS_DLL_DECL boss_aerom : public ScriptedAI
  
     void UpdateAI(const uint32 uiDiff)
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
 
         if(heroism && m_creature->GetHealthPercent() < 70.0f)
         {
