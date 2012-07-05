@@ -1095,7 +1095,7 @@ enum aeromsays
 
 enum aeromspells
 {
-    BLADESTORM       = 46924,
+    BLADESTORM       = 65947,
     REPELLING_WAVE   = 74509,
     HEROISM          = 32182,
     PSICHICK_SCREAM  = 8122,
@@ -1342,7 +1342,8 @@ struct MANGOS_DLL_DECL boss_blend : public ScriptedAI
 
         if(blizzard < uiDiff)
         {
-             if (DoCastSpellIfCan(m_creature, BLIZZARD) == CAST_OK) blizzard = 17000;
+             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                 if (DoCastSpellIfCan(pTarget, BLIZZARD) == CAST_OK) blizzard = 17000;
         }
         else blizzard -= uiDiff;
 
