@@ -899,8 +899,11 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
-        DoScriptText(AILIN_SAY_AGRO, m_creature);
-        DoScriptText(AILIN_SAY_AGRO2, m_creature);
+        if(revive)
+        { 
+            DoScriptText(AILIN_SAY_AGRO, m_creature);
+            DoScriptText(AILIN_SAY_AGRO2, m_creature);
+        }
     }
  
     void UpdateAI(const uint32 uiDiff)
