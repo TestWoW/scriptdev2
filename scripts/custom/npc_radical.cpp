@@ -855,7 +855,8 @@ enum ailinspells
     CREEPENG_PARALIZIS    = 43095,
     SOUL_STONE            = 20763,
     LIGHTNING_WHIRL       = 61915,
-    SUNBEAM               = 62623
+    SUNBEAM               = 62623,
+    RUNE_OF_DEATH         = 62269
 };
 
 struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
@@ -870,6 +871,7 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
     uint32 creepengParalizis;
     uint32 sunbeam;
     uint32 LightningWhirl;
+    uint32 runeOFdeath;
 
     void Reset()
     {
@@ -880,7 +882,8 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
         seduction          = 12000;
         creepengParalizis  = 35000;
         sunbeam            = 80000;
-        LightningWhirl     = 41000;
+        LightningWhirl     = 30000;
+        runeOFdeath        = 40000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -960,10 +963,17 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
         }
         else creepengParalizis -= uiDiff;   
 
+        if(runeOFdeath < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, RUNE_OF_DEATH) == CAST_OK)
+                runeOFdeath = 40000;
+        }
+        else runeOFdeath -= uiDiff;  
+
         if(LightningWhirl < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, LIGHTNING_WHIRL) == CAST_OK)
-                LightningWhirl = 41000;
+                LightningWhirl = 30000;
         }
         else LightningWhirl -= uiDiff; 
 
