@@ -133,7 +133,7 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                         m_pInstance->SetData(TYPE_STAGE, STAGE_WAITING);
                         m_pInstance->SetData(TYPE_EVENT, 666);
                         m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
-                        //m_creature->SetDeathState(JUST_DIED);
+                        m_creature->SetDeathState(JUST_DIED);
                         m_creature->Respawn();
                     }
                     break;
@@ -166,7 +166,7 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                         m_pInstance->SetData(TYPE_STAGE, STAGE_WAITING);
                         m_pInstance->SetData(TYPE_EVENT, 666);
                         m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
-                        //m_creature->SetDeathState(JUST_DIED);
+                        m_creature->SetDeathState(JUST_DIED);
                         m_creature->Respawn();
                     }
                     break;
@@ -183,7 +183,7 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                         m_pInstance->SetData(TYPE_STAGE, STAGE_WAITING);
                         m_pInstance->SetData(TYPE_EVENT,666);
                         m_pInstance->SetData(TYPE_BEASTS, NOT_STARTED);
-                        //m_creature->SetDeathState(JUST_DIED);
+                        m_creature->SetDeathState(JUST_DIED);
                         m_creature->Respawn();
                     };
                     break;
@@ -225,7 +225,7 @@ struct MANGOS_DLL_DECL npc_toc_announcerAI : public ScriptedAI
                     }
                     break;
                 case STAGE_FINISH:
-                    //m_creature->ForcedDespawn();
+                    m_creature->ForcedDespawn();
                     break;
             }
         }
