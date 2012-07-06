@@ -38,7 +38,7 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 
 -- Ailin
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
-('-2000050', 'No, no puede ser. ¿Habeis matado a Bergen? Nooooooooooooooo', '1', 'agro ailin'),
+('-2000050', 'No, no puede ser. ¿Habeis matado a los demás? Nooooooooooooooo.', '1', 'agro ailin'),
 ('-2000051', '', '1', 'kill ailin'),
 ('-2000052', '¿A donde vais? Esto aún no ha terminado', '1', 'pre dead ailin'),
 ('-2000053', 'Hice lo que pude.Pero no es el final. Ya nos volveremos a encontrar', '1', 'Dead ailin'),
@@ -52,9 +52,15 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000062', 'El resto te lo dejo a ti... Ray...', '1', 'Dead blend'),
 ('-2000063', '¡Os banearé injustamente!. ¡Hahahaha!', '1', 'algo, no se que');
 
--- AEROM
+-- Aerom
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000070', 'Habéis llegado hasta aquí, me pregunto qué habrá sido de los demás. \nPor vuestras caras deduzco que no venís en son de paz, así que preparaos para morir.', '1', 'agro aerom'),
 ('-2000071', '', '1', 'kill aerom'),
 ('-2000072', 'Sé quienes sois, no habrá apelación posible para vosotros. Muahahaha.', '1', 'Dead aerom');
+
+-- Gedeon
+INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
+('-2000080', 'No teneis nada mejor que hacer? , Poned ticket para ser atendidos!!!!', '1', 'agro gedeon'),
+('-2000081', 'asunto resuelto, el siguiente???', '1', 'kill gedeon'),
+('-2000082', 'Ahora tirare un reset!! ja ja ja', '1', 'Dead gedeon');
 

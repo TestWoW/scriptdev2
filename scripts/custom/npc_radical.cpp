@@ -470,7 +470,7 @@ enum Gorcrallspells
     EXPLOSIVE_SHOT       = 67985,
     AVENGING_WRATH       = 43430,
     DIVINE_SHIELD        = 40733,
-    AIMED_SHOT           = 67979,
+    AIMED_SHOT           = 65883,
     DIVINE_STORM         = 58127 
 };
 
@@ -911,6 +911,8 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        m_creature->SetPower(m_creature->getPowerType(), 50000000); 
+
         if(revive && m_creature->GetHealthPercent() < 20.0f)
         {
             if (DoCastSpellIfCan(m_creature, SOUL_STONE) == CAST_OK) revive = false;
@@ -963,11 +965,16 @@ CreatureAI* GetAI_boss_ailin(Creature* pCreature)
 
 enum gedeonsays
 {
+    GEDEON_SAY_AGRO        = -2000080,
+    GEDEON_SAY_KILL        = -2000081,
+    GEDEON_SAY_DEAD        = -2000082
 };
 
 enum gedeonspells
 {
-    THUNDER_STORM = 60010
+    THUNDER_STORM         = 60010,
+    G_FROSTBALL_VOLLEY    = 72905,
+    LAVA_GOUT             = 74394
 };
 
 struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
@@ -975,25 +982,32 @@ struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
     boss_gedeon(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
     uint32 thunderStorm;
+    uint32 frostball;
+    uint32 LavaGout;
 
     void Reset()
     {
         SetCombatMovement(false);
 
         thunderStorm = 5000;
+        frostball    = 12000;
+        LavaGout     = 0;
     }
    
     void KilledUnit(Unit* pVictim)
     {
+        DoScriptText(GEDEON_SAY_KILL, m_creature);
     }
 
     void JustDied(Unit* pKiller)
     {
+        DoScriptText(GEDEON_SAY_DEAD, m_creature);
     }
 
     void Aggro(Unit* pWho)
     {
         SetCombatMovement(false);
+        DoScriptText(GEDEON_SAY_AGRO, m_creature);
     }
  
     void UpdateAI(const uint32 uiDiff)
@@ -1011,7 +1025,20 @@ struct MANGOS_DLL_DECL boss_gedeon : public ScriptedAI
             }
         }
         else thunderStorm -= uiDiff;
-        
+
+        if(frostball < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, G_FROSTBALL_VOLLEY) == CAST_OK) frostball = 12000;
+        }
+        else frostball -= uiDiff;
+
+        if (LavaGout <= uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature->getVictim(), LAVA_GOUT) == CAST_OK)
+                LavaGout = 3000;
+        }
+        else LavaGout -= uiDiff;
+    
     }
 };
 
@@ -1042,7 +1069,7 @@ struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
 
     void Reset()
     {
-        enrage = 3 * MINUTE * IN_MILLISECONDS;
+        enrage = 4 * MINUTE * IN_MILLISECONDS;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -1154,6 +1181,8 @@ struct MANGOS_DLL_DECL boss_aerom : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        m_creature->SetPower(m_creature->getPowerType(), 50000000); 
+
         if(heroism && m_creature->GetHealthPercent() < 70.0f)
         {
             m_creature->CastSpell(m_creature, HEROISM, false);
@@ -1239,6 +1268,7 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
 
     void Reset()
     {
+        SetEquipmentSlots(false, 54806, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
     }
    
     void KilledUnit(Unit* pVictim)
@@ -1251,6 +1281,7 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        SetEquipmentSlots(false, 54806, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
     }
  
     void UpdateAI(const uint32 uiDiff)
@@ -1356,6 +1387,46 @@ CreatureAI* GetAI_boss_blend(Creature* pCreature)
     return new boss_blend(pCreature);
 }
 
+// Tallulah
+
+enum tallulahsays
+{
+};
+
+enum tallulahspells
+{
+};
+
+struct MANGOS_DLL_DECL boss_tallulah : public ScriptedAI
+{
+    boss_tallulah(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    void Reset()
+    {
+    }
+   
+    void KilledUnit(Unit* pVictim)
+    {
+    }
+
+    void JustDied(Unit* pKiller)
+    {
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+ 
+    void UpdateAI(const uint32 uiDiff)
+    {
+    }
+};
+
+CreatureAI* GetAI_boss_tallulah(Creature* pCreature)
+{
+    return new boss_tallulah(pCreature);
+}
+
 void AddSC_npcs_radical()
 {
     Script* pNewScript;
@@ -1433,5 +1504,10 @@ void AddSC_npcs_radical()
     pNewScript = new Script;
     pNewScript->Name = "boss_blend";
     pNewScript->GetAI = &GetAI_boss_blend;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_tallulah";
+    pNewScript->GetAI = &GetAI_boss_tallulah;
     pNewScript->RegisterSelf();
 }
