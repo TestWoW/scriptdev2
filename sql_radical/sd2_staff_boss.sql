@@ -2,7 +2,7 @@
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000010', 'Sereis baneados', '1', 'agro Bergen'),
 ('-2000011', 'Un ban menos que meter', '1', 'kill Bergen'),
-('-2000012', 'Parece no os voy a banear', '1', 'Dead Bergen'),
+('-2000012', 'SATANAS!', '1', 'Dead Bergen'),
 ('-2000013', 'A volar!', '1', 'magic wings'),
 ('-2000014', 'Corred insensatos!', '1', 'heat floor');
 

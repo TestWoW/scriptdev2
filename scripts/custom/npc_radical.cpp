@@ -853,8 +853,9 @@ enum ailinspells
     FLAME_BRATH           = 74528,
     SEDUCTION             = 6358,
     CREEPENG_PARALIZIS    = 43095,
-    MIRROR_IMAGE          = 55342,
-    SOUL_STONE            = 20763
+    SOUL_STONE            = 20763,
+    LIGHTNING_WHIRL       = 61915,
+    SUNBEAM               = 62623
 };
 
 struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
@@ -867,7 +868,8 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
     uint32 flameBreath;
     uint32 seduction;
     uint32 creepengParalizis;
-    uint32 mirrorImage;
+    uint32 sunbeam;
+    uint32 LightningWhirl;
 
     void Reset()
     {
@@ -877,7 +879,8 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
         flameBreath        = 20000;
         seduction          = 12000;
         creepengParalizis  = 35000;
-        mirrorImage        = 35000;
+        sunbeam            = 80000;
+        LightningWhirl     = 41000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -936,21 +939,33 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
                 }
             }            
         }
-        else seduction -= uiDiff;    
+        else seduction -= uiDiff;  
+
+        if(sunbeam < uiDiff)
+        {
+            if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                if (DoCastSpellIfCan(pTarget, SUNBEAM) == CAST_OK)
+                {
+                    sunbeam = 8000;
+                }
+            }            
+        }
+        else sunbeam -= uiDiff;   
 
         if(creepengParalizis < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, CREEPENG_PARALIZIS) == CAST_OK)
                 creepengParalizis = 35000;
         }
-        else creepengParalizis -= uiDiff;    
+        else creepengParalizis -= uiDiff;   
 
-        if(mirrorImage < uiDiff)
+        if(LightningWhirl < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, MIRROR_IMAGE) == CAST_OK)
-                mirrorImage = 35000;
+            if (DoCastSpellIfCan(m_creature, LIGHTNING_WHIRL) == CAST_OK)
+                LightningWhirl = 41000;
         }
-        else mirrorImage -= uiDiff;  
+        else LightningWhirl -= uiDiff; 
 
         DoMeleeAttackIfReady();
     }
@@ -1059,6 +1074,7 @@ enum doucesays
 
 enum doucespells
 {
+    IMTIMIDATING_ROAR = 74384
 };
 
 struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
@@ -1066,10 +1082,12 @@ struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
     boss_douce(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
     uint32 enrage;
+    uint32 ImtimidatingRoar;
 
     void Reset()
     {
         enrage = 4 * MINUTE * IN_MILLISECONDS;
+        ImtimidatingRoar = 15000;
     }
    
     void KilledUnit(Unit* pVictim)
@@ -1101,6 +1119,15 @@ struct MANGOS_DLL_DECL boss_douce : public ScriptedAI
             }
         }
         else enrage -= uiDiff;
+
+        if (ImtimidatingRoar <= uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature->getVictim(), IMTIMIDATING_ROAR) == CAST_OK)
+            {
+                ImtimidatingRoar = 15000;
+            }
+        }
+        else ImtimidatingRoar -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
