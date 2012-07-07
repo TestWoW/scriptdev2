@@ -1312,11 +1312,14 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
 {
     boss_raynar(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    Creature *sumon;
+
     uint32 shadowjail;
     uint32 grip;
     uint32 cleave;
     uint32 flameBreath;
     uint32 tailSlash;
+    uint32 sumon;
 
     void Reset()
     {
@@ -1327,6 +1330,9 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
         cleave      = 14000;
         flameBreath = 20000;
         tailSlash   = 20000;
+        tsummon     = 60000;
+
+        sumon = NULL;
     }  
    
     void KilledUnit(Unit* pVictim)
@@ -1397,6 +1403,19 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
             }
         }
         else tailSlash -= uiDiff;
+
+        if(!sumon && tsummon < uiDiff)
+        { 
+            sumon = m_creature->SummonCreature(36724, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 2000); 
+            if(DoCastSpellIfCan(m_creature, DIVINE_SHIELD) == CAST_OK) tsummon = 2 * MINUTE * IN_MILLISECONDS;
+        }
+        else tsummon -= uiDiff;
+
+        if(sumon && sumon->isDead())
+        {
+            if(m_creature->HasAura(DIVINE_SHIELD))m_creature->RemoveAurasDueToSpell(DIVINE_SHIELD);  
+            sumon = NULL;   
+        }
 
         DoMeleeAttackIfReady();
     }
@@ -1628,9 +1647,21 @@ struct MANGOS_DLL_DECL boss_giresse : public ScriptedAI
 {
     boss_giresse(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    bool first;
+    bool second;
+    bool third;
+
+    uint32 timer;
+
     void Reset()
     {
         SetEquipmentSlots(false, 19019, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
+
+        timer   = 0;
+
+        first   = true;
+        second  = true;
+        third   = true;
     }
 
     void KilledUnit(Unit* pVictim) {}
@@ -1640,11 +1671,33 @@ struct MANGOS_DLL_DECL boss_giresse : public ScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         if(!giresse_AI) return;
- 
-        m_creature->MonsterYell("asasddwad prueva", 0);
 
-        giresse_AI = false;
+        timer += uiDiff; 
 
+        if(first)
+        {
+            m_creature->MonsterYell("Durante muchos años os he guiado por el camino del PVE. He testeado instances, he muerto por vosotros para que pudierais derrotar a los más dificiles jefes.", 0);
+            first = false;
+        }
+
+        if(second && timer > 10000)
+        {
+            second = false;
+            m_creature->MonsterYell("Hoy, me complace presentaros mi último test. <La senda de los GMs>, dónde podréis visitar a cada uno de nuestros Maestros de juego y luchar contra ellos. Pero cuidado, os aviso que no será fácil.",0)
+
+        }
+
+        if(third && timer > 20000)
+        {            
+            third = false;
+            m_creature->MonsterYell("Suerte aventureros, seguro que la vais a necesitar.",0)
+        }
+
+        if(!third) 
+        {
+            giresse_AI = false;
+            Reset();
+        }
     }
 
 };

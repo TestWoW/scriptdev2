@@ -68,8 +68,9 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000090', 'Si habéis llegado hasta aquí quiere decir que o bien habéis sobornado a mis GMs o los habéis matado. En cualquier caso.... NO ESTÁIS PREPARADOS!', '1', 'agro raynar'),
 ('-2000091', 'Arthras es un conejito a mi lado!', '1', 'kill raynar'),
-('-2000092', '¿Quien me ha tocado el culo?', '1', 'Dead raynar'),
-('-2000093', 'Un hacker! Intenta escapar ahora!!!', '1', 'shadowjail');
+('-2000092', 'Enhorabuena, habéis completado el reto! Esperamos que os haya gustado y os hayáis divertido. Feliz Aniversario! Cuidado con meterme mano ahora que estoy muerto, que os vigilo desde arriba...', '1', 'Dead raynar'),
+('-2000093', 'Un hacker! Intenta escapar ahora!!!', '1', 'shadowjail'),
+('-2000094', '¿Quien me ha tocado el culo?', '1', 'culo raynar');
 
 -- Tallulah
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES

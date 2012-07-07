@@ -35,5 +35,8 @@ insert into `creature_template` (`entry`, `modelid_1`, `modelid_2`, `modelid_3`,
 values ('80011', '23177', '0', '0', '0', "Tallulah", "STAFF", '83', '83', '7000000', '7000000', '50000000', '50000000', '5000', '14', '14', '0', '1', '1.50', '2', '3', '30000', '40000', '2500', '2500', '0', 0, 0, '7', '0', '0', '0', '0', '0', '0', '0', '0', '667893759', 'boss_tallulah');
 
 insert into `creature_template` (`entry`, `modelid_1`, `modelid_2`, `modelid_3`, `modelid_4`, `name`, `subname`, `minlevel`, `maxlevel`, `minhealth`, `maxhealth`, `minmana`, `maxmana`, `armor`, `faction_A`, `faction_H`, `npcflag`, `speed_walk`, `speed_run`, `scale`, `rank`, `mindmg`, `maxdmg`, `baseattacktime`, `rangeattacktime`, `family`, `minrangedmg`, `maxrangedmg`, `type`, `resistance1`, `resistance2`, `resistance3`, `resistance4`, `resistance5`, `resistance6`, `mingold`, `maxgold`, `mechanic_immune_mask`, `ScriptName`)
-values ('80012', '16801', '0', '0', '0', "Giresse", "STAFF", '83', '83', '7000000', '7000000', '50000000', '50000000', '5000', '14', '14', '0', '1', '1.50', '2', '3', '30000', '40000', '2500', '2500', '0', 0, 0, '7', '0', '0', '0', '0', '0', '0', '0', '0', '667893759', 'boss_giresse');
+values ('80012', '16801', '0', '0', '0', "Giresse", "STAFF", '83', '83', '7000000', '7000000', '50000000', '50000000', '5000', '35', '35', '0', '1', '1.50', '2', '3', '30000', '40000', '2500', '2500', '0', 0, 0, '7', '0', '0', '0', '0', '0', '0', '0', '0', '667893759', 'boss_giresse');
+
+INSERT INTO `creature_loot_template` 
+values ('80008', '37297', '100', '0', '1', '1', '0', '0', '0', '0');
 
