@@ -161,6 +161,7 @@ enum
     DESPAWN_TIME                = 300000,
     SPELL_SHADOWS_EDGE          = 71168,
 
+    TYPE_IVE_MADE_AND_MESS              = 3,
 };
 
 enum AchievementCriteriaIds
