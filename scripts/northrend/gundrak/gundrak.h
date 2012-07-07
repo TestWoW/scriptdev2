@@ -109,12 +109,6 @@ class MANGOS_DLL_DECL instance_gundrak : public ScriptedInstance
 
         bool m_bCriteriaShareTheLove;
         bool m_bCriteriaLessRabi;
-
-        /*GUIDList m_luiStalkerGUIDs;
-        GUIDVector m_vStalkerCasterGuids;
-        GUIDVector m_vStalkerTargetGuids;
-        GUIDList m_lEckDwellerGuids;
-        GUIDList m_lLivingMojoGuids;*/
 };
 
 #endif

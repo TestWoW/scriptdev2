@@ -108,12 +108,6 @@ class MANGOS_DLL_DECL instance_halls_of_stone : public ScriptedInstance
         GuidList m_lTribunalGUIDs;
         GuidList m_lWorldtriggerGUIDs;
 
-/*        GUIDList m_lKaddrakGUIDs;
-        GUIDList m_lAbedneumGUIDs;
-        GUIDList m_lMarnakGUIDs;
-        GUIDList m_lTribunalGUIDs;
-        GUIDList m_lWorldtriggerGUIDs;*/
-
         bool m_bGoodGriefFailed;
         bool m_bBrannFailed;
         uint32 m_uiOozesKilled;
