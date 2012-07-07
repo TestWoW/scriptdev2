@@ -8,31 +8,6 @@
 ## Radical custom npc 
 ######*/
 
-/*bool is_birthday_date()
-{
-    time_t ltime;
-    struct tm *timeinfo;
-    
-    ltime = time(NULL);
-
-    timeinfo = localtime(&ltime);
-
-    return (timeinfo.tm_mon == 5 && timeinfo.tm_mday == 24);
-}  */  
-
-//creo que esta si va a funcionar
-/*bool is_birthday_date()
-{
-    time_t rawtime; 
-    struct tm * timeinfo; 
-
-    time ( &rawtime ); 
-    timeinfo = localtime ( &rawtime ); 
-
-    return (timeinfo.tm_mday == 24 && timeinfo.tm_mon==5);
-
-}*/
-
 bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
 {
     char const* GOSSIP_LONELY;
@@ -91,7 +66,7 @@ bool GossipHello_logroneitor_horde(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HARD_EGG, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PRIMAVERA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-    //if(is_birthday_date()) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BIRTHDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BIRTHDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
 
     pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
     return true;
@@ -204,7 +179,7 @@ bool GossipHello_logroneitor_alliance(Player* pPlayer, Creature* pCreature)
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PINKY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HARD_EGG, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_PRIMAVERA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-    //if(is_birthday_date()) pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BIRTHDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BIRTHDAY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
 
     pPlayer->SEND_GOSSIP_MENU(50003, pCreature->GetObjectGuid());
     return true;
@@ -1319,7 +1294,7 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
     uint32 cleave;
     uint32 flameBreath;
     uint32 tailSlash;
-    uint32 sumon;
+    uint32 tsummon;
 
     void Reset()
     {
