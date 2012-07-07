@@ -825,7 +825,7 @@ CreatureAI* GetAI_mob_frost_giant(Creature* pCreature)
     return new mob_frost_giantAI(pCreature);
 }
 
-void AddSC_icecrown_citadel()
+void AddSC_icecrown_spire()
 {
     Script *pNewScript;
 
