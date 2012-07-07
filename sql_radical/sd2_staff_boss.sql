@@ -64,3 +64,16 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000081', 'asunto resuelto, el siguiente???', '1', 'kill gedeon'),
 ('-2000082', 'Ahora tirare un reset!! ja ja ja', '1', 'Dead gedeon');
 
+-- Raynar
+INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
+('-2000090', 'Si habéis llegado hasta aquí quiere decir que o bien habéis sobornado a mis GMs o los habéis matado. En cualquier caso.... NO ESTÁIS PREPARADOS!', '1', 'agro raynar'),
+('-2000091', 'Arthras es un conejito a mi lado!', '1', 'kill raynar'),
+('-2000092', '¿Quien me ha tocado el culo?', '1', 'Dead raynar'),
+('-2000093', 'Un hacker! Intenta escapar ahora!!!', '1', 'shadowjail');
+
+-- Tallulah
+INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
+('-2000100', 'Bienvenidos al rinconcito de Tallu Alis y Hordis.... ¿listos para sufrir?', '1', 'agro Tallulah'),
+('-2000101', '¿Eso es todo lo que teneís?....seguireis muriendo con tanta debilidad', '1', 'kill Tallulah'),
+('-2000102', 'oh oh no me gusta nada lo que estoy sintiendo...creo que es hora de llamar a Ray...', '1', 'Dead Tallulah');
+

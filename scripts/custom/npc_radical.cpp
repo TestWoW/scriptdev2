@@ -672,7 +672,7 @@ struct MANGOS_DLL_DECL boss_hastur : public ScriptedAI
         {
             if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
             {
-                DoCastSpellIfCan(pTarget, JAWS_OF_DEATH);
+                pTarget->CastSpell(pTarget, JAWS_OF_DEATH, false);
                 jawsOfDeath = 10000;
             }
         }
@@ -691,6 +691,7 @@ struct MANGOS_DLL_DECL boss_hastur : public ScriptedAI
         if(cleave < uiDiff)
         {
             DoCastSpellIfCan(m_creature->getVictim(), CLEAVE);
+            cleave = 6000;
         }
         else cleave -= uiDiff;
 
@@ -1293,36 +1294,111 @@ CreatureAI* GetAI_boss_aerom(Creature* pCreature)
 
 enum raynarsays
 {
+    RAYNAR_SAY_AGRO        = -2000090,
+    RAYNAR_SAY_KILL        = -2000091,
+    RAYNAR_SAY_DEAD        = -2000092,
+    RAYNAR_SAY_JAIL        = -2000093,
+    RAYNAR_SAY_TAIL        = -2000094
 };
 
 enum raynarspells
 {
+    SHADOW_JAIL        = 45922,
+    GRIP_OF_THE_LEGION = 31972,
+
 };
 
 struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
 {
     boss_raynar(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    uint32 shadowjail;
+    uint32 grip;
+    uint32 cleave;
+    uint32 flameBreath;
+    uint32 tailSlash;
+
     void Reset()
     {
         SetEquipmentSlots(false, 54806, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
-    }
+         
+        shadowjail  = 30000;
+        grip        = 10000;
+        cleave      = 14000;
+        flameBreath = 20000;
+        tailSlash   = 20000;
+    }  
    
     void KilledUnit(Unit* pVictim)
     {
+        DoScriptText(RAYNAR_SAY_KILL, m_creature);
     }
 
     void JustDied(Unit* pKiller)
     {
+        DoScriptText(RAYNAR_SAY_DEAD, m_creature);
     }
 
     void Aggro(Unit* pWho)
     {
         SetEquipmentSlots(false, 54806, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
+
+        DoScriptText(RAYNAR_SAY_AGRO, m_creature);
     }
  
     void UpdateAI(const uint32 uiDiff)
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if(shadowjail < uiDiff)
+        {
+            if(Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {    
+                target->CastSpell(target, SHADOW_JAIL, false);
+
+                shadowjail = 2 * MINUTE * IN_MILLISECONDS;
+                DoScriptText(RAYNAR_SAY_JAIL, m_creature);
+
+            }
+        }
+        else shadowjail -= uiDiff;
+
+        if(grip < uiDiff)
+        {
+            if(Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {    
+                if (DoCastSpellIfCan(target, GRIP_OF_THE_LEGION) == CAST_OK)
+                    grip = 20000;
+            }
+        }
+        else grip -= uiDiff;
+
+        if(cleave < uiDiff)
+        {
+            DoCastSpellIfCan(m_creature->getVictim(), CLEAVE);
+                cleave = 12000;
+        }
+        else cleave -= uiDiff;
+
+        if(flameBreath < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, FLAME_BRATH) == CAST_OK)
+                flameBreath = 20000;
+        }
+        else flameBreath -= uiDiff;
+
+        if(tailSlash < uiDiff)
+        {
+            if(DoCastSpellIfCan(m_creature, TAIL_SLASH) == CAST_OK) 
+            {
+                DoScriptText(RAYNAR_SAY_TAIL, m_creature);
+                tailSlash = 30000;
+            }
+        }
+        else tailSlash -= uiDiff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1428,40 +1504,154 @@ CreatureAI* GetAI_boss_blend(Creature* pCreature)
 
 enum tallulahsays
 {
+    TALLULAH_SAY_AGRO        = -2000100,
+    TALLULAH_SAY_KILL        = -2000101,
+    TALLULAH_SAY_DEAD        = -2000102,
 };
 
 enum tallulahspells
 {
+    FIREBLAST          = 45232,
+    SHADOW_NOVA        = 45329,
+    CONFLAGRATION      = 45342,
+    CONFOUNDING_BLOW   = 45256
 };
 
 struct MANGOS_DLL_DECL boss_tallulah : public ScriptedAI
 {
     boss_tallulah(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
+    uint32 fireblast;
+    uint32 shadownova;
+    uint32 confounding;
+
     void Reset()
     {
+        fireblast   = 20000;
+        shadownova  = 15000;
+        confounding = 9000;
     }
    
     void KilledUnit(Unit* pVictim)
     {
+        DoScriptText(TALLULAH_SAY_KILL, m_creature);
     }
 
     void JustDied(Unit* pKiller)
     {
+        DoScriptText(TALLULAH_SAY_DEAD, m_creature);
     }
 
     void Aggro(Unit* pWho)
     {
+        DoScriptText(TALLULAH_SAY_AGRO, m_creature);
     }
  
     void UpdateAI(const uint32 uiDiff)
     {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if(fireblast < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, FIREBLAST) == CAST_OK) 
+            {
+                fireblast = 20000;
+            }
+        }
+        else fireblast -= uiDiff;
+
+        if(shadownova < uiDiff)
+        {
+            if(Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {    
+                bool conf = urand(0,1);
+
+                if (DoCastSpellIfCan(target, conf ? CONFLAGRATION : SHADOW_NOVA) == CAST_OK) 
+                    shadownova = 15000;
+            }
+        }
+        else shadownova -= uiDiff;
+
+        if(confounding < uiDiff)
+        {
+            if(Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {    
+                if (DoCastSpellIfCan(target, CONFOUNDING_BLOW) == CAST_OK) 
+                    confounding = 9000;
+            }
+        }
+        else confounding -= uiDiff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
 CreatureAI* GetAI_boss_tallulah(Creature* pCreature)
 {
     return new boss_tallulah(pCreature);
+}
+
+// Giresse
+
+bool giresse_AI = false;
+
+bool GossipHello_giresse(Player* pPlayer, Creature* pCreature)
+{
+    if(giresse_AI) return false;
+
+    char const* OPTION = "Explicanos el evento";
+ 
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+
+    return true;
+}
+
+bool GossipSelect_giresse(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+
+    switch(uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        default:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            giresse_AI = true;
+            break;
+    }
+
+    return true;
+}
+
+struct MANGOS_DLL_DECL boss_giresse : public ScriptedAI
+{
+    boss_giresse(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    void Reset()
+    {
+        SetEquipmentSlots(false, 19019, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
+    }
+
+    void KilledUnit(Unit* pVictim) {}
+    void JustDied(Unit* pKiller) {}
+    void Aggro(Unit* pWho) {}
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if(!giresse_AI) return;
+ 
+        m_creature->MonsterYell("asasddwad prueva", 0);
+
+        giresse_AI = false;
+
+    }
+
+};
+
+CreatureAI* GetAI_boss_giresse(Creature* pCreature)
+{
+    return new boss_giresse(pCreature);
 }
 
 void AddSC_npcs_radical()
@@ -1546,5 +1736,12 @@ void AddSC_npcs_radical()
     pNewScript = new Script;
     pNewScript->Name = "boss_tallulah";
     pNewScript->GetAI = &GetAI_boss_tallulah;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_giresse";
+    pNewScript->pGossipHello = &GossipHello_giresse;
+    pNewScript->pGossipSelect = &GossipSelect_giresse;
+    pNewScript->GetAI = &GetAI_boss_giresse;
     pNewScript->RegisterSelf();
 }
