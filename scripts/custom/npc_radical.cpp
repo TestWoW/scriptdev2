@@ -1317,6 +1317,7 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        m_creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         DoScriptText(RAYNAR_SAY_DEAD, m_creature);
     }
 
@@ -1382,12 +1383,14 @@ struct MANGOS_DLL_DECL boss_raynar : public ScriptedAI
         if(!sumon && tsummon < uiDiff)
         { 
             sumon = m_creature->SummonCreature(36724, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 2000); 
-            if(DoCastSpellIfCan(m_creature, DIVINE_SHIELD) == CAST_OK) tsummon = 2 * MINUTE * IN_MILLISECONDS;
         }
         else tsummon -= uiDiff;
 
+        if(sumon && !m_creature->HasAura(DIVINE_SHIELD)) DoCastSpellIfCan(m_creature, DIVINE_SHIELD);
+
         if(sumon && sumon->isDead())
         {
+            sumon->ForcedDespawn();
             if(m_creature->HasAura(DIVINE_SHIELD))m_creature->RemoveAurasDueToSpell(DIVINE_SHIELD);  
             sumon = NULL;   
         }
@@ -1481,7 +1484,10 @@ struct MANGOS_DLL_DECL boss_blend : public ScriptedAI
         if(blizzard < uiDiff)
         {
              if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                 if (DoCastSpellIfCan(pTarget, BLIZZARD) == CAST_OK) blizzard = 17000;
+             {
+                 pTarget->CastSpell(pTarget, BLIZZARD, false);
+                 blizzard = 17000;
+             }
         }
         else blizzard -= uiDiff;
 
@@ -1630,6 +1636,7 @@ struct MANGOS_DLL_DECL boss_giresse : public ScriptedAI
 
     void Reset()
     {
+        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         SetEquipmentSlots(false, 19019, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
 
         timer   = 0;
