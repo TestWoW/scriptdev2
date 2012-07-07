@@ -89,6 +89,7 @@ static uint32 uiMutatedInfections[5] =
 //talks
 enum
 {
+    SAY_PRECIOUS_ZOMBIES        = -1631193,
     SAY_PRECIOUS_DIES           = -1631070,
     SAY_AGGRO                   = -1631071,
     SAY_SLIME_SPRAY             = -1631072,
