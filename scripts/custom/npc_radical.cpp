@@ -1658,14 +1658,14 @@ struct MANGOS_DLL_DECL boss_giresse : public ScriptedAI
         if(second && timer > 10000)
         {
             second = false;
-            m_creature->MonsterYell("Hoy, me complace presentaros mi último test. <La senda de los GMs>, dónde podréis visitar a cada uno de nuestros Maestros de juego y luchar contra ellos. Pero cuidado, os aviso que no será fácil.",0)
+            m_creature->MonsterYell("Hoy, me complace presentaros mi último test. <La senda de los GMs>, dónde podréis visitar a cada uno de nuestros Maestros de juego y luchar contra ellos. Pero cuidado, os aviso que no será fácil.",0);
 
         }
 
         if(third && timer > 20000)
         {            
             third = false;
-            m_creature->MonsterYell("Suerte aventureros, seguro que la vais a necesitar.",0)
+            m_creature->MonsterYell("Suerte aventureros, seguro que la vais a necesitar.",0);
         }
 
         if(!third) 
