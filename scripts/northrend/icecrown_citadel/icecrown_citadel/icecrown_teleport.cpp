@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -53,20 +53,13 @@ static t_Locations PortalLoc[]=
 
 bool GOGossipSelect_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo, uint32 sender, uint32 action)
 {
-    instance_icecrown_citadel* pInstance = (instance_icecrown_citadel*)pGo->GetInstanceData();
-
-    if(sender != GOSSIP_SENDER_MAIN)
-        return false;
-
-    if(pInstance->IsEncounterInProgress())
-        return false;
+    if(sender != GOSSIP_SENDER_MAIN) return false;
 
     if(pPlayer->IsInCombat()) 
         return false;
 
     if(action >= 0 && action < PORTALS_COUNT)
         pPlayer->TeleportTo(PortalLoc[action].map_num, PortalLoc[action].x, PortalLoc[action].y, PortalLoc[action].z, PortalLoc[action].o);
-
     if (PortalLoc[action].spellID != 0 )
         pPlayer->_AddAura(PortalLoc[action].spellID, 2000);
 
@@ -76,7 +69,7 @@ bool GOGossipSelect_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo, uin
 
 bool GOGossipHello_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo)
 {
-    instance_icecrown_citadel* pInstance = (instance_icecrown_citadel*)pGo->GetInstanceData();
+    ScriptedInstance *pInstance = (ScriptedInstance *) pGo->GetInstanceData();
 
     if (!pInstance || !pPlayer)
         return false;
@@ -95,7 +88,7 @@ bool GOGossipHello_go_icecrown_teleporter(Player *pPlayer, GameObject* pGo)
 
 bool GOHello_go_plague_sigil(Player *player, GameObject* pGo)
 {
-    instance_icecrown_citadel* pInstance = (instance_icecrown_citadel*)pGo->GetInstanceData();
+    instance_icecrown_spire* pInstance = (instance_icecrown_spire*)pGo->GetInstanceData();
 
     if(!pInstance)
         return false;
@@ -103,33 +96,33 @@ bool GOHello_go_plague_sigil(Player *player, GameObject* pGo)
     if (pInstance->GetData(TYPE_FESTERGUT) == DONE &&
         pInstance->GetData(TYPE_ROTFACE) == DONE)
     {
-        pInstance->DoOpenDoor(GO_SCIENTIST_DOOR_ORANGE);
-        pInstance->DoOpenDoor(GO_SCIENTIST_DOOR_GREEN);
-        pInstance->DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
+        pInstance->DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE);
+        pInstance->DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN);
+        pInstance->DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
     }
     return true;
 }
 
 bool GOHello_go_bloodwing_sigil(Player *player, GameObject* pGo)
 {
-    instance_icecrown_citadel* pInstance = (instance_icecrown_citadel*)pGo->GetInstanceData();
+    instance_icecrown_spire* pInstance = (instance_icecrown_spire*)pGo->GetInstanceData();
 
     if(!pInstance)
         return false;
 
     if (pInstance->GetData(TYPE_SAURFANG) == DONE)
-        pInstance->DoOpenDoor(GO_BLOODWING_DOOR);
+        pInstance->DoUseDoorOrButton(GO_BLOODWING_DOOR);
 
     return true;
 }
 
 bool GOHello_go_frostwing_sigil(Player *player, GameObject* pGo)
 {
-    instance_icecrown_citadel* pInstance = (instance_icecrown_citadel*)pGo->GetInstanceData();
+    instance_icecrown_spire* pInstance = (instance_icecrown_spire*)pGo->GetInstanceData();
     if(!pInstance) return false;
 
     if (pInstance->GetData(TYPE_SAURFANG) == DONE)
-        pInstance->DoOpenDoor(GO_FROSTWING_DOOR);
+        pInstance->DoUseDoorOrButton(GO_FROSTWING_DOOR);
 
     return true;
 }

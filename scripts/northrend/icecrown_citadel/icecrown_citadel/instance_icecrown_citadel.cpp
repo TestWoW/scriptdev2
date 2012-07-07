@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -15,9 +15,13 @@
  */
 
 /* ScriptData
-SDName: instance_icecrown_citadel
+SDName: instance_icecrown_spire
 SD%Complete: 90%
-SDComment: by /dev/rsa
+SDComment:  by michalpolko with special thanks to:
+            mangosR2 team and all who are supporting us with feedback, testing and fixes
+            TrinityCore for some info about spells IDs
+            everybody whom I forgot to mention here ;)
+
 SDCategory: Icecrown Citadel
 EndScriptData */
 
@@ -31,92 +35,72 @@ static Locations SpawnLoc[]=
     {-428.140503f, 2421.336914f, 191.233078f},  // 1 Alliance ship enter
 };
 
-instance_icecrown_citadel::instance_icecrown_citadel(Map* pMap) : ScriptedInstance(pMap)
+instance_icecrown_spire::instance_icecrown_spire(Map* pMap) : ScriptedInstance(pMap)
 {
     Difficulty = pMap->GetDifficulty();
     Initialize();
 }
 
-void instance_icecrown_citadel::Initialize()
+void instance_icecrown_spire::Initialize()
 {
     for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
         m_auiEncounter[i] = NOT_STARTED;
 
-    for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS; ++i)
-        m_abAchievCriteria[i] = false;
+    for (uint8 i = 0; i < ACHIEVE_MAX_COUNT; ++i)
+        m_bAchievCriteria[i] = false;
 
-    m_auiEncounter[TYPE_TELEPORT] = 0;
+    m_auiEncounter[0] = 0;
+
+    m_auiEvent = 0;
+    m_auiEventTimer = 1000;
+    m_uiCouncilInvocation = 0;
+    m_uiDirection = 0;
+    m_uiStinkystate = NOT_STARTED;
+    m_uiPreciousstate = NOT_STARTED;
 
     switch (Difficulty)
     {
-         case RAID_DIFFICULTY_10MAN_NORMAL:
-                   m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_10;
-                   m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_10;
-                   m_uiValithriaCache = GO_DREAMWALKER_CACHE_10;
-                   m_uiSaurfangCache = GO_SAURFANG_CACHE_10;
-                   break;
-         case RAID_DIFFICULTY_10MAN_HEROIC:
-                   m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_10H;
-                   m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_10H;
-                   m_uiValithriaCache = GO_DREAMWALKER_CACHE_10_H;
-                   m_uiSaurfangCache = GO_SAURFANG_CACHE_10_H;
-                   break;
-         case RAID_DIFFICULTY_25MAN_NORMAL:
-                   m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_25;
-                   m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_25;
-                   m_uiValithriaCache = GO_DREAMWALKER_CACHE_25;
-                   m_uiSaurfangCache = GO_SAURFANG_CACHE_25;
-                   break;
-         case RAID_DIFFICULTY_25MAN_HEROIC:
-                   m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_25H;
-                   m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_25H;
-                   m_uiValithriaCache = GO_DREAMWALKER_CACHE_25_H;
-                   m_uiSaurfangCache = GO_SAURFANG_CACHE_25_H;
-                   break;
-         default:
-                   break;
-    };
+        case RAID_DIFFICULTY_10MAN_NORMAL:
+            m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_10;
+            m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_10;
+            m_uiValithriaCache = GO_DREAMWALKER_CACHE_10;
+            m_uiSaurfangCache = GO_SAURFANG_CACHE_10;
+            break;
+        case RAID_DIFFICULTY_10MAN_HEROIC:
+            m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_10H;
+            m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_10H;
+            m_uiValithriaCache = GO_DREAMWALKER_CACHE_10_H;
+            m_uiSaurfangCache = GO_SAURFANG_CACHE_10_H;
+            break;
+        case RAID_DIFFICULTY_25MAN_NORMAL:
+            m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_25;
+            m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_25;
+            m_uiValithriaCache = GO_DREAMWALKER_CACHE_25;
+            m_uiSaurfangCache = GO_SAURFANG_CACHE_25;
+            break;
+        case RAID_DIFFICULTY_25MAN_HEROIC:
+            m_uiGunshipArmoryH_ID = GO_GUNSHIP_ARMORY_H_25H;
+            m_uiGunshipArmoryA_ID = GO_GUNSHIP_ARMORY_A_25H;
+            m_uiValithriaCache = GO_DREAMWALKER_CACHE_25_H;
+            m_uiSaurfangCache = GO_SAURFANG_CACHE_25_H;
+            break;
+        default:
+            break;
+    }
 }
 
-bool instance_icecrown_citadel::IsEncounterInProgress() const
+bool instance_icecrown_spire::IsEncounterInProgress()
 {
     for(uint8 i = 1; i < MAX_ENCOUNTERS-2 ; ++i)
+    {
         if (m_auiEncounter[i] == IN_PROGRESS)
             return true;
-
-    if (m_auiEncounter[TYPE_PUTRICIDE] == SPECIAL)
-        return true;
+    }
 
     return false;
 }
 
-bool instance_icecrown_citadel::IsRaidWiped()
-{
-    Map::PlayerList const &players = instance->GetPlayers();
-
-    for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-    {
-        if (Player* pPlayer = i->getSource())
-        {
-            if (pPlayer->isAlive() &&
-                (pPlayer->HasAura(642) || //Divine shield
-                 pPlayer->HasAura(1022) || // Hand of protection
-                 pPlayer->HasAura(45438) || // Ice block
-                 pPlayer->HasAura(5384) || // Feign Death
-                 pPlayer->HasAura(1784))) // Stealth
-                continue;
-
-            if (!pPlayer->IsInCombat())
-                continue;
-
-            if (pPlayer->isAlive())
-                return false;
-        }
-    }
-    return true;
-}
-
-void instance_icecrown_citadel::OnCreatureCreate(Creature* pCreature)
+void instance_icecrown_spire::OnCreatureCreate(Creature* pCreature)
 {
     switch(pCreature->GetEntry())
     {
@@ -131,21 +115,8 @@ void instance_icecrown_citadel::OnCreatureCreate(Creature* pCreature)
         case NPC_KELESETH:
         case NPC_LANATHEL:
         case NPC_LANATHEL_INTRO:
-        case NPC_HORDE_1:
-        case NPC_HORDE_2:
-        case NPC_HORDE_3:
-        case NPC_HORDE_4:
-        case NPC_HORDE_5:
-        case NPC_ALLY_1:
-        case NPC_ALLY_2:
-        case NPC_ALLY_3:
-        case NPC_ALLY_4:
-        case NPC_ALLY_5:
-        case NPC_SVALNA:
-        case NPC_CROK:
         case NPC_VALITHRIA:
         case NPC_VALITHRIA_QUEST:
-        case NPC_LICH_TRIGGER:
         case NPC_SINDRAGOSA:
         case NPC_LICH_KING:
         case NPC_TIRION:
@@ -153,33 +124,16 @@ void instance_icecrown_citadel::OnCreatureCreate(Creature* pCreature)
         case NPC_SPINESTALKER:
         case NPC_STINKY:
         case NPC_PRECIOUS:
-        case NPC_COMBAT_TRIGGER:
+        case NPC_GREEN_DRAGON_COMBAT_TRIGGER:
         case NPC_FROSTMOURNE_TRIGGER:
         case NPC_FROSTMOURNE_HOLDER:
         case NPC_BLOOD_ORB_CONTROL:
-        case NPC_PUDDLE_STALKER:
-        case NPC_LITTLE_OOZE:
-        case NPC_BIG_OOZE:
-        case NPC_OOZE_SPRAY_STALKER:
-        case NPC_ORANGE_GAS_STALKER:
-        case NPC_MALLEABLE_GOO:
-        case NPC_GREEN_ORANGE_OOZE_STALKER:
-        case NPC_GROWING_OOZE_PUDDLE:
-        case NPC_GROWING_OOZE_PUDDLE_TRIG:
-        case NPC_CHOKING_GAS_BOMB:
-        case NPC_VOLATILE_OOZE:
-        case NPC_MUTATED_ABOMINATION:
-        case NPC_CULT_ADHERENT:
-        case NPC_REANIMATED_ADHERENT:
-        case NPC_CULT_FANATIC:
-        case NPC_REANIMATED_FANATIC:
-        case NPC_DEFORMED_FANATIC:
              m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
              break;
     }
 }
 
-void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
+void instance_icecrown_spire::OnObjectCreate(GameObject* pGo)
 {
     switch(pGo->GetEntry())
     {
@@ -209,7 +163,7 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
-        /*case GO_SCIENTIST_DOOR_GREEN:
+        case GO_SCIENTIST_DOOR_GREEN:
             if (m_auiEncounter[TYPE_ROTFACE] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
@@ -223,7 +177,7 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
             if (m_auiEncounter[TYPE_FESTERGUT] == DONE && m_auiEncounter[TYPE_ROTFACE] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
-            break;*/
+            break;
         case GO_SCIENTIST_DOOR:
             if (m_auiEncounter[TYPE_FESTERGUT] == DONE && m_auiEncounter[TYPE_ROTFACE] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
@@ -254,10 +208,6 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
-        case GO_GREEN_DRAGON_DOOR_1:
-            if (m_auiEncounter[TYPE_SVALNA] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
         case GO_GREEN_DRAGON_DOOR_2:
             if (m_auiEncounter[TYPE_VALITHRIA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
@@ -271,6 +221,10 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
         case GO_SINDRAGOSA_DOOR_2:
             if (m_auiEncounter[TYPE_VALITHRIA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
+            break;
+        case GO_DRINK_ME_TABLE:
+            pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
         case GO_SAURFANG_CACHE_10:
@@ -303,20 +257,21 @@ void instance_icecrown_citadel::OnObjectCreate(GameObject* pGo)
         case GO_BLOODPRINCE_DOOR:
         case GO_ICECROWN_GRATE:
         case GO_SINDRAGOSA_ENTRANCE:
-        case GO_SINDRAGOSA_ICEWALL:
         case GO_VALITHRIA_DOOR_1:
         case GO_VALITHRIA_DOOR_2:
         case GO_VALITHRIA_DOOR_3:
         case GO_VALITHRIA_DOOR_4:
         case GO_FROSTWING_DOOR:
+        case GO_GREEN_DRAGON_DOOR_1:
         case GO_BLOODWING_DOOR:
         case GO_ORATORY_DOOR:
+	case GO_SINDRAGOSA_ICE_WALL:
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
     }
 }
 
-void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
+void instance_icecrown_spire::SetData(uint32 uiType, uint32 uiData)
 {
     switch(uiType)
     {
@@ -325,22 +280,20 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
         case TYPE_MARROWGAR:
             m_auiEncounter[TYPE_MARROWGAR] = uiData;
 
+            DoUseDoorOrButton(GO_MARROWGAR_DOOR);
+
             if (uiData == DONE)
             {
-                DoOpenDoor(GO_ICEWALL_1);
-                DoOpenDoor(GO_ICEWALL_2);
-                DoOpenDoor(GO_ORATORY_DOOR);
+                DoUseDoorOrButton(GO_ICEWALL_1);
+                DoUseDoorOrButton(GO_ICEWALL_2);
+                // door to Deathwhisper are already open
+                //DoUseDoorOrButton(GO_ORATORY_DOOR);
             }
-            if (uiData == IN_PROGRESS)
-            {
-                DoCloseDoor(GO_MARROWGAR_DOOR);
-                SetSpecialAchievementCriteria(TYPE_BONED, true);
-            }
-            else
-                DoOpenDoor(GO_MARROWGAR_DOOR);
             break;
          case TYPE_DEATHWHISPER:
             m_auiEncounter[TYPE_DEATHWHISPER] = uiData;
+
+            DoUseDoorOrButton(GO_ORATORY_DOOR);
 
             if (uiData == DONE)
             {
@@ -350,39 +303,16 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                       pGO->SetGoState(GO_STATE_READY);
                 }
             }
-            if (uiData == IN_PROGRESS)
-            {
-                DoCloseDoor(GO_ORATORY_DOOR);
-            }
-            else
-                DoOpenDoor(GO_ORATORY_DOOR);
             break;
          case TYPE_FLIGHT_WAR:
-            /*if (uiData == DONE && m_auiEncounter[TYPE_FLIGHT_WAR] != DONE) // add when implemented
-            {
-                if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiGunshipArmoryA_ID))
-                {
-                    if (pChest && !pChest->isSpawned())
-                    {
-                        pChest->SetRespawnTime(7*DAY);
-                    }
-                }
-                if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiGunshipArmoryH_ID))
-                {
-                    if (pChest && !pChest->isSpawned())
-                    {
-                        pChest->SetRespawnTime(7*DAY);
-                    }
-                }
-            }*/
-            m_auiEncounter[TYPE_FLIGHT_WAR] = uiData;
+            m_auiEncounter[3] = uiData;
             break;
          case TYPE_SAURFANG:
             m_auiEncounter[TYPE_SAURFANG] = uiData;
 
             if (uiData == DONE)
             {
-                DoOpenDoor(GO_SAURFANG_DOOR);
+                DoUseDoorOrButton(GO_SAURFANG_DOOR);
 
                 if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiSaurfangCache))
                 {
@@ -390,52 +320,38 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                         pChest->SetRespawnTime(7*DAY);
                 }
             }
-            if (uiData == IN_PROGRESS)
-            {
-                SetSpecialAchievementCriteria(TYPE_IVE_MADE_AND_MESS, true);
-            }
             break;
          case TYPE_FESTERGUT:
             m_auiEncounter[TYPE_FESTERGUT] = uiData;
 
+            DoUseDoorOrButton(GO_ORANGE_PLAGUE);
+
             if (uiData == DONE)
             {
-                DoOpenDoor(GO_ORANGE_TUBES);
-                /*if (m_auiEncounter[TYPE_ROTFACE] == DONE)
-                {
+                DoUseDoorOrButton(GO_ORANGE_TUBES);
+                if (m_auiEncounter[TYPE_ROTFACE] == DONE)
+                {                    
                     DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE, 0, true);
                     DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN, 0, true);
-                    DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
-                }*/
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
+                }
             }
-            if (uiData == IN_PROGRESS)
-            {
-                DoCloseDoor(GO_ORANGE_PLAGUE);
-                SetSpecialAchievementCriteria(TYPE_FLU_SHORT_SHORTAGE, true);
-            }
-            else
-                DoOpenDoor(GO_ORANGE_PLAGUE);
             break;
          case TYPE_ROTFACE:
             m_auiEncounter[TYPE_ROTFACE] = uiData;
 
+            DoUseDoorOrButton(GO_GREEN_PLAGUE);
+
             if (uiData == DONE)
             {
-                DoOpenDoor(GO_GREEN_TUBES);
-                /*if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
+                DoUseDoorOrButton(GO_GREEN_TUBES);
+                if (m_auiEncounter[TYPE_FESTERGUT] == DONE)
                 {
-                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE, 0, true);
                     DoUseDoorOrButton(GO_SCIENTIST_DOOR_GREEN, 0, true);
-                    DoOpenDoor(GO_SCIENTIST_DOOR_COLLISION);
-                }*/
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_ORANGE, 0, true);
+                    DoUseDoorOrButton(GO_SCIENTIST_DOOR_COLLISION);
+                }
             }
-            if (uiData == IN_PROGRESS)
-            {
-                DoCloseDoor(GO_GREEN_PLAGUE);
-                SetSpecialAchievementCriteria(TYPE_DANCES_WITH_OOZES, true);
-            }
-            else
-                DoOpenDoor(GO_GREEN_PLAGUE);
             break;
          case TYPE_PUTRICIDE:
             m_auiEncounter[TYPE_PUTRICIDE] = uiData;
@@ -448,36 +364,56 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                     m_auiEncounter[TYPE_KINGS_OF_ICC] = DONE;
                 }
             }
-            if (uiData == IN_PROGRESS || uiData == SPECIAL)
+
             {
-                DoCloseDoor(GO_SCIENTIST_DOOR);
-                SetSpecialAchievementCriteria(TYPE_NAUSEA_HEATBURN_INDIGESTION, true);
+                // Proff sometimes does't trigger door, so let's check it explicitly
+                GameObject* pDoor = GetSingleGameObjectFromStorage(GO_SCIENTIST_DOOR);
+                if (pDoor)
+                {
+                    switch (uiData)
+                    {
+                        case IN_PROGRESS:
+                        case SPECIAL:
+                        {
+                            // Close door if it's open
+                            if (pDoor->getLootState() != GO_ACTIVATED)
+                                DoUseDoorOrButton(GO_SCIENTIST_DOOR);
+                            break;
+                        }
+                        case NOT_STARTED:
+                        case FAIL:
+                        case DONE:
+                        {
+                            // Open door if it's closed
+                            if (pDoor->getLootState() != GO_READY)
+                                DoUseDoorOrButton(GO_SCIENTIST_DOOR);
+                            break;
+                        }
+                        default: break;
+                    }
+                }
             }
-            else
-                DoOpenDoor(GO_SCIENTIST_DOOR);
+
             break;
          case TYPE_BLOOD_COUNCIL:
             m_auiEncounter[TYPE_BLOOD_COUNCIL] = uiData;
 
+            DoUseDoorOrButton(GO_CRIMSON_HALL_DOOR);
+
             if (uiData == DONE)
             {
-                DoOpenDoor(GO_COUNCIL_DOOR_1);
-                DoOpenDoor(GO_COUNCIL_DOOR_2);
+                DoUseDoorOrButton(GO_COUNCIL_DOOR_1);
+                DoUseDoorOrButton(GO_COUNCIL_DOOR_2);
             }
-            if (uiData == IN_PROGRESS)
-            {
-                DoCloseDoor(GO_CRIMSON_HALL_DOOR);
-                SetSpecialAchievementCriteria(TYPE_ORB_WHISPERER, true);
-            }
-            else
-                DoOpenDoor(GO_CRIMSON_HALL_DOOR);
             break;
          case TYPE_LANATHEL:
             m_auiEncounter[TYPE_LANATHEL] = uiData;
 
+            DoUseDoorOrButton(GO_BLOODPRINCE_DOOR);
+
             if (uiData == DONE)
             {
-                DoOpenDoor(GO_ICECROWN_GRATE);
+                DoUseDoorOrButton(GO_ICECROWN_GRATE);
 
                 if (m_auiEncounter[TYPE_PUTRICIDE] == DONE &&
                     m_auiEncounter[TYPE_SINDRAGOSA] == DONE)
@@ -485,57 +421,41 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                     m_auiEncounter[TYPE_KINGS_OF_ICC] = DONE;
                 }
             }
-            if (uiData == IN_PROGRESS)
-                DoCloseDoor(GO_BLOODPRINCE_DOOR);
-            else
-                DoOpenDoor(GO_BLOODPRINCE_DOOR);
             break;
          case TYPE_VALITHRIA:
             m_auiEncounter[TYPE_VALITHRIA] = uiData;
 
+            DoUseDoorOrButton(GO_GREEN_DRAGON_DOOR_1);
+            DoUseDoorOrButton(GO_VALITHRIA_DOOR_1);
+            DoUseDoorOrButton(GO_VALITHRIA_DOOR_2);
+
+            if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
+                instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
+            {
+                DoUseDoorOrButton(GO_VALITHRIA_DOOR_3);
+                DoUseDoorOrButton(GO_VALITHRIA_DOOR_4);
+            }
+
             if (uiData == DONE)
             {
-                DoOpenDoor(GO_GREEN_DRAGON_DOOR_2);
+                DoUseDoorOrButton(GO_GREEN_DRAGON_DOOR_2);
 
-                DoOpenDoor(GO_SINDRAGOSA_DOOR_1);
-                DoOpenDoor(GO_SINDRAGOSA_DOOR_2);
+                DoUseDoorOrButton(GO_SINDRAGOSA_DOOR_1);
+                DoUseDoorOrButton(GO_SINDRAGOSA_DOOR_2);
 
-                if (GameObject* pChest = GetSingleGameObjectFromStorage(m_uiValithriaCache))
+                if (GameObject* pChest = GetSingleGameObjectFromStorage( m_uiValithriaCache))
                 {
                     if (pChest && !pChest->isSpawned())
                         pChest->SetRespawnTime(7*DAY);
                 }
             }
-            if (uiData == IN_PROGRESS)
-            {
-                DoCloseDoor(GO_GREEN_DRAGON_DOOR_1);
-                DoOpenDoor(GO_VALITHRIA_DOOR_1);
-                DoOpenDoor(GO_VALITHRIA_DOOR_2);
 
-                if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
-                    instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
-                {
-                    DoOpenDoor(GO_VALITHRIA_DOOR_3);
-                    DoOpenDoor(GO_VALITHRIA_DOOR_4);
-                }
-                SetSpecialAchievementCriteria(TYPE_PORTAL_JOCKEY, false); // should be true when implemented
-            }
-            else
-            {
-                DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
-                DoCloseDoor(GO_VALITHRIA_DOOR_1);
-                DoCloseDoor(GO_VALITHRIA_DOOR_2);
-
-                if (instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL ||
-                    instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC)
-                {
-                    DoCloseDoor(GO_VALITHRIA_DOOR_3);
-                    DoCloseDoor(GO_VALITHRIA_DOOR_4);
-                }
-            }
             break;
          case TYPE_SINDRAGOSA:
             m_auiEncounter[TYPE_SINDRAGOSA] = uiData;
+
+            DoUseDoorOrButton(GO_SINDRAGOSA_ENTRANCE);
+	    DoUseDoorOrButton(GO_SINDRAGOSA_ICE_WALL);
 
             if (uiData == DONE)
             {
@@ -545,40 +465,16 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
                     m_auiEncounter[TYPE_KINGS_OF_ICC] = DONE;
                 }
             }
-            if (uiData == IN_PROGRESS)
-            {
-                DoCloseDoor(GO_SINDRAGOSA_ICEWALL);
-                SetSpecialAchievementCriteria(TYPE_ALL_YOU_CAN_EAT, true);
-            }
-            else
-                DoOpenDoor(GO_SINDRAGOSA_ICEWALL);
-
             break;
          case TYPE_LICH_KING:
             m_auiEncounter[TYPE_LICH_KING] = uiData;
-            if (uiData == IN_PROGRESS)
-            {
-                SetSpecialAchievementCriteria(TYPE_NECK_DEEP_IN_VILE, true);
-                SetSpecialAchievementCriteria(TYPE_BEEN_WAITING_A_LONG_TIME, false);
-            }
             break;
          case TYPE_FROSTMOURNE_ROOM:
              m_auiEncounter[TYPE_FROSTMOURNE_ROOM] = uiData;
              break;
          case TYPE_ICECROWN_QUESTS:
-             m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;
-             break;
-         case TYPE_STINKY:
-             m_auiEncounter[TYPE_STINKY] = uiData;
-             break;
-         case TYPE_PRECIOUS:
-             m_auiEncounter[TYPE_PRECIOUS] = uiData;
-             break;
-         case TYPE_SVALNA:
-             m_auiEncounter[TYPE_SVALNA] = uiData;
-             if (uiData == DONE)
-                 DoOpenDoor(GO_GREEN_DRAGON_DOOR_1);
-             break;
+            m_auiEncounter[TYPE_ICECROWN_QUESTS] = uiData;
+            break;
     }
 
     if (uiData == DONE)
@@ -597,35 +493,102 @@ void instance_icecrown_citadel::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-uint32 instance_icecrown_citadel::GetData(uint32 uiType)
+uint32 instance_icecrown_spire::GetData(uint32 uiType)
 {
     switch(uiType)
     {
-        case TYPE_TELEPORT:
-        case TYPE_MARROWGAR:
-        case TYPE_DEATHWHISPER:
-        case TYPE_FLIGHT_WAR:
-        case TYPE_SAURFANG:
-        case TYPE_FESTERGUT:
-        case TYPE_ROTFACE:
-        case TYPE_PUTRICIDE:
-        case TYPE_BLOOD_COUNCIL:
-        case TYPE_LANATHEL:
-        case TYPE_VALITHRIA:
-        case TYPE_SINDRAGOSA:
-        case TYPE_KINGS_OF_ICC:
-        case TYPE_LICH_KING:
-        case TYPE_FROSTMOURNE_ROOM:
-        case TYPE_ICECROWN_QUESTS:
-        case TYPE_SVALNA:
-        case TYPE_STINKY:
-        case TYPE_PRECIOUS:
-            return m_auiEncounter[uiType];
+         case TYPE_TELEPORT:
+         case TYPE_MARROWGAR:
+         case TYPE_DEATHWHISPER:
+         case TYPE_FLIGHT_WAR:
+         case TYPE_SAURFANG:
+         case TYPE_FESTERGUT:
+         case TYPE_ROTFACE:
+         case TYPE_PUTRICIDE:
+         case TYPE_BLOOD_COUNCIL:
+         case TYPE_LANATHEL:
+         case TYPE_VALITHRIA:
+         case TYPE_SINDRAGOSA:
+         case TYPE_KINGS_OF_ICC:
+         case TYPE_LICH_KING:
+         case TYPE_FROSTMOURNE_ROOM:
+         case TYPE_ICECROWN_QUESTS:
+             return m_auiEncounter[uiType];
+         default:
+             return 0;
     }
-    return 0;
+}
+bool instance_icecrown_spire::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+{
+    switch(uiCriteriaId)
+    {
+        case CRITERIA_BONED_10N:
+        case CRITERIA_BONED_25N:
+        case CRITERIA_BONED_10H:
+        case CRITERIA_BONED_25H:
+             return m_bAchievCriteria[ACHIEVE_BONED];
+        case CRITERIA_FULL_HOUSE_10N:
+        case CRITERIA_FULL_HOUSE_25N:
+        case CRITERIA_FULL_HOUSE_10H:
+        case CRITERIA_FULL_HOUSE_25H:
+             return m_bAchievCriteria[ACHIEVE_FULL_HOUSE];
+        case CRITERIA_IM_ON_A_BOAT_10N:
+        case CRITERIA_IM_ON_A_BOAT_25N:
+        case CRITERIA_IM_ON_A_BOAT_10H:
+        case CRITERIA_IM_ON_A_BOAT_25H:
+             return m_bAchievCriteria[ACHIEVE_IM_ON_A_BOAT];
+        case CRITERIA_IVE_GONE_AND_MADE_A_MESS_10N:
+        case CRITERIA_IVE_GONE_AND_MADE_A_MESS_25N:
+        case CRITERIA_IVE_GONE_AND_MADE_A_MESS_10H:
+        case CRITERIA_IVE_GONE_AND_MADE_A_MESS_25H:
+             return m_bAchievCriteria[ACHIEVE_IVE_GONE_AND_MADE_A_MESS];
+        case CRITERIA_FLU_SHOT_SHORTAGE_10N:
+        case CRITERIA_FLU_SHOT_SHORTAGE_25N:
+        case CRITERIA_FLU_SHOT_SHORTAGE_10H:
+        case CRITERIA_FLU_SHOT_SHORTAGE_25H:
+             return m_bAchievCriteria[ACHIEVE_FLU_SHOT_SHORTAGE];
+        case CRITERIA_DANCES_WITH_OOZES_10N:
+        case CRITERIA_DANCES_WITH_OOZES_25N:
+        case CRITERIA_DANCES_WITH_OOZES_10H:
+        case CRITERIA_DANCES_WITH_OOZES_25H:
+             return m_bAchievCriteria[ACHIEVE_DANCES_WITH_OOZES];
+        case CRITERIA_NAUSEA_10N:
+        case CRITERIA_NAUSEA_25N:
+        case CRITERIA_NAUSEA_10H:
+        case CRITERIA_NAUSEA_25H:
+             return m_bAchievCriteria[ACHIEVE_NAUSEA];
+        case CRITERIA_ORB_WHISPERER_10N:
+        case CRITERIA_ORB_WHISPERER_25N:
+        case CRITERIA_ORB_WHISPERER_10H:
+        case CRITERIA_ORB_WHISPERER_25H:
+             return m_bAchievCriteria[ACHIEVE_ORB_WHISPERER];
+        case CRITERIA_PORTAL_JOCKEY_10N:
+        case CRITERIA_PORTAL_JOCKEY_25N:
+        case CRITERIA_PORTAL_JOCKEY_10H:
+        case CRITERIA_PORTAL_JOCKEY_25H:
+             return m_bAchievCriteria[ACHIEVE_PORTAL_JOCKEY];
+        case CRITERIA_ALL_YOU_CAN_EAT_10N:
+        case CRITERIA_ALL_YOU_CAN_EAT_25N:
+        case CRITERIA_ALL_YOU_CAN_EAT_10V:
+        case CRITERIA_ALL_YOU_CAN_EAT_25V:
+             return m_bAchievCriteria[ACHIEVE_ALL_YOU_CAN_EAT];
+        case CRITERIA_BEEN_WAITING_A_LONG_TIME_10N:
+        case CRITERIA_BEEN_WAITING_A_LONG_TIME_25N:
+        case CRITERIA_BEEN_WAITING_A_LONG_TIME_10H:
+        case CRITERIA_BEEN_WAITING_A_LONG_TIME_25H:
+             return m_bAchievCriteria[ACHIEVE_BEEN_WAITING_A_LONG_TIME];
+        default:
+            return false;
+    }
 }
 
-void instance_icecrown_citadel::Load(const char* chrIn)
+void instance_icecrown_spire::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
+{
+    if (uiType < ACHIEVE_MAX_COUNT)
+        m_bAchievCriteria[uiType] = bIsMet;
+}
+
+void instance_icecrown_spire::Load(const char* chrIn)
 {
     if (!chrIn)
     {
@@ -648,103 +611,17 @@ void instance_icecrown_citadel::Load(const char* chrIn)
     OUT_LOAD_INST_DATA_COMPLETE;
 }
 
-bool instance_icecrown_citadel::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+InstanceData* GetInstanceData_instance_icecrown_spire(Map* pMap)
 {
-    switch (uiCriteriaId)
-    {
-    case CRITERIA_BONED_10N:
-    case CRITERIA_BONED_25N:
-    case CRITERIA_BONED_10H:
-    case CRITERIA_BONED_25H:
-        return m_abAchievCriteria[TYPE_BONED];
-    case CRITERIA_IVE_MADE_AND_MESS_10N:
-    case CRITERIA_IVE_MADE_AND_MESS_10H:
-    case CRITERIA_IVE_MADE_AND_MESS_25N:
-    case CRITERIA_IVE_MADE_AND_MESS_25H:
-        return m_abAchievCriteria[TYPE_IVE_MADE_AND_MESS];
-    case CRITERIA_DANCES_WITH_OOZES_10N:
-    case CRITERIA_DANCES_WITH_OOZES_25N:
-    case CRITERIA_DANCES_WITH_OOZES_10H:
-    case CRITERIA_DANCES_WITH_OOZES_25H:
-        return m_abAchievCriteria[TYPE_DANCES_WITH_OOZES];
-    case CRITERIA_FLU_SHORT_SHORTAGE_10N:
-    case CRITERIA_FLU_SHORT_SHORTAGE_25N:
-    case CRITERIA_FLU_SHORT_SHORTAGE_10H:
-    case CRITERIA_FLU_SHORT_SHORTAGE_25H:
-        return m_abAchievCriteria[TYPE_FLU_SHORT_SHORTAGE];
-    case CRITERIA_NAUSEA_10N:
-    case CRITERIA_NAUSEA_25N:
-    case CRITERIA_NAUSEA_10H:
-    case CRITERIA_NAUSEA_25H:
-        return m_abAchievCriteria[TYPE_NAUSEA_HEATBURN_INDIGESTION];
-    case CRITERIA_ORB_WHISPERER_10N:
-    case CRITERIA_ORB_WHISPERER_25N:
-    case CRITERIA_ORB_WHISPERER_10H:
-    case CRITERIA_ORB_WHISPERER_25H:
-        return m_abAchievCriteria[TYPE_ORB_WHISPERER];
-    case CRITERIA_ONCE_BITTEN_TWICE_SHY_10N:
-        if (!pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_10MAN_NORMAL || Difficulty == RAID_DIFFICULTY_10MAN_HEROIC))
-            return true;
-        else
-            return false;
-    case CRITERIA_ONCE_BITTEN_TWICE_SHY_25N:
-        if (!pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_25MAN_NORMAL || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC))
-            return true;
-        else
-            return false;
-    case CRITERIA_ONCE_BITTEN_TWICE_SHY_10V:
-        if (pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_10MAN_NORMAL || Difficulty == RAID_DIFFICULTY_10MAN_HEROIC))
-            return true;
-        else
-            return false;
-    case CRITERIA_ONCE_BITTEN_TWICE_SHY_25V:
-        if (pSource->HasAura(70867) && (Difficulty == RAID_DIFFICULTY_25MAN_NORMAL || Difficulty == RAID_DIFFICULTY_25MAN_HEROIC))
-            return true;
-        else
-            return false;
-    case CRITERIA_PORTAL_JOCKEY_10N:
-    case CRITERIA_PORTAL_JOCKEY_25N:
-    case CRITERIA_PORTAL_JOCKEY_10H:
-    case CRITERIA_PORTAL_JOCKEY_25H:
-        return m_abAchievCriteria[TYPE_PORTAL_JOCKEY];
-    case CRITERIA_ALL_YOU_CAN_EAT_10N:
-    case CRITERIA_ALL_YOU_CAN_EAT_25N:
-    case CRITERIA_ALL_YOU_CAN_EAT_10H:
-    case CRITERIA_ALL_YOU_CAN_EAT_25H:
-        return m_abAchievCriteria[TYPE_ALL_YOU_CAN_EAT];
-    case CRITERIA_BEEN_WAITING_10N:
-    case CRITERIA_BEEN_WAITING_10H:
-    case CRITERIA_BEEN_WAITING_25N:
-    case CRITERIA_BEEN_WAITING_25H:
-        return m_abAchievCriteria[TYPE_BEEN_WAITING_A_LONG_TIME];
-    case CRITERIA_NECK_DEEP_IN_VILE_10N:
-    case CRITERIA_NECK_DEEP_IN_VILE_10H:
-    case CRITERIA_NECK_DEEP_IN_VILE_25N:
-    case CRITERIA_NECK_DEEP_IN_VILE_25H:
-        return m_abAchievCriteria[TYPE_NECK_DEEP_IN_VILE];
-    default:
-         return false;
-    }
-}
-
-void instance_icecrown_citadel::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
-{
-    if (uiType < MAX_SPECIAL_ACHIEV_CRITS)
-        m_abAchievCriteria[uiType] = bIsMet;
-}
-
-InstanceData* GetInstanceData_instance_icecrown_citadel(Map* pMap)
-{
-    return new instance_icecrown_citadel(pMap);
+    return new instance_icecrown_spire(pMap);
 }
 
 
-void AddSC_instance_icecrown_citadel()
+void AddSC_instance_icecrown_spire()
 {
     Script* pNewScript;
     pNewScript = new Script;
-    pNewScript->Name = "instance_icecrown_citadel";
-    pNewScript->GetInstanceData = &GetInstanceData_instance_icecrown_citadel;
+    pNewScript->Name = "instance_icecrown_spire";
+    pNewScript->GetInstanceData = &GetInstanceData_instance_icecrown_spire;
     pNewScript->RegisterSelf();
 }
-

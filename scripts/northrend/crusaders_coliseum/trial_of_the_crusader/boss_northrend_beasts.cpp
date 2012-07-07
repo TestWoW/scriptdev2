@@ -145,7 +145,7 @@ struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
     uint32 m_uiStaggeringStompTimer;
     uint32 m_uiSummonSnoboldTimer;
 
-    std::list<ObjectGuid> mobsGUIDList;
+    std::list<ObjectGuid> mobsGuidList;
 
     void Reset() 
     {
@@ -164,7 +164,7 @@ struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
         m_uiStaggeringStompTimer  = urand(20000, 25000);
         m_uiSummonSnoboldTimer    = urand(20000, 30000);
 
-        mobsGUIDList.clear();
+        mobsGuidList.clear();
     }
 
     void SummonAdds()
@@ -176,16 +176,16 @@ struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
         {
             Unit *pTemp = m_creature->SummonCreature(NPC_SNOBOLD_VASSAL, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0);
             pTemp->EnterVehicle(m_creature->GetVehicleKit(), i);
-            mobsGUIDList.push_back(pTemp->GetObjectGuid());
+            mobsGuidList.push_back(pTemp->GetObjectGuid());
         }
     }
 
     void ThrowAdd(Unit *pTarget)
     {
-        if (!m_pInstance || mobsGUIDList.empty())
+        if (!m_pInstance || mobsGuidList.empty())
             return;
 
-        for(std::list<ObjectGuid>::iterator itr = mobsGUIDList.begin(); itr != mobsGUIDList.end(); ++itr)
+        for(std::list<ObjectGuid>::iterator itr = mobsGuidList.begin(); itr != mobsGuidList.end(); ++itr)
         {
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
             {
@@ -195,7 +195,7 @@ struct MANGOS_DLL_DECL boss_gormokAI : public ScriptedAI
                     pTemp->SetInCombatWithZone();
                     pTemp->AddThreat(pTarget, 10000.0f);
                     pTemp->AI()->AttackStart(pTarget);
-                    mobsGUIDList.remove(pTemp->GetObjectGuid());
+                    mobsGuidList.remove(pTemp->GetObjectGuid());
                     break;
                 }
             }

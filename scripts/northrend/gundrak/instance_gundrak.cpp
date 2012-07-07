@@ -83,7 +83,7 @@ void instance_gundrak::OnCreatureCreate(Creature* pCreature)
 void instance_gundrak::OnPlayerEnter(Player* pPlayer)
 {
     if (Creature* pEck = GetSingleCreatureFromStorage(NPC_ECK))
-        for (GUIDList::const_iterator itr = m_lEckDwellerGuids.begin(); itr != m_lEckDwellerGuids.end(); ++itr)
+        for (GuidList::const_iterator itr = m_lEckDwellerGuids.begin(); itr != m_lEckDwellerGuids.end(); ++itr)
             if (Creature* pDweller = instance->GetCreature(*itr))
                 if (pDweller->isAlive())
                 {
@@ -92,7 +92,7 @@ void instance_gundrak::OnPlayerEnter(Player* pPlayer)
                 }
 
     if (Creature* pColossus = GetSingleCreatureFromStorage(NPC_COLOSSUS))
-        for (GUIDList::const_iterator itr = m_lLivingMojoGuids.begin(); itr != m_lLivingMojoGuids.end(); ++itr)
+        for (GuidList::const_iterator itr = m_lLivingMojoGuids.begin(); itr != m_lLivingMojoGuids.end(); ++itr)
             if (Creature* pMojo = instance->GetCreature(*itr))
                 if (pMojo->isAlive())
                 {
@@ -289,7 +289,7 @@ void instance_gundrak::OnCreatureDeath(Creature* pCreature)
     switch(pCreature->GetEntry())
     {
         case NPC_RUIN_DWELLER:
-            for (GUIDList::const_iterator itr = m_lEckDwellerGuids.begin(); itr != m_lEckDwellerGuids.end(); ++itr)
+            for (GuidList::const_iterator itr = m_lEckDwellerGuids.begin(); itr != m_lEckDwellerGuids.end(); ++itr)
                 if (Creature* pDweller = instance->GetCreature(*itr))
                     if (pDweller->isAlive())
                         return;
@@ -305,7 +305,7 @@ void instance_gundrak::OnCreatureDeath(Creature* pCreature)
             if (!IsValidLivingMojo(pCreature->GetObjectGuid()))
                 return;
 
-            for (GUIDList::const_iterator itr = m_lLivingMojoGuids.begin(); itr != m_lLivingMojoGuids.end(); ++itr)
+            for (GuidList::const_iterator itr = m_lLivingMojoGuids.begin(); itr != m_lLivingMojoGuids.end(); ++itr)
                 if (Creature* pMojo = instance->GetCreature(*itr))
                     if (pMojo->isAlive())
                         return;
@@ -326,7 +326,7 @@ void instance_gundrak::OnCreatureEnterCombat(Creature* pCreature)
     {
         if (IsValidLivingMojo(pCreature->GetObjectGuid()))
             // if mojo is in list move all members to merge with colossus
-            for (GUIDList::const_iterator iter = m_lLivingMojoGuids.begin(); iter != m_lLivingMojoGuids.end(); ++iter)
+            for (GuidList::const_iterator iter = m_lLivingMojoGuids.begin(); iter != m_lLivingMojoGuids.end(); ++iter)
                 if (Creature* pMojo = instance->GetCreature(*iter))
                     pMojo->AI()->EnterEvadeMode();
 
@@ -336,7 +336,7 @@ void instance_gundrak::OnCreatureEnterCombat(Creature* pCreature)
 
 bool instance_gundrak::IsValidLivingMojo(ObjectGuid callerGuid)
 {
-    for (GUIDList::iterator itr = m_lLivingMojoGuids.begin(); itr != m_lLivingMojoGuids.end(); ++itr)
+    for (GuidList::iterator itr = m_lLivingMojoGuids.begin(); itr != m_lLivingMojoGuids.end(); ++itr)
         if (*itr == callerGuid)
             return true;
     return false;
@@ -365,7 +365,7 @@ void instance_gundrak::DoAltarVisualEffect(uint8 uiType)
             fHeight += pCollusAltar->GetPositionZ();
 
         std::list<Creature*> lStalkerTargets, lStalkerCasters;
-        for (GUIDList::const_iterator itr = m_luiStalkerGUIDs.begin(); itr != m_luiStalkerGUIDs.end(); ++itr)
+        for (GuidList::const_iterator itr = m_luiStalkerGUIDs.begin(); itr != m_luiStalkerGUIDs.end(); ++itr)
         {
             if (Creature* pStalker = instance->GetCreature(*itr))
             {

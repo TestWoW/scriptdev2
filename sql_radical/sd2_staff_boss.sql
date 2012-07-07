@@ -27,7 +27,7 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 ('-2000030', 'Vuestro fin se acerca', '1', 'agro shyla'),
 ('-2000031', 'avisare a vuestros familiares de vuestra muerte', '1', 'kill shyla'),
 ('-2000032', 'Me vengare!!', '1', 'Dead shyla'),
-('-2000033', 'O la reina en pena', '1', 'essence');
+('-2000033', 'No arreglo cosas, no atiendo bugs, soy gm de eventos ¬¬', '1', 'essence');
 
 -- Douce
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
@@ -60,7 +60,7 @@ INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
 
 -- Gedeon
 INSERT INTO custom_texts (`entry`, `content_default`, `type`, `comment`) VALUES
-('-2000080', 'No teneis nada mejor que hacer? , Poned ticket para ser atendidos!!!!', '1', 'agro gedeon'),
+('-2000080', 'No teneis nada mejor que hacer?, Poned ticket para ser atendidos!!!!', '1', 'agro gedeon'),
 ('-2000081', 'asunto resuelto, el siguiente???', '1', 'kill gedeon'),
 ('-2000082', 'Ahora tirare un reset!! ja ja ja', '1', 'Dead gedeon');
 

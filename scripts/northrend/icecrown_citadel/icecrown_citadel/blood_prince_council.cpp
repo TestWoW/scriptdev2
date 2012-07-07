@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,12 @@
 
 /* ScriptData
 SDName: blood_prince_council
-SD%Complete:
-SDComment:
+SD%Complete: 99%
+SDComment:  by michalpolko with special thanks to:
+            mangosR2 team and all who are supporting us with feedback, testing and fixes
+            TrinityCore for some info about spells IDs
+            everybody whom I forgot to mention here ;)
+
 SDCategory: Icecrown Citadel
 EndScriptData */
 
@@ -109,7 +113,6 @@ struct MANGOS_DLL_DECL boss_blood_queen_lanathel_introAI : public ScriptedAI
 {
     boss_blood_queen_lanathel_introAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->SetRespawnTime(7*DAY);
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
@@ -220,8 +223,6 @@ struct MANGOS_DLL_DECL npc_blood_orb_controlAI : public ScriptedAI
     {
         SetCombatMovement(false);
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         Reset();
     }
 
@@ -236,7 +237,6 @@ struct MANGOS_DLL_DECL npc_blood_orb_controlAI : public ScriptedAI
         m_uiCheckTimer = 1000;
         m_bIsInProgress = false;
         m_uiInvocationTimer = 30000;
-        m_creature->SetHealth(m_creature->GetMaxHealth());
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -325,10 +325,9 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
         Reset();
         DoCastSpellIfCan(m_creature, SPELL_FEIGN_DEATH, CAST_TRIGGERED);
     }
-
+    
     bool m_bIsEmpowered;
     bool m_bIsSaidSpecial; // 1st spell cast after being empowered is followed by special say
-    bool m_bIsStarted;
     uint32 m_uiEmpowermentFadeTimer;
     uint32 m_uiInvocationSpellEntry;
     int32 m_iSayInvocationEntry;
@@ -339,11 +338,9 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
     {
         m_bIsEmpowered = false;
         m_bIsSaidSpecial = false;
-        m_bIsStarted = false;
         m_uiEmpowermentFadeTimer = 30000;
         m_uiSphereTimer = urand(5000, 15000);
         m_uiBerserkTimer = 10 * MINUTE * IN_MILLISECONDS;
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetHealth(1);
     }
 
@@ -352,36 +349,10 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
         m_creature->CallForHelp(30.0f);
     }
 
-    void MoveInLineOfSight(Unit* pWho)
-    {
-        if (!m_creature->isAlive())
-            return;
-            
-        if (pWho && pWho->IsWithinDistInMap(m_creature, 40.0f) &&
-            ((pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster()) ||
-            pWho->GetObjectGuid().IsPet()) && !m_bIsStarted && !m_creature->HasAura(SPELL_FEIGN_DEATH))
-        {
-            AttackStart(pWho);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            m_bIsStarted = true;
-        }
-    }
-
     void DamageTaken(Unit *pDealer, uint32 &uiDamage)
     {
         if (!m_bIsEmpowered && pDealer->GetEntry() != NPC_BLOOD_ORB_CONTROL)
             uiDamage = 0;
-    }
-
-    void DamageDeal(Unit *pDoneTo, uint32 &uiDamage)
-    {
-        if (pDoneTo->GetTypeId() == TYPEID_PLAYER)
-        {
-            SpellSchoolMask damageSchoolMask;
-
-            if ((damageSchoolMask & SPELL_SCHOOL_MASK_SPELL) && uiDamage >= m_bIs25Man ? 25000 : 23000)
-                m_pInstance->SetSpecialAchievementCriteria(TYPE_ORB_WHISPERER, false);
-        }
     }
 
     void JustDied(Unit *pKiller)
@@ -395,7 +366,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
                     if (pTmp->isAlive())
                     {
                         pTmp->RemoveAurasDueToSpell(SPELL_INVOCATION_VALANAR);
-                        pKiller->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+                        pTmp->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
                     }
                 }
             }
@@ -407,7 +378,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
                     if (pTmp->isAlive())
                     {
                         pTmp->RemoveAurasDueToSpell(SPELL_INVOCATION_KELESETH);
-                        pKiller->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+                        pTmp->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
                     }
                 }
             }
@@ -419,7 +390,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
                     if (pTmp->isAlive())
                     {
                         pTmp->RemoveAurasDueToSpell(SPELL_INVOCATION_TALDARAM);
-                        pKiller->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
+                        pTmp->DealDamage(pTmp, pTmp->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
                     }
                 }
             }
@@ -439,13 +410,13 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
             if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != FAIL)
                 m_pInstance->SetData(TYPE_BLOOD_COUNCIL, FAIL);
         }
-        m_creature->SetHealth(1);
     }
     
     void SpellHit(Unit *pCaster, const SpellEntry *pSpell)
     {
         if (pSpell->Id == m_uiInvocationSpellEntry)
         {
+            m_creature->SetHealth(pCaster->GetHealth());
             m_bIsEmpowered = true;
             DoScriptText(m_iSayInvocationEntry, m_creature);
         }
@@ -462,6 +433,7 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
             if (m_uiEmpowermentFadeTimer <= uiDiff)
             {
                 m_creature->RemoveAurasDueToSpell(m_uiInvocationSpellEntry);
+                m_creature->SetHealth(1);
                 m_bIsEmpowered = false;
                 m_bIsSaidSpecial = false;
                 m_uiEmpowermentFadeTimer = 30000;
@@ -487,26 +459,24 @@ struct MANGOS_DLL_DECL boss_valanar_iccAI : public base_blood_prince_council_bos
 {
     boss_valanar_iccAI(Creature* pCreature) : base_blood_prince_council_bossAI(pCreature)
     {
+        Reset();
         m_uiInvocationSpellEntry = SPELL_INVOCATION_VALANAR;
         m_iSayInvocationEntry = SAY_VALANAR_INVOCATION;
     }
 
     uint32 m_uiVortexTimer;
-    uint32 dietempfix;
 
     void Reset()
     {
         base_blood_prince_council_bossAI::Reset();
 
         m_uiVortexTimer = urand(5000, 10000);
-        dietempfix = 0;
     }
 
     void Aggro(Unit *pWho)
     {
         base_blood_prince_council_bossAI::Aggro(pWho);
 
-        m_creature->SetHealth(m_creature->GetMaxHealth());
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_BLOOD_COUNCIL, IN_PROGRESS);
@@ -529,19 +499,12 @@ struct MANGOS_DLL_DECL boss_valanar_iccAI : public base_blood_prince_council_bos
 
     void JustDied(Unit *pKiller)
     {
+        base_blood_prince_council_bossAI::JustDied(pKiller);
 
-        if(dietempfix < 2 * MINUTE * IN_MILLISECONDS)
-        {
-            m_pInstance->GetSingleCreatureFromStorage(NPC_VALANAR)->Respawn();
-            Reset();
-        }
-        else
-        {
-            base_blood_prince_council_bossAI::JustDied(pKiller);
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_BLOOD_COUNCIL, DONE);
-            DoScriptText(SAY_VALANAR_DEATH, m_creature);
-        }
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_BLOOD_COUNCIL, DONE);
+
+        DoScriptText(SAY_VALANAR_DEATH, m_creature);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -581,8 +544,6 @@ struct MANGOS_DLL_DECL boss_valanar_iccAI : public base_blood_prince_council_bos
             m_uiVortexTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
-    
-        dietempfix += uiDiff;
     }
 };
 
@@ -597,22 +558,21 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
 {
     boss_keleseth_iccAI(Creature* pCreature) : base_blood_prince_council_bossAI(pCreature)
     {
+        Reset();
         m_uiInvocationSpellEntry = SPELL_INVOCATION_KELESETH;
         m_iSayInvocationEntry = SAY_KELESETH_INVOCATION;
     }
 
     uint32 m_uiShadowLanceTimer;
     bool m_bHasCastShadowPrison;
-    uint32 dietempfix;
 
     void Reset()
     {
         base_blood_prince_council_bossAI::Reset();
 
         m_bHasCastShadowPrison = false;
-        m_uiShadowLanceTimer = 8000;
-
-        dietempfix = 0;
+        m_uiShadowLanceTimer = urand(2000, 5000);
+        m_uiSphereTimer = 4000;
     }
 
     void KilledUnit(Unit *pVictim)
@@ -623,17 +583,9 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
 
     void JustDied(Unit *pKiller)
     {
-        if(dietempfix < 2 * MINUTE * IN_MILLISECONDS)
-        {
-            m_pInstance->GetSingleCreatureFromStorage(NPC_KELESETH)->Respawn();
-            Reset();
-        }
-        else
-        {
-            base_blood_prince_council_bossAI::JustDied(pKiller);
+        base_blood_prince_council_bossAI::JustDied(pKiller);
 
-            DoScriptText(SAY_KELESETH_DEATH, m_creature);
-        }
+        DoScriptText(SAY_KELESETH_DEATH, m_creature);
     }
 
     void JustSummoned(Creature *pSummoned)
@@ -677,13 +629,11 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
                     m_bIsSaidSpecial = true;
                 }
 
-                m_uiShadowLanceTimer = 8000;
+                m_uiShadowLanceTimer = urand(2000, 5000);
             }
         }
         else
             m_uiShadowLanceTimer -= uiDiff;
-
-        dietempfix += uiDiff;
     }
 };
 
@@ -698,21 +648,18 @@ struct MANGOS_DLL_DECL boss_taldaram_iccAI : public base_blood_prince_council_bo
 {
     boss_taldaram_iccAI(Creature* pCreature) : base_blood_prince_council_bossAI(pCreature)
     {
+        Reset();
         m_uiInvocationSpellEntry = SPELL_INVOCATION_TALDARAM;
         m_iSayInvocationEntry = SAY_TALDARAM_INVOCATION;
     }
 
     uint32 m_uiSparksTimer;
 
-    uint32 dietempfix;
-
     void Reset()
     {
         base_blood_prince_council_bossAI::Reset();
 
         m_uiSparksTimer = urand(8000, 15000);
-
-        dietempfix = 0;
     }
 
     void KilledUnit(Unit *pVictim)
@@ -723,27 +670,48 @@ struct MANGOS_DLL_DECL boss_taldaram_iccAI : public base_blood_prince_council_bo
 
     void JustDied(Unit *pKiller)
     {
-        if(dietempfix < 2 * MINUTE * IN_MILLISECONDS)
-        {
-            m_pInstance->GetSingleCreatureFromStorage(NPC_TALDARAM)->Respawn();
-            Reset();
-        }
-        else
-        {
-            base_blood_prince_council_bossAI::JustDied(pKiller);
+        base_blood_prince_council_bossAI::JustDied(pKiller);
 
-            DoScriptText(SAY_TALDARAM_DEATH, m_creature);
-        }
+        DoScriptText(SAY_TALDARAM_DEATH, m_creature);
     }
 
     void JustSummoned(Creature *pSummoned)
     {
         pSummoned->SetInCombatWithZone();
-        if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, 99999, SELECT_FLAG_IN_LOS|SELECT_FLAG_PLAYER))
+        Player* pTarget = GetFarthestPlayer(pSummoned, 60.0f);
+
+        if (pTarget)
         {
             pSummoned->AddThreat(pTarget, 1000000.0f, true);
             pSummoned->AI()->AttackStart(pTarget);
+            if (m_bIsEmpowered)
+                pSummoned->CastSpell(pSummoned, SPELL_BALL_FLAMES_PERIODIC, true);
         }
+    }
+
+    Player* GetFarthestPlayer(Creature *pCreature, float MaxRangeDistance = 100.0f)
+    {
+        Player* farPlayer;
+        uint32 m_iuMaxDistance = 0;
+        uint32 m_iuCurDistance = 0;
+        Map* pMap = pCreature->GetMap();
+        Map::PlayerList const& pPlayers = pMap->GetPlayers();
+
+        if (!pPlayers.isEmpty())
+        for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
+        {
+            Player* pPlayer = itr->getSource();
+            if(pPlayer)
+            {
+                m_iuCurDistance = pCreature->GetDistance(pPlayer);
+                if (m_iuCurDistance > m_iuMaxDistance && m_iuCurDistance < MaxRangeDistance)
+                {
+                    m_iuMaxDistance = m_iuCurDistance;
+                    farPlayer = pPlayer;
+                }
+            }
+        }
+        return farPlayer;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -775,8 +743,6 @@ struct MANGOS_DLL_DECL boss_taldaram_iccAI : public base_blood_prince_council_bo
             m_uiSparksTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
-
-        dietempfix += uiDiff;
     }
 };
 
@@ -812,9 +778,6 @@ struct MANGOS_DLL_DECL mob_shock_vortexAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
-            m_creature->ForcedDespawn();
-
         if (!m_bHasCast)
         {
             if (m_uiCastTimer <= uiDiff)
@@ -834,15 +797,12 @@ CreatureAI* GetAI_mob_shock_vortex(Creature* pCreature)
 };
 
 // Dark Nucleus
-struct MANGOS_DLL_DECL mob_dark_nucleusAI : public ScriptedAI
+struct MANGOS_DLL_DECL mob_dark_nucleusAI : public base_icc_bossAI
 {
-    mob_dark_nucleusAI(Creature *pCreature) : ScriptedAI(pCreature)
+    mob_dark_nucleusAI(Creature *pCreature) : base_icc_bossAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
-
-    ScriptedInstance* m_pInstance;
 
     void Reset(){}
 
@@ -855,9 +815,15 @@ struct MANGOS_DLL_DECL mob_dark_nucleusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
-            m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, NULL, false);
-            
+        if (m_pInstance)
+        {
+            if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
+            {
+                m_creature->ForcedDespawn();
+                return;
+            }
+        }
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
@@ -877,7 +843,7 @@ struct MANGOS_DLL_DECL mob_ball_of_flamesAI : public ScriptedAI
     mob_ball_of_flamesAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 7.0f);
+        m_creature->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 7.0f, false);
         Reset();
     }
 
@@ -899,8 +865,6 @@ struct MANGOS_DLL_DECL mob_ball_of_flamesAI : public ScriptedAI
         m_bIsStarted = false;
 
         DoCastSpellIfCan(m_creature, SPELL_BALL_FLAMES_VISUAL, CAST_TRIGGERED);
-        if (m_creature->GetMap()->GetDifficulty() > RAID_DIFFICULTY_25MAN_NORMAL)
-            DoCastSpellIfCan(m_creature, SPELL_BALL_FLAMES_PERIODIC, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -933,7 +897,7 @@ struct MANGOS_DLL_DECL mob_ball_of_flamesAI : public ScriptedAI
             }
             else
             {
-                DoCastSpellIfCan(m_creature, SPELL_FLAMES_BUFF, CAST_TRIGGERED);
+                m_creature->CastSpell(m_creature, SPELL_FLAMES_BUFF, true);
                 m_uiStartTimer -= uiDiff;
             }
         }
@@ -980,7 +944,7 @@ struct MANGOS_DLL_DECL mob_kinetic_bombAI : public ScriptedAI
         m_creature->GetPosition(x, y, z);
         m_creature->NearTeleportTo(x, y, z + (m_bIsHeroic ? 10.0f : 15.0f), 0.0f);
 
-        m_creature->GetMotionMaster()->MovePoint(0, x, y, z);
+        m_creature->GetMotionMaster()->MovePoint(0, x, y, z, false);
     }
 
     void DamageTaken(Unit *pDealer, uint32 &uiDamage)
@@ -996,9 +960,6 @@ struct MANGOS_DLL_DECL mob_kinetic_bombAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_pInstance->GetData(TYPE_BLOOD_COUNCIL) != IN_PROGRESS)
-            m_creature->ForcedDespawn();
-
         if (!m_bIsStarted)
         {
             if (m_uiStartTimer <= uiDiff)
@@ -1022,7 +983,6 @@ struct MANGOS_DLL_DECL mob_kinetic_bombAI : public ScriptedAI
                 {
                     m_bHasCast = true;
                     m_creature->ForcedDespawn(3000);
-                    m_creature->RemoveAllAuras();
                 }
             }
         }
@@ -1074,55 +1034,55 @@ CreatureAI* GetAI_mob_kinetic_bomb_target(Creature* pCreature)
 
 void AddSC_blood_prince_council()
 {
-    Script* pNewScript;
+    Script* newscript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_taldaram_icc";
-    pNewScript->GetAI = &GetAI_boss_taldaram_icc;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_taldaram_icc";
+    newscript->GetAI = &GetAI_boss_taldaram_icc;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_keleseth_icc";
-    pNewScript->GetAI = &GetAI_boss_keleseth_icc;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_keleseth_icc";
+    newscript->GetAI = &GetAI_boss_keleseth_icc;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_valanar_icc";
-    pNewScript->GetAI = &GetAI_boss_valanar_icc;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_valanar_icc";
+    newscript->GetAI = &GetAI_boss_valanar_icc;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "boss_blood_queen_lanathel_intro";
-    pNewScript->GetAI = &GetAI_boss_blood_queen_lanathel_intro;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "boss_blood_queen_lanathel_intro";
+    newscript->GetAI = &GetAI_boss_blood_queen_lanathel_intro;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_blood_orb_control";
-    pNewScript->GetAI = &GetAI_npc_blood_orb_control;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "npc_blood_orb_control";
+    newscript->GetAI = &GetAI_npc_blood_orb_control;
+    newscript->RegisterSelf();
     
-    pNewScript = new Script;
-    pNewScript->Name = "mob_shock_vortex";
-    pNewScript->GetAI = &GetAI_mob_shock_vortex;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_shock_vortex";
+    newscript->GetAI = &GetAI_mob_shock_vortex;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "mob_dark_nucleus";
-    pNewScript->GetAI = &GetAI_mob_dark_nucleus;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_dark_nucleus";
+    newscript->GetAI = &GetAI_mob_dark_nucleus;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "mob_ball_of_flames";
-    pNewScript->GetAI = &GetAI_mob_ball_of_flames;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_ball_of_flames";
+    newscript->GetAI = &GetAI_mob_ball_of_flames;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "mob_kinetic_bomb";
-    pNewScript->GetAI = &GetAI_mob_kinetic_bomb;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_kinetic_bomb";
+    newscript->GetAI = &GetAI_mob_kinetic_bomb;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "mob_kinetic_bomb_target";
-    pNewScript->GetAI = &GetAI_mob_kinetic_bomb_target;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_kinetic_bomb_target";
+    newscript->GetAI = &GetAI_mob_kinetic_bomb_target;
+    newscript->RegisterSelf();
 }

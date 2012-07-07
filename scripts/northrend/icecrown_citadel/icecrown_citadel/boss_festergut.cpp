@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,19 +17,20 @@
 /* ScriptData
 SDName: boss_festergut
 SD%Complete: 99%
-SDComment: targeting spells of Malleable Goo and Vile Gas unclear, coded targeting in script
+SDComment:  by michalpolko with special thanks to:
+            mangosR2 team and all who are supporting us with feedback, testing and fixes
+            TrinityCore for some info about spells IDs
+            everybody whom I forgot to mention here ;)
+
 SDCategory: Icecrown Citadel
 EndScriptData */
+
 #include "precompiled.h"
 #include "icecrown_citadel.h"
 
 enum
 {
     SPELL_BERSERK               = 47008,
-
-    // Stinky
-    SPELL_STINKY_DECIMATE       = 71123,
-    SPELL_STINKY_MORTALWOUND    = 71127,
 
     // Gastric Bloat
     SPELL_GASTRIC_BLOAT         = 72214, // proc aura, ~8 sec cooldown, currently not used
@@ -71,6 +72,11 @@ enum
     SPELL_MALLEABLE_GOO         = 72295,
     SPELL_MALLEABLE_GOO_VISUAL  = 75845,
     SPELL_MALLEABLE_GOO_MISSILE = 70852,
+
+    // other
+    NPC_ORANGE_GAS_STALKER      = 36659, // has dummy auras of the orange gas
+    NPC_PUDDLE_STALKER          = 37013, // dummy npc for initial gas flowing from pipes animation
+    NPC_MALLEABLE_GOO           = 38556,
 };
 
 // talks
@@ -94,7 +100,7 @@ static Locations SpawnLoc[]=
     {4311.91f, 3157.42f, 389.00f, 3.62f},               // hacky (LoS problems?) festergut side
     {4391.38f, 3163.71f, 389.40f, 5.8f}                 // rotface side
 };
-// Festergut
+
 struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
 {
     boss_festergutAI(Creature *pCreature) : base_icc_bossAI(pCreature)
@@ -102,15 +108,12 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
         Reset();
     }
 
-    bool m_bAchievFail;
-
     uint32 m_uiBerserkTimer;
     uint32 m_uiGastricBloatTimer;
     uint32 m_uiInhaleBlightTimer;
     uint32 m_uiGasSporeTimer;
     uint32 m_uiVileGasTimer;
     uint32 m_uiMalleableGooTimer;
-    uint32 m_uiCheckTimer;
 
     void Reset()
     {
@@ -120,7 +123,6 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
         m_uiGasSporeTimer = 20000;
         m_uiVileGasTimer = 10000;
         m_uiMalleableGooTimer = urand(15000, 20000);
-        m_uiCheckTimer = 1000;
     }
 
     void Aggro(Unit *pWho)
@@ -139,7 +141,7 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
 
             if (Creature *pProfessor = m_pInstance->GetSingleCreatureFromStorage(NPC_PROFESSOR_PUTRICIDE))
             {
-                pProfessor->NearTeleportTo(SpawnLoc[m_bIsHeroic ? 1 : 0].x, SpawnLoc[m_bIsHeroic ? 1 : 0].y, SpawnLoc[m_bIsHeroic ? 1 : 0].z, SpawnLoc[m_bIsHeroic ? 1 : 0].o);
+                pProfessor->NearTeleportTo(SpawnLoc[1].x, SpawnLoc[1].y, SpawnLoc[1].z, SpawnLoc[1].o);
                 pProfessor->SetInCombatWithZone();
             }
         }
@@ -161,7 +163,6 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
         }
 
         DoCastSpellIfCan(m_creature, SPELL_REMOVE_INOCULENT, CAST_TRIGGERED);
-        m_creature->RemoveAllAuras();
     }
 
     void JustDied(Unit *pKiller)
@@ -176,40 +177,6 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
 
         DoScriptText(SAY_DEATH, m_creature);
         DoCastSpellIfCan(m_creature, SPELL_REMOVE_INOCULENT, CAST_TRIGGERED);
-    }
-
-    void CheckAchievement()
-    {
-        if (!m_pInstance)
-            return;
-
-        Map* pMap = m_creature->GetMap();
-        Map::PlayerList const& pPlayers = pMap->GetPlayers();
-        if (!pPlayers.isEmpty())
-        {
-            for (Map::PlayerList::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
-            {
-                Unit *pTarget = itr->getSource();
-                if (pTarget)
-                {
-                    SpellAuraHolderPtr holder = pTarget->GetSpellAuraHolder(69291);
-                    if (m_bIs25Man && !m_bIsHeroic)
-                        holder = pTarget->GetSpellAuraHolder(72101);
-                    if (!m_bIs25Man && m_bIsHeroic)
-                        holder = pTarget->GetSpellAuraHolder(72102);
-                    if (m_bIs25Man && m_bIsHeroic)
-                        holder = pTarget->GetSpellAuraHolder(72103);
-                    if (holder)
-                    {
-                        if (holder->GetStackAmount() >= 3)
-                        {
-                            m_pInstance->SetSpecialAchievementCriteria(TYPE_FLU_SHORT_SHORTAGE, false);
-                            m_bAchievFail = true;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -252,10 +219,8 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
                     // can't inhale anymore...
                     if (DoCastSpellIfCan(m_creature, SPELL_PUNGENT_BLIGHT) == CAST_OK)
                     {
-                        DoScriptText(SAY_PUNGUENT_BLIGHT, m_creature);
                         DoScriptText(SAY_PUNGUENT_BLIGHT_EMOTE, m_creature);
-                        m_creature->RemoveAurasDueToSpell(SPELL_INHALED_BLIGHT_10);
-                        m_creature->RemoveAurasDueToSpell(SPELL_INHALED_BLIGHT_25);
+                        DoScriptText(SAY_PUNGUENT_BLIGHT, m_creature);
                         m_uiInhaleBlightTimer = 35000;
                     }
 
@@ -283,8 +248,10 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             {
                 DoScriptText(SAY_SPORE, m_creature);
                 m_uiGasSporeTimer = 40000;
-                if (m_uiVileGasTimer <= 15000)
-                    m_uiVileGasTimer = 15000;
+                
+                // make sure Vile Gas is not cast when players are gathered near Gas Spore
+                if (m_uiVileGasTimer < 12000)
+                    m_uiVileGasTimer = 12000;
             }
         }
         else
@@ -300,8 +267,8 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
             {
                 pTarget->CastSpell(pTarget, SPELL_VILE_GAS_SUMMON_TRIG, true);
                 DoCastSpellIfCan(m_creature, SPELL_VILE_GAS, CAST_TRIGGERED);
+                m_uiVileGasTimer = 30000;
             }
-            m_uiVileGasTimer = 30000;
         }
         else
             m_uiVileGasTimer -= uiDiff;
@@ -332,17 +299,6 @@ struct MANGOS_DLL_DECL boss_festergutAI : public base_icc_bossAI
                 m_uiMalleableGooTimer -= uiDiff;
         }
 
-        // Check achievement
-        if (!m_bAchievFail)
-        {
-            if (m_uiCheckTimer < uiDiff)
-            {
-                CheckAchievement();
-                m_uiCheckTimer = 1000;
-            }
-            else m_uiCheckTimer = uiDiff;
-        }
-
         DoMeleeAttackIfReady();
     }
 };
@@ -357,9 +313,6 @@ struct MANGOS_DLL_DECL mob_vile_gas_malleable_gooAI : public ScriptedAI
     mob_vile_gas_malleable_gooAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
-        m_creature->SetVisibility(VISIBILITY_ON);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
     void DamageTaken(Unit *pDealer, uint32 &uiDamage){ uiDamage = 0; }
     void Reset(){}
@@ -372,84 +325,16 @@ CreatureAI* GetAI_mob_vile_gas_malleable_goo(Creature* pCreature)
     return new mob_vile_gas_malleable_gooAI(pCreature);
 }
 
-
-// Stinky
-struct MANGOS_DLL_DECL mob_stinkyAI : public ScriptedAI
-{
-    mob_stinkyAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance *m_pInstance;
-    uint32 m_uiDecimateTimer;
-    uint32 m_uiMortalwoundTimer;
-
-    void Reset()
-    {
-        m_uiDecimateTimer = urand(10000, 12000);
-        m_uiMortalwoundTimer = urand(2000, 5000);
-
-        m_creature->SetSpeedRate(MOVE_RUN, 1.0f);
-        m_creature->SetSpeedRate(MOVE_WALK, 1.0f);
-    }
-
-    void JustDied(Unit *killer)
-    {
-        if (m_pInstance)
-            if (Creature* pTemp = m_pInstance->GetSingleCreatureFromStorage(NPC_FESTERGUT))
-                DoScriptText(SAY_STINKY_DIES,pTemp,killer);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        // Decimate
-        if (m_uiDecimateTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_STINKY_DECIMATE) == CAST_OK)
-                m_uiDecimateTimer = 32000;
-        }
-        else
-            m_uiDecimateTimer -= uiDiff;
-
-        // Mortal wound
-        if (m_uiMortalwoundTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STINKY_MORTALWOUND) == CAST_OK)
-                m_uiMortalwoundTimer = 10000;
-        }
-        else
-            m_uiMortalwoundTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mob_stinky(Creature *pCreature)
-{
-    return new mob_stinkyAI(pCreature);
-}
-
 void AddSC_boss_festergut()
 {
-    Script *pNewScript;
-    pNewScript = new Script;
-    pNewScript->Name = "boss_festergut";
-    pNewScript->GetAI = &GetAI_boss_festergut;
-    pNewScript->RegisterSelf();
+    Script *newscript;
+    newscript = new Script;
+    newscript->Name = "boss_festergut";
+    newscript->GetAI = &GetAI_boss_festergut;
+    newscript->RegisterSelf();
 
-    pNewScript = new Script;
-    pNewScript->Name = "mob_vile_gas_malleable_goo";
-    pNewScript->GetAI = &GetAI_mob_vile_gas_malleable_goo;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "mob_stinky";
-    pNewScript->GetAI = &GetAI_mob_stinky;
-    pNewScript->RegisterSelf();
+    newscript = new Script;
+    newscript->Name = "mob_vile_gas_malleable_goo";
+    newscript->GetAI = &GetAI_mob_vile_gas_malleable_goo;
+    newscript->RegisterSelf();
 }
-
