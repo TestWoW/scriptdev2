@@ -49,6 +49,7 @@ void instance_magisters_terrace::OnCreatureCreate(Creature* pCreature)
         case NPC_SELIN_FIREHEART:
         case NPC_DELRISSA:
         case NPC_KALECGOS_DRAGON:
+        case NPC_KAELTHAS:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
         case NPC_FEL_CRYSTAL:
@@ -75,8 +76,7 @@ void instance_magisters_terrace::OnObjectCreate(GameObject* pGo)
             break;
         case GO_SELIN_ENCOUNTER_DOOR:
         case GO_KAEL_DOOR:
-        case GO_KAEL_STATUE_LEFT:
-        case GO_KAEL_STATUE_RIGHT:
+        case GO_ESCAPE_QUEL_DANAS:
             break;
 
         default:
@@ -92,6 +92,30 @@ void instance_magisters_terrace::SetData(uint32 uiType, uint32 uiData)
         case TYPE_SELIN:
             if (uiData == DONE)
                 DoUseDoorOrButton(GO_SELIN_DOOR);
+            if (uiData == FAIL)
+            {
+                // Reset crystals - respawn and kill is handled by creature linking
+                for (GuidList::const_iterator itr = m_lFelCrystalGuid.begin(); itr != m_lFelCrystalGuid.end(); ++itr)
+                {
+                    if (Creature* pTemp = instance->GetCreature(*itr))
+                    {
+                        if (!pTemp->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                            pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+                        if (pTemp->isAlive())
+                            pTemp->AI()->EnterEvadeMode();
+                    }
+                }
+            }
+            if (uiData == IN_PROGRESS)
+            {
+                // Stop channeling when the fight starts
+                for (GuidList::const_iterator itr = m_lFelCrystalGuid.begin(); itr != m_lFelCrystalGuid.end(); ++itr)
+                {
+                    if (Creature* pTemp = instance->GetCreature(*itr))
+                        pTemp->InterruptNonMeleeSpells(false);
+                }
+            }
             DoUseDoorOrButton(GO_SELIN_ENCOUNTER_DOOR);
             m_auiEncounter[uiType] = uiData;
             break;
@@ -109,6 +133,8 @@ void instance_magisters_terrace::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_KAELTHAS:
             DoUseDoorOrButton(GO_KAEL_DOOR);
+            if (uiData == DONE)
+                DoToggleGameObjectFlags(GO_ESCAPE_QUEL_DANAS, GO_FLAG_NO_INTERACT, false);
             m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_DELRISSA_DEATH_COUNT:
@@ -168,14 +194,6 @@ uint32 instance_magisters_terrace::GetData(uint32 uiType)
         default:
             return 0;
     }
-}
-
-void instance_magisters_terrace::GetFelCrystalList(GuidList& lList)
-{
-    if (m_lFelCrystalGuid.empty())
-        error_log("SD2: Magisters Terrace: No Fel Crystals loaded in Inst Data");
-
-    lList = m_lFelCrystalGuid;
 }
 
 InstanceData* GetInstanceData_instance_magisters_terrace(Map* pMap)

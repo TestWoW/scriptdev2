@@ -1398,8 +1398,8 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 
 (-1509002,'%s sets eyes on $N!',0,2,0,0,'buru EMOTE_TARGET'),
 
-(-1509003,'They come now. Try not to get yourself killed, young blood.',0,1,0,0,'andorov SAY_ANDOROV_INTRO'),
-(-1509004,'Remember, Rajaxx, when I said I\'d kill you last? I lied...',0,1,0,0,'andorov SAY_ANDOROV_ATTACK'),
+(-1509003,'They come now. Try not to get yourself killed, young blood.',0,1,0,22,'andorov SAY_ANDOROV_INTRO_3'),
+(-1509004,'Remember, Rajaxx, when I said I\'d kill you last?',0,1,0,0,'andorov SAY_ANDOROV_INTRO_1'),
 
 (-1509005,'The time of our retribution is at hand! Let darkness reign in the hearts of our enemies!',8612,1,0,0,'rajaxx SAY_WAVE3'),
 (-1509006,'No longer will we wait behind barred doors and walls of stone! No longer will our vengeance be denied! The dragons themselves will tremble before our wrath!',8610,1,0,0,'rajaxx SAY_WAVE4'),
@@ -1424,7 +1424,11 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 (-1509024,'Tresspassers will be terminated.',8601,1,0,0,'ossirian SAY_RAND_INTRO4'),
 (-1509025,'Sands of the desert rise and block out the sun!',8598,1,0,0,'ossirian SAY_AGGRO'),
 (-1509026,'You are terminated.',8602,1,0,0,'ossirian SAY_SLAY'),
-(-1509027,'I...have...failed.',8594,1,0,0,'ossirian SAY_DEATH');
+(-1509027,'I...have...failed.',8594,1,0,0,'ossirian SAY_DEATH'),
+-- 28 (above) = EMOTE_ENERGIZING
+(-1509029,'Come get some!',0,0,0,0,'andorov SAY_ANDOROV_INTRO_4'),
+(-1509030,'Kill first, ask questions later... Incoming!',0,1,0,0,'andorov SAY_ANDOROV_ATTACK_START'),
+(-1509031,'I lied...',0,1,0,0,'andorov SAY_ANDOROV_INTRO_2');
 
 -- -1 531 000 TEMPLE OF AHN'QIRAJ
 INSERT INTO script_texts (entry,content_default,sound,type,language,emote,comment) VALUES
@@ -2083,7 +2087,9 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 (-1550041,'This is not over!',11118,1,0,0,'capernian SAY_CAPERNIAN_DEATH'),
 
 (-1550042,'Anar\'alah belore!',11157,1,0,0,'telonicus SAY_TELONICUS_AGGRO'),
-(-1550043,'More perils... await',11158,1,0,0,'telonicus SAY_TELONICUS_DEATH');
+(-1550043,'More perils... await',11158,1,0,0,'telonicus SAY_TELONICUS_DEATH'),
+
+(-1550044,'%s begins to cast Pyroblast!',0,3,0,0,'kaelthas EMOTE_PYROBLAST');
 
 -- -1 552 000 THE ARCATRAZ
 INSERT INTO script_texts (entry,content_default,sound,type,language,emote,comment) VALUES
@@ -2898,13 +2904,14 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 (-1585021,'It\'s been a kick, really.',12411,1,0,0,'delrissa PlayerDeath5'),
 (-1585022,'Not what I had... planned...',12397,1,0,0,'delrissa SAY_DEATH'),
 
-(-1585023,'Don\'t look so smug! I know what you\'re thinking, but Tempest Keep was merely a set back. Did you honestly believe I would trust the future to some blind, half-night elf mongrel? Oh no, he was merely an instrument, a stepping stone to a much larger plan! It has all led to this, and this time, you will not interfere!',12413,1,0,0,'kaelthas MT SAY_AGGRO'),
+(-1585023,'Don\'t look so smug! I know what you\'re thinking, but Tempest Keep was merely a set back. Did you honestly believe I would trust the future to some blind, half-night elf mongrel?',12413,1,0,0,'kaelthas MT SAY_INTRO_1'),
 (-1585024,'Vengeance burns!',12415,1,0,0,'kaelthas MT SAY_PHOENIX'),
 (-1585025,'Felomin ashal!',12417,1,0,0,'kaelthas MT SAY_FLAMESTRIKE'),
 (-1585026,'I\'ll turn your world... upside... down...',12418,1,0,0,'kaelthas MT SAY_GRAVITY_LAPSE'),
 (-1585027,'Master... grant me strength.',12419,1,0,0,'kaelthas MT SAY_TIRED'),
 (-1585028,'Do not... get too comfortable.',12420,1,0,0,'kaelthas MT SAY_RECAST_GRAVITY'),
-(-1585029,'My demise accomplishes nothing! The Master will have you! You will drown in your own blood! This world shall burn! Aaaghh!',12421,1,0,0,'kaelthas MT SAY_DEATH');
+(-1585029,'My demise accomplishes nothing! The Master will have you! You will drown in your own blood! This world shall burn! Aaaghh!',12421,1,0,0,'kaelthas MT SAY_DEATH'),
+(-1585030,'Oh no, he was merely an instrument, a stepping stone to a much larger plan! It has all led to this, and this time, you will not interfere!',0,1,0,0,'kaelthas MT SAY_INTRO_2');
 
 -- -1 595 000 CULLING OF STRATHOLME
 
@@ -3065,7 +3072,7 @@ INSERT INTO script_texts (entry,content_default,sound,type,language,emote,commen
 
 (-1602018,'What hope is there for you? None!',14162,1,0,0,'loken SAY_AGGRO0'),
 (-1602019,'I have witnessed the rise and fall of empires. The birth and extinction of entire species. Over countless millennia the foolishness of mortals has remained beyond a constant. Your presence here confirms this.',14160,1,0,0,'loken SAY_INTRO_1'),
-(-1602020,'My master has shown me the future, and you have no place in it. Azeroth will be reborn in darkness. Yogg-Saron shall be released! The Pantheon shall fall!',14162,1,0,0,'loken SAY_INTRO_2'),
+(-1602020,'My master has shown me the future, and you have no place in it. Azeroth will be reborn in darkness. Yogg-Saron shall be released! The Pantheon shall fall!',14161,1,0,0,'loken SAY_INTRO_2'),
 (-1602021,'Only mortal...',14166,1,0,0,'loken SAY_SLAY_1'),
 (-1602022,'I... am... FOREVER!',14167,1,0,0,'loken SAY_SLAY_2'),
 (-1602023,'What little time you had, you wasted!',14168,1,0,0,'loken SAY_SLAY_3'),
@@ -4213,6 +4220,11 @@ INSERT INTO gossip_texts (entry,content_default,comment) VALUES
 
 (-3469003,'I cannot, Vaelastrasz! Surely something can be done to heal you!','vaelastrasz GOSSIP_ITEM_VAEL_1'),
 (-3469004,'Vaelastrasz, no!!!','vaelastrasz GOSSIP_ITEM_VAEL_2');
+
+-- -3 509 000 RUINS OF AHN'QIRAJ
+INSERT INTO gossip_texts (entry,content_default,comment) VALUES
+(-3509000,'Let\'s find out.','andorov GOSSIP_ITEM_START'),
+(-3509001,'Let\'s see what you have.','andorov GOSSIP_ITEM_TRADE');
 
 -- -3 560 000 ESCAPE FROM DURNHOLDE (OLD HILLSBRAD)
 INSERT INTO gossip_texts (entry,content_default,comment) VALUES
