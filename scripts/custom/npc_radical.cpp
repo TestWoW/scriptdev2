@@ -913,7 +913,7 @@ struct MANGOS_DLL_DECL boss_ailin : public ScriptedAI
             {
                 if (DoCastSpellIfCan(pTarget, SEDUCTION) == CAST_OK)
                 {
-                    seduction = 12000;
+                    seduction = 22000;
                     DoScriptText(AILIN_SAY_SEDUCTION, m_creature);
                 }
             }            

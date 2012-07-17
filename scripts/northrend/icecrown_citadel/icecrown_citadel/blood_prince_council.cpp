@@ -629,7 +629,7 @@ struct MANGOS_DLL_DECL boss_keleseth_iccAI : public base_blood_prince_council_bo
                     m_bIsSaidSpecial = true;
                 }
 
-                m_uiShadowLanceTimer = urand(2000, 5000);
+                m_uiShadowLanceTimer = 8000;
             }
         }
         else
