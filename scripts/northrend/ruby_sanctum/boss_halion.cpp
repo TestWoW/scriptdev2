@@ -259,7 +259,7 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
             }
         }
 
-        // remove temporal objects and creatures
+        // remove temporary objects and creatures
         if(Creature* pControl = m_pInstance->GetSingleCreatureFromStorage(NPC_HALION_CONTROL))
             pControl->ForcedDespawn();
 
