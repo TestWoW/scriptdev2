@@ -242,9 +242,19 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
                     itr->getSource()->RemoveAurasDueToSpell(SPELL_MARK_OF_COMBUSTION);
                 }
 
+                if(itr->getSource()->HasAura(SPELL_FIERY_COMBUSTION))
+                {
+                    itr->getSource()->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION);
+                }
+
                 if(itr->getSource()->HasAura(SPELL_MARK_OF_CONSUMPTION))
                 {
                     itr->getSource()->RemoveAurasDueToSpell(SPELL_MARK_OF_CONSUMPTION);
+                }
+
+                if(itr->getSource()->HasAura(SPELL_SOUL_CONSUMPTION))
+                {
+                    itr->getSource()->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION);
                 }
             }
         }
@@ -728,9 +738,19 @@ struct MANGOS_DLL_DECL boss_halion_twilightAI : public ScriptedAI
                     itr->getSource()->RemoveAurasDueToSpell(SPELL_MARK_OF_COMBUSTION);
                 }
 
+                if(itr->getSource()->HasAura(SPELL_FIERY_COMBUSTION))
+                {
+                    itr->getSource()->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION);
+                }
+
                 if(itr->getSource()->HasAura(SPELL_MARK_OF_CONSUMPTION))
                 {
                     itr->getSource()->RemoveAurasDueToSpell(SPELL_MARK_OF_CONSUMPTION);
+                }
+
+                if(itr->getSource()->HasAura(SPELL_SOUL_CONSUMPTION))
+                {
+                    itr->getSource()->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION);
                 }
             }
         }
@@ -1327,7 +1347,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
             p_TwilightCorp -= p_TwilightDamage;
             p_RealCorp -= p_RealDamage;
 
-            float m_uiDiff = (p_RealCorp / 111560) - (p_TwilightCorp / 111560);
+            float m_uiDiff = (p_RealCorp / (m_bIs25Man ? 404400 : 111560)) - (p_TwilightCorp / (m_bIs25Man ? 404400 : 111560));
 
             uint8 buffnum;
             if (m_uiDiff <= Buff[0].uiDiff)
@@ -1356,7 +1376,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
                     pHalionReal->RemoveAurasDueToSpell(m_lastBuffReal);                          
                 }
             
-                if(Buff[buffnum].real > m_lastBuffReal) DoScriptText(EMOTE_REAL, pHalionReal);
+                if(Buff[buffnum].real > m_lastBuffReal) DoScriptText(EMOTE_TWILIGHT, pHalionTwilight);
 
                 pHalionReal->CastSpell(pHalionReal, Buff[buffnum].real, true);             
                 m_lastBuffReal = Buff[buffnum].real;
@@ -1369,7 +1389,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
                     pHalionTwilight->RemoveAurasDueToSpell(m_lastBuffTwilight);                                 
                 }
 
-                if(Buff[buffnum].twilight > m_lastBuffTwilight) DoScriptText(EMOTE_TWILIGHT, pHalionTwilight);
+                if(Buff[buffnum].twilight > m_lastBuffTwilight) DoScriptText(EMOTE_REAL, pHalionReal);
 
                 pHalionTwilight->CastSpell(pHalionTwilight, Buff[buffnum].twilight, true);                      
                 m_lastBuffTwilight = Buff[buffnum].twilight;
