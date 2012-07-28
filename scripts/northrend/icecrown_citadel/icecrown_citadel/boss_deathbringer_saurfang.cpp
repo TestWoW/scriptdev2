@@ -173,18 +173,12 @@ struct MANGOS_DLL_DECL npc_highlord_saurfang_iccAI : public base_icc_bossAI
 {
     npc_highlord_saurfang_iccAI(Creature* pCreature) : base_icc_bossAI(pCreature)
     {
-        bug = true;             // temporal
-        bugtime = 0;             // temporal      
-
         m_bIsEventStarted = false;
         m_uiEventStep = 0;
         m_uiNextEventTimer = 0;
 
         m_lGuards.clear();
     }
-
-    bool bug;                    // temporal
-    uint32 bugtime;              // temporal
 
     uint32 m_uiNextEventTimer;
     uint32 m_uiEventStep;
@@ -241,6 +235,7 @@ struct MANGOS_DLL_DECL npc_highlord_saurfang_iccAI : public base_icc_bossAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+<<<<<<< HEAD
         /********* temporal ****************/
         if (bug)
         {
@@ -260,6 +255,8 @@ struct MANGOS_DLL_DECL npc_highlord_saurfang_iccAI : public base_icc_bossAI
         }
         /***********************************/
 
+=======
+>>>>>>> parent of 40b3956... Temporal sourfang not start event fix
         if (!m_bIsEventStarted || !m_pInstance)
             return;
 
@@ -409,8 +406,6 @@ struct MANGOS_DLL_DECL npc_highlord_saurfang_iccAI : public base_icc_bossAI
                 }
                 case 12:
                 {
-                    bug = false;            //temporal
-
                     // fight is in progress
                     break;
                 }
