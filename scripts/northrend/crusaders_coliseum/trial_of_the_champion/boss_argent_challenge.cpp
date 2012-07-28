@@ -84,7 +84,8 @@ struct MANGOS_DLL_DECL boss_eadricAI : public ScriptedAI
         m_uiBerserk_Timer = m_bIsRegularMode ? 300000 : 180000;
         HammerTarget.Clear();
         //m_creature->GetMotionMaster()->MovePoint(0, 746, 614, m_creature->GetPositionZ());
-        m_creature->SetWalk(true);
+        //m_creature->SetWalk(true);
+        SetCombatMovement(true);
     }
 
     void Aggro(Unit* pWho)
@@ -199,7 +200,8 @@ struct MANGOS_DLL_DECL boss_paletressAI : public ScriptedAI
         summoned = false;
         shielded = false;
         //m_creature->GetMotionMaster()->MovePoint(0, 746, 614, m_creature->GetPositionZ());
-        m_creature->SetWalk(true);
+        //m_creature->SetWalk(true);
+        SetCombatMovement(true);
     }
 
     void JustSummoned(Creature* _summoned)

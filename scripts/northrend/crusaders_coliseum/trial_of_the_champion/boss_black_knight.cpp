@@ -161,7 +161,8 @@ struct MANGOS_DLL_DECL boss_black_knightAI : public ScriptedAI
         phase3 = false;
         ghoul = false;
         //m_creature->GetMotionMaster()->MovePoint(0, 746, 614, m_creature->GetPositionZ());
-        m_creature->SetWalk(true);
+        //m_creature->SetWalk(true);
+        SetCombatMovement(true);
     }
 
     void Aggro(Unit* pWho)
