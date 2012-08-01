@@ -226,7 +226,6 @@ struct MANGOS_DLL_DECL mob_toc5_mageAI : public ScriptedAI
         Polymorph_Timer = m_bIsRegularMode ? 12000 : 10000;
         m_creature->GetMotionMaster()->MovePoint(0, 746, 614, m_creature->GetPositionZ());
         m_creature->SetWalk(true);
-        m_creature->SetInCombatWithZone();
     }
 
     void Aggro(Unit* pWho)
