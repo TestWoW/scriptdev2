@@ -284,6 +284,56 @@ bool GossipSelect_acherus_teleporter_down(Player* pPlayer, Creature* pCreature, 
 }
 
 /*########
+## npc_dragon_teleporter
+## Radical custom npc
+######*/
+
+bool GossipHello_dragon_up(Player* pPlayer, Creature* pCreature)
+{
+    char const* OPTION = "Quiero ir arriba";
+ 
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+
+    return true;
+}
+
+bool GossipSelect_dragon_up(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+
+    switch(uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        default:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pPlayer->TeleportTo(pPlayer->GetMapId(), 3581.270020, 289.766998, 340.838989, pPlayer->GetOrientation());
+            break;
+    }
+
+    return true;
+}
+
+bool GossipHello_dragon_down(Player* pPlayer, Creature* pCreature)
+{
+    char const* OPTION = "Quiero ir abajo";
+ 
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+
+    return true;
+}
+
+bool GossipSelect_dragon_down(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+    pPlayer->CLOSE_GOSSIP_MENU();
+    pPlayer->TeleportTo(pPlayer->GetMapId(), 3549.489990, 379.307007, 52.257099, pPlayer->GetOrientation());
+
+    return true;
+}
+
+/*########
 ## boss_staff
 ## Radical custom BOSS
 ######*/
@@ -1693,6 +1743,7 @@ void AddSC_npcs_radical()
 {
     Script* pNewScript;
     
+    /** Logroneitor 3000 **/
     pNewScript = new Script;
     pNewScript->Name = "logroneitor_horde";
     pNewScript->pGossipHello = &GossipHello_logroneitor_horde;
@@ -1705,6 +1756,7 @@ void AddSC_npcs_radical()
     pNewScript->pGossipSelect = &GossipSelect_logroneitor_alliance;
     pNewScript->RegisterSelf();
 
+    /** Aucherus teleport **/
     pNewScript = new Script;
     pNewScript->Name = "teleport_acherus_up";
     pNewScript->pGossipHello = &GossipHello_acherus_teleporter_up;
@@ -1715,6 +1767,19 @@ void AddSC_npcs_radical()
     pNewScript->Name = "teleport_acherus_down";
     pNewScript->pGossipHello = &GossipHello_acherus_teleporter_down;
     pNewScript->pGossipSelect = &GossipSelect_acherus_teleporter_down;
+    pNewScript->RegisterSelf();
+
+    /** Dragon teleport **/
+    pNewScript = new Script;
+    pNewScript->Name = "dragon_up";
+    pNewScript->pGossipHello = &GossipHello_dragon_up;
+    pNewScript->pGossipSelect = &GossipSelect_dragon_up;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "dragon_down";
+    pNewScript->pGossipHello = &GossipHello_dragon_down;
+    pNewScript->pGossipSelect = &GossipSelect_dragon_down;
     pNewScript->RegisterSelf();
 
     /** BOSS STAFF **/
