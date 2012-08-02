@@ -257,7 +257,7 @@ bool GossipSelect_acherus_teleporter_up(Player* pPlayer, Creature* pCreature, ui
         case GOSSIP_ACTION_INFO_DEF+1:
         default:
             pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->TeleportTo(pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), 420.667847, pPlayer->GetOrientation());
+            pPlayer->TeleportTo(pPlayer->GetMapId(), 2402.718994, -5632.788534, 420.667847, pPlayer->GetOrientation());
             break;
     }
 
@@ -278,7 +278,7 @@ bool GossipHello_acherus_teleporter_down(Player* pPlayer, Creature* pCreature)
 bool GossipSelect_acherus_teleporter_down(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
 {
     pPlayer->CLOSE_GOSSIP_MENU();
-    pPlayer->TeleportTo(pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), 377.022003, pPlayer->GetOrientation());
+    pPlayer->TeleportTo(pPlayer->GetMapId(), 2402.718994, -5632.788534, 377.022003, pPlayer->GetOrientation());
 
     return true;
 }
