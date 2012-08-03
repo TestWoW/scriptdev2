@@ -21,8 +21,6 @@ SDComment: by notagain, corrected by /dev/rsa && ukulutl
 SDCategory: Ruby Sanctum
 EndScriptData */
 
-// TODO: Add twilight interorbs connection
-
 #include "precompiled.h"
 #include "ruby_sanctum.h"
 
@@ -225,11 +223,9 @@ struct MANGOS_DLL_DECL boss_halion_realAI : public ScriptedAI
     {
         // remove all encounter auras
         Map *pMap = m_creature->GetMap();
-
         if(pMap)
         {
             Map::PlayerList const &players = pMap->GetPlayers();
-
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             {
                 if(itr->getSource()->HasAura(SPELL_TWILIGHT_ENTER))
@@ -1250,7 +1246,7 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
 
         p_Last = false;
         p_RealDamage = p_TwilightDamage = 0;
-        p_RealCorp = p_TwilightCorp = m_bIs25Man ? 20220000 : 5578000;
+        p_RealCorp = p_TwilightCorp = m_bIs25Man ? (m_bIsHeroic ? 29284500 : 20220000) : (m_bIsHeroic ? 7669500 : 5578000);
     }
 
     void AttackStart(Unit *who)
@@ -1270,11 +1266,9 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
         wipe = true;
 
         Map *pMap = m_creature->GetMap();
-
         if(!pMap) return;
         
         Map::PlayerList const &players = pMap->GetPlayers();
-
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             if(itr->getSource()->isAlive())
@@ -1347,7 +1341,10 @@ struct MANGOS_DLL_DECL mob_halion_controlAI : public ScriptedAI
             p_TwilightCorp -= p_TwilightDamage;
             p_RealCorp -= p_RealDamage;
 
-            float m_uiDiff = (p_RealCorp / (m_bIs25Man ? 404400 : 111560)) - (p_TwilightCorp / (m_bIs25Man ? 404400 : 111560));
+            float m_uiDiff = 
+                (p_RealCorp     / (m_bIs25Man ? (m_bIsHeroic ? 585690 : 404400) : (m_bIsHeroic ? 153390 : 111560)))
+                -
+                (p_TwilightCorp / (m_bIs25Man ? (m_bIsHeroic ? 585690 : 404400) : (m_bIsHeroic ? 153390 : 111560)));
 
             uint8 buffnum;
             if (m_uiDiff <= Buff[0].uiDiff)
@@ -1415,10 +1412,13 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
     mob_orb_rotation_focusAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_bIsHeroic = pCreature->GetMap()->GetDifficulty() > RAID_DIFFICULTY_25MAN_NORMAL;
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
+    bool m_bIsHeroic;
+
     uint32 m_timer;
     float m_direction, m_nextdirection;
     bool m_warning;
@@ -1437,7 +1437,6 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         m_warning = false;
 
         Creature* pPulsar1 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N);
-
         if (!pPulsar1 )
         {
             float x,y;
@@ -1447,7 +1446,6 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
         else if (!pPulsar1->isAlive()) pPulsar1->Respawn();
 
         Creature* pPulsar2 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_S);
-
         if (!pPulsar2)
         {
             float x,y;
@@ -1455,6 +1453,27 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
             pPulsar2 = m_creature->SummonCreature(NPC_SHADOW_PULSAR_S, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
         } 
         else if (!pPulsar2->isAlive()) pPulsar2->Respawn();
+
+        if(m_bIsHeroic)
+        {/* TODO:
+            Creature* pPulsar3 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_E);
+            if (!pPulsar3)
+            {
+                float x,y;
+                m_creature->GetNearPoint2D(x, y, FR_RADIUS, m_direction + M_PI_F);
+                pPulsar3 = m_creature->SummonCreature(NPC_SHADOW_PULSAR_E, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+            } 
+            else if (!pPulsar3->isAlive()) pPulsar3->Respawn();
+
+            Creature* pPulsar4 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_W);
+            if (!pPulsar4)
+            {
+                float x,y;
+                m_creature->GetNearPoint2D(x, y, FR_RADIUS, m_direction + M_PI_F);
+                pPulsar4 = m_creature->SummonCreature(NPC_SHADOW_PULSAR_W, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
+            } 
+            else if (!pPulsar4->isAlive()) pPulsar4->Respawn();
+      */}
     }
 
     void AttackStart(Unit *who)
@@ -1494,6 +1513,24 @@ struct MANGOS_DLL_DECL mob_orb_rotation_focusAI : public ScriptedAI
             m_creature->SummonCreature(NPC_ORB_CARRIER, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 5000);
             m_timer = 30000;
             m_warning = false;
+
+            //cast twilight cutter
+            Creature* pPulsar1 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_N);
+            Creature* pPulsar2 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_S);
+            if(pPulsar1 && pPulsar2)
+            {
+                pPulsar1->CastSpell(pPulsar2, SPELL_TWILIGHT_CUTTER, true);
+            }
+            
+            if(m_bIsHeroic)
+            {/* TODO:
+                Creature* pPulsar3 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_E);
+                Creature* pPulsar4 = m_pInstance->GetSingleCreatureFromStorage(NPC_SHADOW_PULSAR_W);
+                if(pPulsar3 && pPulsar4)
+                {
+                    pPulsar3->CastSpell(pPulsar4, SPELL_TWILIGHT_CUTTER, true);
+                }*/
+            }
         }   
         else m_timer -= uiDiff;
     }
