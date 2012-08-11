@@ -432,6 +432,8 @@ struct MANGOS_DLL_DECL base_blood_prince_council_bossAI : public base_icc_bossAI
         {
             if (m_uiEmpowermentFadeTimer <= uiDiff)
             {
+                if(Creature *pTmp = m_pInstance->GetSingleCreatureFromStorage(NPC_BLOOD_ORB_CONTROL)) pTmp->SetHealth(m_creature->GetHealth());
+
                 m_creature->RemoveAurasDueToSpell(m_uiInvocationSpellEntry);
                 m_creature->SetHealth(1);
                 m_bIsEmpowered = false;
