@@ -28,6 +28,8 @@ EndScriptData */
 instance_blackrock_depths::instance_blackrock_depths(Map* pMap) : ScriptedInstance(pMap),
     m_uiBarAleCount(0),
     m_uiCofferDoorsOpened(0),
+    m_uiDwarfRound(0),
+    m_uiDwarfFightTimer(0),
 
     m_fArenaCenterX(0.0f),
     m_fArenaCenterY(0.0f),
@@ -53,7 +55,13 @@ void instance_blackrock_depths::OnCreatureCreate(Creature* pCreature)
         case NPC_VILEREL:
         case NPC_GLOOMREL:
         case NPC_SEETHREL:
+        case NPC_DOOMREL:
         case NPC_DOPEREL:
+        case NPC_SHILL:
+        case NPC_CREST:
+        case NPC_JAZ:
+        case NPC_TOBIAS:
+        case NPC_DUGHAL:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
 
@@ -95,6 +103,8 @@ void instance_blackrock_depths::OnObjectCreate(GameObject* pGo)
         case GO_CHEST_SEVEN:
         case GO_ARENA_SPOILS:
         case GO_SECRET_DOOR:
+        case GO_JAIL_DOOR_SUPPLY:
+        case GO_JAIL_SUPPLY_CRATE:
             break;
 
         default:
@@ -151,20 +161,33 @@ void instance_blackrock_depths::SetData(uint32 uiType, uint32 uiData)
                 m_auiEncounter[2] = uiData;
             break;
         case TYPE_TOMB_OF_SEVEN:
-            switch(uiData)
+            // Don't set the same data twice
+            if (uiData == m_auiEncounter[3])
+                break;
+            // Combat door
+            DoUseDoorOrButton(GO_TOMB_ENTER);
+            // Start the event
+            if (uiData == IN_PROGRESS)
+                DoCallNextDwarf();
+            if (uiData == FAIL)
             {
-                case IN_PROGRESS:
-                    DoUseDoorOrButton(GO_TOMB_ENTER);
-                    break;
-                case FAIL:
-                    if (m_auiEncounter[3] == IN_PROGRESS)   // Prevent use more than one time
-                        DoUseDoorOrButton(GO_TOMB_ENTER);
-                    break;
-                case DONE:
-                    DoRespawnGameObject(GO_CHEST_SEVEN, HOUR);
-                    DoUseDoorOrButton(GO_TOMB_EXIT);
-                    DoUseDoorOrButton(GO_TOMB_ENTER);
-                    break;
+                // Reset dwarfes
+                for (uint8 i = 0; i < MAX_DWARFS; ++i)
+                {
+                    if (Creature* pDwarf = GetSingleCreatureFromStorage(aTombDwarfes[i]))
+                    {
+                        if (!pDwarf->isAlive())
+                            pDwarf->Respawn();
+                    }
+                }
+
+                m_uiDwarfRound = 0;
+                m_uiDwarfFightTimer = 0;
+            }
+            if (uiData == DONE)
+            {
+                DoRespawnGameObject(GO_CHEST_SEVEN, HOUR);
+                DoUseDoorOrButton(GO_TOMB_EXIT);
             }
             m_auiEncounter[3] = uiData;
             break;
@@ -195,6 +218,9 @@ void instance_blackrock_depths::SetData(uint32 uiType, uint32 uiData)
             }
             m_auiEncounter[5] = uiData;
             break;
+        case TYPE_QUEST_JAIL_BREAK:
+            m_auiEncounter[6] = uiData;
+            return;
     }
 
     if (uiData == DONE)
@@ -203,7 +229,7 @@ void instance_blackrock_depths::SetData(uint32 uiType, uint32 uiData)
 
         std::ostringstream saveStream;
         saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " "
-            << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5];
+            << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5] << " " << m_auiEncounter[6];
 
         m_strInstData = saveStream.str();
 
@@ -231,6 +257,8 @@ uint32 instance_blackrock_depths::GetData(uint32 uiType)
             return m_auiEncounter[4];
         case TYPE_IRON_HALL:
             return m_auiEncounter[5];
+        case TYPE_QUEST_JAIL_BREAK:
+            return m_auiEncounter[6];
         default:
             return 0;
     }
@@ -248,7 +276,7 @@ void instance_blackrock_depths::Load(const char* chrIn)
 
     std::istringstream loadStream(chrIn);
     loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3]
-        >> m_auiEncounter[4] >> m_auiEncounter[5];
+        >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6];
 
     for(uint8 i = 0; i < MAX_ENCOUNTER; ++i)
         if (m_auiEncounter[i] == IN_PROGRESS)
@@ -270,6 +298,19 @@ void instance_blackrock_depths::OnCreatureEvade(Creature* pCreature)
              }
         }
     }
+
+    switch (pCreature->GetEntry())
+    {
+        // Handle Tomb of the Seven reset in case of wipe
+        case NPC_HATEREL:
+        case NPC_ANGERREL:
+        case NPC_VILEREL:
+        case NPC_GLOOMREL:
+        case NPC_SEETHREL:
+        case NPC_DOPEREL:
+            SetData(TYPE_TOMB_OF_SEVEN, FAIL);
+            break;
+    }
 }
 
 void instance_blackrock_depths::OnCreatureDeath(Creature* pCreature)
@@ -287,6 +328,57 @@ void instance_blackrock_depths::OnCreatureDeath(Creature* pCreature)
                     SetData(TYPE_VAULT, DONE);
             }
             break;
+        case NPC_OGRABISI:
+        case NPC_SHILL:
+        case NPC_CREST:
+        case NPC_JAZ:
+            if (GetData(TYPE_QUEST_JAIL_BREAK) == IN_PROGRESS)
+                SetData(TYPE_QUEST_JAIL_BREAK, SPECIAL);
+            break;
+        // Handle Tomb of the Seven dwarf death event
+        case NPC_HATEREL:
+        case NPC_ANGERREL:
+        case NPC_VILEREL:
+        case NPC_GLOOMREL:
+        case NPC_SEETHREL:
+        case NPC_DOPEREL:
+            // Call the next dwarf only if it's the last one which joined the fight
+            if (pCreature->GetEntry() == aTombDwarfes[m_uiDwarfRound - 1])
+                DoCallNextDwarf();
+            break;
+    }
+}
+
+void instance_blackrock_depths::DoCallNextDwarf()
+{
+    if (Creature* pDwarf = GetSingleCreatureFromStorage(aTombDwarfes[m_uiDwarfRound]))
+    {
+        if (Player* pPlayer = GetPlayerInMap())
+        {
+            pDwarf->SetFactionTemporary(FACTION_DWARF_HOSTILE, TEMPFACTION_RESTORE_RESPAWN | TEMPFACTION_RESTORE_REACH_HOME);
+            pDwarf->AI()->AttackStart(pPlayer);
+        }
+    }
+    m_uiDwarfFightTimer = 30000;
+    ++m_uiDwarfRound;
+}
+
+void instance_blackrock_depths::Update(uint32 uiDiff)
+{
+    if (m_uiDwarfFightTimer)
+    {
+        if (m_uiDwarfFightTimer <= uiDiff)
+        {
+            if (m_uiDwarfRound < MAX_DWARFS)
+            {
+                DoCallNextDwarf();
+                m_uiDwarfFightTimer = 30000;
+            }
+            else
+                m_uiDwarfFightTimer = 0;
+        }
+        else
+            m_uiDwarfFightTimer -= uiDiff;
     }
 }
 
