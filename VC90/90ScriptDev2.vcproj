@@ -1761,6 +1761,10 @@
 					RelativePath="..\scripts\northrend\storm_peaks.cpp"
 					>
 				</File>
+	 			<File	
+					RelativePath="..\scripts\northrend\wintergrasp.cpp"	
+					>	
+				</File>					
 				<File
 					RelativePath="..\scripts\northrend\zuldrak.cpp"
 					>
@@ -2956,7 +2960,15 @@
 							>
 						</File>
 						<File
+							RelativePath="..\scripts\outland\tempest_keep\arcatraz\boss_dalliah.cpp"
+							>
+						</File>
+						<File
 							RelativePath="..\scripts\outland\tempest_keep\arcatraz\boss_harbinger_skyriss.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\scripts\outland\tempest_keep\arcatraz\boss_soccothrates.cpp"
 							>
 						</File>
 						<File

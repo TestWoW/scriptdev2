@@ -450,6 +450,7 @@ extern void AddSC_howling_fjord();
 extern void AddSC_icecrown();
 extern void AddSC_sholazar_basin();
 extern void AddSC_storm_peaks();
+extern void AddSC_wintergrasp();
 extern void AddSC_zuldrak();
 
 // outland
@@ -508,7 +509,9 @@ extern void AddSC_boss_warbringer_omrogg();
 extern void AddSC_boss_warchief_kargath_bladefist();
 extern void AddSC_instance_shattered_halls();
 extern void AddSC_arcatraz();                               // TK, arcatraz
+extern void AddSC_boss_dalliah();
 extern void AddSC_boss_harbinger_skyriss();
+extern void AddSC_boss_soccothrates();
 extern void AddSC_instance_arcatraz();
 extern void AddSC_boss_high_botanist_freywinn();            // TK, botanica
 extern void AddSC_boss_laj();
@@ -982,6 +985,7 @@ void AddScripts()
     AddSC_icecrown();
     AddSC_sholazar_basin();
     AddSC_storm_peaks();
+	AddSC_wintergrasp();
     AddSC_zuldrak();
 
     // outland
@@ -1040,7 +1044,9 @@ void AddScripts()
     AddSC_boss_warchief_kargath_bladefist();
     AddSC_instance_shattered_halls();
     AddSC_arcatraz();                                       // TK, arcatraz
+    AddSC_boss_dalliah();
     AddSC_boss_harbinger_skyriss();
+    AddSC_boss_soccothrates();
     AddSC_instance_arcatraz();
     AddSC_boss_high_botanist_freywinn();                    // TK, botanica
     AddSC_boss_laj();

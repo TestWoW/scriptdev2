@@ -33,6 +33,9 @@ EndScriptData */
 
 enum
 {
+    SAY_SOCCOTHRATES_AGGRO          = -1552039,
+    SAY_SOCCOTHRATES_DEATH          = -1552043,
+
     YELL_MELLICHAR_INTRO1           = -1552023,
     YELL_MELLICHAR_INTRO2           = -1552024,
     YELL_MELLICHAR_RELEASE1         = -1552025,
@@ -50,14 +53,22 @@ enum
     SPELL_TARGET_ALPHA              = 36856,
     SPELL_TARGET_DELTA              = 36857,
     SPELL_TARGET_GAMMA              = 36858,
+    SPELL_SIMPLE_TELEPORT           = 12980,
+    SPELL_MIND_REND                 = 36859,
 };
 
 static const DialogueEntry aArcatrazDialogue[] =
 {
+    // Soccothares taunts
+    {TYPE_DALLIAH,            0,             5000},
+    {SAY_SOCCOTHRATES_AGGRO,  NPC_SOCCOTHRATES, 0},
+    {TYPE_SOCCOTHRATES,       0,             5000},
+    {SAY_SOCCOTHRATES_DEATH,  NPC_SOCCOTHRATES, 0},
+    // Skyriss event
     {YELL_MELLICHAR_INTRO1,   NPC_MELLICHAR, 22000},
     {YELL_MELLICHAR_INTRO2,   NPC_MELLICHAR, 7000},
     {SPELL_TARGET_ALPHA,      0,             7000},
-    {TYPE_WARDEN_1,           0,             0},
+    {YELL_MELLICHAR_RELEASE1, NPC_MELLICHAR, 0},
     {YELL_MELLICHAR_RELEASE2, NPC_MELLICHAR, 7000},
     {SPELL_TARGET_BETA,       0,             7000},
     {TYPE_WARDEN_2,           0,             0},
@@ -70,7 +81,7 @@ static const DialogueEntry aArcatrazDialogue[] =
     {YELL_MELLICHAR_RELEASE5, NPC_MELLICHAR, 8000},
     {TYPE_WARDEN_5,           0,             5000},
     {SAY_SKYRISS_INTRO,       NPC_SKYRISS,   25000},
-    {YELL_MELLICAR_WELCOME,   NPC_MELLICHAR, 5000},
+    {YELL_MELLICAR_WELCOME,   NPC_MELLICHAR, 3000},
     {SAY_SKYRISS_AGGRO,       NPC_SKYRISS,   0},
     {0, 0, 0},
 };
@@ -126,6 +137,8 @@ void instance_arcatraz::OnCreatureCreate(Creature* pCreature)
         case NPC_PRISON_GAMMA_POD:
         case NPC_PRISON_BOSS_POD:
         case NPC_MELLICHAR:
+        case NPC_DALLIAH:
+        case NPC_SOCCOTHRATES:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
         case NPC_BLAZING_TRICKSTER:
@@ -148,8 +161,20 @@ void instance_arcatraz::SetData(uint32 uiType, uint32 uiData)
             break;
 
         case TYPE_DALLIAH:
+            if (uiData == IN_PROGRESS)
+            {
+                // Soccothares taunts after Dalliah gets aggro
+                if (GetData(TYPE_SOCCOTHRATES) != DONE)
+                    StartNextDialogueText(TYPE_DALLIAH);
+            }
             if (uiData == DONE)
+            {
                 DoUseDoorOrButton(GO_CORE_SECURITY_FIELD_BETA);
+
+                // Soccothares taunts after Dalliah dies
+                if (GetData(TYPE_SOCCOTHRATES) != DONE)
+                    StartNextDialogueText(TYPE_SOCCOTHRATES);
+            }
             m_auiEncounter[1] = uiData;
             break;
 
@@ -260,6 +285,8 @@ uint32 instance_arcatraz::GetData(uint32 uiType)
 {
     switch(uiType)
     {
+        case TYPE_DALLIAH:          return m_auiEncounter[1];
+        case TYPE_SOCCOTHRATES:     return m_auiEncounter[2];
         case TYPE_HARBINGERSKYRISS: return m_auiEncounter[3];
         case TYPE_WARDEN_1:         return m_auiEncounter[4];
         case TYPE_WARDEN_2:         return m_auiEncounter[5];
@@ -308,7 +335,7 @@ void instance_arcatraz::JustDidDialogueStep(int32 iEntry)
                 pMellichar->SetFacingToObject(pTarget);
             SetData(TYPE_WARDEN_1, IN_PROGRESS);
             break;
-        case TYPE_WARDEN_1:
+        case YELL_MELLICHAR_RELEASE1:
             pMellichar->SummonCreature(urand(0, 1) ? NPC_BLAZING_TRICKSTER : NPC_PHASE_HUNTER, aSummonPosition[0].m_fX, aSummonPosition[0].m_fY, aSummonPosition[0].m_fZ, aSummonPosition[0].m_fO, TEMPSUMMON_DEAD_DESPAWN, 0);
             break;
         case YELL_MELLICHAR_RELEASE2:
@@ -356,7 +383,12 @@ void instance_arcatraz::JustDidDialogueStep(int32 iEntry)
             SetData(TYPE_WARDEN_5, IN_PROGRESS);
             break;
         case TYPE_WARDEN_5:
-            pMellichar->SummonCreature(NPC_SKYRISS, aSummonPosition[4].m_fX, aSummonPosition[4].m_fY, aSummonPosition[4].m_fZ, aSummonPosition[4].m_fO, TEMPSUMMON_DEAD_DESPAWN, 0);
+            if (Creature* pSkyriss = pMellichar->SummonCreature(NPC_SKYRISS, aSummonPosition[4].m_fX, aSummonPosition[4].m_fY, aSummonPosition[4].m_fZ, aSummonPosition[4].m_fO, TEMPSUMMON_DEAD_DESPAWN, 0))
+                pSkyriss->CastSpell(pSkyriss, SPELL_SIMPLE_TELEPORT, false);
+            break;
+        case YELL_MELLICAR_WELCOME:
+            if (Creature* pSkyriss = GetSingleCreatureFromStorage(NPC_SKYRISS))
+                pSkyriss->CastSpell(pSkyriss, SPELL_MIND_REND, false);
             break;
         case SAY_SKYRISS_AGGRO:
             // Kill Mellichar and start combat
