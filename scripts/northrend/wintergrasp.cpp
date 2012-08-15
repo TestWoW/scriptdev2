@@ -15,13 +15,13 @@
  */
 
 #include "precompiled.h"
-#include "WorldPvP/WorldPvPWG.h"
+//#include "WorldPvP/WorldPvPWG.h"
 
 /*######
 ## go_wg_def_portal
 ######*/
 
-static float SpawnLocation[10][3]=
+/*static float SpawnLocation[10][3]=
 {
     { 5153.41f, 2901.35f, 409.191f },
     { 5268.70f, 2666.42f, 409.099f },
@@ -58,7 +58,7 @@ bool GOHello_go_wg_teleport(Player* pPlayer, GameObject* pGo)
     }
 
     return false;
-}
+}*/
 
 /*######
 ## npc_wg_demolisher_engineer
@@ -84,7 +84,7 @@ bool GOHello_go_wg_teleport(Player* pPlayer, GameObject* pGo)
     WS_VEHICLE_COUNT_MAX_A              = 3681,
 */
 
-bool GossipHello_npc_wg_demolisher_engineer(Player* pPlayer, Creature* pCreature)
+/*bool GossipHello_npc_wg_demolisher_engineer(Player* pPlayer, Creature* pCreature)
 {
     uint32 team     = 0;
     uint32 count    = 0;
@@ -169,4 +169,4 @@ void AddSC_wintergrasp()
     pNewScript->pGossipHello = &GossipHello_npc_wg_demolisher_engineer;
     pNewScript->pGossipSelect = &GossipSelect_npc_wg_demolisher_engineer;
     pNewScript->RegisterSelf();
-}
+}*/
