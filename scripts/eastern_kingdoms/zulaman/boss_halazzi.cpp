@@ -65,7 +65,7 @@ enum
     SPELL_LIGHTNING_TOTEM           = 43302,            // summons 24224
 
     NPC_HALAZZI_TROLL               = 24144,            // dummy creature - used to update stats
-    NPC_SPIRIT_LYNX                 = 24143,
+    //NPC_SPIRIT_LYNX                 = 24143,
 };
 
 enum HalazziPhase
