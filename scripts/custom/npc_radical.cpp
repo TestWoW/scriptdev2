@@ -1739,6 +1739,88 @@ CreatureAI* GetAI_boss_giresse(Creature* pCreature)
     return new boss_giresse(pCreature);
 }
 
+/*########
+## Arena_vendor
+## Radical custom vendor
+######*/
+
+#include "ObjectMgr.h"
+#include "ArenaTeam.h"
+
+bool GossipHello_arena_vendor(Player* pPlayer, Creature* pCreature)
+{
+    uint32 rating = 0;
+
+    ArenaTeam* team = sObjectMgr.GetArenaTeamById(pPlayer->GetArenaTeamId(1));
+    if(team) rating = team->GetMember(pPlayer->GetObjectGuid())->personal_rating;
+
+    switch(pCreature->GetDisplayId())
+    {
+        case 26391:    //s1
+        {
+            if(rating >= 1800) pPlayer->SEND_VENDORLIST(pCreature->GetObjectGuid());
+            else 
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "No tienes el índice requerido! Sigue hasta 1800", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+            }
+            break;
+        }
+        case  6380:    //s2
+        {
+            if(rating >= 2200) pPlayer->SEND_VENDORLIST(pCreature->GetObjectGuid());
+            else 
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "No tienes el índice requerido! Sigue hasta 2200", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+            }
+            break;
+        }
+        case 25338:    //s3
+        {
+            if(rating >= 2550) pPlayer->SEND_VENDORLIST(pCreature->GetObjectGuid());
+            else 
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "No tienes el índice requerido! Sigue hasta 2550", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+            }
+            break;
+        }
+        case  5233:    //s4
+        {
+            if(rating >= 2750) pPlayer->SEND_VENDORLIST(pCreature->GetObjectGuid());
+            else 
+            {
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "No tienes el índice requerido! Sigue hasta 2750", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);        
+                pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+            }
+            break;
+        }
+        default:
+        {
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Algún @#%$ me ha cambiado el display, no pienso vender nada a nadie", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
+            break;
+        }
+    }
+
+    return true;
+}
+
+bool GossipSelect_arena_vendor(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
+{
+
+    switch(uiAction)
+    {
+        case GOSSIP_ACTION_INFO_DEF+1:
+        default:
+            pPlayer->CLOSE_GOSSIP_MENU();
+            break;
+    }
+
+    return true;
+}
+
 void AddSC_npcs_radical()
 {
     Script* pNewScript;
@@ -1843,5 +1925,12 @@ void AddSC_npcs_radical()
     pNewScript->pGossipHello = &GossipHello_giresse;
     pNewScript->pGossipSelect = &GossipSelect_giresse;
     pNewScript->GetAI = &GetAI_boss_giresse;
+    pNewScript->RegisterSelf();
+
+    /** Arena_vendor **/
+    pNewScript = new Script;
+    pNewScript->Name = "arena_vendor";
+    pNewScript->pGossipHello = &GossipHello_arena_vendor;
+    pNewScript->pGossipSelect = &GossipSelect_arena_vendor;
     pNewScript->RegisterSelf();
 }
