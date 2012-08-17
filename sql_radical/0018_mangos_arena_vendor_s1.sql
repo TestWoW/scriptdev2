@@ -33,7 +33,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `ExtendedCost
 (80600, 60016, 0, 0, 2954),   -- guantes
 (80600, 60017, 0, 0, 2949),   -- casco
 (80600, 60018, 0, 0, 2953),   -- pantalones 
-(80600, 60019, 0, 0, 2948);   -- hombros
+(80600, 60019, 0, 0, 2948),   -- hombros
 
 (80600, 60020, 0, 0, 2952),   -- pecho
 (80600, 60021, 0, 0, 2954),   -- guantes
@@ -61,7 +61,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `ExtendedCost
 (80600, 60036, 0, 0, 2954),   -- guantes
 (80600, 60037, 0, 0, 2949),   -- casco
 (80600, 60038, 0, 0, 2953),   -- pantalones 
-(80600, 60039, 0, 0, 2948);   -- hombros
+(80600, 60039, 0, 0, 2948),   -- hombros
 
 (80600, 60040, 0, 0, 2952),   -- pecho
 (80600, 60041, 0, 0, 2954),   -- guantes
@@ -97,7 +97,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `ExtendedCost
 (80600, 60061, 0, 0, 2954),   -- guantes
 (80600, 60062, 0, 0, 2949),   -- casco
 (80600, 60063, 0, 0, 2953),   -- pantalones 
-(80600, 60064, 0, 0, 2948);   -- hombros
+(80600, 60064, 0, 0, 2948),   -- hombros
 
 (80600, 60065, 0, 0, 2952),   -- pecho
 (80600, 60066, 0, 0, 2954),   -- guantes
