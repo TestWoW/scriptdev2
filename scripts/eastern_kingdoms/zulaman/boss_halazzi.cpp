@@ -65,7 +65,7 @@ enum
     SPELL_LIGHTNING_TOTEM           = 43302,            // summons 24224
 
     NPC_HALAZZI_TROLL               = 24144,            // dummy creature - used to update stats
-    //NPC_SPIRIT_LYNX                 = 24143,
+    NPC_SPIRIT_LYNX                 = 24143,
 };
 
 enum HalazziPhase
@@ -353,7 +353,7 @@ struct MANGOS_DLL_DECL boss_spirit_lynxAI : public ScriptedAI
         else
             m_uiShredArmorTimer -= uiDiff;
 
-        // Unite spirits at 20% health
+        // Unite spirits at 10% health
         // Note: maybe there is some spell related to this - needs research
         if (!m_bHasUnited && m_creature->GetHealthPercent() < 10.0f && m_pInstance)
         {

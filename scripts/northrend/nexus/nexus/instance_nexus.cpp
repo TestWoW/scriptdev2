@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -48,14 +48,14 @@ bool GOUse_go_containment_sphere(Player* pPlayer, GameObject* pGo)
 instance_nexus::instance_nexus(Map* pMap) : ScriptedInstance(pMap)
 {
     Initialize();
+
+    for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS; ++i)
+        m_abAchievCriteria[i] = false;
 }
 
 void instance_nexus::Initialize()
 {
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-    for (uint8 i = 0; i < MAX_SPECIAL_ACHIEV_CRITS; ++i)
-        m_abAchievCriteria[i] = false;
 }
 
 void instance_nexus::OnObjectCreate(GameObject* pGo)
@@ -81,19 +81,6 @@ void instance_nexus::OnObjectCreate(GameObject* pGo)
     m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
 }
 
-void instance_nexus::OnCreatureDeath(Creature *pCreature)
-{
-    switch(pCreature->GetEntry())
-    {
-    case NPC_CHAOTIC_RIFT:
-        if (GetData(TYPE_ANOMALUS) == IN_PROGRESS)
-            SetSpecialAchievementCriteria(TYPE_CHAOS_THEORY, false);
-        break;
-    default:
-        break;
-    }
-}
-
 void instance_nexus::OnCreatureCreate(Creature* pCreature)
 {
     if (pCreature->GetEntry() == NPC_KERISTRASZA)
@@ -108,57 +95,38 @@ uint32 instance_nexus::GetData(uint32 uiType)
     return 0;
 }
 
-bool instance_nexus::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
-{
-    switch (uiCriteriaId)
-    {
-        case ACHIEV_CHAOS_THEORY:
-            return m_abAchievCriteria[TYPE_CHAOS_THEORY];
-        case ACHIEV_DOUBLE_PERSONALITY:
-            return m_abAchievCriteria[TYPE_DOUBLE_PERSONALITY];
-        case ACHIEV_INTENSE_COLD:
-            return m_abAchievCriteria[TYPE_INTENSE_COLD];
-        default:
-            return 0;
-    }
-}
-
-void instance_nexus::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
-{
-    if (uiType < MAX_SPECIAL_ACHIEV_CRITS)
-        m_abAchievCriteria[uiType] = bIsMet;
-}
-
 void instance_nexus::SetData(uint32 uiType, uint32 uiData)
 {
     switch (uiType)
     {
         case TYPE_TELESTRA:
             m_auiEncounter[uiType] = uiData;
+            if (uiData == IN_PROGRESS)
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_SPLIT_PERSONALITY, true);
             if (uiData == DONE)
-            {
-                if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_CONTAINMENT_SPHERE_TELESTRA))
-                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            }
+                DoToggleGameObjectFlags(GO_CONTAINMENT_SPHERE_TELESTRA, GO_FLAG_NO_INTERACT, false);
             break;
         case TYPE_ANOMALUS:
             m_auiEncounter[uiType] = uiData;
+            if (uiData == IN_PROGRESS)
+                SetSpecialAchievementCriteria(TYPE_ACHIEV_CHAOS_THEORY, true);
             if (uiData == DONE)
-            {
-                if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_CONTAINMENT_SPHERE_ANOMALUS))
-                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            }
+                DoToggleGameObjectFlags(GO_CONTAINMENT_SPHERE_ANOMALUS, GO_FLAG_NO_INTERACT, false);
             break;
         case TYPE_ORMOROK:
             m_auiEncounter[uiType] = uiData;
             if (uiData == DONE)
-            {
-                if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_CONTAINMENT_SPHERE_ORMOROK))
-                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            }
+                DoToggleGameObjectFlags(GO_CONTAINMENT_SPHERE_ORMOROK, GO_FLAG_NO_INTERACT, false);
             break;
         case TYPE_KERISTRASZA:
             m_auiEncounter[uiType] = uiData;
+            if (uiData == IN_PROGRESS)
+                m_sIntenseColdFailPlayers.clear();
+            break;
+        case TYPE_INTENSE_COLD_FAILED:
+            // Insert the players who fail the achiev and haven't been already inserted in the set
+            if (m_sIntenseColdFailPlayers.find(uiData) == m_sIntenseColdFailPlayers.end())
+                m_sIntenseColdFailPlayers.insert(uiData);
             break;
         default:
             error_log("SD2: Instance Nexus: ERROR SetData = %u for type %u does not exist/not implemented.", uiType, uiData);
@@ -192,6 +160,29 @@ void instance_nexus::SetData(uint32 uiType, uint32 uiData)
 
         SaveToDB();
         OUT_SAVE_INST_DATA_COMPLETE;
+    }
+}
+
+void instance_nexus::SetSpecialAchievementCriteria(uint32 uiType, bool bIsMet)
+{
+    if (uiType < MAX_SPECIAL_ACHIEV_CRITS)
+        m_abAchievCriteria[uiType] = bIsMet;
+}
+
+bool instance_nexus::CheckAchievementCriteriaMeet(uint32 uiCriteriaId, Player const* pSource, Unit const* pTarget, uint32 uiMiscValue1 /* = 0*/)
+{
+    switch (uiCriteriaId)
+    {
+        case ACHIEV_CRIT_CHAOS_THEORY:
+            return m_abAchievCriteria[TYPE_ACHIEV_CHAOS_THEORY];
+        case ACHIEV_CRIT_SPLIT_PERSONALITY:
+            return m_abAchievCriteria[TYPE_ACHIEV_SPLIT_PERSONALITY];
+        case ACHIEV_CRIT_INTENSE_COLD:
+            // Return true if not found in the set
+            return m_sIntenseColdFailPlayers.find(pSource->GetGUIDLow()) == m_sIntenseColdFailPlayers.end();
+
+        default:
+            return false;
     }
 }
 
@@ -243,13 +234,13 @@ struct MANGOS_DLL_DECL boss_commander_kolurgAI : public ScriptedAI // triggers s
 {
     boss_commander_kolurgAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        //m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        //m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
-    bool m_bIsRegularMode;
+    //ScriptedInstance* m_pInstance;
+    //bool m_bIsRegularMode;
 
     uint32 SPELL_BATTLE_SHOUT_Timer;
     uint32 SPELL_CHARGE_Timer;
@@ -266,33 +257,33 @@ struct MANGOS_DLL_DECL boss_commander_kolurgAI : public ScriptedAI // triggers s
         SPELL_WHIRLWIND_2_Timer = 2000;   // needs adjusting
 
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_COMMANDER, NOT_STARTED);
+        //if (m_pInstance)
+            //m_pInstance->SetData(TYPE_COMMANDER_KOLURG, NOT_STARTED);
     }
 
     void EnterCombat(Unit* who)
     {
-        DoScriptText(SAY_AGGRO, m_creature);
+       /* DoScriptText(SAY_AGGRO, m_creature);
 
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_COMMANDER, IN_PROGRESS);
+            m_pInstance->SetData(TYPE_COMMANDER_KOLURG, IN_PROGRESS);*/
     }
 
-    void AttackStart(Unit* who) {}
+    //void AttackStart(Unit* who) {}
 
-    void MoveInLineOfSight(Unit* who) {}
+    //void MoveInLineOfSight(Unit* who) {}
 
     void KilledUnit(Unit *victim)
     {
-        DoScriptText(SAY_KILL, m_creature);
+        //DoScriptText(SAY_KILL, m_creature);
     }
 
     void JustDied(Unit* killer)
     {
-        DoScriptText(SAY_DEATH, m_creature);
+        //DoScriptText(SAY_DEATH, m_creature);
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_COMMANDER, DONE);
+        //if (m_pInstance)
+            //m_pInstance->SetData(TYPE_COMMANDER_KOLURG, DONE);
     }
 
     void UpdateAI(const uint32 diff)
@@ -341,13 +332,13 @@ struct MANGOS_DLL_DECL boss_commander_stoutbeardAI : public ScriptedAI
 {
     boss_commander_stoutbeardAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
+        //m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        //m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
-    bool m_bIsRegularMode;
+    //ScriptedInstance* m_pInstance;
+    //bool m_bIsRegularMode;
 
     uint32 SPELL_BATTLE_SHOUT_Timer;
     uint32 SPELL_CHARGE_Timer;
@@ -364,33 +355,33 @@ struct MANGOS_DLL_DECL boss_commander_stoutbeardAI : public ScriptedAI
         SPELL_WHIRLWIND_2_Timer = 2000;   // needs adjusting
 
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_COMMANDER, NOT_STARTED);
+        //if (m_pInstance)
+            //m_pInstance->SetData(TYPE_COMMANDER_STOUTBEARD, NOT_STARTED);
     }
 
     void EnterCombat(Unit* who)
     {
-        DoScriptText(SAY_AGGRO, m_creature);
+       /* DoScriptText(SAY_AGGRO, m_creature);
 
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_COMMANDER, IN_PROGRESS);
+            m_pInstance->SetData(TYPE_COMMANDER_STOUTBEARD, IN_PROGRESS);*/
     }
 
-    void AttackStart(Unit* who) {}
+    //void AttackStart(Unit* who) {}
 
-    void MoveInLineOfSight(Unit* who) {}
+    //void MoveInLineOfSight(Unit* who) {}
 
     void KilledUnit(Unit *victim)
     {
-        DoScriptText(SAY_KILL, m_creature);
+        //DoScriptText(SAY_KILL, m_creature);
     }
 
     void JustDied(Unit* killer)
     {
-        DoScriptText(SAY_DEATH, m_creature);
+        //DoScriptText(SAY_DEATH, m_creature);
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_COMMANDER, DONE);
+        //if (m_pInstance)
+            //m_pInstance->SetData(TYPE_COMMANDER_STOUTBEARD, DONE);
     }
 
     void UpdateAI(const uint32 diff)
@@ -402,29 +393,25 @@ struct MANGOS_DLL_DECL boss_commander_stoutbeardAI : public ScriptedAI
         {
             DoCastSpellIfCan(m_creature, SPELL_BATTLE_SHOUT);
             SPELL_BATTLE_SHOUT_Timer = 3000 + rand()%5000;
-        }
-        else SPELL_BATTLE_SHOUT_Timer -= diff;
+        }else SPELL_BATTLE_SHOUT_Timer -= diff;
 
         if (SPELL_CHARGE_Timer < diff)  // this spell needs to be a distance check on victims in distance not a timer on victim
         {
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE);
             SPELL_CHARGE_Timer = 2000 + rand()%5000;
-        }
-        else SPELL_CHARGE_Timer -= diff;
+        }else SPELL_CHARGE_Timer -= diff;
 
         if (SPELL_FRIGHTENING_SHOUT_Timer < diff)
         {
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_FRIGHTENING_SHOUT);
             SPELL_FRIGHTENING_SHOUT_Timer = 2000 + rand()%5000;
-        }
-        else SPELL_FRIGHTENING_SHOUT_Timer -= diff;
+        }else SPELL_FRIGHTENING_SHOUT_Timer -= diff;
 
         if (SPELL_WHIRLWIND_2_Timer < diff)
         {
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_WHIRLWIND_2);
             SPELL_WHIRLWIND_2_Timer = 2000 + rand()%5000;
-        }
-        else SPELL_WHIRLWIND_2_Timer -= diff;
+        }else SPELL_WHIRLWIND_2_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }

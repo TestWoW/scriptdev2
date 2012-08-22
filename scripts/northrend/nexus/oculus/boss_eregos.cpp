@@ -141,21 +141,6 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
            case 2: DoScriptText(SAY_KILL_3, m_creature); break;
         }
     }
-    
-    void KillCreditEregos()
-    {
-        Map *map = m_creature->GetMap();
-        Map::PlayerList const& players = map->GetPlayers();
-        
-        if (!players.isEmpty() && map->IsDungeon())
-        {
-            for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            {
-                if(Player* pPlayer = itr->getSource())
-                    pPlayer->KilledMonsterCredit(NPC_EREGOS, m_creature->GetObjectGuid());
-            }
-        }
-    }
 
     void JustDied(Unit* killer)
     {
@@ -181,8 +166,6 @@ struct MANGOS_DLL_DECL boss_eregosAI : public ScriptedAI
             if (DragonsEntryList.empty())
                 m_pInstance->SetSpecialAchievementCriteria(ACHIEV_AMBER_VOID, true);
             DragonsEntryList.clear();
-            
-            KillCreditEregos();
         }
 
     }

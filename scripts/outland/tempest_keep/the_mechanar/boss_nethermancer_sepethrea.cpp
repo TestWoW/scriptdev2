@@ -41,11 +41,6 @@ enum
     SPELL_DRAGONS_BREATH            = 35250,
 
     NPC_RAGING_FLAMES               = 20481,
-
-    // Summons spells
-    SPELL_INFERNO                   = 35268,
-    SPELL_INFERNO_H                 = 39346,
-    SPELL_FIRE_TAIL                 = 35278,
 };
 
 struct MANGOS_DLL_DECL boss_nethermancer_sepethreaAI : public ScriptedAI
@@ -66,9 +61,9 @@ struct MANGOS_DLL_DECL boss_nethermancer_sepethreaAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiFrostAttackTimer    = urand(7000, 10000);
-        m_uiArcaneBlastTimer    = urand(12000, 18000);
-        m_uiDragonsBreathTimer  = urand(18000, 22000);
+        m_uiFrostAttackTimer    = urand(8000, 17000);
+        m_uiArcaneBlastTimer    = urand(14000, 25000);
+        m_uiDragonsBreathTimer  = urand(20000, 26000);
     }
 
     void Aggro(Unit* pWho)
@@ -113,7 +108,7 @@ struct MANGOS_DLL_DECL boss_nethermancer_sepethreaAI : public ScriptedAI
         if (m_uiFrostAttackTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_ATTACK) == CAST_OK)
-                m_uiFrostAttackTimer = urand(7000, 10000);
+                m_uiFrostAttackTimer = urand(5000, 17000);
         }
         else
             m_uiFrostAttackTimer -= uiDiff;
@@ -122,7 +117,7 @@ struct MANGOS_DLL_DECL boss_nethermancer_sepethreaAI : public ScriptedAI
         if (m_uiArcaneBlastTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_BLAST) == CAST_OK)
-                m_uiArcaneBlastTimer = 15000;
+                m_uiArcaneBlastTimer = urand(15000, 30000);
         }
         else
             m_uiArcaneBlastTimer -= uiDiff;
@@ -135,7 +130,7 @@ struct MANGOS_DLL_DECL boss_nethermancer_sepethreaAI : public ScriptedAI
                 if (urand(0, 1))
                     DoScriptText(urand(0, 1) ? SAY_DRAGONS_BREATH_1 : SAY_DRAGONS_BREATH_2, m_creature);
 
-                m_uiDragonsBreathTimer = urand(12000, 22000);
+                m_uiDragonsBreathTimer = urand(20000, 35000);
             }
         }
         else
@@ -150,56 +145,6 @@ CreatureAI* GetAI_boss_nethermancer_sepethrea(Creature* pCreature)
     return new boss_nethermancer_sepethreaAI(pCreature);
 }
 
-struct MANGOS_DLL_DECL mob_ragin_flamesAI : public ScriptedAI
-{
-    mob_ragin_flamesAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_bIsRegularMode = pCreature->GetMap()->IsRegularDifficulty();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-    bool m_bIsRegularMode;
-
-    uint32 inferno_Timer;
-    uint32 flame_timer;
-
-    void Reset()
-    {
-        inferno_Timer = 10000;
-        flame_timer = 500;
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (inferno_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->getVictim(), m_bIsRegularMode ? SPELL_INFERNO : SPELL_INFERNO_H);
-
-            m_creature->TauntApply(m_creature->getVictim());
-
-            inferno_Timer = 10000;
-        }else inferno_Timer -= diff;
-
-        if (flame_timer < diff)
-        {
-            DoCastSpellIfCan(m_creature,SPELL_FIRE_TAIL);
-            flame_timer = 500;
-        }else flame_timer -=diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mob_ragin_flames(Creature* pCreature)
-{
-    return new mob_ragin_flamesAI(pCreature);
-}
-
 void AddSC_boss_nethermancer_sepethrea()
 {
     Script* pNewScript;
@@ -207,10 +152,5 @@ void AddSC_boss_nethermancer_sepethrea()
     pNewScript = new Script;
     pNewScript->Name = "boss_nethermancer_sepethrea";
     pNewScript->GetAI = &GetAI_boss_nethermancer_sepethrea;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "mob_ragin_flames";
-    pNewScript->GetAI = &GetAI_mob_ragin_flames;
     pNewScript->RegisterSelf();
 }

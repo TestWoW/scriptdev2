@@ -1,4 +1,4 @@
-/* Copyright (C) 2006 - 2011 ScriptDev2 <http://www.scriptdev2.com/>
+/* Copyright (C) 2006 - 2012 ScriptDev2 <http://www.scriptdev2.com/>
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -45,11 +45,11 @@ enum
     MOB_CRYSTALLINE_TANGLER                    = 32665,
 
     // Texts
-    SAY_AGGRO                                  = -1576006,
-    SAY_DEATH                                  = -1576007,
-    SAY_REFLECT                                = -1576008,
-    SAY_CRYSTAL_SPIKES                         = -1576009,
-    SAY_KILL                                   = -1576010,
+    SAY_AGGRO                                  = -1576020,
+    SAY_DEATH                                  = -1576021,
+    SAY_REFLECT                                = -1576022,
+    SAY_CRYSTAL_SPIKES                         = -1576023,
+    SAY_KILL                                   = -1576024,
 
     // Others
     SPIKE_DISTANCE                             = 5
@@ -132,7 +132,7 @@ struct MANGOS_DLL_DECL boss_ormorokAI : public ScriptedAI
                 m_fSpikeXY[3][1] = m_fBaseY-(SPIKE_DISTANCE*m_uiCrystalSpikesCount*sin(m_fBaseO-(M_PI/2)));
 
                 for (uint8 i = 0; i < 4; i++)
-                    m_creature->SummonCreature(MOB_CRYSTAL_SPIKE, m_fSpikeXY[i][0], m_fSpikeXY[i][1], m_fBaseZ, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
+                    Creature* Spike = m_creature->SummonCreature(MOB_CRYSTAL_SPIKE, m_fSpikeXY[i][0], m_fSpikeXY[i][1], m_fBaseZ, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
 
                 if (++m_uiCrystalSpikesCount >= 13)
                     m_bIsCrystalSpikes = false;
