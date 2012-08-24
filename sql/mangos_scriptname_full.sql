@@ -267,7 +267,6 @@ UPDATE creature_template SET ScriptName='npc_magwin' WHERE entry=17312;
 /* BARRENS */
 UPDATE creature_template SET ScriptName='npc_beaten_corpse' WHERE entry=10668;
 UPDATE creature_template SET ScriptName='npc_gilthares' WHERE entry=3465;
-UPDATE creature_template SET ScriptName='npc_sputtervalve' WHERE entry=3442;
 UPDATE creature_template SET ScriptName='npc_taskmaster_fizzule' WHERE entry=7233;
 UPDATE creature_template SET ScriptName='npc_twiggy_flathead' WHERE entry=6248;
 DELETE FROM scripted_areatrigger WHERE entry=522;
@@ -392,10 +391,12 @@ UPDATE creature_template SET ScriptName='npc_doomfire_spirit' WHERE entry=18104;
 
 /* OLD HILLSBRAD */
 UPDATE instance_template SET ScriptName='instance_old_hillsbrad' WHERE map=560;
-UPDATE gameobject_template SET ScriptName='go_barrel_old_hillsbrad' WHERE entry=182589;
 UPDATE creature_template SET ScriptName='npc_erozion' WHERE entry=18723;
 UPDATE creature_template SET ScriptName='npc_taretha' WHERE entry=18887;
 UPDATE creature_template SET ScriptName='npc_thrall_old_hillsbrad' WHERE entry=17876;
+DELETE FROM scripted_event_id WHERE id=11111;
+INSERT INTO scripted_event_id VALUES
+(11111,'event_go_barrel_old_hillsbrad');
 
 /* THE CULLING OF STRATHOLME */
 UPDATE instance_template SET ScriptName='instance_culling_of_stratholme' WHERE map=595;
@@ -1034,7 +1035,6 @@ UPDATE creature_template SET ScriptName='npc_galen_goodward' WHERE entry=5391;
 /* TANARIS */
 UPDATE creature_template SET ScriptName='mob_aquementas' WHERE entry=9453;
 UPDATE creature_template SET ScriptName='npc_custodian_of_time' WHERE entry=20129;
-UPDATE creature_template SET ScriptName='npc_marin_noggenfogger' WHERE entry=7564;
 UPDATE creature_template SET ScriptName='npc_oox17tn' WHERE entry=7784;
 UPDATE creature_template SET ScriptName='npc_stone_watcher_of_norgannon' WHERE entry=7918;
 UPDATE creature_template SET ScriptName='npc_tooga' WHERE entry=5955;
