@@ -232,6 +232,12 @@ struct MANGOS_DLL_DECL boss_professor_putricideAI : public base_icc_bossAI
         // Make table interactable
         if (GameObject* pGOTable = m_pInstance->GetSingleGameObjectFromStorage(GO_DRINK_ME_TABLE))
             pGOTable->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+
+        if(m_creature->GetMap()->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL)
+        {
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            m_creature->MonsterYell("Estoy nerf no me pegueis!", 0);
+        }
     }
 
     void JustDied(Unit *pKiller)
