@@ -534,7 +534,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public base_icc_bossAI
     uint32 m_uiBloodBeastsTimer;
     uint32 m_uiScentOfBloodTimer;
     uint32 m_uiBerserkTimer;
-    uint32 m_uiMarkOfFallenCount;
+    int32 m_iMarkOfFallenCount;
 
     bool m_bIsFrenzied;
 
@@ -557,11 +557,12 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public base_icc_bossAI
         m_bIsFrenzied = false;
 
         m_creature->SetPower(m_powerBloodPower, 0);
-        m_uiMarkOfFallenCount = 0;
+        m_iMarkOfFallenCount = 0;
 
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        // Temp
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
     }
 
@@ -585,6 +586,12 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public base_icc_bossAI
             if (npc_highlord_saurfang_iccAI *pTmpAI = dynamic_cast<npc_highlord_saurfang_iccAI*>(pTmp->AI()))
                 pTmpAI->DoStartEvent();
         }
+
+        // Temp
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
     }
 
     void Aggro(Unit *pWho)
@@ -593,7 +600,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public base_icc_bossAI
         {
             m_pInstance->SetData(TYPE_SAURFANG, IN_PROGRESS);
             m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_IVE_GONE_AND_MADE_A_MESS, true);
-            m_uiMarkOfFallenCount = 0;
+            m_iMarkOfFallenCount = 0;
         }
 
         DoScriptText(SAY_AGGRO, m_creature);
@@ -648,7 +655,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public base_icc_bossAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_SAURFANG, DONE);
-            if (m_uiMarkOfFallenCount > (m_bIs25Man ? 5: 3))
+            if (m_iMarkOfFallenCount > (m_bIs25Man ? 5: 3))
                 m_pInstance->SetSpecialAchievementCriteria(ACHIEVE_IVE_GONE_AND_MADE_A_MESS, false);
         }
 
@@ -744,7 +751,7 @@ struct MANGOS_DLL_DECL boss_deathbringer_saurfangAI : public base_icc_bossAI
                     m_creature->CastCustomSpell(m_creature, SPELL_BLOOD_POWER, &power, &power, NULL, true);
                     DoScriptText(SAY_FALLENCHAMPION, m_creature);
                     // count mark for achievement
-                    ++m_uiMarkOfFallenCount;
+                    ++m_iMarkOfFallenCount;
                 }
             }
         }
